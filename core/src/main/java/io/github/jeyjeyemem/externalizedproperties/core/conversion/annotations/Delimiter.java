@@ -1,0 +1,21 @@
+package io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * Specify a delimiter which can be used to override 
+ * the default delimiter in collection/array conversion handlers.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Delimiter {
+    /**
+     * The property value delimiter.
+     * 
+     * @return The property value delimiter.
+     */
+    String value();
+}

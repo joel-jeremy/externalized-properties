@@ -1,0 +1,7 @@
+description = 'Externalized Properties AWS SSM property resolver.'
+
+dependencies {
+    implementation project(':core')
+    implementation platform('software.amazon.awssdk:bom:2.17.19')
+    implementation 'software.amazon.awssdk:ssm'
+}

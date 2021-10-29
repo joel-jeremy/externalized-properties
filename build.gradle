@@ -1,0 +1,142 @@
+plugins {
+    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+}
+
+allprojects{
+    group = 'io.github.jeyjeyemem.externalizedproperties'
+
+    def snapshotSuffix = rootProject.hasProperty('release') ? '' : '-SNAPSHOT'
+    version = '1.0.0' + snapshotSuffix
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'jacoco'
+    apply plugin: 'maven-publish'
+    apply plugin: 'signing'
+
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    dependencies {
+        // Use JUnit Jupiter for testing.
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+    }
+
+    test { 
+        useJUnitPlatform() 
+        finalizedBy jacocoTestReport
+    }
+
+    jacocoTestReport {
+        dependsOn test
+    }
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    javadoc {
+        configure(options) {
+            tags(
+                'apiNote:a:API Note:',
+                'implSpec:a:Implementation Requirements:',
+                'implNote:a:Implementation Note:'
+            )
+        }
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+
+                pom {
+                    name = jar.archiveBaseName
+                    description = project.description
+                    packaging = 'jar'
+
+                    url = 'https://github.com/jeyjeyemem/externalized-properties'
+
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = 'jeyjeyemem'
+                            name = 'Joel Jeremy M. Marquez'
+                            email = 'joeljeremy.marquez@gmail.com'
+                        }
+                    }
+
+                    scm {
+                        connection = 'scm:git:https://github.com/jeyjeyemem/externalized-properties.git'
+                        developerConnection = 'scm:git:https://github.com/jeyjeyemem/externalized-properties.git'
+                        url = 'https://github.com/jeyjeyemem/externalized-properties'
+                    }
+                }
+            }
+        }
+
+        if (project.hasProperty('github-packages')) {
+            repositories {
+                maven {
+                    url = 'https://maven.pkg.github.com/jeyjeyemem/externalized-properties'
+                    name = 'github-packages'
+                    credentials {
+                        username = System.getenv('GITHUB_ACTOR') ?: property('githubActor')
+                        password = System.getenv('GITHUB_TOKEN') ?: property('githubToken')
+                    }
+                }
+            }
+        }
+    }
+
+    if (project.hasProperty('release')) {
+        // If release property is set, do not allow publishing with SNAPSHOT dependencies.
+        Task checkSnapshotDependencies = project.tasks.create('checkSnapshotDependencies', {
+            doFirst {
+                def snapshots = project.configurations.findAll {
+                    it.canBeResolved
+                }.resolvedConfiguration.resolvedArtifacts.flatten().findAll {
+                    it.moduleVersion.id.version.endsWith('-SNAPSHOT')
+                }.unique()
+                if (!snapshots.isEmpty()) {
+                    throw new GradleException(
+                        "Cannot release with SNAPSHOT dependencies: $snapshots.moduleVersion"
+                    )
+                }
+            }
+        })
+        project.tasks.publish.dependsOn checkSnapshotDependencies
+    }
+
+    if (project.hasProperty('ossrh')) {
+        signing {
+            required rootProject.hasProperty('release')
+            sign publishing.publications.mavenJava
+        }
+    }
+}
+
+if (project.hasProperty('ossrh')) {
+    nexusPublishing {
+        repositories {
+            sonatype {
+                nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+                snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                username = System.getenv('OSSRH_USERNAME') ?: property('ossrhUsername')
+                password = System.getenv('OSSRH_PASSWORD') ?: property('ossrhPassword')
+            }
+        }
+    }
+}
