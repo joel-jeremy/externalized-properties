@@ -1,20 +1,8 @@
-plugins {
-  id "com.github.johnrengelman.shadow" version "7.1.0"
-}
-
 description = 'Externalized Properties database property resolver.'
 
 dependencies {
-    implementation project(':core')
-    implementation 'org.apache.commons:commons-text:1.9'
-    implementation 'jakarta.persistence:jakarta.persistence-api:3.0.0'
-    testImplementation 'org.hibernate:hibernate-core-jakarta:5.5.7.Final'
-    testRuntimeOnly 'com.h2database:h2:1.4.200'
+  implementation project(':core')
+  implementation 'jakarta.persistence:jakarta.persistence-api:3.0.0'
+  testImplementation 'org.hibernate:hibernate-core-jakarta:5.5.7.Final'
+  testRuntimeOnly 'com.h2database:h2:1.4.200'
 }
-
-shadowJar {
-    // Relocate org.apache.commons package to avoid possible version conflicts with client dependencies.
-    relocate 'org.apache.commons', 'shadow.io.github.jeyjeyemem.externalizedproperties.resolvers.database.org.apache.commons'
-}
-
-tasks.build.dependsOn tasks.shadowJar

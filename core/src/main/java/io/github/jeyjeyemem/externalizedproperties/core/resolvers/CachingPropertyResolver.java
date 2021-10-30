@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -23,33 +22,43 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Ar
  * for a specified duration.
  */
 public class CachingPropertyResolver implements ExternalizedPropertyResolver {
-
-    private final ScheduledExecutorService cacheExpiryExecutor = 
-        Executors.newSingleThreadScheduledExecutor();
     private final ExternalizedPropertyResolver decorated;
     private final Duration cacheItemLifetime;
     private final CacheStrategy cacheStrategy;
+    private final ScheduledExecutorService expiryScheduler;
 
     /**
      * Constructor.
      * 
      * @param decorated The decorated resolver where properties will actually be resolved from.
      * @param cacheItemLifetime The duration of cache items in the cache.
+     * @param expiryScheduler The cache item expiry scheduler.
      */
     public CachingPropertyResolver(
             ExternalizedPropertyResolver decorated, 
-            Duration cacheItemLifetime
+            Duration cacheItemLifetime,
+            ScheduledExecutorService expiryScheduler
     ) {
-        this(decorated, cacheItemLifetime, new DefaultMapCachingStrategy());
+        this(decorated, cacheItemLifetime, expiryScheduler, new ConcurrentMapCacheStrategy());
     }
 
+    /**
+     * Constructor.
+     * 
+     * @param decorated The decorated resolver where properties will actually be resolved from.
+     * @param cacheItemLifetime The duration of cache items in the cache.
+     * @param expiryScheduler The cache item expiry scheduler.
+     * @param cacheStrategy The cache strategy.
+     */
     public CachingPropertyResolver(
             ExternalizedPropertyResolver decorated,
             Duration cacheItemLifetime,
+            ScheduledExecutorService expiryScheduler,
             CacheStrategy cacheStrategy
     ) {
         this.decorated = requireNonNull(decorated, "decorated");
         this.cacheItemLifetime = requireNonNull(cacheItemLifetime, "cacheItemLifetime");
+        this.expiryScheduler = requireNonNull(expiryScheduler, "expiryScheduler");
         this.cacheStrategy = requireNonNull(cacheStrategy, "cacheStrategy");
     }
 
@@ -64,7 +73,7 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
      */
     @Override
     public ExternalizedPropertyResolverResult resolve(Collection<String> propertyNames) {
-        requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
+        validate(propertyNames);
 
         List<String> nonCachedProperties = new ArrayList<>(propertyNames.size());
         List<ResolvedProperty> resolvedProperties = new ArrayList<>(propertyNames.size());
@@ -106,11 +115,22 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
     }
 
     private void scheduleCacheExpiryTask(CacheExpiryTask cacheExpiryTask) {
-        cacheExpiryExecutor.schedule(
+        expiryScheduler.schedule(
             cacheExpiryTask, 
             cacheExpiryTask.cacheLifetime().toMillis(),
             TimeUnit.MILLISECONDS
         );
+    }
+
+    private void validate(Collection<String> propertyNames) {
+        requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
+        propertyNames.forEach(this::throwWhenNullOrEmptyValue);
+    }
+
+    private void throwWhenNullOrEmptyValue(String propertyName) {
+        if (propertyName == null || propertyName.isEmpty()) {
+            throw new IllegalArgumentException("Property names must not be null or empty.");
+        }
     }
 
     /**
@@ -145,7 +165,7 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
     /**
      * Default caching strategy which caches resolved properties in a {@link ConcurrentHashMap}.
      */
-    public static class DefaultMapCachingStrategy implements CacheStrategy {
+    public static class ConcurrentMapCacheStrategy implements CacheStrategy {
 
         private final ConcurrentMap<String, ResolvedProperty> cache;
 
@@ -153,7 +173,7 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
          * Default constructor for building a cache strategy that uses an 
          * internal {@link ConcurrentHashMap} cache.
          */
-        public DefaultMapCachingStrategy() {
+        public ConcurrentMapCacheStrategy() {
             this(new ConcurrentHashMap<>());
         }
 
@@ -163,7 +183,7 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
          * 
          * @param cache The cache map.
          */
-        public DefaultMapCachingStrategy(ConcurrentMap<String, ResolvedProperty> cache) {
+        public ConcurrentMapCacheStrategy(ConcurrentMap<String, ResolvedProperty> cache) {
             this.cache = requireNonNull(cache, "cache");
         }
 

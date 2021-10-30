@@ -1,12 +1,12 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.StringUtilities;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.QueryExecutor;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.metamodel.EntityType;
-import org.apache.commons.text.StringSubstitutor;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -168,6 +168,6 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
         variables.put("entityName", entityName);
         variables.put("propertyNamesQueryParameterName", propertyNamesQueryParameterName());
 
-        return StringSubstitutor.replace(QUERY_TEMPLATE, variables);
+        return StringUtilities.replaceVariables(QUERY_TEMPLATE, variables::get);
     }
 }

@@ -4,6 +4,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyReso
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CachingPropertyResolver.CacheStrategy;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +29,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CachingPropertyResolverTests {
+    private static final ScheduledExecutorService expiryScheduler = 
+        Executors.newSingleThreadScheduledExecutor();
+
+    @AfterAll
+    public static void cleanup() {
+        expiryScheduler.shutdown();
+    }
 
     @Nested
     class Constructor {
@@ -34,7 +44,7 @@ public class CachingPropertyResolverTests {
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new CachingPropertyResolver(null, Duration.ofMinutes(5))
+                () -> new CachingPropertyResolver(null, Duration.ofMinutes(5), expiryScheduler)
             );
         }
 
@@ -43,18 +53,32 @@ public class CachingPropertyResolverTests {
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new CachingPropertyResolver(new SystemPropertyResolver(), null)
+                () -> new CachingPropertyResolver(new SystemPropertyResolver(), null, expiryScheduler)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when expiry scheduler argument is null")
+        public void test3() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> new CachingPropertyResolver(
+                    new SystemPropertyResolver(), 
+                    Duration.ofMinutes(5), 
+                    null
+                )
             );
         }
 
         @Test
         @DisplayName("should throw when cache strategy argument is null")
-        public void test3() {
+        public void test4() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new CachingPropertyResolver(
                     new SystemPropertyResolver(),
                     Duration.ofMinutes(5),
+                    expiryScheduler,
                     null
                 )
             );
@@ -264,7 +288,7 @@ public class CachingPropertyResolverTests {
 
                 ConcurrentMap<String, ResolvedProperty> cache = new ConcurrentHashMap<>();
                 CacheStrategy cacheStrategy = 
-                    new CachingPropertyResolver.DefaultMapCachingStrategy(cache);
+                    new CachingPropertyResolver.ConcurrentMapCacheStrategy(cache);
 
                 cacheStrategy.cache(property);
 
@@ -286,7 +310,7 @@ public class CachingPropertyResolverTests {
                 cache.put(property.name(), property);
 
                 CacheStrategy cacheStrategy = 
-                    new CachingPropertyResolver.DefaultMapCachingStrategy(cache);
+                    new CachingPropertyResolver.ConcurrentMapCacheStrategy(cache);
 
                 Optional<ResolvedProperty> cachedProperty = 
                     cacheStrategy.getFromCache(property.name());
@@ -310,7 +334,7 @@ public class CachingPropertyResolverTests {
                 cache.put(property.name(), property);
 
                 CacheStrategy cacheStrategy = 
-                    new CachingPropertyResolver.DefaultMapCachingStrategy(cache);
+                    new CachingPropertyResolver.ConcurrentMapCacheStrategy(cache);
 
                 cacheStrategy.expire(property);
 
@@ -337,12 +361,13 @@ public class CachingPropertyResolverTests {
             CacheStrategy cacheStrategy
     ) {
         if (cacheStrategy == null) {
-            return new CachingPropertyResolver(decorated, cacheItemLifetime);
+            return new CachingPropertyResolver(decorated, cacheItemLifetime, expiryScheduler);
         }
 
         return new CachingPropertyResolver(
             decorated, 
             cacheItemLifetime, 
+            expiryScheduler,
             cacheStrategy
         );
     }

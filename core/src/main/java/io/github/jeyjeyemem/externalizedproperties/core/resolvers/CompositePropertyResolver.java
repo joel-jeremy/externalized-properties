@@ -50,7 +50,7 @@ public class CompositePropertyResolver implements ExternalizedPropertyResolver {
      */
     @Override
     public ExternalizedPropertyResolverResult resolve(Collection<String> propertyNames) {
-        requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
+        validate(propertyNames);
 
         List<ResolvedProperty> resolvedProperties = new ArrayList<>(propertyNames.size());
         List<String> unresolvedProperties = new ArrayList<>(propertyNames);
@@ -59,7 +59,7 @@ public class CompositePropertyResolver implements ExternalizedPropertyResolver {
             ExternalizedPropertyResolverResult result = resolver.resolve(unresolvedProperties);
             result.resolvedProperties().forEach(newResolvedProperty -> {
                 LOGGER.log(
-                    Level.INFO,
+                    Level.FINE,
                     "Resolved {0} externalized property from {1}.",
                     new Object[] {
                         newResolvedProperty.name(),
@@ -73,7 +73,7 @@ public class CompositePropertyResolver implements ExternalizedPropertyResolver {
             // Stop when all properties are already resolved.
             if (unresolvedProperties.isEmpty()) {
                 LOGGER.log(
-                    Level.INFO,
+                    Level.FINE,
                     "All externalized properties have been resolved: {0}",
                     propertyNames
                 );
@@ -85,5 +85,26 @@ public class CompositePropertyResolver implements ExternalizedPropertyResolver {
             propertyNames,
             resolvedProperties
         );
+    }
+
+    /**
+     * Returns the string containing the list of resolvers inside this composite resolver.
+     * 
+     * @return The string containing the list of resolvers inside this composite resolver.
+     */
+    @Override
+    public String toString() {
+        return resolvers.toString();
+    }
+
+    private void validate(Collection<String> propertyNames) {
+        requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
+        propertyNames.forEach(this::throwWhenNullOrEmptyValue);
+    }
+
+    private void throwWhenNullOrEmptyValue(String propertyName) {
+        if (propertyName == null || propertyName.isEmpty()) {
+            throw new IllegalArgumentException("Property names must not be null or empty.");
+        }
     }
 }

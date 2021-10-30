@@ -2,7 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.StringVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
@@ -31,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExternalizedPropertyMethodTests {
     private final ExternalizedPropertyResolver resolver = new SystemPropertyResolver();
-    private final VariableExpander variableExpander = new InternalVariableExpander(resolver);
+    private final StringVariableExpander variableExpander = new InternalStringVariableExpander(resolver);
     private final ResolvedPropertyConverter converter = new InternalResolvedPropertyConverter(
         new DefaultPropertyConversionHandler()
     );
@@ -53,8 +53,8 @@ public class ExternalizedPropertyMethodTests {
                         "property1"
                     ),
                     resolver,
-                    variableExpander,
-                    converter
+                    converter,
+                    variableExpander
                 ));
         }
 
@@ -66,8 +66,8 @@ public class ExternalizedPropertyMethodTests {
                     proxyStub,
                     null,
                     resolver,
-                    variableExpander,
-                    converter
+                    converter,
+                    variableExpander
                 ));
         }
 
@@ -82,8 +82,8 @@ public class ExternalizedPropertyMethodTests {
                         "property1"
                     ),
                     null,
-                    variableExpander,
-                    converter
+                    converter,
+                    variableExpander
                 ));
         }
 
@@ -98,8 +98,8 @@ public class ExternalizedPropertyMethodTests {
                         "property1"
                     ),
                     resolver,
-                    null,
-                    converter
+                    converter,
+                    null
                 ));
         }
 
@@ -114,8 +114,8 @@ public class ExternalizedPropertyMethodTests {
                         "property1"
                     ),
                     resolver,
-                    variableExpander,
-                    null
+                    null,
+                    variableExpander
                 ));
         }
     }
@@ -804,8 +804,8 @@ public class ExternalizedPropertyMethodTests {
                 proxyStub,
                 method,
                 resolver,
-                variableExpander,
-                converter
+                converter,
+                variableExpander
             );
         return externalizedPropertyMethod;
     }

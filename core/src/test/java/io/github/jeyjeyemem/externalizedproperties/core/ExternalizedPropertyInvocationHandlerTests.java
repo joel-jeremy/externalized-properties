@@ -2,13 +2,14 @@ package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedExternalizedPropertyException;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.StringVariableExpansionException;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositePropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.VariableProxyInterface;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -29,6 +32,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 // Let ExternalizedPropertiesexternalizedProperties.proxy(Class<?> proxyInterface) 
 // create the proxy for these test cases.
 public class ExternalizedPropertyInvocationHandlerTests {
+    private static final ScheduledExecutorService expiryScheduler = 
+        Executors.newSingleThreadScheduledExecutor();
+
+    @AfterAll
+    public static void cleanup() {
+        expiryScheduler.shutdown();
+    }
+
     @Nested
     class InvokeMethod {
         @Test
@@ -206,7 +217,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             VariableProxyInterface proxyInterface = 
                 externalizedProperties.initialize(VariableProxyInterface.class);
             
-            assertThrows(VariableExpansionException.class, 
+            assertThrows(StringVariableExpansionException.class, 
                 () -> proxyInterface.variableProperty()
             );
         }
@@ -384,7 +395,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties.builder()
                 .resolvers(compositeResolver)
                 .conversionHandlers(resolvedPropertyConversionHandlers)
-                .enableCachingResolver(Duration.ofMinutes(5));
+                .enableCachingResolver(Duration.ofMinutes(5), expiryScheduler);
 
         if (resolvedPropertyConversionHandlers.size() == 0) {
             builder.enableDefaultConversionHandlers();

@@ -1,9 +1,9 @@
 package io.github.jeyjeyemem.externalizedproperties.core.testentities;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.StringVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalVariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalStringVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
 
 import java.lang.annotation.Annotation;
@@ -19,13 +19,13 @@ public class StubExternalizedPropertyMethodInfo
         implements ExternalizedPropertyMethodInfo {
 
     private final Method method;
-    private final VariableExpander variableExpander;
+    private final StringVariableExpander variableExpander;
 
     private StubExternalizedPropertyMethodInfo(Method method) {
-        this(method, new InternalVariableExpander(new SystemPropertyResolver()));
+        this(method, new InternalStringVariableExpander(new SystemPropertyResolver()));
     }
 
-    private StubExternalizedPropertyMethodInfo(Method method, VariableExpander variableExpander) {
+    private StubExternalizedPropertyMethodInfo(Method method, StringVariableExpander variableExpander) {
         if (method == null) {
             throw new IllegalArgumentException("method must not be null.");
         }
@@ -124,7 +124,7 @@ public class StubExternalizedPropertyMethodInfo
 
     public static StubExternalizedPropertyMethodInfo fromMethod(
         Method propertyMethod,
-        VariableExpander variableExpander
+        StringVariableExpander variableExpander
     ) {
         return new StubExternalizedPropertyMethodInfo(propertyMethod, variableExpander);
     }

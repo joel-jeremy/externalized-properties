@@ -1,16 +1,16 @@
 package io.github.jeyjeyemem.externalizedproperties.core.exceptions;
 
 /**
- * Variable expansion related exception. 
+ * String variable expansion related exception. 
  */
-public class VariableExpansionException extends ExternalizedPropertiesException {
+public class StringVariableExpansionException extends ExternalizedPropertiesException {
 
     /**
      * Constructor.
      * 
      * @param message The exception message.
      */
-    public VariableExpansionException(String message) {
+    public StringVariableExpansionException(String message) {
         super(message);
     }
 
@@ -20,7 +20,7 @@ public class VariableExpansionException extends ExternalizedPropertiesException 
      * @param message The exception message.
      * @param cause The underlying cause.
      */
-    public VariableExpansionException(String message, Throwable cause) {
+    public StringVariableExpansionException(String message, Throwable cause) {
         super(message, cause);
     }
 }

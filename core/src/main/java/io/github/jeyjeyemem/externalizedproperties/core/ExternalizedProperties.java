@@ -4,12 +4,12 @@ import io.github.jeyjeyemem.externalizedproperties.core.annotations.Externalized
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.DefaultPropertyConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalStringVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.ExternalizedPropertyInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalResolvedPropertyConverter;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CachingPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositePropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CachingPropertyResolver.CacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositePropertyResolver;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
@@ -28,23 +29,23 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Ar
 public class ExternalizedProperties {
 
     private final ExternalizedPropertyResolver externalizedPropertyResolver;
-    private final VariableExpander variableExpander;
+    private final StringVariableExpander variableExpander;
     private final ResolvedPropertyConverter resolvedPropertyConverter;
 
     private ExternalizedProperties(
             ExternalizedPropertyResolver externalizedPropertyResolver,
-            VariableExpander variableExpander,
-            ResolvedPropertyConverter resolvedPropertyConverter
+            ResolvedPropertyConverter resolvedPropertyConverter,
+            StringVariableExpander variableExpander
     ) {
         this.externalizedPropertyResolver = requireNonNull(
             externalizedPropertyResolver, 
             "externalizedPropertyResolver"
         );
-        this.variableExpander = requireNonNull(variableExpander, "variableExpander");
         this.resolvedPropertyConverter = requireNonNull(
             resolvedPropertyConverter, 
             "resolvedPropertyConverter"
         );
+        this.variableExpander = requireNonNull(variableExpander, "variableExpander");
     }
 
     /**
@@ -52,7 +53,7 @@ public class ExternalizedProperties {
      * 
      * @implNote The names specified in the {@link ExternalizedProperty} supports variables
      * e.g. "${MY_VARIABLE_NAME}-property". These variables will be expanded accordingly depending
-     * on the provided {@link VariableExpander} implementation. By default,
+     * on the provided {@link StringVariableExpander} implementation. By default,
      * the variable values will be resolved from system properties / environment variables if no
      * custom implementation is provided.
      * 
@@ -70,7 +71,7 @@ public class ExternalizedProperties {
      * 
      * @implNote The names specified in the {@link ExternalizedProperty} supports variables
      * e.g. "${MY_VARIABLE_NAME}-property". These variables will be expanded accordingly depending
-     * on the provided {@link VariableExpander} implementation. By default,
+     * on the provided {@link StringVariableExpander} implementation. By default,
      * the variable values will be resolved from system properties / environment variables if no
      * custom implementation is provided.
      * 
@@ -92,8 +93,8 @@ public class ExternalizedProperties {
             new Class<?>[] { proxyInterface }, 
             new ExternalizedPropertyInvocationHandler(
                 externalizedPropertyResolver,
-                variableExpander,
-                resolvedPropertyConverter
+                resolvedPropertyConverter,
+                variableExpander
             )
         );
     }
@@ -132,7 +133,10 @@ public class ExternalizedProperties {
         private List<ExternalizedPropertyResolver> externalizedPropertyResolvers = new ArrayList<>();
         private List<ResolvedPropertyConversionHandler<?>> resolvedPropertyConversionHandlers = 
             new ArrayList<>();
+
+        // Caching resolver fields
         private Duration cacheItemLifetime;
+        private ScheduledExecutorService expiryScheduler;
         private CacheStrategy cacheStrategy;
 
         private Builder(){}
@@ -181,10 +185,15 @@ public class ExternalizedProperties {
          * {@link ExternalizedPropertyResolver}s.
          * 
          * @param cacheItemLifetime The duration of cache items in the cache before being expired.
+         * @param expiryScheduler The cache item expiry scheduler.
          * @return This builder.
          */
-        public Builder enableCachingResolver(Duration cacheItemLifetime) {
+        public Builder enableCachingResolver(
+                Duration cacheItemLifetime,
+                ScheduledExecutorService expiryScheduler
+        ) {
             this.cacheItemLifetime = requireNonNull(cacheItemLifetime, "cacheItemLifetime");
+            this.expiryScheduler = requireNonNull(expiryScheduler, "expiryScheduler");
             return this;
         }
 
@@ -193,14 +202,17 @@ public class ExternalizedProperties {
          * {@link ExternalizedPropertyResolver}s.
          * 
          * @param cacheItemLifetime The duration of cache items in the cache before being expired.
+         * @param expiryScheduler The cache item expiry scheduler.
          * @param cacheStrategy The cache strategy used by the caching resolver.
          * @return This builder.
          */
         public Builder enableCachingResolver(
-                Duration cacheItemLifetime, 
+                Duration cacheItemLifetime,
+                ScheduledExecutorService expiryScheduler,
                 CacheStrategy cacheStrategy
             ) {
             this.cacheItemLifetime = requireNonNull(cacheItemLifetime, "cacheItemLifetime");
+            this.expiryScheduler = requireNonNull(expiryScheduler, "expiryScheduler");
             this.cacheStrategy = requireNonNull(cacheStrategy, "cacheStrategy");
             return this;
         }
@@ -246,15 +258,15 @@ public class ExternalizedProperties {
 
             return new ExternalizedProperties(
                 resolver, 
-                new InternalVariableExpander(resolver), 
-                new InternalResolvedPropertyConverter(resolvedPropertyConversionHandlers)
+                new InternalResolvedPropertyConverter(resolvedPropertyConversionHandlers),
+                new InternalStringVariableExpander(resolver)
             );
         }
 
         private ExternalizedPropertyResolver configureExternalizedPropertyResolver() {
             if (externalizedPropertyResolvers.isEmpty()) {
                 throw new IllegalStateException(
-                    "Atleast one externalized property resolver is required."
+                    "At least one externalized property resolver is required."
                 );
             }
 
@@ -272,8 +284,8 @@ public class ExternalizedProperties {
             if (cacheItemLifetime != null) {
                 // Use custom cache strategy if present.
                 resolver = cacheStrategy != null ?
-                    new CachingPropertyResolver(resolver, cacheItemLifetime, cacheStrategy) :
-                    new CachingPropertyResolver(resolver, cacheItemLifetime);
+                    new CachingPropertyResolver(resolver, cacheItemLifetime, expiryScheduler, cacheStrategy) :
+                    new CachingPropertyResolver(resolver, cacheItemLifetime, expiryScheduler);
             }
 
             return resolver;

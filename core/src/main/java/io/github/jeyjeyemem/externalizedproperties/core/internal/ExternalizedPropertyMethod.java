@@ -4,7 +4,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMeth
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.StringVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverterContext;
@@ -31,7 +31,7 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
     private final Object proxy;
     private final Method method;
     private final ExternalizedPropertyResolver externalizedPropertyResolver;
-    private final VariableExpander variableExpander;
+    private final StringVariableExpander variableExpander;
     private final ResolvedPropertyConverter resolvedPropertyConverter;
 
     /**
@@ -40,15 +40,15 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
      * @param proxy The proxy instance.
      * @param method The externalized property method.
      * @param externalizedPropertyResolver The externalized property resolver.
-     * @param variableExpander The externalized property name variable expander.
      * @param resolvedPropertyConverter The resolved property converter.
+     * @param variableExpander The externalized property name variable expander.
      */
     public ExternalizedPropertyMethod(
             Object proxy, 
             Method method,
             ExternalizedPropertyResolver externalizedPropertyResolver,
-            VariableExpander variableExpander,
-            ResolvedPropertyConverter resolvedPropertyConverter
+            ResolvedPropertyConverter resolvedPropertyConverter,
+            StringVariableExpander variableExpander
     ) {
         this.proxy = requireNonNull(proxy, "proxy");
         this.method = requireNonNull(method, "method");
@@ -56,11 +56,11 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
             externalizedPropertyResolver, 
             "externalizedPropertyResolver"
         );
-        this.variableExpander = requireNonNull(variableExpander, "variableExpander");
         this.resolvedPropertyConverter = requireNonNull(
             resolvedPropertyConverter, 
             "resolvedPropertyConverter"
         );
+        this.variableExpander = requireNonNull(variableExpander, "variableExpander");
     }
 
     /** {@inheritDoc} */

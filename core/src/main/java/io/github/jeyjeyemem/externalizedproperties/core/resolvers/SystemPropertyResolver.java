@@ -9,6 +9,8 @@ public class SystemPropertyResolver extends MapPropertyResolver {
      * Constructor.
      */
     public SystemPropertyResolver() {
+        // For any unresolved property, try to resolve again from system properties
+        // in case new system properties were added after this resolver was constructed.
         super(System.getProperties(), propName -> System.getProperty(propName));
     }
 }

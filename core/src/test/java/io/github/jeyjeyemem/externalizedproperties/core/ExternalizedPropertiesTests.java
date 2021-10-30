@@ -7,6 +7,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemProperty
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.JavaPropertiesProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.VoidReturnTypeProxyInterface;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,12 +17,22 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ExternalizedPropertiesTests {
+    private static final ScheduledExecutorService expiryScheduler = 
+        Executors.newSingleThreadScheduledExecutor();
+
+    @AfterAll
+    public static void cleanup() {
+        expiryScheduler.shutdown();
+    }
+
     @Nested
     class Builder {
         @Test
@@ -69,12 +80,12 @@ public class ExternalizedPropertiesTests {
         public void test6() {
             assertThrows(
                 IllegalArgumentException.class,
-                () -> ExternalizedProperties.builder().enableCachingResolver(null)
+                () -> ExternalizedProperties.builder().enableCachingResolver(null, expiryScheduler)
             );
         }
 
         @Test
-        @DisplayName("should throw when cache strategy is null")
+        @DisplayName("should throw when expiry scheduler is null")
         public void test7() {
             assertThrows(
                 IllegalArgumentException.class,
@@ -84,8 +95,18 @@ public class ExternalizedPropertiesTests {
         }
 
         @Test
-        @DisplayName("should throw when on build when there are no resolvers")
+        @DisplayName("should throw when cache strategy is null")
         public void test8() {
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> ExternalizedProperties.builder()
+                    .enableCachingResolver(Duration.ofMinutes(5), expiryScheduler, null)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when on build when there are no resolvers")
+        public void test9() {
             assertThrows(
                 IllegalStateException.class,
                 () -> ExternalizedProperties.builder().build()
@@ -94,7 +115,7 @@ public class ExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should allow multiple resolvers")
-        public void test9() {
+        public void test10() {
             ExternalizedProperties ep = ExternalizedProperties.builder()
                 .resolvers(
                     new SystemPropertyResolver(),
@@ -176,7 +197,7 @@ public class ExternalizedPropertiesTests {
             ExternalizedProperties.builder()
                 .resolvers(resolvers)
                 .conversionHandlers(resolvedPropertyConversionHandlers)
-                .enableCachingResolver(Duration.ofMinutes(5));
+                .enableCachingResolver(Duration.ofMinutes(5), expiryScheduler);
         
         if (resolvedPropertyConversionHandlers.size() == 0) {
             builder.enableDefaultConversionHandlers();

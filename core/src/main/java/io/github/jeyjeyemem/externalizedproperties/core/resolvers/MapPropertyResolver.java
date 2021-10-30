@@ -137,7 +137,7 @@ public class MapPropertyResolver implements ExternalizedPropertyResolver {
      */
     @Override
     public ExternalizedPropertyResolverResult resolve(Collection<String> propertyNames) {
-        requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
+        validate(propertyNames);
 
         List<ResolvedProperty> resolvedProperties = propertyNames.stream()
             .map(this::getPropertyOrNull)
@@ -176,5 +176,16 @@ public class MapPropertyResolver implements ExternalizedPropertyResolver {
                 e -> (String)e.getKey(), 
                 e -> (String)e.getValue()
             ));
+    }
+
+    private void validate(Collection<String> propertyNames) {
+        requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
+        propertyNames.forEach(this::throwWhenNullOrEmptyValue);
+    }
+
+    private void throwWhenNullOrEmptyValue(String propertyName) {
+        if (propertyName == null || propertyName.isEmpty()) {
+            throw new IllegalArgumentException("Property names must not be null or empty.");
+        }
     }
 }
