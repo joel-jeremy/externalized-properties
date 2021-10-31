@@ -38,7 +38,8 @@ String databasePassword = props.databasePassword();
 
 ## Overview
 
-The core API for this library is the `ExternalizedProperties` class. Given an interface, it creates a proxy which does the property resolution behind the scenes.
+### ExternalizedProperties
+The core API for the Externalized Properties library. Given an interface, it creates a proxy which does the property resolution behind the scenes.
 
 `ExternalizedProperties` can be configured to use a variety of resolvers to resolve property values:
 
@@ -48,7 +49,8 @@ ExternalizedProperties defaultExternalizedProperties =
     ExternalizedProperties.builder()
         .withDefaultResolvers()
         .build();
-
+```
+```java
 // Configure with builtin + custom resolvers.
 ExternalizedProperties customExternalizedProperties = 
     ExternalizedProperties.builder()
@@ -71,7 +73,8 @@ ExternalizedProperties defaultExternalizedProperties =
     ExternalizedProperties.builder()
         .withDefaultConversionHandlers()
         .build();
-
+```
+```java
 // Configure with builtin + custom conversion handler.
 ExternalizedProperties customExternalizedProperties = 
     ExternalizedProperties.builder()
