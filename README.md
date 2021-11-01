@@ -18,7 +18,7 @@ Given an interface:
 public interface ApplicationProperties {
     @ExternalizedProperty("DATABASE_URL")
     String databaseUrl();
-    @ExternalizedProeprty("DATABASE_DRIVER")
+    @ExternalizedProperty("DATABASE_DRIVER")
     String databaseDriver();
 }
 ```
@@ -36,5 +36,5 @@ ApplicationProperties props = externalizedProperties.initialize(ApplicationPrope
 
 // Start resolving properties from registered resolvers.
 String databaseUrl = props.databaseUrl();
-String databasePassword = props.databasePassword();
+String databaseDriver = props.databaseDriver();
 ```
