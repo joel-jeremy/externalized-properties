@@ -26,9 +26,8 @@ We can initialize and start resolving external configurations/properties by:
 
 ```java 
 // Create the ExternalizedProperties instance.
-// Default resolvers include SystemPropertiesResolver and EnvironmentVariablesPropertyResolver
 ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-    .withDefaultResolvers() // Register default resolvers
+    .withDefaultResolvers() // Register default resolvers (system properties + env var)
     .resolvers(...) // Register any custom/additional resolvers
     .build();
 
