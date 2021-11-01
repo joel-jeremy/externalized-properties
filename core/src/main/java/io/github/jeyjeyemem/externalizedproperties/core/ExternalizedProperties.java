@@ -144,13 +144,13 @@ public class ExternalizedProperties {
         private Builder(){}
 
         /**
-         * Enable default configuration. This will enable default {@link ExternalizedPropertyResolver}s 
+         * Enable default configurations. This will enable default {@link ExternalizedPropertyResolver}s 
          * and {@link ResolvedPropertyConversionHandler}s via the {@link #withDefaultResolvers()} and 
          * {@link #withDefaultConversionHandlers()} methods. 
          * 
          * @return This builder.
          */
-        public Builder withDefault() {
+        public Builder withDefaults() {
             withDefaultResolvers();
             withDefaultConversionHandlers();
             return this;
