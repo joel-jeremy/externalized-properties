@@ -395,10 +395,10 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties.builder()
                 .resolvers(compositeResolver)
                 .conversionHandlers(resolvedPropertyConversionHandlers)
-                .enableCachingResolver(Duration.ofMinutes(5), expiryScheduler);
+                .withCachingResolver(Duration.ofMinutes(5), expiryScheduler);
 
         if (resolvedPropertyConversionHandlers.size() == 0) {
-            builder.enableDefaultConversionHandlers();
+            builder.withDefaultConversionHandlers();
         }
 
         return builder.build();

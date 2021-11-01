@@ -80,7 +80,7 @@ public class ExternalizedPropertiesTests {
         public void test6() {
             assertThrows(
                 IllegalArgumentException.class,
-                () -> ExternalizedProperties.builder().enableCachingResolver(null, expiryScheduler)
+                () -> ExternalizedProperties.builder().withCachingResolver(null, expiryScheduler)
             );
         }
 
@@ -90,7 +90,7 @@ public class ExternalizedPropertiesTests {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> ExternalizedProperties.builder()
-                    .enableCachingResolver(Duration.ofMinutes(5), null)
+                    .withCachingResolver(Duration.ofMinutes(5), null)
             );
         }
 
@@ -100,7 +100,7 @@ public class ExternalizedPropertiesTests {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> ExternalizedProperties.builder()
-                    .enableCachingResolver(Duration.ofMinutes(5), expiryScheduler, null)
+                    .withCachingResolver(Duration.ofMinutes(5), expiryScheduler, null)
             );
         }
 
@@ -197,10 +197,10 @@ public class ExternalizedPropertiesTests {
             ExternalizedProperties.builder()
                 .resolvers(resolvers)
                 .conversionHandlers(resolvedPropertyConversionHandlers)
-                .enableCachingResolver(Duration.ofMinutes(5), expiryScheduler);
+                .withCachingResolver(Duration.ofMinutes(5), expiryScheduler);
         
         if (resolvedPropertyConversionHandlers.size() == 0) {
-            builder.enableDefaultConversionHandlers();
+            builder.withDefaultConversionHandlers();
         }
 
         return builder.build();

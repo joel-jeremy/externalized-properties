@@ -10,6 +10,8 @@ import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalResolve
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CachingPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CachingPropertyResolver.CacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositePropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.EnvironmentVariablePropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -142,6 +144,79 @@ public class ExternalizedProperties {
         private Builder(){}
 
         /**
+         * Enable default configurations. This will enable default {@link ExternalizedPropertyResolver}s 
+         * and {@link ResolvedPropertyConversionHandler}s via the {@link #withDefaultResolvers()} and 
+         * {@link #withDefaultConversionHandlers()} methods. 
+         * 
+         * @return This builder.
+         */
+        public Builder withDefaults() {
+            withDefaultResolvers();
+            withDefaultConversionHandlers();
+            return this;
+        }
+
+        /**
+         * Adds the {@link SystemPropertyResolver} and {@link EnvironmentVariablePropertyResolver} 
+         * to the registered {@link ExternalizedPropertyResolver}s.
+         * 
+         * @return This builder.
+         */
+        public Builder withDefaultResolvers() {
+            return resolvers(
+                new SystemPropertyResolver(),
+                new EnvironmentVariablePropertyResolver()
+            );
+        }
+
+        /**
+         * Adds the {@link DefaultPropertyConversionHandler} to the registered 
+         * {@link ResolvedPropertyConversionHandler}s.
+         * 
+         * @return This builder.
+         */
+        public Builder withDefaultConversionHandlers() {
+            return conversionHandlers(new DefaultPropertyConversionHandler());
+        }
+
+        /**
+         * Adds the {@link CachingPropertyResolver} to the collection of 
+         * {@link ExternalizedPropertyResolver}s.
+         * 
+         * @param cacheItemLifetime The duration of cache items in the cache before being expired.
+         * @param expiryScheduler The cache item expiry scheduler.
+         * @return This builder.
+         */
+        public Builder withCachingResolver(
+                Duration cacheItemLifetime,
+                ScheduledExecutorService expiryScheduler
+        ) {
+            this.cacheItemLifetime = requireNonNull(cacheItemLifetime, "cacheItemLifetime");
+            this.expiryScheduler = requireNonNull(expiryScheduler, "expiryScheduler");
+            return this;
+        }
+
+        /**
+         * Adds the {@link CachingPropertyResolver} to the collection of 
+         * {@link ExternalizedPropertyResolver}s.
+         * 
+         * @param cacheItemLifetime The duration of cache items in the cache before being expired.
+         * @param expiryScheduler The cache item expiry scheduler.
+         * @param cacheStrategy The cache strategy used by the caching resolver.
+         * @return This builder.
+         */
+        public Builder withCachingResolver(
+                Duration cacheItemLifetime,
+                ScheduledExecutorService expiryScheduler,
+                CacheStrategy cacheStrategy
+            ) {
+            this.cacheItemLifetime = requireNonNull(cacheItemLifetime, "cacheItemLifetime");
+            this.expiryScheduler = requireNonNull(expiryScheduler, "expiryScheduler");
+            this.cacheStrategy = requireNonNull(cacheStrategy, "cacheStrategy");
+            return this;
+        }
+
+        /**
          * The array of {@link ExternalizedPropertyResolver}s to resolve properties from.
          * 
          * @param externalizedPropertyResolvers The externalized property resolver.
@@ -167,53 +242,6 @@ public class ExternalizedProperties {
             requireNonNull(externalizedPropertyResolvers, "externalizedPropertyResolvers");
 
             this.externalizedPropertyResolvers.addAll(externalizedPropertyResolvers);
-            return this;
-        }
-
-        /**
-         * Adds the {@link DefaultPropertyConversionHandler} to the collection of 
-         * {@link ExternalizedPropertyResolver}s.
-         * 
-         * @return This builder.
-         */
-        public Builder enableDefaultConversionHandlers() {
-            return conversionHandlers(new DefaultPropertyConversionHandler());
-        }
-
-        /**
-         * Adds the {@link CachingPropertyResolver} to the collection of 
-         * {@link ExternalizedPropertyResolver}s.
-         * 
-         * @param cacheItemLifetime The duration of cache items in the cache before being expired.
-         * @param expiryScheduler The cache item expiry scheduler.
-         * @return This builder.
-         */
-        public Builder enableCachingResolver(
-                Duration cacheItemLifetime,
-                ScheduledExecutorService expiryScheduler
-        ) {
-            this.cacheItemLifetime = requireNonNull(cacheItemLifetime, "cacheItemLifetime");
-            this.expiryScheduler = requireNonNull(expiryScheduler, "expiryScheduler");
-            return this;
-        }
-
-        /**
-         * Adds the {@link CachingPropertyResolver} to the collection of 
-         * {@link ExternalizedPropertyResolver}s.
-         * 
-         * @param cacheItemLifetime The duration of cache items in the cache before being expired.
-         * @param expiryScheduler The cache item expiry scheduler.
-         * @param cacheStrategy The cache strategy used by the caching resolver.
-         * @return This builder.
-         */
-        public Builder enableCachingResolver(
-                Duration cacheItemLifetime,
-                ScheduledExecutorService expiryScheduler,
-                CacheStrategy cacheStrategy
-            ) {
-            this.cacheItemLifetime = requireNonNull(cacheItemLifetime, "cacheItemLifetime");
-            this.expiryScheduler = requireNonNull(expiryScheduler, "expiryScheduler");
-            this.cacheStrategy = requireNonNull(cacheStrategy, "cacheStrategy");
             return this;
         }
 
@@ -280,7 +308,7 @@ public class ExternalizedProperties {
                 resolver = externalizedPropertyResolvers.get(0);
             }
 
-            // Caching was enabled.
+            // Caching was enabled. Decorate registered resolvers.
             if (cacheItemLifetime != null) {
                 // Use custom cache strategy if present.
                 resolver = cacheStrategy != null ?
