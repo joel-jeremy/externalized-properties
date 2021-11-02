@@ -3,12 +3,8 @@ package io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 
 public interface BasicProxyInterface {
-    @ExternalizedProperty("property.1")
-    String property1();
-
-
-    @ExternalizedProperty("property.2")
-    String property2();
+    @ExternalizedProperty("property")
+    String property();
 
     @ExternalizedProperty("property.with.default.value")
     default String propertyWithDefaultValue() {
@@ -30,6 +26,6 @@ public interface BasicProxyInterface {
         return defaultValue;
     }
 
-    // No annotation ano no default value.
+    // No annotation and no default value.
     String propertyWithNoAnnotationAndNoDefaultValue();
 }

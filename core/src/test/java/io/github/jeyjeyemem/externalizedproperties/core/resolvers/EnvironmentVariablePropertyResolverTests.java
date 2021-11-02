@@ -17,14 +17,16 @@ public class EnvironmentVariablePropertyResolverTests {
         @DisplayName("should resolve values from environment variables")
         public void test1() {
             EnvironmentVariablePropertyResolver resolver = resolverToTest();
-            ExternalizedPropertyResolverResult result = resolver.resolve("JAVA_HOME");
+            ExternalizedPropertyResolverResult result = resolver.resolve("PATH");
+
+            System.out.println(System.getenv().keySet());
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
 
             assertEquals(
-                System.getenv("JAVA_HOME"), 
-                result.findResolvedProperty("JAVA_HOME")
+                System.getenv("PATH"), 
+                result.findResolvedProperty("PATH")
                     .map(ResolvedProperty::value)
                     .orElse(null)
             );
@@ -36,10 +38,10 @@ public class EnvironmentVariablePropertyResolverTests {
         )
         public void test2() {
             EnvironmentVariablePropertyResolver resolver = resolverToTest();
-            ExternalizedPropertyResolverResult result = resolver.resolve("nonexisting.envvar");
+            ExternalizedPropertyResolverResult result = resolver.resolve("NON_EXISTING_ENVVAR");
             
             assertTrue(result.hasUnresolvedProperties());
-            assertTrue(result.unresolvedPropertyNames().contains("nonexisting.envvar"));
+            assertTrue(result.unresolvedPropertyNames().contains("NON_EXISTING_ENVVAR"));
         }
     }
 

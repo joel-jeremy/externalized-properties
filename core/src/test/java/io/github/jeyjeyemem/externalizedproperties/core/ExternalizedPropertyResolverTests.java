@@ -21,7 +21,7 @@ public class ExternalizedPropertyResolverTests {
                 new AtomicReference<>();
             
             ExternalizedPropertyResolver resolver = propertyNamesCollection -> {
-                // Tract propertyName collection for assertion.
+                // Track propertyName collection for assertion.
                 propertyNamesCollectionRef.set(propertyNamesCollection);
                 // Dummy result.
                 return new ExternalizedPropertyResolverResult(
@@ -31,7 +31,7 @@ public class ExternalizedPropertyResolverTests {
             };
 
             // This shall be converted to a empty collection
-            // prior calling to ExternalizedPropertyResolver.resolve(Collection<String>).
+            // and delegate to ExternalizedPropertyResolver.resolve(Collection<String>).
             resolver.resolve((String[])null);
 
             assertNotNull(propertyNamesCollectionRef.get());

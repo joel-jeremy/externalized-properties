@@ -10,7 +10,6 @@ import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPrope
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverterContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedExternalizedPropertyException;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.MethodHandleUtilities;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
@@ -33,7 +32,7 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
     private final ExternalizedPropertyResolver externalizedPropertyResolver;
     private final StringVariableExpander variableExpander;
     private final ResolvedPropertyConverter resolvedPropertyConverter;
-
+    private final MethodHandleFactory methodHandleFactory;
     /**
      * Constructor.
      * 
@@ -42,13 +41,15 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
      * @param externalizedPropertyResolver The externalized property resolver.
      * @param resolvedPropertyConverter The resolved property converter.
      * @param variableExpander The externalized property name variable expander.
+     * @param methodHandleFactory The method handle factory.
      */
     public ExternalizedPropertyMethod(
             Object proxy, 
             Method method,
             ExternalizedPropertyResolver externalizedPropertyResolver,
             ResolvedPropertyConverter resolvedPropertyConverter,
-            StringVariableExpander variableExpander
+            StringVariableExpander variableExpander,
+            MethodHandleFactory methodHandleFactory
     ) {
         this.proxy = requireNonNull(proxy, "proxy");
         this.method = requireNonNull(method, "method");
@@ -60,7 +61,14 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
             resolvedPropertyConverter, 
             "resolvedPropertyConverter"
         );
-        this.variableExpander = requireNonNull(variableExpander, "variableExpander");
+        this.variableExpander = requireNonNull(
+            variableExpander, 
+            "variableExpander"
+        );
+        this.methodHandleFactory = requireNonNull(
+            methodHandleFactory, 
+            "methodHandleFactory"
+        );
     }
 
     /** {@inheritDoc} */
@@ -246,7 +254,8 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
         }
 
         try {
-            MethodHandle defaultInterfaceMethodHandle = MethodHandleUtilities.buildMethodHandle(proxy, method);
+            MethodHandle defaultInterfaceMethodHandle = 
+                methodHandleFactory.createMethodHandle(proxy, method);
             return defaultInterfaceMethodHandle.invokeWithArguments(args);
         } 
         catch (Throwable ex) {

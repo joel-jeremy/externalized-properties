@@ -46,39 +46,46 @@ public class ExternalizedPropertyInvocationHandlerTests {
         @DisplayName("should resolve property")
         public void test1() {
             Map<String, String> map = new HashMap<>();
-            map.put("property.1", "test.value.1");
+            map.put("property", "test.value.1");
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            BasicProxyInterface proxyInterface = externalizedProperties.initialize(BasicProxyInterface.class);
-            String property = proxyInterface.property1();
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
+            String property = proxyInterface.property();
 
             assertEquals("test.value.1", property);
         }
         
         @Test
-        @DisplayName("should resolve property from map and not from default interface method value")
+        @DisplayName(
+            "should resolve property from map and not from default interface method value"
+        )
         public void test2() {
             Map<String, String> map = new HashMap<>();
             map.put("property.with.default.value", "test.value");
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            BasicProxyInterface proxyInterface = externalizedProperties.initialize(BasicProxyInterface.class);
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
             String property = proxyInterface.propertyWithDefaultValue();
 
             assertEquals("test.value", property);
         }
 
         @Test
-        @DisplayName("should resolve property from map and not from default interface method value parameter")
+        @DisplayName(
+            "should resolve property from map and not from default interface method value parameter"
+        )
         public void test3() {
             Map<String, String> map = new HashMap<>();
             map.put("property.with.default.value", "test.value");
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            BasicProxyInterface proxyInterface = externalizedProperties.initialize(BasicProxyInterface.class);
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
 
             String providedDefaultValue = "provided.default.value";
             String property = proxyInterface.propertyWithDefaultValueParameter(providedDefaultValue);
@@ -89,9 +96,11 @@ public class ExternalizedPropertyInvocationHandlerTests {
         @Test
         @DisplayName("should resolve default value from default interface method")
         public void test4() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = externalizedProperties.initialize(BasicProxyInterface.class);
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
             String property = proxyInterface.propertyWithDefaultValue();
 
             assertEquals("default.value", property);
@@ -100,9 +109,11 @@ public class ExternalizedPropertyInvocationHandlerTests {
         @Test
         @DisplayName("should resolve default value from default interface method parameter")
         public void test5() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = externalizedProperties.initialize(BasicProxyInterface.class);
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
 
             String providedDefaultValue = "provided.default.value";
             String property = proxyInterface.propertyWithDefaultValueParameter(providedDefaultValue);
@@ -111,11 +122,15 @@ public class ExternalizedPropertyInvocationHandlerTests {
         }
 
         @Test
-        @DisplayName("should always return default value from default interface method when not annotated")
+        @DisplayName(
+            "should always return default value from default interface method when not annotated"
+        )
         public void test6() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = externalizedProperties.initialize(BasicProxyInterface.class);
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
 
             String property = proxyInterface.propertyWithNoAnnotationButWithDefaultValue();
 
@@ -124,12 +139,15 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
         @Test
         @DisplayName(
-            "should always return default value from default interface method parameter when not annotated"
+            "should always return default value from default interface method parameter " + 
+            "when not annotated"
         )
         public void test7() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = externalizedProperties.initialize(BasicProxyInterface.class);
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
 
             String providedDefaultValue = "provided.default.value";
             String property = proxyInterface.propertyWithNoAnnotationButWithDefaultValueParameter(
@@ -142,21 +160,25 @@ public class ExternalizedPropertyInvocationHandlerTests {
         @Test
         @DisplayName("should throw when an annotated non-Optional property cannot be resolved.")
         public void test8() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = externalizedProperties.initialize(BasicProxyInterface.class);
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
 
             assertThrows(UnresolvedExternalizedPropertyException.class, () -> {
-                proxyInterface.property1();
+                proxyInterface.property();
             });
         }
 
         @Test
         @DisplayName("should throw when an unannotated non-Optional property cannot be resolved.")
         public void test9() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = externalizedProperties.initialize(BasicProxyInterface.class);
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
 
             assertThrows(UnresolvedExternalizedPropertyException.class, () -> {
                 proxyInterface.propertyWithNoAnnotationAndNoDefaultValue();
@@ -172,7 +194,8 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            PrimitiveProxyInterface proxyInterface = externalizedProperties.initialize(PrimitiveProxyInterface.class);
+            PrimitiveProxyInterface proxyInterface = 
+                externalizedProperties.initialize(PrimitiveProxyInterface.class);
 
             // Support for wrapper types.
             Integer property = proxyInterface.integerWrapperProperty();
@@ -209,14 +232,14 @@ public class ExternalizedPropertyInvocationHandlerTests {
         public void testVariableExpansion2() {
             Map<String, String> map = new HashMap<>();
             map.put("property-custom-variable", "property.value");
-            // There is no custom-variable-value property.
-            // Property name of VariableProxyInterface.variableProperty() won't be able to be expanded.
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
             VariableProxyInterface proxyInterface = 
                 externalizedProperties.initialize(VariableProxyInterface.class);
             
+            // There is no custom-variable-value property.
+            // Property name of VariableProxyInterface.variableProperty() won't be able to be expanded.
             assertThrows(StringVariableExpansionException.class, 
                 () -> proxyInterface.variableProperty()
             );
@@ -234,7 +257,8 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            OptionalProxyInterface proxyInterface = externalizedProperties.initialize(OptionalProxyInterface.class);
+            OptionalProxyInterface proxyInterface = 
+                externalizedProperties.initialize(OptionalProxyInterface.class);
             Optional<String> property = proxyInterface.optionalProperty();
 
             assertTrue(property.isPresent());
@@ -249,7 +273,8 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            OptionalProxyInterface proxyInterface = externalizedProperties.initialize(OptionalProxyInterface.class);
+            OptionalProxyInterface proxyInterface = 
+                externalizedProperties.initialize(OptionalProxyInterface.class);
             Optional<String> property = proxyInterface.optionalPropertyWithDefaultValue();
 
             assertTrue(property.isPresent());
@@ -257,14 +282,17 @@ public class ExternalizedPropertyInvocationHandlerTests {
         }
 
         @Test
-        @DisplayName("should resolve property from map and not from default interface method value parameter")
+        @DisplayName(
+            "should resolve property from map and not from default interface method value parameter"
+        )
         public void testOptional3() {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional.with.default.value", "test.value");
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            OptionalProxyInterface proxyInterface = externalizedProperties.initialize(OptionalProxyInterface.class);
+            OptionalProxyInterface proxyInterface = 
+                externalizedProperties.initialize(OptionalProxyInterface.class);
 
             String providedDefaultValue = "provided.default.value";
             Optional<String> property = 
@@ -280,7 +308,8 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            OptionalProxyInterface proxyInterface = externalizedProperties.initialize(OptionalProxyInterface.class);
+            OptionalProxyInterface proxyInterface = 
+                externalizedProperties.initialize(OptionalProxyInterface.class);
             Optional<String> property = proxyInterface.optionalPropertyWithDefaultValue();
 
             assertTrue(property.isPresent());
@@ -290,9 +319,11 @@ public class ExternalizedPropertyInvocationHandlerTests {
         @Test
         @DisplayName("should resolve default value from default interface method parameter")
         public void testOptional5() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
 
-            OptionalProxyInterface proxyInterface = externalizedProperties.initialize(OptionalProxyInterface.class);
+            OptionalProxyInterface proxyInterface = 
+                externalizedProperties.initialize(OptionalProxyInterface.class);
 
             String providedDefaultValue = "provided.default.value";
             Optional<String> property = 
@@ -303,11 +334,15 @@ public class ExternalizedPropertyInvocationHandlerTests {
         }
 
         @Test
-        @DisplayName("should always return default value from default interface method when not annotated")
+        @DisplayName(
+            "should always return default value from default interface method when not annotated"
+        )
         public void testOptional6() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
 
-            OptionalProxyInterface proxyInterface = externalizedProperties.initialize(OptionalProxyInterface.class);
+            OptionalProxyInterface proxyInterface = 
+                externalizedProperties.initialize(OptionalProxyInterface.class);
 
             Optional<String> property = 
                 proxyInterface.optionalPropertyWithNoAnnotationAndWithDefaultValue();
@@ -318,12 +353,15 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
         @Test
         @DisplayName(
-            "should always return default value from default interface method parameter when not annotated"
+            "should always return default value from default interface method parameter " + 
+            "when not annotated"
         )
         public void testOptional7() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
 
-            OptionalProxyInterface proxyInterface = externalizedProperties.initialize(OptionalProxyInterface.class);
+            OptionalProxyInterface proxyInterface = 
+                externalizedProperties.initialize(OptionalProxyInterface.class);
 
             String providedDefaultValue = "provided.default.value";
             Optional<String> property = 
@@ -336,11 +374,15 @@ public class ExternalizedPropertyInvocationHandlerTests {
         }
 
         @Test
-        @DisplayName("should return empty Optional when an annotated Optional property cannot be resolved.")
+        @DisplayName(
+            "should return empty Optional when an annotated Optional property cannot be resolved."
+        )
         public void testOptional8() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
 
-            OptionalProxyInterface proxyInterface = externalizedProperties.initialize(OptionalProxyInterface.class);
+            OptionalProxyInterface proxyInterface = 
+                externalizedProperties.initialize(OptionalProxyInterface.class);
 
             Optional<String> property = proxyInterface.optionalProperty();
 
@@ -348,11 +390,15 @@ public class ExternalizedPropertyInvocationHandlerTests {
         }
 
         @Test
-        @DisplayName("should return empty Optional when an unannotated Optional property cannot be resolved.")
+        @DisplayName(
+            "should return empty Optional when an unannotated Optional property cannot be resolved."
+        )
         public void testOptional9() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
 
-            OptionalProxyInterface proxyInterface = externalizedProperties.initialize(OptionalProxyInterface.class);
+            OptionalProxyInterface proxyInterface = 
+                externalizedProperties.initialize(OptionalProxyInterface.class);
 
             Optional<String> property = proxyInterface.optionalPropertyWithNoAnnotationAndNoDefaultValue();
             
@@ -367,7 +413,8 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            OptionalProxyInterface proxyInterface = externalizedProperties.initialize(OptionalProxyInterface.class);
+            OptionalProxyInterface proxyInterface = 
+                externalizedProperties.initialize(OptionalProxyInterface.class);
             Optional<Integer> property = proxyInterface.nonStringOptionalProperty();
 
             assertTrue(property.isPresent());

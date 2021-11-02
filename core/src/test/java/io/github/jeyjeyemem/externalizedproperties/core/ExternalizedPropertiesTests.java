@@ -36,7 +36,7 @@ public class ExternalizedPropertiesTests {
     @Nested
     class Builder {
         @Test
-        @DisplayName("should throw when externalizedPropertyResolvers collection argument is null")
+        @DisplayName("should throw when externalized property resolvers collection argument is null")
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class,
@@ -46,7 +46,7 @@ public class ExternalizedPropertiesTests {
         }
 
         @Test
-        @DisplayName("should throw when externalizedPropertyResolvers varargs argument is null")
+        @DisplayName("should throw when externalized property resolvers varargs argument is null")
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class,
@@ -56,7 +56,7 @@ public class ExternalizedPropertiesTests {
         }
 
         @Test
-        @DisplayName("should throw when resolvedPropertyConverters collection argument is null")
+        @DisplayName("should throw when resolved property converters collection argument is null")
         public void test4() {
             assertThrows(
                 IllegalArgumentException.class,
@@ -66,7 +66,7 @@ public class ExternalizedPropertiesTests {
         }
 
         @Test
-        @DisplayName("should throw when resolvedPropertyConverters varargs argument is null")
+        @DisplayName("should throw when resolved property converters varargs argument is null")
         public void test5() {
             assertThrows(
                 IllegalArgumentException.class,
@@ -134,8 +134,8 @@ public class ExternalizedPropertiesTests {
 
             // Resolved from environment variables.
             assertEquals(
-                System.getenv("JAVA_HOME"), 
-                proxyInterface.javaHomeEnv()
+                System.getenv("PATH"), 
+                proxyInterface.pathEnv()
             );
         }
     }
@@ -145,9 +145,11 @@ public class ExternalizedPropertiesTests {
         @Test
         @DisplayName("should not return null")
         public void validationTest1() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = externalizedProperties.initialize(BasicProxyInterface.class);
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
 
             assertNotNull(proxyInterface);
         }
@@ -155,27 +157,37 @@ public class ExternalizedPropertiesTests {
         @Test
         @DisplayName("should throw when proxy interface is null")
         public void validationTest2() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
             
-            assertThrows(IllegalArgumentException.class, () -> externalizedProperties.initialize(null));
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(null)
+            );
         }
 
         @Test
         @DisplayName("should throw when proxy interface is not an interface")
         public void validationTest3() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
             
-            assertThrows(IllegalArgumentException.class, () -> 
-                externalizedProperties.initialize(ExternalizedPropertiesTests.class));
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(ExternalizedPropertiesTests.class)
+            );
         }
 
         @Test
         @DisplayName("should not allow proxy interface methods with void return type")
         public void validationTest4() {
-            ExternalizedProperties externalizedProperties = externalizedProperties(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
             
-            assertThrows(IllegalArgumentException.class, () -> 
-                externalizedProperties.initialize(VoidReturnTypeProxyInterface.class));
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(VoidReturnTypeProxyInterface.class)
+            );
         }
     }
 

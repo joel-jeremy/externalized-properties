@@ -91,7 +91,9 @@ public class Arguments {
          * {@link IllegalArgumentException} message if the argument failed validation.
          * @return The {@link Collection} argument.
          */
-        public static <T> Collection<T> requireNonNullOrEmptyCollection(Collection<T> arg, String argName) {
+        public static <T> Collection<T> requireNonNullOrEmptyCollection(
+                Collection<T> arg, String argName
+        ) {
             if (isNullOrEmpty(argName))
                 throw new IllegalArgumentException("argName must not be null or empty.");
 

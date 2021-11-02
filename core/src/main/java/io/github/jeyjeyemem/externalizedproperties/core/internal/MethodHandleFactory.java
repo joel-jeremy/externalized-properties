@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core.internal.utils;
+package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 
@@ -7,13 +7,11 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-/**
- * Method handle utilities.
- */
-public class MethodHandleUtilities {
+public class MethodHandleFactory {
     // Not Java 1.7, 1.8, etc.
     private static final boolean IS_RUNNING_ON_JAVA_9_OR_LATER = 
         !System.getProperty("java.specification.version").startsWith("1.");
@@ -41,21 +39,22 @@ public class MethodHandleUtilities {
         }
     }
 
-    private static final ConcurrentMap<Method, MethodHandle> METHOD_HANDLE_CACHE = new ConcurrentHashMap<>();
-
-    private MethodHandleUtilities(){}
+    private final ConcurrentMap<MethodKey, MethodHandle> cache = 
+        new ConcurrentHashMap<>();
 
     /**
      * Build a method handle from the given target and method.
      * 
      * @param target The target object to bind the generated method handle to.
      * @param method The method to build the method handle from.
-     * @return The generated {@link MethodHandle} for the given target and method.
+     * @return The generated {@link MethodHandle} for the method. 
+     * This method handle has been binded to the target object. 
      */
-    public static MethodHandle buildMethodHandle(Object target, Method method) {
-        return METHOD_HANDLE_CACHE.computeIfAbsent(
-            method, 
-            m -> buildMethodHandleInternal(target, m)
+    public MethodHandle createMethodHandle(Object target, Method method) {
+        MethodKey methodKey = new MethodKey(method);
+        return cache.computeIfAbsent(
+            methodKey, 
+            key -> buildMethodHandleInternal(target, method)
         );
     }
 
@@ -124,5 +123,35 @@ public class MethodHandleUtilities {
         }
 
         return privateLookup;
+    }
+
+    private static final class MethodKey {
+        private final String methodSignature;
+        private final int hash;
+
+        public MethodKey(Method method) {
+            this.methodSignature = method.toString();
+            this.hash = Objects.hash(methodSignature);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (other != null && other instanceof MethodKey) {
+                MethodKey otherCacheKey = (MethodKey)other;
+                return methodSignature.equals(otherCacheKey.methodSignature);
+            }
+
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return methodSignature;
+        }
     }
 }

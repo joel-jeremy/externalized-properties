@@ -6,6 +6,6 @@ public interface JavaPropertiesProxyInterface {
     @ExternalizedProperty("java.version")
     String javaVersion();
 
-    @ExternalizedProperty("JAVA_HOME")
-    String javaHomeEnv();
+    @ExternalizedProperty("PATH")
+    String pathEnv();
 }
