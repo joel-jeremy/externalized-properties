@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.Collections.requireNonNullOrEmptyCollection;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNullOrEmptyCollection;
 
 /**
  * An {@link ExternalizedPropertyResolver} decorator which resolves requested properties 
