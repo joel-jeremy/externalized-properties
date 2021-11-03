@@ -307,6 +307,26 @@ public class ExternalizedPropertyMethodTests {
             assertEquals(propertyMethod.getReturnType(), returnType);
         }
     }
+
+    @Nested
+    class GenericReturnTypeMethod {
+        @Test
+        @DisplayName("should return method's generic return type")
+        public void test1() {
+            Method propertyMethod = getProxyInterfaceMethod(
+                BasicProxyInterface.class, 
+                "property"
+            );
+
+            ExternalizedPropertyMethod externalizedPropertyMethod = 
+                externalizedPropertyMethod(propertyMethod);
+
+            Type genericReturnType = externalizedPropertyMethod.genericReturnType();
+
+            assertEquals(propertyMethod.getGenericReturnType(), genericReturnType);
+        }
+    }
+
     @Nested
     class HasReturnTypeMethod {
         @Test
@@ -341,6 +361,46 @@ public class ExternalizedPropertyMethodTests {
             );
         }
     }
+
+    @Nested
+    class HasReturnTypeMethodWithTypeArgument {
+        @Test
+        @DisplayName("should return true when method's return type matches")
+        public void test1() {
+            Method propertyMethod = getProxyInterfaceMethod(
+                BasicProxyInterface.class, 
+                "property"
+            );
+
+            ExternalizedPropertyMethod externalizedPropertyMethod = 
+                externalizedPropertyMethod(propertyMethod);
+
+            Type type = String.class;
+
+            assertTrue(
+                externalizedPropertyMethod.hasReturnType(type)
+            );
+        }
+
+        @Test
+        @DisplayName("should return false when method's return type does not match")
+        public void test2() {
+            Method propertyMethod = getProxyInterfaceMethod(
+                BasicProxyInterface.class, 
+                "property"
+            );
+
+            ExternalizedPropertyMethod externalizedPropertyMethod = 
+                externalizedPropertyMethod(propertyMethod);
+
+            Type type = Integer.class;
+
+            assertFalse(
+                externalizedPropertyMethod.hasReturnType(type)
+            );
+        }
+    }
+
     @Nested
     class GenericReturnTypeParametersMethod {
         @Test
@@ -386,6 +446,7 @@ public class ExternalizedPropertyMethodTests {
             assertTrue(genericTypeParameters.isEmpty());
         }
     }
+
     @Nested
     class GenericReturnTypeParameterMethod {
         @Test

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -120,6 +121,44 @@ public class CachingPropertyResolverTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> resolver.resolve(new String[0])
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when property names collection contains any null or empty values"
+        )
+        public void validationTest3() {
+            CachingPropertyResolver resolver = resolverToTest(
+                new SystemPropertyResolver()
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> resolver.resolve(Arrays.asList("property", null))
+            );
+            
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> resolver.resolve(Arrays.asList("property", ""))
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when property names varargs contain any null or empty values")
+        public void validationTest4() {
+            CachingPropertyResolver resolver = resolverToTest(
+                new SystemPropertyResolver()
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> resolver.resolve(new String[] { "property", null })
+            );
+            
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> resolver.resolve(new String[] { "property", "" })
             );
         }
 

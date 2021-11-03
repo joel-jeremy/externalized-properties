@@ -23,7 +23,7 @@ public class EnumPropertyConversionHandlerTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when expected type is null.")
+        @DisplayName("should return false when expected type is null.")
         public void test1() {
             EnumPropertyConversionHandler<TestEnum> handler = handlerToTest(TestEnum.class);
             boolean canConvert = handler.canConvertTo(null);

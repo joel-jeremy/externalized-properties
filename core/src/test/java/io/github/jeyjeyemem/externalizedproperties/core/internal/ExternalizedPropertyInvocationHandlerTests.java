@@ -1,8 +1,10 @@
-package io.github.jeyjeyemem.externalizedproperties.core;
+package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedExternalizedPropertyException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.StringVariableExpansionException;
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedExternalizedPropertyException;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositePropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
@@ -419,6 +421,68 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             assertTrue(property.isPresent());
             assertEquals(1, property.get());
+        }
+
+        @Test
+        @DisplayName("should return true when object references are the same")
+        public void proxyEqualsMethod1() {
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
+
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
+
+            assertTrue(proxyInterface.equals(proxyInterface));
+        }
+
+        @Test
+        @DisplayName("should return false when object references are not same")
+        public void proxyEqualsMethod2() {
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
+
+            BasicProxyInterface proxyInterface1 = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
+            BasicProxyInterface proxyInterface2 = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
+
+            assertFalse(proxyInterface1.equals(proxyInterface2));
+        }
+
+        @Test
+        @DisplayName("should return proxy's identity hash code")
+        public void proxyHashCodeMethod() {
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
+
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
+
+            assertEquals(
+                System.identityHashCode(proxyInterface),
+                proxyInterface.hashCode()
+            );
+        }
+
+        @Test
+        @DisplayName("should return standard Object.toString() format")
+        public void proxyToStringMethod() {
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
+
+            BasicProxyInterface proxyInterface = 
+                externalizedProperties.initialize(BasicProxyInterface.class);
+
+            assertEquals(
+                standardToStringFormat(proxyInterface),
+                proxyInterface.toString()
+            );
+        }
+
+        // Matches implementation of Object.toString()
+        private String standardToStringFormat(BasicProxyInterface proxyInterface) {
+            return proxyInterface.getClass().getName() + "@" + 
+                Integer.toHexString(proxyInterface.hashCode());
         }
     }
 

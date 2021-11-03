@@ -10,13 +10,12 @@ import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPrope
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverterContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedExternalizedPropertyException;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -93,15 +92,27 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
 
     /** {@inheritDoc} */
     @Override
+    public Type genericReturnType() {
+        return method.getGenericReturnType();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public boolean hasReturnType(Class<?> type) {
         return returnType().equals(type);
     }
 
     /** {@inheritDoc} */
     @Override
+    public boolean hasReturnType(Type type) {
+        return genericReturnType().equals(type);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public List<Type> genericReturnTypeParameters() {
         Type returnType = method.getGenericReturnType();
-        return getTypeParameters(returnType);
+        return TypeUtilities.getTypeParameters(returnType);
     }
 
     /** {@inheritDoc} */
@@ -269,12 +280,4 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
             );
         }
     }
-
-    private List<Type> getTypeParameters(Type type) {
-        if (type instanceof ParameterizedType) {
-            return Arrays.asList(((ParameterizedType)type).getActualTypeArguments());
-        }
-        return Collections.emptyList();
-    }
-    
 }

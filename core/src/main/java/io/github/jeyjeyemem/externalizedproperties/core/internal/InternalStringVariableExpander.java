@@ -35,11 +35,14 @@ public class InternalStringVariableExpander implements StringVariableExpander {
      */
     @Override
     public String expandVariables(String value) {
+        requireNonNull(value, "value");
+        
+        if (value.isEmpty()) {
+            return value;
+        }
+
         try {
             return StringUtilities.replaceVariables(value, this::resolvePropertyValue);
-        } catch (StringVariableExpansionException sve){
-            // Just rethrow.
-            throw sve;
         } catch (Exception ex) {
             throw new StringVariableExpansionException(
                 "Exception occurred while trying to expand value: " + value,

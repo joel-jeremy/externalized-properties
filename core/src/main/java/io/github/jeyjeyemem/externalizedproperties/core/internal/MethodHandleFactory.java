@@ -11,6 +11,12 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * Method handle factory to creating {@link MethodHandle} for methods.
+ * This factory changes implementation based on the detected java version.
+ * 
+ * This should continue working even when running under Java 9+.
+ */
 public class MethodHandleFactory {
     // Not Java 1.7, 1.8, etc.
     private static final boolean IS_RUNNING_ON_JAVA_9_OR_LATER = 
@@ -39,8 +45,15 @@ public class MethodHandleFactory {
         }
     }
 
-    private final ConcurrentMap<MethodKey, MethodHandle> cache = 
-        new ConcurrentHashMap<>();
+    // Diferrent cache for every declaring class.
+    private final ClassValue<ConcurrentMap<MethodKey, MethodHandle>> classMethodCache = 
+        new ClassValue<ConcurrentMap<MethodKey, MethodHandle>>() {
+            @Override
+            protected ConcurrentMap<MethodKey, MethodHandle> computeValue(Class<?> type) {
+                // Separate cache for a given type.
+                return new ConcurrentHashMap<>();
+            }
+        };
 
     /**
      * Build a method handle from the given target and method.
@@ -51,11 +64,15 @@ public class MethodHandleFactory {
      * This method handle has been binded to the target object. 
      */
     public MethodHandle createMethodHandle(Object target, Method method) {
-        MethodKey methodKey = new MethodKey(method);
-        return cache.computeIfAbsent(
-            methodKey, 
+        ConcurrentMap<MethodKey, MethodHandle> methodHandleCache = 
+            classMethodCache.get(method.getDeclaringClass());
+
+        MethodHandle methodHandle = methodHandleCache.computeIfAbsent(
+            new MethodKey(method.getName(), method.getParameterTypes()), 
             key -> buildMethodHandleInternal(target, method)
         );
+
+        return methodHandle;
     }
 
     private static MethodHandle buildMethodHandleInternal(Object target, Method method) {
@@ -125,13 +142,15 @@ public class MethodHandleFactory {
         return privateLookup;
     }
 
-    private static final class MethodKey {
-        private final String methodSignature;
+    private static class MethodKey {
+        private final String methodName;
+        private final String parameterTypesDescriptor;
         private final int hash;
 
-        public MethodKey(Method method) {
-            this.methodSignature = method.toString();
-            this.hash = Objects.hash(methodSignature);
+        public MethodKey(String methodName, Class<?>[] parameterTypes) {
+            this.methodName = methodName;
+            this.parameterTypesDescriptor = buildParameterTypeDescriptor(parameterTypes);
+            this.hash = Objects.hash(methodName, parameterTypesDescriptor);
         }
 
         @Override
@@ -142,8 +161,9 @@ public class MethodHandleFactory {
         @Override
         public boolean equals(Object other) {
             if (other != null && other instanceof MethodKey) {
-                MethodKey otherCacheKey = (MethodKey)other;
-                return methodSignature.equals(otherCacheKey.methodSignature);
+                MethodKey otherKey = (MethodKey)other;
+                return methodName.equals(otherKey.methodName) &&
+                    parameterTypesDescriptor.equals(otherKey.parameterTypesDescriptor);
             }
 
             return false;
@@ -151,7 +171,26 @@ public class MethodHandleFactory {
 
         @Override
         public String toString() {
-            return methodSignature;
+            return methodName + parameterTypesDescriptor;
+        }
+
+        private String buildParameterTypeDescriptor(Class<?>[] parameterTypes) {
+            StringBuilder sb = new StringBuilder();
+            
+            sb.append("(");
+            separateWithCommas(parameterTypes, sb);
+            sb.append(")");
+
+            return sb.toString();
+        }
+
+        private void separateWithCommas(Class<?>[] parameterTypes, StringBuilder sb) {
+            for (int j = 0; j < parameterTypes.length; j++) {
+                sb.append(parameterTypes[j].getTypeName());
+                if (j < (parameterTypes.length - 1)) {
+                    sb.append(",");
+                }
+            }
         }
     }
 }

@@ -4,14 +4,12 @@ import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMeth
 import io.github.jeyjeyemem.externalizedproperties.core.StringVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalStringVariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,18 +62,24 @@ public class StubExternalizedPropertyMethodInfo
     }
 
     @Override
+    public Type genericReturnType() {
+        return method.getGenericReturnType();
+    }
+
+    @Override
     public boolean hasReturnType(Class<?> type) {
         return returnType().equals(type);
     }
 
     @Override
+    public boolean hasReturnType(Type type) {
+        return genericReturnType().equals(type);
+    }
+
+    @Override
     public List<Type> genericReturnTypeParameters() {
         Type returnType = method.getGenericReturnType();
-        if (!(returnType instanceof ParameterizedType)) {
-            return Collections.emptyList();
-        }
-
-        return getTypeParameters(returnType);
+        return TypeUtilities.getTypeParameters(returnType);
     }
 
     @Override
@@ -139,12 +143,5 @@ public class StubExternalizedPropertyMethodInfo
         } catch (Exception e) {
             throw new IllegalStateException("Failed to find property method.", e);
         }
-    }
-
-    private List<Type> getTypeParameters(Type type) {
-        if (type instanceof ParameterizedType) {
-            return Arrays.asList(((ParameterizedType)type).getActualTypeArguments());
-        }
-        return Collections.emptyList();
     }
 }

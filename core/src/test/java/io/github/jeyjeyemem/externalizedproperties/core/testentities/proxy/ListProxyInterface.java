@@ -6,6 +6,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.S
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface ListProxyInterface {
     @ExternalizedProperty("property.list")
@@ -40,4 +41,13 @@ public interface ListProxyInterface {
     @ExternalizedProperty("property.list.stripempty")
     @StripEmptyValues
     List<String> listPropertyStripEmpty();
+
+    @ExternalizedProperty("property.list.nested.generics")
+    List<Optional<String>> listPropertyNestedGenerics();
+
+    @ExternalizedProperty("property.list.nested.generics.array")
+    List<Optional<String>[]> listPropertyNestedGenericsArray();
+
+    @ExternalizedProperty("property.list.T")
+    <T> List<T> listPropertyT();
 }

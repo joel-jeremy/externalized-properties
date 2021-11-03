@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
- * Argument utilities.
+ * Arguments-related utility methods.
  */
 public class Arguments {
     private Arguments(){}
