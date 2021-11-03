@@ -25,17 +25,25 @@ public class TypeUtilities {
             return (Class<?>)type;
         } 
         else if (type instanceof ParameterizedType) {
+            // Return raw type.
             // For example, if type is List<String>, List shall be returned.
+
             ParameterizedType pt = (ParameterizedType)type;
             return (Class<?>)pt.getRawType();
         } 
         else if (type instanceof GenericArrayType) {
+            // Return generic component type of array.
             // For example, if type is Optional<String>[], Optional[] shall be returned.
+            
             GenericArrayType gat = (GenericArrayType)type;
             Type genericArrayComponentType = gat.getGenericComponentType();
+
             if (genericArrayComponentType instanceof ParameterizedType) {
-                Class<?> rawType = ((Class<?>)((ParameterizedType)genericArrayComponentType).getRawType());
-                // Get array class.
+                ParameterizedType genericArrayComponentParameterizedType =
+                    (ParameterizedType)genericArrayComponentType;
+
+                Class<?> rawType = (Class<?>)genericArrayComponentParameterizedType.getRawType();
+                // Return an array class.
                 return Array.newInstance(rawType, 0).getClass();
             }
         }
@@ -57,14 +65,9 @@ public class TypeUtilities {
             return Arrays.asList(((ParameterizedType)type).getActualTypeArguments());
         } 
         else if (type instanceof GenericArrayType) {
-            // Return generic component type of arrays.
+            // Return array's generic component type's type parameter.
             // For example, if type is Optional<String>[], String shall be returned.
             Type arrayGenericComponentType = ((GenericArrayType)type).getGenericComponentType();
-
-            if (arrayGenericComponentType instanceof Class<?>) {
-                // Component type is not parameterized.
-                return Collections.emptyList();
-            }
 
             // Need to get the actual type parameter of the generic component type.
             return getTypeParameters(arrayGenericComponentType);
