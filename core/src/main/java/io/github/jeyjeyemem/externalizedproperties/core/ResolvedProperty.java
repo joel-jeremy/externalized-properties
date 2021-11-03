@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.Strings.requireNonNullOrEmptyString;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNullOrEmptyString;
 
 /**
  * The resolved property.

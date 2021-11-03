@@ -8,8 +8,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -87,6 +89,44 @@ public class CompositePropertyResolverTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> compositeResolver.resolve(new String[0])
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when property names collection contains any null or empty values"
+        )
+        public void validationTest3() {
+            CompositePropertyResolver resolver = resolverToTest(
+                new StubExternalizedPropertyResolver()
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> resolver.resolve(Arrays.asList("property", null))
+            );
+            
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> resolver.resolve(Arrays.asList("property", ""))
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when property names varargs contain any null or empty values")
+        public void validationTest4() {
+            CompositePropertyResolver resolver = resolverToTest(
+                new StubExternalizedPropertyResolver()
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> resolver.resolve(new String[] { "property", null })
+            );
+            
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> resolver.resolve(new String[] { "property", "" })
             );
         }
 
@@ -290,6 +330,25 @@ public class CompositePropertyResolverTests {
                     .map(ResolvedProperty::value)
                     .orElse(null)
             );
+        }
+    }
+
+    @Nested
+    class ToStringMethod {
+        @Test
+        @DisplayName("should return resolver collection string")
+        public void test1() {
+            List<ExternalizedPropertyResolver> resolvers = Arrays.asList(
+                new SystemPropertyResolver(),
+                new EnvironmentVariablePropertyResolver(),
+                new CompositePropertyResolver(new MapPropertyResolver(Collections.emptyMap()))
+            );
+
+            CompositePropertyResolver resolver = resolverToTest(
+                resolvers.toArray(new ExternalizedPropertyResolver[resolvers.size()])
+            );
+
+            assertEquals(resolvers.toString(), resolver.toString());
         }
     }
 

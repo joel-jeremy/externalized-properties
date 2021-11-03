@@ -4,6 +4,8 @@ import io.github.jeyjeyemem.externalizedproperties.core.annotations.Externalized
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.StripEmptyValues;
 
+import java.util.Optional;
+
 public interface ArrayProxyInterface {
     @ExternalizedProperty("property.array")
     String[] arrayProperty();
@@ -11,17 +13,23 @@ public interface ArrayProxyInterface {
     @ExternalizedProperty("property.array.object")
     Object[] arrayPropertyObject();
 
-    @ExternalizedProperty("property.array.integer")
-    Integer[] arrayInteger();
-
-    @ExternalizedProperty("property.array.integer.primitive")
-    int[] arrayIntegerPrimitive();
-
     @ExternalizedProperty("property.array.custom.delimiter")
     @Delimiter("|")
-    Integer[] arrayCustomDelimiter();
+    String[] arrayCustomDelimiter();
 
     @ExternalizedProperty("property.array.stripempty")
     @StripEmptyValues
     String[] arrayPropertyStripEmpty();
+
+    @ExternalizedProperty("property.array.integer.wrapper")
+    Integer[] arrayIntegerWrapper();
+
+    @ExternalizedProperty("property.array.integer.primitive")
+    int[] arrayIntegerPrimitive();
+
+    @ExternalizedProperty("property.array.generic")
+    Optional<String>[] arrayGeneric();
+
+    @ExternalizedProperty("property.array.generic.wildcard")
+    Optional<?>[] arrayGenericWildcard();
 }

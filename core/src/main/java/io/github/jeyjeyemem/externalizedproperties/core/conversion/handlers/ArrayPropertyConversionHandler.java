@@ -10,7 +10,11 @@ import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.D
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.StripEmptyValues;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
@@ -41,17 +45,12 @@ public class ArrayPropertyConversionHandler implements ResolvedPropertyConversio
         
         ExternalizedPropertyMethodInfo propertyMethodInfo = context.externalizedPropertyMethodInfo();
 
-        ResolvedProperty resolvedProperty = context.resolvedProperty();
-
-        String propertyValue = resolvedProperty.value();
-        if (propertyValue.isEmpty()) {
-            return new String[0];
-        }
-        
         final String[] values = getValues(context);
 
-        Class<?> arrayType = context.expectedType().getComponentType();
-        if (arrayType == null) {
+        List<Type> arrayComponentTypeGenericTypeParameters = 
+            context.expectedTypeGenericTypeParameters();
+        Class<?> arrayComponentType = context.expectedType().getComponentType();
+        if (arrayComponentType == null) {
             throw new ResolvedPropertyConversionException(String.format(
                 "Externalized Property method does not return an array. " +
                 "Externalized property method: %s",
@@ -60,11 +59,24 @@ public class ArrayPropertyConversionHandler implements ResolvedPropertyConversio
         }
         
         // If array is String[] or Object[], return the string values.
-        if (Object.class.equals(arrayType) ||
-                String.class.equals(arrayType)) {
+        if (String.class.equals(arrayComponentType) || Object.class.equals(arrayComponentType)) {
             return values;
         }
+        
+        return convertToArrayComponentType(
+            context,
+            values, 
+            arrayComponentType, 
+            arrayComponentTypeGenericTypeParameters
+        );
+    }
 
+    private Object[] convertToArrayComponentType(
+            ResolvedPropertyConversionHandlerContext context, 
+            String[] values, 
+            Class<?> arrayType, 
+            List<Type> arrayGenericTypeParameters
+    ) {
         ResolvedPropertyConverter resolvedPropertyConverter = 
             context.resolvedPropertyConverter();
 
@@ -75,20 +87,24 @@ public class ArrayPropertyConversionHandler implements ResolvedPropertyConversio
                 new ResolvedPropertyConverterContext(
                     context.externalizedPropertyMethodInfo(),
                     ResolvedProperty.with(
-                        indexedName(resolvedProperty.name(), i),
+                        indexedName(context.resolvedProperty().name(), i),
                         value
                     ), 
-                    arrayType
+                    arrayType,
+                    arrayGenericTypeParameters
                 )
             );
         })
-        .toArray();
+        .toArray(arrayLength -> (Object[])Array.newInstance(arrayType, arrayLength));
     }
 
     private String[] getValues(ResolvedPropertyConversionHandlerContext context) {
-        ExternalizedPropertyMethodInfo propertyMethodInfo = context.externalizedPropertyMethodInfo();
         String propertyValue = context.resolvedProperty().value();
+        if (propertyValue.isEmpty()) {
+            return new String[0];
+        }
 
+        ExternalizedPropertyMethodInfo propertyMethodInfo = context.externalizedPropertyMethodInfo();
         // Determine delimiter.
         String delimiter = propertyMethodInfo.findAnnotation(Delimiter.class)
             .map(d -> d.value())
@@ -100,7 +116,7 @@ public class ArrayPropertyConversionHandler implements ResolvedPropertyConversio
                 .filter(v -> !v.isEmpty())
                 .toArray(String[]::new);
         }
-        return propertyValue.split(delimiter);
+        return propertyValue.split(Pattern.quote(delimiter));
     }
 
     private static String indexedName(String name, int index) {

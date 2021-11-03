@@ -53,20 +53,44 @@ public interface ExternalizedPropertyMethodInfo {
     Class<?> returnType();
 
     /**
+     * The externalized property method generic return type.
+     * 
+     * @return The externalized property method generic return type.
+     */
+    Type genericReturnType();
+
+    /**
      * Check if the externalized property method return type matches the given type. 
      * 
-     * @param type The type to match against the externalized property method's return type.
+     * @param type The class to match against the externalized property method's return type.
      * @return {@code true}, if the externalized property method return type matches 
      * the given type. Otherwise, {@code false}.
      */
     boolean hasReturnType(Class<?> type);
 
     /**
+     * Check if the externalized property method return type matches the given type. 
+     * 
+     * @param type The type to match against the externalized property method's return type.
+     * @return {@code true}, if the externalized property method return type matches 
+     * the given type. Otherwise, {@code false}.
+     */
+    boolean hasReturnType(Type type);
+
+    /**
      * <p>The externalized property method return type's generic type parameters, 
      * if the return type is a generic type e.g. {@code Optional<String>}. 
      * 
-     * <p>For example, we have a property method: {@code Optional<String> awesomeMethod();},
-     * {@code Class<String>} shall be returned when this method is invoked.
+     * <p>For example, if {@link #genericReturnType()} returns a parameterized type 
+     * e.g. {@code List<String>}, this method shall return a list containing a {@code String} type/class.
+     * 
+     * <p>Another example is if {@link #genericReturnType()} returns an array with a 
+     * generic component type e.g. {@code Optional<Integer>[]}, this method shall return a 
+     * list containing an {@code Integer} type/class.
+     * 
+     * <p>It is also possible to have {@link #genericReturnType()} return a parameterized type 
+     * which contains another parameterized type parameter e.g. {@code Optional<List<String>>}, 
+     * in this case, this method shall return a list containing a {@code List<String>} parameterized type.
      * 
      * @return The list of generic return type parameters, if the return type is a generic type 
      * e.g. {@code Optional<String>}.

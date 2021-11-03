@@ -15,7 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.Collections.requireNonNullOrEmptyCollection;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNullOrEmptyCollection;
 
 /**
  * An {@link ExternalizedPropertyResolver} decorator which caches resolved properties

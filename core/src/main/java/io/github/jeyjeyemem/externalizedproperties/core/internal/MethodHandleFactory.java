@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core.internal.utils;
+package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 
@@ -7,13 +7,17 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Method handle utilities.
+ * Method handle factory to creating {@link MethodHandle} for methods.
+ * This factory changes implementation based on the detected java version.
+ * 
+ * This should continue working even when running under Java 9+.
  */
-public class MethodHandleUtilities {
+public class MethodHandleFactory {
     // Not Java 1.7, 1.8, etc.
     private static final boolean IS_RUNNING_ON_JAVA_9_OR_LATER = 
         !System.getProperty("java.specification.version").startsWith("1.");
@@ -41,22 +45,34 @@ public class MethodHandleUtilities {
         }
     }
 
-    private static final ConcurrentMap<Method, MethodHandle> METHOD_HANDLE_CACHE = new ConcurrentHashMap<>();
-
-    private MethodHandleUtilities(){}
+    // Diferrent cache for every declaring class.
+    private final ClassValue<ConcurrentMap<MethodKey, MethodHandle>> classMethodCache = 
+        new ClassValue<ConcurrentMap<MethodKey, MethodHandle>>() {
+            @Override
+            protected ConcurrentMap<MethodKey, MethodHandle> computeValue(Class<?> type) {
+                // Separate cache for a given type.
+                return new ConcurrentHashMap<>();
+            }
+        };
 
     /**
      * Build a method handle from the given target and method.
      * 
      * @param target The target object to bind the generated method handle to.
      * @param method The method to build the method handle from.
-     * @return The generated {@link MethodHandle} for the given target and method.
+     * @return The generated {@link MethodHandle} for the method. 
+     * This method handle has been binded to the target object. 
      */
-    public static MethodHandle buildMethodHandle(Object target, Method method) {
-        return METHOD_HANDLE_CACHE.computeIfAbsent(
-            method, 
-            m -> buildMethodHandleInternal(target, m)
+    public MethodHandle createMethodHandle(Object target, Method method) {
+        ConcurrentMap<MethodKey, MethodHandle> methodHandleCache = 
+            classMethodCache.get(method.getDeclaringClass());
+
+        MethodHandle methodHandle = methodHandleCache.computeIfAbsent(
+            new MethodKey(method.getName(), method.getParameterTypes()), 
+            key -> buildMethodHandleInternal(target, method)
         );
+
+        return methodHandle;
     }
 
     private static MethodHandle buildMethodHandleInternal(Object target, Method method) {
@@ -124,5 +140,57 @@ public class MethodHandleUtilities {
         }
 
         return privateLookup;
+    }
+
+    private static class MethodKey {
+        private final String methodName;
+        private final String parameterTypesDescriptor;
+        private final int hash;
+
+        public MethodKey(String methodName, Class<?>[] parameterTypes) {
+            this.methodName = methodName;
+            this.parameterTypesDescriptor = buildParameterTypeDescriptor(parameterTypes);
+            this.hash = Objects.hash(methodName, parameterTypesDescriptor);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (other != null && other instanceof MethodKey) {
+                MethodKey otherKey = (MethodKey)other;
+                return methodName.equals(otherKey.methodName) &&
+                    parameterTypesDescriptor.equals(otherKey.parameterTypesDescriptor);
+            }
+
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return methodName + parameterTypesDescriptor;
+        }
+
+        private String buildParameterTypeDescriptor(Class<?>[] parameterTypes) {
+            StringBuilder sb = new StringBuilder();
+            
+            sb.append("(");
+            separateWithCommas(parameterTypes, sb);
+            sb.append(")");
+
+            return sb.toString();
+        }
+
+        private void separateWithCommas(Class<?>[] parameterTypes, StringBuilder sb) {
+            for (int j = 0; j < parameterTypes.length; j++) {
+                sb.append(parameterTypes[j].getTypeName());
+                if (j < (parameterTypes.length - 1)) {
+                    sb.append(",");
+                }
+            }
+        }
     }
 }

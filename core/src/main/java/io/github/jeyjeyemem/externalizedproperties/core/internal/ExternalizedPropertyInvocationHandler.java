@@ -8,8 +8,6 @@ import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedP
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
@@ -22,18 +20,17 @@ public class ExternalizedPropertyInvocationHandler implements InvocationHandler 
     private static final String EQUALS_METHOD_NAME = "equals";
     private static final String TO_STRING_METHOD_NAME = "toString";
 
-    private final ConcurrentMap<Method, ExternalizedPropertyMethod> methodCache = 
-        new ConcurrentHashMap<>();
     private final ExternalizedPropertyResolver externalizedPropertyResolver;
     private final StringVariableExpander variableExpander;
     private final ResolvedPropertyConverter resolvedPropertyConverter;
+    private final MethodHandleFactory methodHandleFactory = new MethodHandleFactory();
 
     /**
      * Constructor.
      * 
      * @param externalizedPropertyResolver The externalized property resolver.
-     * @param variableExpander The string variable expander.
      * @param resolvedPropertyConverter The resolved property converter.
+     * @param variableExpander The string variable expander.
      */
     public ExternalizedPropertyInvocationHandler(
             ExternalizedPropertyResolver externalizedPropertyResolver,
@@ -72,15 +69,13 @@ public class ExternalizedPropertyInvocationHandler implements InvocationHandler 
         }
 
         ExternalizedPropertyMethod propertyMethodProxy = 
-            methodCache.computeIfAbsent(
-                method, 
-                m -> new ExternalizedPropertyMethod(
-                    proxy, 
-                    method,
-                    externalizedPropertyResolver,
-                    resolvedPropertyConverter,
-                    variableExpander
-                )
+            new ExternalizedPropertyMethod(
+                proxy, 
+                method,
+                externalizedPropertyResolver,
+                resolvedPropertyConverter,
+                variableExpander,
+                methodHandleFactory
             );
 
         return propertyMethodProxy.resolveProperty(args);

@@ -10,14 +10,12 @@ import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPrope
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverterContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedExternalizedPropertyException;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.MethodHandleUtilities;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +31,7 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
     private final ExternalizedPropertyResolver externalizedPropertyResolver;
     private final StringVariableExpander variableExpander;
     private final ResolvedPropertyConverter resolvedPropertyConverter;
-
+    private final MethodHandleFactory methodHandleFactory;
     /**
      * Constructor.
      * 
@@ -42,13 +40,15 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
      * @param externalizedPropertyResolver The externalized property resolver.
      * @param resolvedPropertyConverter The resolved property converter.
      * @param variableExpander The externalized property name variable expander.
+     * @param methodHandleFactory The method handle factory.
      */
     public ExternalizedPropertyMethod(
             Object proxy, 
             Method method,
             ExternalizedPropertyResolver externalizedPropertyResolver,
             ResolvedPropertyConverter resolvedPropertyConverter,
-            StringVariableExpander variableExpander
+            StringVariableExpander variableExpander,
+            MethodHandleFactory methodHandleFactory
     ) {
         this.proxy = requireNonNull(proxy, "proxy");
         this.method = requireNonNull(method, "method");
@@ -60,7 +60,14 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
             resolvedPropertyConverter, 
             "resolvedPropertyConverter"
         );
-        this.variableExpander = requireNonNull(variableExpander, "variableExpander");
+        this.variableExpander = requireNonNull(
+            variableExpander, 
+            "variableExpander"
+        );
+        this.methodHandleFactory = requireNonNull(
+            methodHandleFactory, 
+            "methodHandleFactory"
+        );
     }
 
     /** {@inheritDoc} */
@@ -85,15 +92,27 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
 
     /** {@inheritDoc} */
     @Override
+    public Type genericReturnType() {
+        return method.getGenericReturnType();
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public boolean hasReturnType(Class<?> type) {
         return returnType().equals(type);
     }
 
     /** {@inheritDoc} */
     @Override
+    public boolean hasReturnType(Type type) {
+        return genericReturnType().equals(type);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public List<Type> genericReturnTypeParameters() {
         Type returnType = method.getGenericReturnType();
-        return getTypeParameters(returnType);
+        return TypeUtilities.getTypeParameters(returnType);
     }
 
     /** {@inheritDoc} */
@@ -246,7 +265,8 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
         }
 
         try {
-            MethodHandle defaultInterfaceMethodHandle = MethodHandleUtilities.buildMethodHandle(proxy, method);
+            MethodHandle defaultInterfaceMethodHandle = 
+                methodHandleFactory.createMethodHandle(proxy, method);
             return defaultInterfaceMethodHandle.invokeWithArguments(args);
         } 
         catch (Throwable ex) {
@@ -260,12 +280,4 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
             );
         }
     }
-
-    private List<Type> getTypeParameters(Type type) {
-        if (type instanceof ParameterizedType) {
-            return Arrays.asList(((ParameterizedType)type).getActualTypeArguments());
-        }
-        return Collections.emptyList();
-    }
-    
 }

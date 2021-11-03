@@ -31,11 +31,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExternalizedPropertyMethodTests {
     private final ExternalizedPropertyResolver resolver = new SystemPropertyResolver();
-    private final StringVariableExpander variableExpander = new InternalStringVariableExpander(resolver);
-    private final ResolvedPropertyConverter converter = new InternalResolvedPropertyConverter(
-        new DefaultPropertyConversionHandler()
-    );
-    private final BasicProxyInterface proxyStub = ExternalizedProperties.builder()
+    private final ResolvedPropertyConverter converter = 
+        new InternalResolvedPropertyConverter(
+            new DefaultPropertyConversionHandler()
+        );
+    private final StringVariableExpander variableExpander = 
+        new InternalStringVariableExpander(resolver);
+    private final MethodHandleFactory methodHandleFactory = new MethodHandleFactory();
+
+    private final BasicProxyInterface proxy = ExternalizedProperties.builder()
         .resolvers(resolver)
         .build()
         .initialize(BasicProxyInterface.class);
@@ -50,11 +54,12 @@ public class ExternalizedPropertyMethodTests {
                     null, 
                     getProxyInterfaceMethod(
                         BasicProxyInterface.class, 
-                        "property1"
+                        "property"
                     ),
                     resolver,
                     converter,
-                    variableExpander
+                    variableExpander,
+                    methodHandleFactory
                 ));
         }
 
@@ -63,11 +68,12 @@ public class ExternalizedPropertyMethodTests {
         public void test2() {
             assertThrows(IllegalArgumentException.class, () ->
                 new ExternalizedPropertyMethod(
-                    proxyStub,
+                    proxy,
                     null,
                     resolver,
                     converter,
-                    variableExpander
+                    variableExpander,
+                    methodHandleFactory
                 ));
         }
 
@@ -76,46 +82,65 @@ public class ExternalizedPropertyMethodTests {
         public void test3() {
             assertThrows(IllegalArgumentException.class, () ->
                 new ExternalizedPropertyMethod(
-                    proxyStub,
+                    proxy,
                     getProxyInterfaceMethod(
                         BasicProxyInterface.class, 
-                        "property1"
+                        "property"
                     ),
                     null,
                     converter,
-                    variableExpander
+                    variableExpander,
+                    methodHandleFactory
+                ));
+        }
+        @Test
+        @DisplayName("should throw when resolved property converter argument is null")
+        public void test4() {
+            assertThrows(IllegalArgumentException.class, () ->
+                new ExternalizedPropertyMethod(
+                    proxy,
+                    getProxyInterfaceMethod(
+                        BasicProxyInterface.class, 
+                        "property"
+                    ),
+                    resolver,
+                    null,
+                    variableExpander,
+                    methodHandleFactory
                 ));
         }
 
         @Test
         @DisplayName("should throw when variable expander argument is null")
-        public void test4() {
+        public void test5() {
             assertThrows(IllegalArgumentException.class, () ->
                 new ExternalizedPropertyMethod(
-                    proxyStub,
+                    proxy,
                     getProxyInterfaceMethod(
                         BasicProxyInterface.class, 
-                        "property1"
+                        "property"
                     ),
                     resolver,
                     converter,
-                    null
+                    null,
+                    methodHandleFactory
                 ));
         }
 
         @Test
-        @DisplayName("should throw when resolved property converter argument is null")
-        public void test5() {
+        @DisplayName("should throw when method handle builder argument is null")
+        public void test6() {
             assertThrows(IllegalArgumentException.class, () ->
                 new ExternalizedPropertyMethod(
-                    proxyStub,
+                    proxy,
                     getProxyInterfaceMethod(
                         BasicProxyInterface.class, 
-                        "property1"
+                        "property"
                     ),
                     resolver,
-                    null,
-                    variableExpander
+                    converter,
+                    variableExpander,
+                    null
                 ));
         }
     }
@@ -125,18 +150,18 @@ public class ExternalizedPropertyMethodTests {
         @Test
         @DisplayName("should return @ExternalizedProperty instance when method is annotated")
         public void test1() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             Optional<ExternalizedProperty> annotation = 
                 externalizedPropertyMethod.externalizedPropertyAnnotation();
             
-            // BasicProxyInterface.property1 is annotated with @ExternalizedProperty
+            // BasicProxyInterface.property is annotated with @ExternalizedProperty
             assertTrue(annotation.isPresent());
         }
 
@@ -154,7 +179,7 @@ public class ExternalizedPropertyMethodTests {
             Optional<ExternalizedProperty> annotation = 
                 externalizedPropertyMethod.externalizedPropertyAnnotation();
             
-            // BasicProxyInterface.property1 is annotated with @ExternalizedProperty
+            // BasicProxyInterface.property is annotated with @ExternalizedProperty
             assertFalse(annotation.isPresent());
         }
     }
@@ -164,20 +189,20 @@ public class ExternalizedPropertyMethodTests {
         @Test
         @DisplayName("should return name of the property")
         public void test1() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
             
             Optional<String> propertyName = externalizedPropertyMethod.propertyName();
             
             assertTrue(propertyName.isPresent());
 
-            // See BasicProxyInterface.property1 @ExternalizedProperty annotation value.
-            assertEquals("property.1", propertyName.get());
+            // See BasicProxyInterface.property @ExternalizedProperty annotation value.
+            assertEquals("property", propertyName.get());
         }
     }
 
@@ -189,13 +214,13 @@ public class ExternalizedPropertyMethodTests {
             "when method is annotation with the specified annotation class"
         )
         public void test() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
             
             Optional<ExternalizedProperty> annotation = 
                 externalizedPropertyMethod.findAnnotation(ExternalizedProperty.class);
@@ -209,13 +234,13 @@ public class ExternalizedPropertyMethodTests {
             "when method is not annotated with the specified annotation class"
         )
         public void test2() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             // Method not annotated with @Delimiter.
             Optional<Delimiter> nonExistentAnnotation =
@@ -232,13 +257,13 @@ public class ExternalizedPropertyMethodTests {
             "should return true when method is annotated with the specified annotation class"
         )
         public void test1() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             assertTrue(
                 externalizedPropertyMethod.hasAnnotation(ExternalizedProperty.class)
@@ -250,13 +275,13 @@ public class ExternalizedPropertyMethodTests {
             "should return false when method is annotated with the specified annotation class"
         )
         public void test2() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             assertFalse(
                 externalizedPropertyMethod.hasAnnotation(Delimiter.class)
@@ -269,31 +294,51 @@ public class ExternalizedPropertyMethodTests {
         @Test
         @DisplayName("should return method's return type")
         public void test1() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             Class<?> returnType = externalizedPropertyMethod.returnType();
 
-            assertEquals(property1Method.getReturnType(), returnType);
+            assertEquals(propertyMethod.getReturnType(), returnType);
         }
     }
+
+    @Nested
+    class GenericReturnTypeMethod {
+        @Test
+        @DisplayName("should return method's generic return type")
+        public void test1() {
+            Method propertyMethod = getProxyInterfaceMethod(
+                BasicProxyInterface.class, 
+                "property"
+            );
+
+            ExternalizedPropertyMethod externalizedPropertyMethod = 
+                externalizedPropertyMethod(propertyMethod);
+
+            Type genericReturnType = externalizedPropertyMethod.genericReturnType();
+
+            assertEquals(propertyMethod.getGenericReturnType(), genericReturnType);
+        }
+    }
+
     @Nested
     class HasReturnTypeMethod {
         @Test
         @DisplayName("should return true when method's return type matches")
         public void test1() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             assertTrue(
                 externalizedPropertyMethod.hasReturnType(String.class)
@@ -303,19 +348,59 @@ public class ExternalizedPropertyMethodTests {
         @Test
         @DisplayName("should return false when method's return type does not match")
         public void test2() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             assertFalse(
                 externalizedPropertyMethod.hasReturnType(Integer.class)
             );
         }
     }
+
+    @Nested
+    class HasReturnTypeMethodWithTypeArgument {
+        @Test
+        @DisplayName("should return true when method's return type matches")
+        public void test1() {
+            Method propertyMethod = getProxyInterfaceMethod(
+                BasicProxyInterface.class, 
+                "property"
+            );
+
+            ExternalizedPropertyMethod externalizedPropertyMethod = 
+                externalizedPropertyMethod(propertyMethod);
+
+            Type type = String.class;
+
+            assertTrue(
+                externalizedPropertyMethod.hasReturnType(type)
+            );
+        }
+
+        @Test
+        @DisplayName("should return false when method's return type does not match")
+        public void test2() {
+            Method propertyMethod = getProxyInterfaceMethod(
+                BasicProxyInterface.class, 
+                "property"
+            );
+
+            ExternalizedPropertyMethod externalizedPropertyMethod = 
+                externalizedPropertyMethod(propertyMethod);
+
+            Type type = Integer.class;
+
+            assertFalse(
+                externalizedPropertyMethod.hasReturnType(type)
+            );
+        }
+    }
+
     @Nested
     class GenericReturnTypeParametersMethod {
         @Test
@@ -346,21 +431,22 @@ public class ExternalizedPropertyMethodTests {
             "when method's return type is not a generic type"
         )
         public void test2() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             List<Type> genericTypeParameters = 
                 externalizedPropertyMethod.genericReturnTypeParameters();
 
-            // BasicProxyInterface.property1 returns a String which is not generic.
+            // BasicProxyInterface.property returns a String which is not generic.
             assertTrue(genericTypeParameters.isEmpty());
         }
     }
+
     @Nested
     class GenericReturnTypeParameterMethod {
         @Test
@@ -412,18 +498,18 @@ public class ExternalizedPropertyMethodTests {
             "when method's return type is not a generic type"
         )
         public void test3() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             Optional<Type> genericTypeParameter = 
                 externalizedPropertyMethod.genericReturnTypeParameter(0);
 
-            // BasicProxyInterface.property1 returns a String which is not generic.
+            // BasicProxyInterface.property returns a String which is not generic.
             assertFalse(genericTypeParameter.isPresent());
         }
     }
@@ -482,20 +568,20 @@ public class ExternalizedPropertyMethodTests {
             "when method's return type is not a generic type"
         )
         public void test3() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             Type returnType = 
                 externalizedPropertyMethod.genericReturnTypeParameterOrReturnType(0);
 
-            // BasicProxyInterface.property1 returns a String which is not generic.
+            // BasicProxyInterface.property returns a String which is not generic.
             assertEquals(
-                property1Method.getReturnType(),
+                propertyMethod.getReturnType(),
                 returnType
             );
         }
@@ -522,13 +608,13 @@ public class ExternalizedPropertyMethodTests {
         @Test
         @DisplayName("should return false when method is not a default interface method")
         public void test2() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             assertFalse(
                 externalizedPropertyMethod.isDefaultInterfaceMethod()
@@ -542,20 +628,20 @@ public class ExternalizedPropertyMethodTests {
         @Test
         @DisplayName("should return method's signature string")
         public void test1() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             String methodSignature = externalizedPropertyMethod.methodSignatureString();
 
             // Since method is non-generic,
             // Method.toGenericString() and Method.toString() returns the same signature.
-            assertEquals(property1Method.toGenericString(), methodSignature);
-            assertEquals(property1Method.toString(), methodSignature);
+            assertEquals(propertyMethod.toGenericString(), methodSignature);
+            assertEquals(propertyMethod.toString(), methodSignature);
         }
 
         @Test
@@ -618,13 +704,13 @@ public class ExternalizedPropertyMethodTests {
         @Test
         @DisplayName("should throw when method is not a default interface method")
         public void test2() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             assertThrows(
                 IllegalStateException.class, 
@@ -716,13 +802,13 @@ public class ExternalizedPropertyMethodTests {
             "and does not have an Optional method return type."
         )
         public void test3() {
-            Method property1Method = getProxyInterfaceMethod(
+            Method propertyMethod = getProxyInterfaceMethod(
                 BasicProxyInterface.class, 
-                "property1"
+                "property"
             );
 
             ExternalizedPropertyMethod externalizedPropertyMethod = 
-                externalizedPropertyMethod(property1Method);
+                externalizedPropertyMethod(propertyMethod);
 
             assertThrows(
                 UnresolvedExternalizedPropertyException.class, 
@@ -744,7 +830,6 @@ public class ExternalizedPropertyMethodTests {
             ExternalizedPropertyMethod externalizedPropertyMethod = 
                 externalizedPropertyMethod(javaVersionMethod);
 
-            // property.1 is not in system properties so this should return default value.
             Object resolvedValue = externalizedPropertyMethod.resolveProperty(new String[0]);
 
             // Since we're using SystemPropertyResolver,
@@ -789,7 +874,7 @@ public class ExternalizedPropertyMethodTests {
             ExternalizedPropertyMethod externalizedPropertyMethod = 
                 externalizedPropertyMethod(propertyWithDefaultValue);
 
-            // property.1 is not in system properties so this should return default value.
+            // property is not in system properties so this should return default value.
             Object resolvedValue = externalizedPropertyMethod.resolveProperty(new String[0]);
             Object defaultValue = externalizedPropertyMethod.determineDefaultValue(new String[0]);
 
@@ -801,11 +886,12 @@ public class ExternalizedPropertyMethodTests {
     private ExternalizedPropertyMethod externalizedPropertyMethod(Method method) {
         ExternalizedPropertyMethod externalizedPropertyMethod =
             new ExternalizedPropertyMethod(
-                proxyStub,
+                proxy,
                 method,
                 resolver,
                 converter,
-                variableExpander
+                variableExpander,
+                methodHandleFactory
             );
         return externalizedPropertyMethod;
     }

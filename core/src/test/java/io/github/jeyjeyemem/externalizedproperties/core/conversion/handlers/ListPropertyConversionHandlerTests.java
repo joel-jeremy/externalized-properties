@@ -5,6 +5,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalResolvedPropertyConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ListProxyInterface;
@@ -12,11 +13,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,7 +30,7 @@ public class ListPropertyConversionHandlerTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when expected type is null.")
+        @DisplayName("should return false when expected type is null.")
         public void test1() {
             ListPropertyConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(null);
@@ -94,9 +99,10 @@ public class ListPropertyConversionHandlerTests {
             assertNotNull(list);
             assertTrue(list.size() == 3);
             assertTrue(list.stream().allMatch(v -> v instanceof String));
-            assertEquals("value1", list.get(0));
-            assertEquals("value2", list.get(1));
-            assertEquals("value3", list.get(2));
+            assertIterableEquals(
+                Arrays.asList("value1", "value2", "value3"), 
+                list
+            );
         }
 
         @Test
@@ -125,13 +131,15 @@ public class ListPropertyConversionHandlerTests {
             assertNotNull(list);
             assertTrue(list.size() == 3);
             assertTrue(list.stream().allMatch(v -> v instanceof String));
-            assertEquals("value1", list.get(0));
-            assertEquals("value2", list.get(1));
-            assertEquals("value3", list.get(2));
+            assertIterableEquals(
+                Arrays.asList("value1", "value2", "value3"), 
+                list
+            );
+
         }
 
         @Test
-        @DisplayName("should convert resolved property according to the List's generic parameter type.")
+        @DisplayName("should convert resolved property according to the List's generic type parameter.")
         public void test4() {
             ListPropertyConversionHandler handler = handlerToTest();
 
@@ -158,13 +166,15 @@ public class ListPropertyConversionHandlerTests {
             assertNotNull(list);
             assertTrue(list.size() == 3);
             assertTrue(list.stream().allMatch(v -> v instanceof Integer));
-            assertEquals(1, list.get(0));
-            assertEquals(2, list.get(1));
-            assertEquals(3, list.get(2));
+            assertIterableEquals(
+                Arrays.asList(1, 2, 3), 
+                list
+            );
+
         }
 
         @Test
-        @DisplayName("should return String values when List's generic parameter type is a wildcard.")
+        @DisplayName("should return String values when List's generic type parameter is a wildcard.")
         public void test5() {
             ListPropertyConversionHandler handler = handlerToTest();
 
@@ -189,9 +199,11 @@ public class ListPropertyConversionHandlerTests {
             assertNotNull(list);
             assertTrue(list.size() == 3);
             assertTrue(list.stream().allMatch(v -> v instanceof String));
-            assertEquals("value1", list.get(0));
-            assertEquals("value2", list.get(1));
-            assertEquals("value3", list.get(2));
+            assertIterableEquals(
+                Arrays.asList("value1", "value2", "value3"), 
+                list
+            );
+
         }
 
         @Test
@@ -223,9 +235,11 @@ public class ListPropertyConversionHandlerTests {
             assertNotNull(list);
             assertTrue(list.size() == 3);
             assertTrue(list.stream().allMatch(v -> v instanceof String));
-            assertEquals("value1", list.get(0));
-            assertEquals("value2", list.get(1));
-            assertEquals("value3", list.get(2));
+            assertIterableEquals(
+                Arrays.asList("value1", "value2", "value3"), 
+                list
+            );
+
         }
 
         @Test
@@ -281,11 +295,11 @@ public class ListPropertyConversionHandlerTests {
             assertNotNull(list);
             assertTrue(list.size() == 5);
             assertTrue(list.stream().allMatch(v -> v instanceof String));
-            assertEquals("value1", list.get(0));
-            assertEquals("", list.get(1));
-            assertEquals("value3", list.get(2));
-            assertEquals("", list.get(3));
-            assertEquals("value5", list.get(4));
+            assertIterableEquals(
+                Arrays.asList("value1", "", "value3", "", "value5"), 
+                list
+            );
+
         }
 
         @Test
@@ -317,9 +331,10 @@ public class ListPropertyConversionHandlerTests {
             assertNotNull(list);
             assertTrue(list.size() == 3);
             assertTrue(list.stream().allMatch(v -> v instanceof String));
-            assertEquals("value1", list.get(0));
-            assertEquals("value3", list.get(1));
-            assertEquals("value5", list.get(2));
+            assertIterableEquals(
+                Arrays.asList("value1", "value3", "value5"), 
+                list
+            );
         }
 
         @Test
@@ -339,17 +354,176 @@ public class ListPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
             
+            // No registered conversion handler for Integer.
             assertThrows(ExternalizedPropertiesException.class, () -> {
                 handler.convert(
                     new ResolvedPropertyConversionHandlerContext(
                         converter,
                         propertyMethodInfo,
-                        ResolvedProperty.with("property.list.integer", "1,2,3,4,5"), 
-                        propertyMethodInfo.returnType(), // No registered conversion handler for Integer.
-                        propertyMethodInfo.genericReturnTypeParameters()
+                        ResolvedProperty.with("property.list.integer", "1,2,3,4,5")
                     )
                 );
             });
+        }
+
+        @Test
+        @DisplayName(
+            "should convert resolved property according to the List's generic type parameter. " + 
+            "Generic type parameter is also a parameterized type e.g. List<Optional<String>>."
+        )
+        public void test11() {
+            ListPropertyConversionHandler handler = handlerToTest();
+
+            ExternalizedPropertyMethodInfo propertyMethodInfo = 
+                StubExternalizedPropertyMethodInfo.fromMethod(
+                    ListProxyInterface.class,
+                    "listPropertyNestedGenerics" // Returns a List<Optional<String>>.
+                );
+            
+            ResolvedPropertyConverter converter = 
+                new InternalResolvedPropertyConverter(
+                    handler,
+                    new OptionalPropertyConversionHandler() // Register additional Optional handler.
+                );
+
+            ResolvedPropertyConversionHandlerContext context = 
+                new ResolvedPropertyConversionHandlerContext(
+                    converter,
+                    propertyMethodInfo,
+                    ResolvedProperty.with(
+                        "property.list.nested.generics", 
+                        "value1,value2,value3"
+                    )
+                );
+
+            List<?> list = handler.convert(context);
+            
+            assertNotNull(list);
+            assertTrue(list.size() == 3);
+            assertTrue(list.stream().allMatch(v -> v instanceof Optional<?>));
+            assertIterableEquals(
+                Arrays.asList(
+                    Optional.of("value1"), 
+                    Optional.of("value2"), 
+                    Optional.of("value3")
+                ), 
+                list
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should convert resolved property according to the List's generic type parameter. " + 
+            "Generic type parameter is generic array e.g. List<Optional<String>[]>."
+        )
+        public void test12() {
+            ListPropertyConversionHandler handler = handlerToTest();
+
+            ExternalizedPropertyMethodInfo propertyMethodInfo = 
+                StubExternalizedPropertyMethodInfo.fromMethod(
+                    ListProxyInterface.class,
+                    "listPropertyNestedGenericsArray" // Returns a List<Optional<String>[]>.
+                );
+            
+            ResolvedPropertyConverter converter = 
+                new InternalResolvedPropertyConverter(
+                    handler,
+                    new ArrayPropertyConversionHandler(), // Register additional array handler.
+                    new OptionalPropertyConversionHandler() // Register additional Optional handler.
+                );
+
+            ResolvedPropertyConversionHandlerContext context = 
+                new ResolvedPropertyConversionHandlerContext(
+                    converter,
+                    propertyMethodInfo,
+                    ResolvedProperty.with(
+                        "property.list.nested.generics.array", 
+                        "value1,value2,value3"
+                    )
+                );
+
+            List<?> list = handler.convert(context);
+            
+            assertNotNull(list);
+            assertTrue(list.size() == 3);
+            assertTrue(list.stream().allMatch(v -> v instanceof Optional<?>[]));
+            
+            Optional<?>[] item1 = (Optional<?>[])list.get(0);
+            Optional<?>[] item2 = (Optional<?>[])list.get(1);
+            Optional<?>[] item3 = (Optional<?>[])list.get(2);
+
+            assertArrayEquals(
+                new Optional<?>[] { Optional.of("value1") }, 
+                item1
+            );
+
+            assertArrayEquals(
+                new Optional<?>[] { Optional.of("value2") }, 
+                item2
+            );
+            
+            assertArrayEquals(
+                new Optional<?>[] { Optional.of("value3") }, 
+                item3
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when expected type has a type variable e.g. List<T>.")
+        public void test13() {
+            ListPropertyConversionHandler handler = handlerToTest();
+
+            ExternalizedPropertyMethodInfo propertyMethodInfo = 
+                StubExternalizedPropertyMethodInfo.fromMethod(
+                    ListProxyInterface.class,
+                    "listPropertyT"
+                );
+            
+            ResolvedPropertyConverter converter = 
+                new InternalResolvedPropertyConverter(handler);
+
+            ResolvedPropertyConversionHandlerContext context = 
+                new ResolvedPropertyConversionHandlerContext(
+                    converter,
+                    propertyMethodInfo,
+                    ResolvedProperty.with("property.list.T", "value")
+                );
+                
+            assertThrows(
+                ResolvedPropertyConversionException.class, 
+                () -> handler.convert(context)
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when there is no expected type generic type parameters in context."
+        )
+        public void test14() {
+            ListPropertyConversionHandler handler = handlerToTest();
+
+            ExternalizedPropertyMethodInfo propertyMethodInfo = 
+                StubExternalizedPropertyMethodInfo.fromMethod(
+                    ListProxyInterface.class,
+                    "listProperty"
+                );
+            
+            ResolvedPropertyConverter converter = 
+                new InternalResolvedPropertyConverter(handler);
+
+            ResolvedPropertyConversionHandlerContext context = 
+                new ResolvedPropertyConversionHandlerContext(
+                    converter,
+                    propertyMethodInfo,
+                    ResolvedProperty.with("property.list", "value1,value2,value3"),
+                    List.class,
+                    Collections.emptyList()
+                );
+                
+            assertThrows(
+                ResolvedPropertyConversionException.class, 
+                () -> handler.convert(context)
+            );
         }
     }
 

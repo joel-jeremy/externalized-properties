@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 /**
- * Argument utilities.
+ * Arguments-related utility methods.
  */
 public class Arguments {
     private Arguments(){}
@@ -51,56 +51,45 @@ public class Arguments {
     }
 
     /**
-     * String argument utilities.
+     * Require argument to not be {@code null} or an empty {@link String}.
+     * 
+     * @param arg The {@link String} argument.
+     * @param argName The name of the {@link String} argument to be used in building the 
+     * {@link IllegalArgumentException} message if the argument failed validation.
+     * @return The {@link String} argument.
      */
-    public static class Strings {
-        private Strings(){}
+    public static String requireNonNullOrEmptyString(String arg, String argName) {
+        if (isNullOrEmpty(argName))
+            throw new IllegalArgumentException("argName must not be null or empty.");
 
-        /**
-         * Require argument to not be {@code null} or an empty {@link String}.
-         * 
-         * @param arg The {@link String} argument.
-         * @param argName The name of the {@link String} argument to be used in building the 
-         * {@link IllegalArgumentException} message if the argument failed validation.
-         * @return The {@link String} argument.
-         */
-        public static String requireNonNullOrEmptyString(String arg, String argName) {
-            if (isNullOrEmpty(argName))
-                throw new IllegalArgumentException("argName must not be null or empty.");
-
-            return require(
-                arg, 
-                a -> a != null && !a.isEmpty(), 
-                argName + " must not be null or empty."
-            );
-        }
+        return require(
+            arg,
+            a -> a != null && !a.isEmpty(),
+            argName + " must not be null or empty."
+        );
     }
 
     /**
-     * Collection argument utilities.
+     * Require argument to not be {@code null} or an empty {@link Collection}.
+     * 
+     * @param <T> The type of the collection argument.
+     * @param arg The {@link Collection} argument.
+     * @param argName The name of the {@link Collection} argument to be used in building the 
+     * {@link IllegalArgumentException} message if the argument failed validation.
+     * @return The {@link Collection} argument.
      */
-    public static class Collections {
-        private Collections(){}
+    public static <T> Collection<T> requireNonNullOrEmptyCollection(
+            Collection<T> arg, 
+            String argName
+    ) {
+        if (isNullOrEmpty(argName))
+            throw new IllegalArgumentException("argName must not be null or empty.");
 
-        /**
-         * Require argument to not be {@code null} or an empty {@link Collection}.
-         * 
-         * @param <T> The type of the collection argument.
-         * @param arg The {@link Collection} argument.
-         * @param argName The name of the {@link Collection} argument to be used in building the 
-         * {@link IllegalArgumentException} message if the argument failed validation.
-         * @return The {@link Collection} argument.
-         */
-        public static <T> Collection<T> requireNonNullOrEmptyCollection(Collection<T> arg, String argName) {
-            if (isNullOrEmpty(argName))
-                throw new IllegalArgumentException("argName must not be null or empty.");
-
-            return require(
-                arg, 
-                a -> a != null && !a.isEmpty(), 
-                argName + " must not be null or empty."
-            );
-        }
+        return require(
+            arg,
+            a -> a != null && !a.isEmpty(),
+            argName + " must not be null or empty."
+        );
     }
 
     private static boolean isNullOrEmpty(String string) {

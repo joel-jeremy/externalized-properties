@@ -14,8 +14,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,7 +27,7 @@ public class ArrayPropertyConversionHandlerTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when expected type is null.")
+        @DisplayName("should return false when expected type is null.")
         public void test1() {
             ArrayPropertyConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(null);
@@ -109,9 +110,10 @@ public class ArrayPropertyConversionHandlerTests {
             assertNotNull(array);
             assertTrue(array.length == 3);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
-            assertEquals("value1", array[0]);
-            assertEquals("value2", array[1]);
-            assertEquals("value3", array[2]);
+            assertArrayEquals(
+                new String[] { "value1", "value2", "value3" }, 
+                array
+            );
         }
 
         @Test
@@ -122,7 +124,7 @@ public class ArrayPropertyConversionHandlerTests {
             ExternalizedPropertyMethodInfo propertyMethodInfo = 
                 StubExternalizedPropertyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
-                    "arrayInteger"
+                    "arrayIntegerWrapper"
                 );
             
             ResolvedPropertyConverter converter = new InternalResolvedPropertyConverter(
@@ -141,9 +143,10 @@ public class ArrayPropertyConversionHandlerTests {
             assertNotNull(array);
             assertTrue(array.length == 3);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof Integer));
-            assertEquals(1, array[0]);
-            assertEquals(2, array[1]);
-            assertEquals(3, array[2]);
+            assertArrayEquals(
+                new Integer[] { 1, 2, 3 }, 
+                array
+            );
         }
 
         @Test
@@ -197,11 +200,10 @@ public class ArrayPropertyConversionHandlerTests {
             assertNotNull(array);
             assertTrue(array.length == 5);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
-            assertEquals("value1", array[0]);
-            assertEquals("", array[1]);
-            assertEquals("value3", array[2]);
-            assertEquals("", array[3]);
-            assertEquals("value5", array[4]);
+            assertArrayEquals(
+                new String[] { "value1", "", "value3", "", "value5" }, 
+                array
+            );
         }
 
         @Test
@@ -232,9 +234,10 @@ public class ArrayPropertyConversionHandlerTests {
             assertNotNull(array);
             assertTrue(array.length == 3);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
-            assertEquals("value1", array[0]);
-            assertEquals("value3", array[1]);
-            assertEquals("value5", array[2]);
+            assertArrayEquals(
+                new String[] { "value1", "value3", "value5" }, 
+                array
+            );
         }
 
         @Test
@@ -265,9 +268,10 @@ public class ArrayPropertyConversionHandlerTests {
             assertNotNull(array);
             assertTrue(array.length == 3);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
-            assertEquals("value1", array[0]);
-            assertEquals("value2", array[1]);
-            assertEquals("value3", array[2]);
+            assertArrayEquals(
+                new String[] { "value1", "value2", "value3" }, 
+                array
+            );
         }
 
         @Test
@@ -281,7 +285,7 @@ public class ArrayPropertyConversionHandlerTests {
             ExternalizedPropertyMethodInfo propertyMethodInfo = 
                 StubExternalizedPropertyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
-                    "arrayInteger"
+                    "arrayIntegerWrapper"
                 );
             
             ResolvedPropertyConverter converter = 
@@ -298,6 +302,126 @@ public class ArrayPropertyConversionHandlerTests {
                     )
                 );
             });
+        }
+
+        @Test
+        @DisplayName("should use custom delimiter defined by @Delimiter.")
+        public void test10() {
+            ArrayPropertyConversionHandler handler = handlerToTest();
+            
+            ExternalizedPropertyMethodInfo propertyMethodInfo = 
+                StubExternalizedPropertyMethodInfo.fromMethod(
+                    ArrayProxyInterface.class,
+                    "arrayCustomDelimiter"
+                );
+            
+            ResolvedPropertyConverter converter = 
+                new InternalResolvedPropertyConverter(handler);
+            
+            Object[] array = handler.convert(
+                new ResolvedPropertyConversionHandlerContext(
+                    converter,
+                    propertyMethodInfo,
+                    ResolvedProperty.with(
+                        "property.array.custom.delimiter", 
+                        "value1|value2|value3" // Custom delimiter
+                    )
+                )
+            );
+            
+            assertNotNull(array);
+            assertTrue(array.length == 3);
+            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
+            assertArrayEquals(
+                new String[] { "value1", "value2", "value3" }, 
+                array
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should convert resolved property according to the array's generic component type."
+        )
+        public void test11() {
+            ArrayPropertyConversionHandler handler = handlerToTest();
+            
+            ExternalizedPropertyMethodInfo propertyMethodInfo = 
+                StubExternalizedPropertyMethodInfo.fromMethod(
+                    ArrayProxyInterface.class,
+                    "arrayGeneric" // Returns a generic type array Optional<String>[]
+                );
+            
+            ResolvedPropertyConverter converter = 
+                new InternalResolvedPropertyConverter(
+                    handler,
+                    new OptionalPropertyConversionHandler() // Register additional Optional handler.
+                );
+            
+            Object[] array = handler.convert(
+                new ResolvedPropertyConversionHandlerContext(
+                    converter,
+                    propertyMethodInfo,
+                    ResolvedProperty.with(
+                        "property.array.generic", 
+                        "value1,value2,value3"
+                    )
+                )
+            );
+            
+            assertNotNull(array);
+            assertTrue(array.length == 3);
+            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof Optional));
+            assertArrayEquals(
+                new Optional[] { 
+                    Optional.of("value1"), 
+                    Optional.of("value2"), 
+                    Optional.of("value3")
+                }, 
+                array
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should convert generic type parameter wildcards to Strings."
+        )
+        public void test12() {
+            ArrayPropertyConversionHandler handler = handlerToTest();
+            
+            ExternalizedPropertyMethodInfo propertyMethodInfo = 
+                StubExternalizedPropertyMethodInfo.fromMethod(
+                    ArrayProxyInterface.class,
+                    "arrayGenericWildcard" // Returns a generic type array Optional<?>[]
+                );
+            
+            ResolvedPropertyConverter converter = 
+                new InternalResolvedPropertyConverter(
+                    handler,
+                    new OptionalPropertyConversionHandler() // Register additional Optional handler.
+                );
+            
+            Object[] array = handler.convert(
+                new ResolvedPropertyConversionHandlerContext(
+                    converter,
+                    propertyMethodInfo,
+                    ResolvedProperty.with(
+                        "property.array.generic.wildcard", 
+                        "value1,value2,value3"
+                    )
+                )
+            );
+            
+            assertNotNull(array);
+            assertTrue(array.length == 3);
+            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof Optional));
+            assertArrayEquals(
+                new Optional[] { 
+                    Optional.of("value1"), 
+                    Optional.of("value2"), 
+                    Optional.of("value3")
+                }, 
+                array
+            );
         }
     }
 

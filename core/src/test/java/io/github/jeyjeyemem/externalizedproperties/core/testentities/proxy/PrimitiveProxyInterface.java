@@ -29,19 +29,19 @@ public interface PrimitiveProxyInterface {
         return defaultValue;
     }
 
-    @ExternalizedProperty("property.long")
+    @ExternalizedProperty("property.long.primitive")
     long longPrimitiveProperty();
 
     @ExternalizedProperty("property.long.wrapper")
     Long longWrapperProperty();
 
-    @ExternalizedProperty("property.float")
+    @ExternalizedProperty("property.float.primitive")
     float floatPrimitiveProperty();
 
     @ExternalizedProperty("property.float.wrapper")
     Float floatWrapperProperty();
 
-    @ExternalizedProperty("property.double")
+    @ExternalizedProperty("property.double.primitive")
     double doublePrimitiveProperty();
 
     @ExternalizedProperty("property.double.wrapper")

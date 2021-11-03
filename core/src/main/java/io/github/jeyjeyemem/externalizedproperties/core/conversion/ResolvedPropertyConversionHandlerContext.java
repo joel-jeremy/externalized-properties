@@ -5,7 +5,6 @@ import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
@@ -26,8 +25,8 @@ public class ResolvedPropertyConversionHandlerContext {
 
 
     /**
-     * Constructor. This will use the externalized property method's return type as the expected type and the
-     * externalized property method's generic return type parameter as expected type's generic type parameters.
+     * Constructor which constructs a context object to convert to whatever the 
+     * return type and return type's generic type parameter of the property method is.
      * 
      * @param resolvedPropertyConverter The resolved property converter. 
      * This is here to allow for recursive conversion in {@link ResolvedPropertyConversionHandler}
@@ -57,9 +56,20 @@ public class ResolvedPropertyConversionHandlerContext {
      * implementations.
      * @param externalizedPropertyMethodInfo The externalized property method info.
      * @param resolvedProperty The resolved property.
-     * @param expectedType The type to convert to.
+     * @param expectedType The type to convert to. This could be different from the return type of 
+     * the property method.
      * @param expectedTypeGenericTypeParameters The generic type parameters of the class returned by 
-     * {@link #expectedType()}, if there are any.
+     * {@link #expectedType()}, if there are any. 
+     * 
+     * <p>For example, if {@link #expectedType()} is a parameterized type e.g. {@code List<String>}, 
+     * this should contain a {@code String} type/class.
+     * 
+     * <p>Another example is if {@link #expectedType()} is an array with a generic component type
+     * e.g. {@code Optional<Integer>[]}, this should contain an {@code Integer} type/class.
+     * 
+     * <p>It is also possible for {@link #expectedType()} to be a parameterized type which contains
+     * another parameterized type parameter e.g. {@code Optional<List<String>>}, in this case, 
+     * this should contain a {@code List<String>} parameterized type.
      */
     public ResolvedPropertyConversionHandlerContext(
             ResolvedPropertyConverter resolvedPropertyConverter,
@@ -73,9 +83,12 @@ public class ResolvedPropertyConversionHandlerContext {
             externalizedPropertyMethodInfo,
             resolvedProperty, 
             expectedType, 
-            expectedTypeGenericTypeParameters == null ? 
-                Collections.emptyList() : 
-                Arrays.asList(expectedTypeGenericTypeParameters)
+            Arrays.asList(
+                requireNonNull(
+                    expectedTypeGenericTypeParameters,
+                    "expectedTypeGenericTypeParameters"
+                )
+            )
         );
     }
 
@@ -87,9 +100,20 @@ public class ResolvedPropertyConversionHandlerContext {
      * implementations.
      * @param externalizedPropertyMethodInfo The externalized property method info.
      * @param resolvedProperty The resolved property.
-     * @param expectedType The type to convert to.
+     * @param expectedType The type to convert to. This could be different from the return type of 
+     * the property method.
      * @param expectedTypeGenericTypeParameters The generic type parameters of the class returned by 
-     * {@link #expectedType()}, if there are any.
+     * {@link #expectedType()}, if there are any. 
+     * 
+     * <p>For example, if {@link #expectedType()} is a parameterized type e.g. {@code List<String>}, 
+     * this should contain a {@code String} type/class.
+     * 
+     * <p>Another example is if {@link #expectedType()} is an array with a generic component type
+     * e.g. {@code Optional<Integer>[]}, this should contain an {@code Integer} type/class.
+     * 
+     * <p>It is also possible for {@link #expectedType()} to be a parameterized type which contains
+     * another parameterized type parameter e.g. {@code Optional<List<String>>}, in this case, 
+     * this should contain a {@code List<String>} parameterized type.
      */
     public ResolvedPropertyConversionHandlerContext(
             ResolvedPropertyConverter resolvedPropertyConverter,
@@ -151,10 +175,10 @@ public class ResolvedPropertyConversionHandlerContext {
     }
 
     /**
-     * The generic type parameters of the class returned by {@linkplain #expectedType()}, if there are any.
+     * The generic type parameters of the class returned by {@link #expectedType()}, if there are any.
      * Otherwise, this shall return an empty list.
      * 
-     * @return The type parameters of the class returned by {@linkplain #expectedType()}, 
+     * @return The type parameters of the class returned by {@link #expectedType()}, 
      * if there are any. Otherwise, this shall return an empty list.
      */
     public List<Type> expectedTypeGenericTypeParameters() {
