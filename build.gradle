@@ -20,9 +20,6 @@ subprojects {
   apply plugin: 'maven-publish'
   apply plugin: 'signing'
 
-  sourceCompatibility = JavaVersion.VERSION_1_8
-  targetCompatibility = JavaVersion.VERSION_1_8
-
   dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
@@ -38,8 +35,16 @@ subprojects {
   }
 
   java {
+    toolchain {
+      languageVersion = JavaLanguageVersion.of(11)
+    }
+
     withJavadocJar()
     withSourcesJar()
+  }
+
+  compileJava {
+    options.release = 8
   }
 
   javadoc {
