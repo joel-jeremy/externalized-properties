@@ -6,8 +6,8 @@ import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyReso
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.StringVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverterContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedExternalizedPropertyException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
@@ -189,10 +189,11 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
             // Non-string return type handling.
             if (!hasReturnType(String.class)) {
                 return resolvedPropertyConverter.convert(
-                    new ResolvedPropertyConverterContext(
+                    new ResolvedPropertyConversionContext(
+                        resolvedPropertyConverter,
                         this,
                         resolvedProperty.get(), 
-                        returnType(),
+                        genericReturnType(),
                         genericReturnTypeParameters()
                     )
                 );

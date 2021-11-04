@@ -47,9 +47,9 @@ public interface OptionalProxyInterface {
     @ExternalizedProperty("property.optional.nested.generics.array")
     Optional<Optional<String>[]> optionalPropertyNestedGenericsArray();
 
-    @ExternalizedProperty("property.optional.T")
-    <T> Optional<T> optionalPropertyT();
-
     @ExternalizedProperty("property.optional.array")
     Optional<String[]> optionalPropertyArray();
+
+    @ExternalizedProperty("property.optional.T")
+    <T> Optional<T> optionalPropertyT();
 }

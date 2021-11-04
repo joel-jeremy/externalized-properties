@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments;
 
@@ -31,7 +31,7 @@ public class EnumPropertyConversionHandler<T extends Enum<T>> implements Resolve
 
     /** {@inheritDoc} */
     @Override
-    public T convert(ResolvedPropertyConversionHandlerContext context) {
+    public T convert(ResolvedPropertyConversionContext context) {
         requireNonNull(context, "context");
 
         try {

@@ -2,14 +2,12 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverterContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
 
 import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,42 +26,32 @@ public class OptionalPropertyConversionHandler implements ResolvedPropertyConver
 
     /** {@inheritDoc} */
     @Override
-    public Optional<?> convert(ResolvedPropertyConversionHandlerContext context) {
+    public Optional<?> convert(ResolvedPropertyConversionContext context) {
         requireNonNull(context, "context");
 
         try {
-            ResolvedProperty resolvedProperty = context.resolvedProperty();
             Type optionalGenericTypeParameter = context.expectedTypeGenericTypeParameters()
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new ResolvedPropertyConversionException(
                     "Optional generic type parameter is required."
                 ));
-            
-            // If Optional<String>, Optional<Object> or Optional<?>, return String value.
-            if (String.class.equals(optionalGenericTypeParameter) ||
-                    Object.class.equals(optionalGenericTypeParameter) ||
-                    optionalGenericTypeParameter instanceof WildcardType) {
+
+            // Do not allow Optional<T>, Optional<T extends ...>, etc.
+            throwIfOptionalHasTypeVariable(optionalGenericTypeParameter);
+
+            ResolvedProperty resolvedProperty = context.resolvedProperty();
+            Class<?> rawOptionalType = TypeUtilities.getRawType(optionalGenericTypeParameter);
+
+            // If Optional<String> or Optional<Object>, return String value.
+            if (String.class.equals(rawOptionalType) || Object.class.equals(rawOptionalType)) {
                 return Optional.of(resolvedProperty.value());
             }
 
-            ResolvedPropertyConverter resolvedPropertyConverter = 
-                context.resolvedPropertyConverter();
-
-            Class<?> converterExpectedType = TypeUtilities.getRawType(optionalGenericTypeParameter);
-            List<Type> converterExpectedTypeGenericTypeParameters = 
-                TypeUtilities.getTypeParameters(optionalGenericTypeParameter);
-
-            // Convert property and wrap in Optional.
-            return Optional.ofNullable(
-                resolvedPropertyConverter.convert(
-                    new ResolvedPropertyConverterContext(
-                        context.externalizedPropertyMethodInfo(),
-                        resolvedProperty, 
-                        converterExpectedType,
-                        converterExpectedTypeGenericTypeParameters
-                    )
-                )
+            return convertToOptionalType(
+                context, 
+                resolvedProperty, 
+                optionalGenericTypeParameter
             );
         } catch (Exception ex) {
             throw new ResolvedPropertyConversionException(String.format(
@@ -76,28 +64,37 @@ public class OptionalPropertyConversionHandler implements ResolvedPropertyConver
         }
     }
 
-    // private Class<?> determineExpectedType(Type optionalGenericTypeParameter) {
-    //     if (optionalGenericTypeParameter instanceof Class<?>) {
-    //         return (Class<?>)optionalGenericTypeParameter;
-    //     } 
-    //     else if (optionalGenericTypeParameter instanceof ParameterizedType) {
-    //         ParameterizedType pt = (ParameterizedType)optionalGenericTypeParameter;
-    //         return (Class<?>)pt.getRawType();
-    //     } 
-    //     else if (optionalGenericTypeParameter instanceof GenericArrayType) {
-    //         GenericArrayType gat = (GenericArrayType)optionalGenericTypeParameter;
-    //         if (gat.getGenericComponentType() instanceof ParameterizedType) {
-    //             return (Class<?>)((ParameterizedType)gat.getGenericComponentType()).getRawType();
-    //         }
-    //     }
-    //     else if (optionalGenericTypeParameter instanceof TypeVariable<?>) {
-    //         throw new ResolvedPropertyConversionException(
-    //             "Type variables in optional's generic parameter type e.g. Optional<T> are not supported."
-    //         );
-    //     }
+    private Optional<?> convertToOptionalType(
+            ResolvedPropertyConversionContext context, 
+            ResolvedProperty resolvedProperty,
+            Type optionalGenericTypeParameter
+    ) {
+        ResolvedPropertyConverter resolvedPropertyConverter = 
+            context.resolvedPropertyConverter();
 
-    //     throw new ResolvedPropertyConversionException(
-    //         "Could not determine list's generic parameter type."
-    //     );
-    // }
+        // Type parameter of the actual optional type parameter
+        List<Type> genericTypeParameterOfOptionalType = 
+            TypeUtilities.getTypeParameters(optionalGenericTypeParameter);
+
+        // Convert property and wrap in Optional.
+        return Optional.ofNullable(
+            resolvedPropertyConverter.convert(
+                new ResolvedPropertyConversionContext(
+                    context.resolvedPropertyConverter(),
+                    context.externalizedPropertyMethodInfo(),
+                    resolvedProperty, 
+                    optionalGenericTypeParameter,
+                    genericTypeParameterOfOptionalType
+                )
+            )
+        );
+    }
+
+    private void throwIfOptionalHasTypeVariable(Type optionalGenericTypeParameter) {
+        if (TypeUtilities.isTypeVariable(optionalGenericTypeParameter)) {
+            throw new ResolvedPropertyConversionException(
+                "Type variables e.g. Optional<T> are not supported."
+            );
+        }
+    }
 }

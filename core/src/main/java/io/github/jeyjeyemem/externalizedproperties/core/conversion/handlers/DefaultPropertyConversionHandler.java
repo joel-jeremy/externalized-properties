@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 
 import java.util.Arrays;
@@ -49,11 +49,11 @@ public class DefaultPropertyConversionHandler implements ResolvedPropertyConvers
 
     /** {@inheritDoc} */
     @Override
-    public Object convert(ResolvedPropertyConversionHandlerContext context) {
+    public Object convert(ResolvedPropertyConversionContext context) {
         requireNonNull(context, "context");
 
         ResolvedPropertyConversionHandler<?> converter = defaultConversionHandlers.stream()
-            .filter(c -> c.canConvertTo(context.expectedType()))
+            .filter(c -> c.canConvertTo(context.rawExpectedType()))
             .findFirst()
             // This should neven happen since infrastructure checks with 
             // canConvertTo(...) method before calling convert(...) method.

@@ -2,7 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,8 +86,8 @@ public class ListPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.list", "value1,value2,value3")
@@ -119,8 +118,8 @@ public class ListPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
             
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.list", "value1#value2#value3")
@@ -154,8 +153,8 @@ public class ListPropertyConversionHandlerTests {
                 new IntegerPropertyConversionHandler()
             );
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.list.integer", "1,2,3")
@@ -187,8 +186,8 @@ public class ListPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.list.wildcard", "value1,value2,value3")
@@ -220,8 +219,8 @@ public class ListPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with(
@@ -256,8 +255,8 @@ public class ListPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.list", "") // Empty value.
@@ -283,8 +282,8 @@ public class ListPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.list", "value1,,value3,,value5") // Has empty values.
@@ -316,8 +315,8 @@ public class ListPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with(
@@ -357,7 +356,7 @@ public class ListPropertyConversionHandlerTests {
             // No registered conversion handler for Integer.
             assertThrows(ExternalizedPropertiesException.class, () -> {
                 handler.convert(
-                    new ResolvedPropertyConversionHandlerContext(
+                    new ResolvedPropertyConversionContext(
                         converter,
                         propertyMethodInfo,
                         ResolvedProperty.with("property.list.integer", "1,2,3,4,5")
@@ -386,8 +385,8 @@ public class ListPropertyConversionHandlerTests {
                     new OptionalPropertyConversionHandler() // Register additional Optional handler.
                 );
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with(
@@ -432,8 +431,8 @@ public class ListPropertyConversionHandlerTests {
                     new OptionalPropertyConversionHandler() // Register additional Optional handler.
                 );
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with(
@@ -447,6 +446,8 @@ public class ListPropertyConversionHandlerTests {
             assertNotNull(list);
             assertTrue(list.size() == 3);
             assertTrue(list.stream().allMatch(v -> v instanceof Optional<?>[]));
+
+            // List is a list of arrays (List<Optional<String>[]>).
             
             Optional<?>[] item1 = (Optional<?>[])list.get(0);
             Optional<?>[] item2 = (Optional<?>[])list.get(1);
@@ -482,8 +483,8 @@ public class ListPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.list.T", "value")
@@ -511,13 +512,12 @@ public class ListPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.list", "value1,value2,value3"),
-                    List.class,
-                    Collections.emptyList()
+                    List.class
                 );
                 
             assertThrows(

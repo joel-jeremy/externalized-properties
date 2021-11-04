@@ -2,7 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalResolvedPropertyConverter;
@@ -76,13 +76,12 @@ public class ArrayPropertyConversionHandlerTests {
                 handler
             );
 
+            // Method return type is a List and not an array
             assertThrows(ResolvedPropertyConversionException.class, () -> {
-                handler.convert(new ResolvedPropertyConversionHandlerContext(
+                handler.convert(new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.list", "value1,value2,value3"), 
-                    propertyMethodInfo.returnType(), // Method return type is a List and not an array
-                    propertyMethodInfo.genericReturnTypeParameters()
+                    ResolvedProperty.with("property.list", "value1,value2,value3")
                 ));
             });
         }
@@ -101,7 +100,7 @@ public class ArrayPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            Object[] array = handler.convert(new ResolvedPropertyConversionHandlerContext(
+            Object[] array = handler.convert(new ResolvedPropertyConversionContext(
                 converter,
                 propertyMethodInfo,
                 ResolvedProperty.with("property.array", "value1,value2,value3")
@@ -133,7 +132,7 @@ public class ArrayPropertyConversionHandlerTests {
             );
             
             Object[] array = handler.convert(
-                new ResolvedPropertyConversionHandlerContext(
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.array.integer", "1,2,3")
@@ -164,7 +163,7 @@ public class ArrayPropertyConversionHandlerTests {
                 new InternalResolvedPropertyConverter(handler);
             
             Object[] array = handler.convert(
-                new ResolvedPropertyConversionHandlerContext(
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.array", "") // Empty value.
@@ -190,7 +189,7 @@ public class ArrayPropertyConversionHandlerTests {
                 new InternalResolvedPropertyConverter(handler);
             
             Object[] array = handler.convert(
-                new ResolvedPropertyConversionHandlerContext(
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.array", "value1,,value3,,value5") // Has empty values.
@@ -221,7 +220,7 @@ public class ArrayPropertyConversionHandlerTests {
                 new InternalResolvedPropertyConverter(handler);
             
             Object[] array = handler.convert(
-                new ResolvedPropertyConversionHandlerContext(
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with(
@@ -255,7 +254,7 @@ public class ArrayPropertyConversionHandlerTests {
                 new InternalResolvedPropertyConverter(handler);
             
             Object[] array = handler.convert(
-                new ResolvedPropertyConversionHandlerContext(
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with(
@@ -288,17 +287,16 @@ public class ArrayPropertyConversionHandlerTests {
                     "arrayIntegerWrapper"
                 );
             
+            // No registered handler for integer.
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
             
             assertThrows(ResolvedPropertyConversionException.class, () -> {
                 handler.convert(
-                    new ResolvedPropertyConversionHandlerContext(
+                    new ResolvedPropertyConversionContext(
                         converter,
                         propertyMethodInfo,
-                        ResolvedProperty.with("property.array.integer", "1,2,3,4,5"), 
-                        propertyMethodInfo.returnType(), // No registered handler for integer.
-                        propertyMethodInfo.genericReturnTypeParameters()
+                        ResolvedProperty.with("property.array.integer", "1,2,3,4,5")
                     )
                 );
             });
@@ -319,7 +317,7 @@ public class ArrayPropertyConversionHandlerTests {
                 new InternalResolvedPropertyConverter(handler);
             
             Object[] array = handler.convert(
-                new ResolvedPropertyConversionHandlerContext(
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with(
@@ -348,7 +346,7 @@ public class ArrayPropertyConversionHandlerTests {
             ExternalizedPropertyMethodInfo propertyMethodInfo = 
                 StubExternalizedPropertyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
-                    "arrayGeneric" // Returns a generic type array Optional<String>[]
+                    "arrayPropertyGeneric" // Returns a generic type array Optional<String>[]
                 );
             
             ResolvedPropertyConverter converter = 
@@ -358,7 +356,7 @@ public class ArrayPropertyConversionHandlerTests {
                 );
             
             Object[] array = handler.convert(
-                new ResolvedPropertyConversionHandlerContext(
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with(
@@ -391,7 +389,7 @@ public class ArrayPropertyConversionHandlerTests {
             ExternalizedPropertyMethodInfo propertyMethodInfo = 
                 StubExternalizedPropertyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
-                    "arrayGenericWildcard" // Returns a generic type array Optional<?>[]
+                    "arrayPropertyGenericWildcard" // Returns a generic type array Optional<?>[]
                 );
             
             ResolvedPropertyConverter converter = 
@@ -401,7 +399,7 @@ public class ArrayPropertyConversionHandlerTests {
                 );
             
             Object[] array = handler.convert(
-                new ResolvedPropertyConversionHandlerContext(
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with(
@@ -421,6 +419,38 @@ public class ArrayPropertyConversionHandlerTests {
                     Optional.of("value3")
                 }, 
                 array
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when expected type has a type variable e.g. List<T>.")
+        public void test13() {
+            ArrayPropertyConversionHandler handler = handlerToTest();
+            
+            ExternalizedPropertyMethodInfo propertyMethodInfo = 
+                StubExternalizedPropertyMethodInfo.fromMethod(
+                    ArrayProxyInterface.class,
+                    "arrayPropertyT" // Returns a generic type array <T> T[]
+                );
+            
+            ResolvedPropertyConverter converter = 
+                new InternalResolvedPropertyConverter(
+                    handler
+                );
+            
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
+                    converter,
+                    propertyMethodInfo,
+                    ResolvedProperty.with(
+                        "property.array.T", 
+                        "value1,value2,value3"
+                    )
+                );
+            
+            assertThrows(
+                ResolvedPropertyConversionException.class, 
+                () -> handler.convert(context)
             );
         }
     }

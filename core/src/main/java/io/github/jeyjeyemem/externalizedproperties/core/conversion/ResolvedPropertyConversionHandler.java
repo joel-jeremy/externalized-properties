@@ -27,5 +27,5 @@ public interface ResolvedPropertyConversionHandler<T> {
      * the resolved property and externalized property method info.
      * @return The converted value.
      */
-    T convert(ResolvedPropertyConversionHandlerContext context);
+    T convert(ResolvedPropertyConversionContext context);
 }

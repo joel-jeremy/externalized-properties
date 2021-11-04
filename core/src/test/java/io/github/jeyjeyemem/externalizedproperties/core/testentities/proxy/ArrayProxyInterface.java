@@ -28,8 +28,11 @@ public interface ArrayProxyInterface {
     int[] arrayIntegerPrimitive();
 
     @ExternalizedProperty("property.array.generic")
-    Optional<String>[] arrayGeneric();
+    Optional<String>[] arrayPropertyGeneric();
 
     @ExternalizedProperty("property.array.generic.wildcard")
-    Optional<?>[] arrayGenericWildcard();
+    Optional<?>[] arrayPropertyGenericWildcard();
+
+    @ExternalizedProperty("property.array.T")
+    <T> T[] arrayPropertyT();
 }

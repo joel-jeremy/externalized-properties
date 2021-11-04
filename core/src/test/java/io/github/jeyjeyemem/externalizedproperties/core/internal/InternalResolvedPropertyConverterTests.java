@@ -2,8 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverterContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.IntegerPropertyConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
@@ -84,11 +83,13 @@ public class InternalResolvedPropertyConverterTests {
 
             Class<Integer> expectedType = Integer.class;
 
-            ResolvedPropertyConverterContext context = new ResolvedPropertyConverterContext(
-                propertyMethod, 
-                ResolvedProperty.with("property.integer.primitive", "1"), 
-                expectedType
-            );
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
+                    converter,
+                    propertyMethod, 
+                    ResolvedProperty.with("property.integer.primitive", "1"), 
+                    expectedType
+                );
 
             Object convertedValue = converter.convert(context);
 
@@ -115,11 +116,13 @@ public class InternalResolvedPropertyConverterTests {
             // No handler registered to convert to TestEnum.
             Class<?> expectedType = TestEnum.class;
 
-            ResolvedPropertyConverterContext context = new ResolvedPropertyConverterContext(
-                propertyMethod, 
-                ResolvedProperty.with("enumProperty", TestEnum.ONE.name()), 
-                expectedType
-            );
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
+                    converter,
+                    propertyMethod, 
+                    ResolvedProperty.with("enumProperty", TestEnum.ONE.name()), 
+                    expectedType
+                );
 
             assertThrows(
                 ResolvedPropertyConversionException.class, 
@@ -142,7 +145,7 @@ public class InternalResolvedPropertyConverterTests {
                     }
 
                     @Override
-                    public Object convert(ResolvedPropertyConversionHandlerContext context) {
+                    public Object convert(ResolvedPropertyConversionContext context) {
                         throw new RuntimeException("Mr. Stark I don't feel so good...");
                     }
                     
@@ -158,11 +161,13 @@ public class InternalResolvedPropertyConverterTests {
 
             Class<?> expectedType = Integer.class;
 
-            ResolvedPropertyConverterContext context = new ResolvedPropertyConverterContext(
-                propertyMethod, 
-                ResolvedProperty.with("property.integer.primitive", "1"), 
-                expectedType
-            );
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
+                    converter,
+                    propertyMethod, 
+                    ResolvedProperty.with("property.integer.primitive", "1"), 
+                    expectedType
+                );
 
             assertThrows(
                 ResolvedPropertyConversionException.class, 

@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
@@ -20,7 +20,7 @@ public class LongPropertyConversionHandler implements ResolvedPropertyConversion
 
     /** {@inheritDoc} */
     @Override
-    public Long convert(ResolvedPropertyConversionHandlerContext context) {
+    public Long convert(ResolvedPropertyConversionContext context) {
         requireNonNull(context, "context");
 
         try {

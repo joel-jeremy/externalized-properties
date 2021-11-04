@@ -1,9 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverterContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 
 import java.util.Arrays;
@@ -53,23 +52,23 @@ public class InternalResolvedPropertyConverter implements ResolvedPropertyConver
 
     /** {@inheritDoc} */
     @Override
-    public Object convert(ResolvedPropertyConverterContext context) {
+    public Object convert(ResolvedPropertyConversionContext context) {
         requireNonNull(context, "context");
 
         ResolvedPropertyConversionHandler<?> handler = resolvedPropertyConversionHandlers.stream()
-            .filter(c -> c.canConvertTo(context.expectedType()))
+            .filter(c -> c.canConvertTo(context.rawExpectedType()))
             .findFirst()
             .orElseThrow(() -> new ResolvedPropertyConversionException(String.format(
                 "No converter found to convert resolved property to expected type: %s. " +
                 "Resolved property value: %s. " +
                 "Externalized property method: %s.",
-                context.expectedType().getName(),
+                context.rawExpectedType().getName(),
                 context.resolvedProperty().value(), 
                 context.externalizedPropertyMethodInfo().methodSignatureString()
             )));
 
         try {
-            return handler.convert(new ResolvedPropertyConversionHandlerContext(
+            return handler.convert(new ResolvedPropertyConversionContext(
                 this,
                 context.externalizedPropertyMethodInfo(),
                 context.resolvedProperty(),
@@ -82,7 +81,7 @@ public class InternalResolvedPropertyConverter implements ResolvedPropertyConver
                     "Exception occurred while converting resolved property to expected type: %s. " + 
                     "Resolved property value: %s. " + 
                     "Externalized property method: %s.",
-                    context.expectedType().getName(),
+                    context.rawExpectedType().getName(),
                     context.resolvedProperty().value(),
                     context.externalizedPropertyMethodInfo().methodSignatureString()
                 ),

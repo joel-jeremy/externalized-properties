@@ -12,5 +12,5 @@ public interface ResolvedPropertyConverter {
      * the resolved property to.
      * @return The converted value.
      */
-    Object convert(ResolvedPropertyConverterContext context);
+    Object convert(ResolvedPropertyConversionContext context);
 }

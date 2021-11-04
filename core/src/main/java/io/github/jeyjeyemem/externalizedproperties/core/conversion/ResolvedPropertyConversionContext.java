@@ -2,6 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -12,29 +13,38 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Ar
 /**
  * Context object for {@link ResolvedPropertyConversionHandler}s.
  * This contains the resolved property to be converted and the expected type
- * to which the resolved property value should be converted to.
+ * to which the resolved property value should be converted to. 
+ * This also contains the externalized property method info and the root converter instance
+ * for the specific externalized property method.
  */
-public class ResolvedPropertyConverterContext {
+public class ResolvedPropertyConversionContext {
+    private final ResolvedPropertyConverter resolvedPropertyConverter;
     private final ExternalizedPropertyMethodInfo externalizedPropertyMethodInfo;
     private final ResolvedProperty resolvedProperty;
-    private final Class<?> expectedType;
+    private final Type expectedType;
+    private final Class<?> rawExpectedType;
     private final List<Type> expectedTypeGenericTypeParameters;
 
     /**
      * Constructor which constructs a context object to convert to whatever the 
      * return type and return type's generic type parameter of the property method is.
      * 
+     * @param resolvedPropertyConverter The resolved property converter. 
+     * This is here to allow for recursive conversion in {@link ResolvedPropertyConversionHandler}
+     * implementations.
      * @param externalizedPropertyMethodInfo The externalized property method info.
      * @param resolvedProperty The resolved property.
      */
-    public ResolvedPropertyConverterContext(
+    public ResolvedPropertyConversionContext(
+            ResolvedPropertyConverter resolvedPropertyConverter,
             ExternalizedPropertyMethodInfo externalizedPropertyMethodInfo,
             ResolvedProperty resolvedProperty
     ) {
         this(
+            resolvedPropertyConverter, 
             externalizedPropertyMethodInfo,
             resolvedProperty, 
-            externalizedPropertyMethodInfo.returnType(),
+            externalizedPropertyMethodInfo.genericReturnType(),
             externalizedPropertyMethodInfo.genericReturnTypeParameters()
         );
     }
@@ -42,77 +52,97 @@ public class ResolvedPropertyConverterContext {
     /**
      * Constructor.
      * 
+     * @param resolvedPropertyConverter The resolved property converter. 
+     * This is here to allow for recursive conversion in {@link ResolvedPropertyConversionHandler}
+     * implementations.
      * @param externalizedPropertyMethodInfo The externalized property method info.
      * @param resolvedProperty The resolved property.
-     * @param expectedType The type to convert to. This could be different from the return type of 
-     * the property method.
-     * @param expectedTypeGenericTypeParameters The generic type parameters of the class returned by 
-     * {@link #expectedType()}, if there are any. This could be different from the return type's 
-     * generic type parameters of the property method. 
-     * 
-     * <p>For example, if {@link #expectedType()} is a parameterized type e.g. {@code List<String>}, 
-     * this should contain a {@code String} type/class.
-     * 
-     * <p>Another example is if {@link #expectedType()} is an array with a generic component type
-     * e.g. {@code Optional<Integer>[]}, this should contain an {@code Integer} type/class.
-     * 
-     * <p>It is also possible for {@link #expectedType()} to be a parameterized type which contains
-     * another parameterized type parameter e.g. {@code Optional<List<String>>}, in this case, 
-     * this should contain a {@code List<String>} parameterized type.
-     */
-    public ResolvedPropertyConverterContext(
-            ExternalizedPropertyMethodInfo externalizedPropertyMethodInfo,
-            ResolvedProperty resolvedProperty, 
-            Class<?> expectedType,
-            Type... expectedTypeGenericTypeParameters
-    ) {
-        this(
-            externalizedPropertyMethodInfo,
-            resolvedProperty, 
-            expectedType, 
-            Arrays.asList(requireNonNull(
-                expectedTypeGenericTypeParameters,
-                "expectedTypeGenericTypeParameters"
-            ))
-        );
-    }
-    
-    /**
-     * Constructor.
-     * 
-     * @param externalizedPropertyMethodInfo The externalized property method info.
-     * @param resolvedProperty The resolved property.
-     * @param expectedType The type to convert to. This could be different from the return type of 
-     * the property method.
+     * @param expectedType The generic type to convert to. This could be different from the generic
+     * return type of the property method. This may be the same class as the raw expected type if the 
+     * actual expected type is not a generic type. 
      * @param expectedTypeGenericTypeParameters The generic type parameters of the class returned by 
      * {@link #expectedType()}, if there are any. 
      * 
      * <p>For example, if {@link #expectedType()} is a parameterized type e.g. {@code List<String>}, 
      * this should contain a {@code String} type/class.
      * 
-     * <p>Another example is if {@link #expectedType()} is an array with a generic component type
-     * e.g. {@code Optional<Integer>[]}, this should contain an {@code Integer} type/class.
-     * 
      * <p>It is also possible for {@link #expectedType()} to be a parameterized type which contains
      * another parameterized type parameter e.g. {@code Optional<List<String>>}, in this case, 
      * this should contain a {@code List<String>} parameterized type.
      */
-    public ResolvedPropertyConverterContext(
+    public ResolvedPropertyConversionContext(
+            ResolvedPropertyConverter resolvedPropertyConverter,
             ExternalizedPropertyMethodInfo externalizedPropertyMethodInfo,
-            ResolvedProperty resolvedProperty, 
-            Class<?> expectedType,
+            ResolvedProperty resolvedProperty,
+            Type expectedType,
+            Type... expectedTypeGenericTypeParameters
+    ) {
+        this(
+            resolvedPropertyConverter, 
+            externalizedPropertyMethodInfo,
+            resolvedProperty, 
+            expectedType,
+            Arrays.asList(
+                requireNonNull(
+                    expectedTypeGenericTypeParameters,
+                    "expectedTypeGenericTypeParameters"
+                )
+            )
+        );
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param resolvedPropertyConverter The resolved property converter. 
+     * This is here to allow for recursive conversion in {@link ResolvedPropertyConversionHandler}
+     * implementations.
+     * @param externalizedPropertyMethodInfo The externalized property method info.
+     * @param resolvedProperty The resolved property.
+     * @param expectedType The type to convert to. This could be different from the generic return type of 
+     * the property method. This may be the same class as the raw expected type if the actual expected type 
+     * is not a generic type. 
+     * @param expectedTypeGenericTypeParameters The generic type parameters of the type returned by 
+     * {@link #expectedType()}, if there are any. 
+     * 
+     * <p>For example, if {@link #expectedType()} is a parameterized type e.g. {@code List<String>}, 
+     * this should contain a {@code String} type/class.
+     * 
+     * <p>It is also possible for {@link #expectedType()} to be a parameterized type which contains
+     * another parameterized type e.g. {@code Optional<List<String>>}, in this case, 
+     * this should contain a {@code List<String>} parameterized type.
+     */
+    public ResolvedPropertyConversionContext(
+            ResolvedPropertyConverter resolvedPropertyConverter,
+            ExternalizedPropertyMethodInfo externalizedPropertyMethodInfo,
+            ResolvedProperty resolvedProperty,
+            Type expectedType,
             List<Type> expectedTypeGenericTypeParameters
     ) {
+        this.resolvedPropertyConverter = requireNonNull(
+            resolvedPropertyConverter, 
+            "resolvedPropertyConverter"
+        );
         this.externalizedPropertyMethodInfo = requireNonNull(
-            externalizedPropertyMethodInfo,
+            externalizedPropertyMethodInfo, 
             "externalizedPropertyMethodInfo"
         );
         this.resolvedProperty = requireNonNull(resolvedProperty, "resolvedProperty");
         this.expectedType = requireNonNull(expectedType, "expectedType");
+        this.rawExpectedType = getRawExpectedType(expectedType);
         this.expectedTypeGenericTypeParameters = requireNonNull(
             expectedTypeGenericTypeParameters, 
             "expectedTypeGenericTypeParameters"
         );
+    }
+
+    /**
+     * The resolved property converter.
+     * 
+     * @return The resolved property converter.
+     */
+    public ResolvedPropertyConverter resolvedPropertyConverter() {
+        return resolvedPropertyConverter;
     }
 
     /**
@@ -134,22 +164,39 @@ public class ResolvedPropertyConverterContext {
     }
 
     /**
+     * The raw type to convert resolved property to.
+     * 
+     * @return The raw type to convert resolved property to.
+     */
+    public Class<?> rawExpectedType() {
+        return rawExpectedType;
+    }
+
+    /**
      * The type to convert resolved property to.
      * 
      * @return The type to convert resolved property to.
      */
-    public Class<?> expectedType() {
+    public Type expectedType() {
         return expectedType;
     }
 
     /**
-     * The generic type parameters of the class returned by {@linkplain #expectedType()}, if there are any.
+     * The generic type parameters of the class returned by {@link #expectedType()}, if there are any.
      * Otherwise, this shall return an empty list.
      * 
-     * @return The type parameters of the class returned by {@linkplain #expectedType()}, 
+     * @return The generic type parameters of the class returned by {@link #expectedType()}, 
      * if there are any. Otherwise, this shall return an empty list.
      */
     public List<Type> expectedTypeGenericTypeParameters() {
         return expectedTypeGenericTypeParameters;
+    }
+
+    private Class<?> getRawExpectedType(Type type) {
+        Class<?> rawType = TypeUtilities.getRawType(type);
+        if (rawType == null) {
+            throw new IllegalStateException("Unable to extract raw type from type: " + type);
+        }
+        return rawType;
     }
 }

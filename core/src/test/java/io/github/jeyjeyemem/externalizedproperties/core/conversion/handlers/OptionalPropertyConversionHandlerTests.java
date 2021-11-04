@@ -2,7 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalResolvedPropertyConverter;
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,8 +75,8 @@ public class OptionalPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.optional", "value")
@@ -109,8 +108,8 @@ public class OptionalPropertyConversionHandlerTests {
                 new IntegerPropertyConversionHandler()
             );
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.optional.nonstring", "1")
@@ -138,8 +137,8 @@ public class OptionalPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.optional.object", "value")
@@ -169,8 +168,8 @@ public class OptionalPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.optional.wildcard", "value")
@@ -198,8 +197,8 @@ public class OptionalPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.optional.T", "value")
@@ -227,13 +226,12 @@ public class OptionalPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.optional", "value"),
-                    Optional.class,
-                    Collections.emptyList()
+                    Optional.class
                 );
                 
             assertThrows(
@@ -261,8 +259,8 @@ public class OptionalPropertyConversionHandlerTests {
                 new ListPropertyConversionHandler() // Register additional List handler.
             );
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with(
@@ -301,8 +299,8 @@ public class OptionalPropertyConversionHandlerTests {
                 new ArrayPropertyConversionHandler() // Register additional array handler.
             );
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with(
@@ -316,6 +314,7 @@ public class OptionalPropertyConversionHandlerTests {
             assertNotNull(optional);
             assertTrue(optional.isPresent());
             assertTrue(optional.get() instanceof Optional<?>[]);
+            // Optional returns an array (Optional<?>[])
             assertArrayEquals(
                 new Optional[] { 
                     Optional.of("value1"), 

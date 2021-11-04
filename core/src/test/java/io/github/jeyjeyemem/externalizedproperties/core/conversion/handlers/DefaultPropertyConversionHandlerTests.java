@@ -2,7 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalResolvedPropertyConverter;
@@ -171,8 +171,8 @@ public class DefaultPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.enum", TestEnum.ONE.name()),
@@ -205,15 +205,15 @@ public class DefaultPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext wrapperContext = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext wrapperContext = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     wrapperPropertyMethod,
                     ResolvedProperty.with("property.integer.wrapper", "1")
                 );
 
-            ResolvedPropertyConversionHandlerContext primitiveContext = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext primitiveContext = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     primitivePropertyMethod,
                     ResolvedProperty.with("property.integer.primitive", "2")
@@ -252,15 +252,15 @@ public class DefaultPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext wrapperContext = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext wrapperContext = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     wrapperPropertyMethod,
                     ResolvedProperty.with("property.long.wrapper", "1")
                 );
 
-            ResolvedPropertyConversionHandlerContext primitiveContext = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext primitiveContext = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     primitivePropertyMethod,
                     ResolvedProperty.with("property.long.primitive", "2")
@@ -299,15 +299,15 @@ public class DefaultPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext wrapperContext = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext wrapperContext = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     wrapperPropertyMethod,
                     ResolvedProperty.with("property.float.wrapper", "1.0")
                 );
 
-            ResolvedPropertyConversionHandlerContext primitiveContext = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext primitiveContext = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     primitivePropertyMethod,
                     ResolvedProperty.with("property.float.primitive", "2.0")
@@ -346,15 +346,15 @@ public class DefaultPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext wrapperContext = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext wrapperContext = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     wrapperPropertyMethod,
                     ResolvedProperty.with("property.double.wrapper", "1.0")
                 );
 
-            ResolvedPropertyConversionHandlerContext primitiveContext = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext primitiveContext = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     primitivePropertyMethod,
                     ResolvedProperty.with("property.double.primitive", "2.0")
@@ -393,15 +393,15 @@ public class DefaultPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext wrapperContext = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext wrapperContext = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     listPropertyMethod,
                     ResolvedProperty.with("property.list", "a,b,c")
                 );
 
-            ResolvedPropertyConversionHandlerContext primitiveContext = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext primitiveContext = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     collectionPropertyMethod,
                     ResolvedProperty.with("property.collection", "c,b,a")
@@ -440,8 +440,8 @@ public class DefaultPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethod,
                     ResolvedProperty.with("property.list", "a,b,c")
@@ -472,8 +472,8 @@ public class DefaultPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethod,
                     ResolvedProperty.with("property.optional", "optional-value")

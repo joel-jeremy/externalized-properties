@@ -2,7 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalResolvedPropertyConverter;
@@ -77,8 +77,8 @@ public class LongPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.long.wrapper", "1")
@@ -104,8 +104,8 @@ public class LongPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.long.primitive", "1")
@@ -130,8 +130,8 @@ public class LongPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.long.wrapper", "invalid_wrapper_long")
@@ -156,8 +156,8 @@ public class LongPropertyConversionHandlerTests {
             ResolvedPropertyConverter converter = 
                 new InternalResolvedPropertyConverter(handler);
 
-            ResolvedPropertyConversionHandlerContext context = 
-                new ResolvedPropertyConversionHandlerContext(
+            ResolvedPropertyConversionContext context = 
+                new ResolvedPropertyConversionContext(
                     converter,
                     propertyMethodInfo,
                     ResolvedProperty.with("property.long.wrapper", "invalid_primitive_long")

@@ -3,16 +3,14 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandlerContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverterContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.StripEmptyValues;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ResolvedPropertyConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
 
 import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,35 +42,42 @@ public class ListPropertyConversionHandler implements ResolvedPropertyConversion
 
     /** {@inheritDoc} */
     @Override
-    public List<?> convert(ResolvedPropertyConversionHandlerContext context) {
+    public List<?> convert(ResolvedPropertyConversionContext context) {
         requireNonNull(context, "context");
 
         try {
+            Type listGenericTypeParameter = context.expectedTypeGenericTypeParameters()
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new ResolvedPropertyConversionException(
+                    "List generic type parameter is required."
+                ));
+
+            // Do not allow List<T>, List<T extends ...>, etc.
+            throwIfListHasTypeVariable(listGenericTypeParameter);
+
             String propertyValue = context.resolvedProperty().value();
             if (propertyValue.isEmpty()) {
                 return Collections.emptyList();
             }
 
             final String[] values = getValues(context);
-
-            Type listGenericTypeParameter = context.expectedTypeGenericTypeParameters()
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(
-                    "List generic type parameter is required."
-                ));
             
-            // If List<String>, List<Object> or List<?>, return String values.
-            if (String.class.equals(listGenericTypeParameter) || 
-                    Object.class.equals(listGenericTypeParameter) ||
-                    listGenericTypeParameter instanceof WildcardType) {
+            Class<?> rawListType = TypeUtilities.getRawType(listGenericTypeParameter);
+
+            // If List<String> or List<Object>, return String values.
+            if (String.class.equals(rawListType) || Object.class.equals(rawListType)) {
                 return Arrays.asList(values);
             }
+
+            List<Type> genericTypeParameterOfListType = 
+                TypeUtilities.getTypeParameters(listGenericTypeParameter);
 
             return convertValuesToListType(
                 context, 
                 values, 
-                listGenericTypeParameter
+                listGenericTypeParameter,
+                genericTypeParameterOfListType
             );
         } catch (Exception ex) {
             throw new ResolvedPropertyConversionException(
@@ -87,36 +92,34 @@ public class ListPropertyConversionHandler implements ResolvedPropertyConversion
     }
 
     private List<?> convertValuesToListType(
-            ResolvedPropertyConversionHandlerContext context,
+            ResolvedPropertyConversionContext context,
             String[] values,
-            Type listGenericTypeParameter
+            Type listType,
+            List<Type> listTypeGenericTypeParameters
     ) {
         ResolvedPropertyConverter resolvedPropertyConverter = 
             context.resolvedPropertyConverter();
-
-        Class<?> converterExpectedType = TypeUtilities.getRawType(listGenericTypeParameter);
-        List<Type> converterExpectedTypeGenericTypeParameters = 
-            TypeUtilities.getTypeParameters(listGenericTypeParameter);
 
         // Convert and return values.
         return IntStream.range(0, values.length).mapToObj(i -> {
             String value = values[i];
             return resolvedPropertyConverter.convert(
-                new ResolvedPropertyConverterContext(
+                new ResolvedPropertyConversionContext(
+                    context.resolvedPropertyConverter(),
                     context.externalizedPropertyMethodInfo(),
                     ResolvedProperty.with(
                         indexedName(context.resolvedProperty().name(), i),
                         value
                     ), 
-                    converterExpectedType,
-                    converterExpectedTypeGenericTypeParameters
+                    listType,
+                    listTypeGenericTypeParameters
                 )
             );
         })
         .collect(Collectors.toList());
     }
 
-    private String[] getValues(ResolvedPropertyConversionHandlerContext context) {
+    private String[] getValues(ResolvedPropertyConversionContext context) {
         ExternalizedPropertyMethodInfo propertyMethodInfo = context.externalizedPropertyMethodInfo();
         String propertyValue = context.resolvedProperty().value();
 
@@ -136,5 +139,13 @@ public class ListPropertyConversionHandler implements ResolvedPropertyConversion
 
     private static String indexedName(String name, int index) {
         return name + "[" + index + "]";
+    }
+
+    private void throwIfListHasTypeVariable(Type listGenericTypeParameter) {
+        if (TypeUtilities.isTypeVariable(listGenericTypeParameter)) {
+            throw new ResolvedPropertyConversionException(
+                "Type variables e.g. List<T> are not supported."
+            );
+        }
     }
 }
