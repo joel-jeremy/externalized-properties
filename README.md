@@ -140,7 +140,7 @@ public static void main(String[] args) {
     // Use properties.
     int numberOfThreads = props.numberOfThreads();
 
-    System.out.println("Database URL: " + numberOfThreads);
+    System.out.println("Number of threads: " + numberOfThreads);
 }
 ```
 
@@ -152,7 +152,10 @@ public static void main(String[] args) {
 
     // Use properties.
     Optional<Integer> numberOfThreads = externalizedProperties.resolveProperty("number-of-threads", int.class);
-    Optional<List<Integer>> validNumbers = externalizedProperties.resolveProperty("valid-numbers", new TypeReference<List<Integer>>(){});
+    Optional<List<Integer>> validNumbers = externalizedProperties.resolveProperty(
+        "valid-numbers", 
+        new TypeReference<List<Integer>>(){}
+    );
 
     System.out.println("Number of threads: " + numberOfThreads.get());
     System.out.println("Valid numbers: " + validNumbers.get());
