@@ -47,7 +47,7 @@ public class ExternalizedPropertiesBuilderTests {
     }
 
     @Test
-    @DisplayName("should throw when resolved property converters collection argument is null")
+    @DisplayName("should throw when converters collection argument is null")
     public void test3() {
         assertThrows(
             IllegalArgumentException.class,
@@ -57,7 +57,7 @@ public class ExternalizedPropertiesBuilderTests {
     }
 
     @Test
-    @DisplayName("should throw when resolved property converters varargs argument is null")
+    @DisplayName("should throw when converters varargs argument is null")
     public void test4() {
         assertThrows(
             IllegalArgumentException.class,

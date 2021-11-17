@@ -25,7 +25,7 @@ public class InternalConverterTests {
     class Constructor {
         @Test
         @DisplayName(
-            "should throw when resolved property conversion handlers collection argument is null."
+            "should throw when conversion handlers collection argument is null."
         )
         public void test1() {
             assertThrows(
@@ -38,7 +38,7 @@ public class InternalConverterTests {
 
         @Test
         @DisplayName(
-            "should throw when resolved property conversion handlers varargs argument is null."
+            "should throw when conversion handlers varargs argument is null."
         )
         public void test2() {
             assertThrows(
@@ -54,7 +54,7 @@ public class InternalConverterTests {
     class ConvertMethod {
         @Test
         @DisplayName(
-            "should throw when resolved property converter context argument is null."
+            "should throw when conversion context argument is null."
         )
         public void test1() {
             InternalConverter converter = converter(

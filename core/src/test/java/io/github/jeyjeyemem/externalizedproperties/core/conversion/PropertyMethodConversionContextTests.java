@@ -21,7 +21,7 @@ public class PropertyMethodConversionContextTests {
     @Nested
     class Constructor {
         @Test
-        @DisplayName("should throw when resolved property converter argument is null")
+        @DisplayName("should throw when converter argument is null")
         public void test1() {
             StubExternalizedPropertyMethodInfo propertyMethod = 
                 StubExternalizedPropertyMethodInfo.fromMethod(

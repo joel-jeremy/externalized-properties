@@ -11,8 +11,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.annotations.Externalized
  */
 public interface ConversionHandler<T> {
     /**
-     * Checks if the converter implementation can convert resolved properties
-     * to the specified type.
+     * Checks if the handler can convert properties to the specified type.
      * 
      * @param expectedType The type to convert to.
      * @return {@code true}, if the implementation can convert resolved properties 
@@ -23,7 +22,7 @@ public interface ConversionHandler<T> {
     /**
      * Convert resolved property to the expected type.
      * 
-     * @param context The resolved property converter context which contains
+     * @param context The conversion context which contains
      * the resolved property and the type to convert to.
      * @return The converted value.
      */
@@ -33,7 +32,7 @@ public interface ConversionHandler<T> {
     /**
      * Convert resolved property to the expected type.
      * 
-     * @param context The resolved property converter context which contains
+     * @param context The conversion context which contains
      * the resolved property and externalized property method info.
      * @return The converted value.
      */

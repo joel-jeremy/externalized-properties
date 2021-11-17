@@ -160,7 +160,7 @@ public class ExternalizedPropertiesBuilder {
      * The array of {@link ConversionHandler}s to convert resolved properties
      * to various types.
      * 
-     * @param conversionHandlers The resolved property conversion handlers.
+     * @param conversionHandlers The conversion handlers.
      * @return This builder.
      */
     public ExternalizedPropertiesBuilder conversionHandlers(
@@ -175,7 +175,7 @@ public class ExternalizedPropertiesBuilder {
      * The collection of {@link ConversionHandler}s to convert resolved properties
      * to various types.
      * 
-     * @param conversionHandlers The resolved property conversion handlers.
+     * @param conversionHandlers The conversion handlers.
      * @return This builder.
      */
     public ExternalizedPropertiesBuilder conversionHandlers(

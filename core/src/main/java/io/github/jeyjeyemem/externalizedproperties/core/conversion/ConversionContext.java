@@ -59,9 +59,9 @@ public class ConversionContext {
     }
 
     /**
-     * The resolved property converter.
+     * The converter.
      * 
-     * @return The resolved property converter.
+     * @return The converter.
      */
     public Converter converter() {
         return converter;

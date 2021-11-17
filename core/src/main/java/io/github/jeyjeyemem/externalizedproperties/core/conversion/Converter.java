@@ -7,7 +7,7 @@ public interface Converter {
     /**
      * Convert the resolved property value to a given type.
      * 
-     * @param context The context object containing the resolved property and
+     * @param context The conversion context containing the resolved property and
      * information regarding the type to convert the resolved property to.
      * @return The converted value.
      */
@@ -16,7 +16,7 @@ public interface Converter {
     /**
      * Convert the resolved property value to a given type.
      * 
-     * @param context The context object containing the resolved property and
+     * @param context The conversion context containing the resolved property and
      * information regarding the property method and the type to convert
      * the resolved property to.
      * @return The converted value.
