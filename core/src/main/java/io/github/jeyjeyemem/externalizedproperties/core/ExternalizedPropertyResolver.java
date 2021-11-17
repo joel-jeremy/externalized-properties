@@ -3,11 +3,20 @@ package io.github.jeyjeyemem.externalizedproperties.core;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 /**
  * The mechanism to resolve properties from various external sources.
  */
 public interface ExternalizedPropertyResolver {
+    /**
+     * Resolve property from an external source.
+     * 
+     * @param propertyName The property name.
+     * @return The resolved property value. Otherwise, an empty {@link Optional}.
+     */
+    Optional<ResolvedProperty> resolve(String propertyName);
+
     /**
      * Resolve the properties from an external source.
      * 

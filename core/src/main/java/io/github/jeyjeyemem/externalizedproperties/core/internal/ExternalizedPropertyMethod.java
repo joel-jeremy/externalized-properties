@@ -1,15 +1,10 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.StringVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionContext;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedExternalizedPropertyException;
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertyException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
 
 import java.lang.annotation.Annotation;
@@ -17,8 +12,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
+import java.util.WeakHashMap;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
@@ -26,74 +21,100 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Ar
  * Contains information about an externalized property method.
  */
 public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInfo {
-    private final Object proxy;
-    private final Method method;
-    private final ExternalizedPropertyResolver externalizedPropertyResolver;
-    private final StringVariableExpander variableExpander;
-    private final ResolvedPropertyConverter resolvedPropertyConverter;
-    private final MethodHandleFactory methodHandleFactory;
+    private final ExternalizedProperties externalizedProperties;
+
+    // Cache method info so that we don't hold strong reference to the method object.
+    private final ExternalizedProperty externalizedPropertyAnnotation;
+    private final String expandedPropertyName;
+    private final Class<?> returnType;
+    private final Type genericReturnType;
+    private final Type[] genericReturnTypeGenericTypeParameters;
+    private final Class<?>[] parameterTypes;
+    private final Type[] genericParameterTypes;
+    private final boolean isDefaultInterfaceMethod;
+    private final String methodSignatureString;
+    private final DefaultInterfaceMethodHandler defaultInterfaceMethodHandler;
+    private final WeakHashMap<Class<? extends Annotation>, Annotation> annotationLookup;
+    
     /**
      * Constructor.
      * 
      * @param proxy The proxy instance.
      * @param method The externalized property method.
-     * @param externalizedPropertyResolver The externalized property resolver.
-     * @param resolvedPropertyConverter The resolved property converter.
-     * @param variableExpander The externalized property name variable expander.
+     * @param externalizedProperties The externalized properties.
      * @param methodHandleFactory The method handle factory.
      */
-    public ExternalizedPropertyMethod(
+    private ExternalizedPropertyMethod(
             Object proxy, 
             Method method,
-            ExternalizedPropertyResolver externalizedPropertyResolver,
-            ResolvedPropertyConverter resolvedPropertyConverter,
-            StringVariableExpander variableExpander,
+            ExternalizedProperties externalizedProperties,
             MethodHandleFactory methodHandleFactory
     ) {
-        this.proxy = requireNonNull(proxy, "proxy");
-        this.method = requireNonNull(method, "method");
-        this.externalizedPropertyResolver = requireNonNull(
-            externalizedPropertyResolver, 
-            "externalizedPropertyResolver"
+        requireNonNull(proxy, "proxy");
+        requireNonNull(method, "method");
+        requireNonNull(externalizedProperties, "externalizedProperties");
+        requireNonNull(methodHandleFactory, "methodHandleFactory");
+        
+        // Set to fields to avoiding having a strong reference to the method object.
+        this.externalizedProperties = externalizedProperties;
+        this.externalizedPropertyAnnotation = method.getAnnotation(ExternalizedProperty.class);
+        this.expandedPropertyName = externalizedPropertyAnnotation != null ?
+            externalizedProperties.expandVariables(externalizedPropertyAnnotation.value()) : null;
+        this.returnType = method.getReturnType();
+        this.genericReturnType = method.getGenericReturnType();
+        this.parameterTypes = method.getParameterTypes();
+        this.genericParameterTypes = method.getGenericParameterTypes();
+        this.genericReturnTypeGenericTypeParameters = TypeUtilities.getTypeParameters(genericReturnType);
+        this.isDefaultInterfaceMethod = method.isDefault();
+        this.methodSignatureString = method.toGenericString();
+        this.defaultInterfaceMethodHandler = buildDefaultInterfaceMethodHandler(
+            proxy, 
+            method, 
+            methodHandleFactory
         );
-        this.resolvedPropertyConverter = requireNonNull(
-            resolvedPropertyConverter, 
-            "resolvedPropertyConverter"
-        );
-        this.variableExpander = requireNonNull(
-            variableExpander, 
-            "variableExpander"
-        );
-        this.methodHandleFactory = requireNonNull(
-            methodHandleFactory, 
-            "methodHandleFactory"
-        );
+        this.annotationLookup = buildMethodAnnotationLookup(method);
     }
 
     /** {@inheritDoc} */
     @Override
     public Optional<ExternalizedProperty> externalizedPropertyAnnotation() {
-        return Optional.ofNullable(method.getAnnotation(ExternalizedProperty.class));
+        return Optional.ofNullable(externalizedPropertyAnnotation);
     }
 
     /** {@inheritDoc} */
     @Override
     public Optional<String> propertyName() {
-        return externalizedPropertyAnnotation().map(annotation -> 
-            variableExpander.expandVariables(annotation.value())
-        );
+        return Optional.ofNullable(expandedPropertyName);
     }
 
     /** {@inheritDoc} */
     @Override
     public Class<?> returnType() {
-        return method.getReturnType();
+        return returnType;
     }
 
     /** {@inheritDoc} */
     @Override
     public Type genericReturnType() {
-        return method.getGenericReturnType();
+        return genericReturnType;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Type[] genericReturnTypeGenericTypeParameters() {
+        return genericReturnTypeGenericTypeParameters;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Class<?>[] parameterTypes() {
+        return parameterTypes;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Type[] genericParameterTypes() {
+        return genericParameterTypes;
     }
 
     /** {@inheritDoc} */
@@ -110,38 +131,27 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
 
     /** {@inheritDoc} */
     @Override
-    public List<Type> genericReturnTypeParameters() {
-        Type returnType = method.getGenericReturnType();
-        return TypeUtilities.getTypeParameters(returnType);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Optional<Type> genericReturnTypeParameter(int typeParameterIndex) {
-        List<Type> genericTypeParameters = genericReturnTypeParameters();
-        if (genericTypeParameters.isEmpty() || typeParameterIndex >= genericTypeParameters.size()) {
+    public Optional<Type> genericReturnTypeGenericTypeParameter(int typeParameterIndex) {
+        Type[] genericTypeParameters = genericReturnTypeGenericTypeParameters();
+        if (genericTypeParameters.length == 0 || typeParameterIndex >= genericTypeParameters.length) {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(genericTypeParameters.get(typeParameterIndex));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Type genericReturnTypeParameterOrReturnType(int typeParameterIndex) {
-        return genericReturnTypeParameter(typeParameterIndex).orElse(returnType());
+        return Optional.ofNullable(genericTypeParameters[typeParameterIndex]);
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean isDefaultInterfaceMethod() {
-        return method.isDefault();
+        return isDefaultInterfaceMethod;
     }
 
     /** {@inheritDoc} */
     @Override
     public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass) {
-        return Optional.ofNullable(method.getAnnotation(annotationClass));
+        return Optional.ofNullable(
+            annotationClass.cast(annotationLookup.get(annotationClass))
+        );
     }
 
     /** {@inheritDoc} */
@@ -153,7 +163,7 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
     /** {@inheritDoc} */
     @Override
     public String methodSignatureString() {
-        return method.toGenericString();
+        return methodSignatureString;
     }
 
     /**
@@ -173,34 +183,18 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
      * @return The resolved property.
      */
     public Object resolveProperty(Object[] args) {
-        // Get property name from @ExternalizedProperty if method is annotated.
-        Optional<String> propertyAnnotationName = propertyName();
-        if (!propertyAnnotationName.isPresent()) {
+        // No property name. Means not annotated with @ExternalizedProperty.
+        if (expandedPropertyName == null) {
             return determineDefaultValue(args);
         }
 
-        String propertyName = propertyAnnotationName.get();
+        Optional<?> resolved = externalizedProperties.resolveProperty(
+            expandedPropertyName, 
+            genericReturnType()
+        );
 
-        ExternalizedPropertyResolverResult result = 
-            externalizedPropertyResolver.resolve(propertyName);
-        
-        Optional<ResolvedProperty> resolvedProperty = result.findResolvedProperty(propertyName);
-        if (resolvedProperty.isPresent()) {
-            // Non-string return type handling.
-            if (!hasReturnType(String.class)) {
-                return resolvedPropertyConverter.convert(
-                    new ResolvedPropertyConversionContext(
-                        resolvedPropertyConverter,
-                        this,
-                        resolvedProperty.get(), 
-                        genericReturnType(),
-                        genericReturnTypeParameters()
-                    )
-                );
-            }
-
-            // String return type. Return value as is.
-            return resolvedProperty.map(ResolvedProperty::value).get();
+        if (resolved.isPresent()) {
+            return resolved.get();
         }
 
         // Property not resolved.
@@ -238,11 +232,11 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
         }
 
         // Non-optional properties will throw an exception if cannot be resolved.
-        throw new UnresolvedExternalizedPropertyException(
+        throw new UnresolvedPropertyException(
             Collections.singletonList(propertyName().orElse(null)),
             String.format(
                 "Failed to resolve property (%s) for externalized property method (%s). " + 
-                "To prevent exception when a property cannot be resolved, " +
+                "To prevent exceptions when a property cannot be resolved, " +
                 "consider changing method's return type to an Optional.",
                 propertyName().orElse(null),
                 methodSignatureString()
@@ -257,19 +251,12 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
      * @return The result of the default interface method.
      */
     public Object invokeDefaultInterfaceMethod(Object[] args) {
-        if (!isDefaultInterfaceMethod()) {
-            throw new IllegalStateException(String.format(
-                "Tried to invoke a non-default interface method. " +
-                "Externalized property method: %s.",
-                methodSignatureString()
-            ));
-        }
-
         try {
-            MethodHandle defaultInterfaceMethodHandle = 
-                methodHandleFactory.createMethodHandle(proxy, method);
-            return defaultInterfaceMethodHandle.invokeWithArguments(args);
-        } 
+            return defaultInterfaceMethodHandler.invoke(args);
+        }
+        catch (RuntimeException ex) {
+            throw ex;
+        }
         catch (Throwable ex) {
             throw new ExternalizedPropertiesException(
                 String.format(
@@ -280,5 +267,66 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
                 ex
             );
         }
+    }
+    
+    /**
+     * Factory method.
+     * 
+     * @param proxy The proxy instance.
+     * @param method The externalized property method.
+     * @param externalizedProperties The externalized properties.
+     * @param methodHandleFactory The method handle factory.
+     * @return The externalized property method.
+     */
+    public static ExternalizedPropertyMethod create(
+            Object proxy, 
+            Method method,
+            ExternalizedProperties externalizedProperties,
+            MethodHandleFactory methodHandleFactory
+    ) {
+        return new ExternalizedPropertyMethod(
+            proxy, 
+            method, 
+            externalizedProperties, 
+            methodHandleFactory
+        );
+    }
+
+    private DefaultInterfaceMethodHandler buildDefaultInterfaceMethodHandler(
+            Object proxy, 
+            Method method, 
+            MethodHandleFactory methodHandleFactory
+    ) {
+        if (isDefaultInterfaceMethod) {
+            MethodHandle methodHandle = methodHandleFactory.createMethodHandle(method);
+            return args -> {
+                return methodHandle.bindTo(proxy).invokeWithArguments(args);
+            };
+        }
+
+        // Just make it throw if method is not a default interface method.
+        return args -> {
+            throw new IllegalStateException(String.format(
+                "Tried to invoke a non-default interface method. " +
+                "Externalized property method: %s.",
+                methodSignatureString()
+            ));
+        };
+    }
+
+    private WeakHashMap<Class<? extends Annotation>, Annotation> buildMethodAnnotationLookup(
+            Method method
+    ) {
+        Annotation[] declaredAnnotations = method.getDeclaredAnnotations();
+        WeakHashMap<Class<? extends Annotation>, Annotation> lookup = 
+            new WeakHashMap<>(declaredAnnotations.length);
+        for (Annotation annotation : declaredAnnotations) {
+            lookup.put(annotation.annotationType(), annotation);
+        }
+        return lookup;
+    }
+
+    private static interface DefaultInterfaceMethodHandler {
+        Object invoke(Object... args) throws Throwable;
     }
 }

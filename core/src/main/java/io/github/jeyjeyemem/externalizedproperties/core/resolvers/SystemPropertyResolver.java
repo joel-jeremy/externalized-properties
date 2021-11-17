@@ -4,7 +4,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
  * A {@link MapPropertyResolver} extension which resolves requested properties 
  * from the Java system properties.
  */
-public class SystemPropertyResolver extends MapPropertyResolver {
+public class SystemPropertyResolver extends PropertiesPropertyResolver {
     /**
      * Constructor.
      */

@@ -10,12 +10,11 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -237,14 +236,14 @@ public class TypeUtilitiesTests {
             
             Type genericReturnType = propertyMethod.genericReturnType();
 
-            assertIterableEquals(
-                Arrays.asList(String.class),
+            assertArrayEquals(
+                new Type[] { String.class },
                 TypeUtilities.getTypeParameters(genericReturnType)
             );
         }
 
         @Test
-        @DisplayName("should return empty list when type is not a parameterized type.")
+        @DisplayName("should return empty array when type is not a parameterized type.")
         public void test2() {
             StubExternalizedPropertyMethodInfo propertyMethod = 
                 StubExternalizedPropertyMethodInfo.fromMethod(
@@ -254,7 +253,7 @@ public class TypeUtilitiesTests {
             
             Type genericReturnType = propertyMethod.genericReturnType();
 
-            assertTrue(TypeUtilities.getTypeParameters(genericReturnType).isEmpty());
+            assertTrue(TypeUtilities.getTypeParameters(genericReturnType).length == 0);
         }
     }
 

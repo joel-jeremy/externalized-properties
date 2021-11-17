@@ -1,17 +1,17 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBuilder;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ResolvedPropertyConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.StringVariableExpansionException;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedExternalizedPropertyException;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertyException;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositePropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.VariableProxyInterface;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -34,14 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 // Let ExternalizedPropertiesexternalizedProperties.proxy(Class<?> proxyInterface) 
 // create the proxy for these test cases.
 public class ExternalizedPropertyInvocationHandlerTests {
-    private static final ScheduledExecutorService expiryScheduler = 
-        Executors.newSingleThreadScheduledExecutor();
-
-    @AfterAll
-    public static void cleanup() {
-        expiryScheduler.shutdown();
-    }
-
     @Nested
     class InvokeMethod {
         @Test
@@ -53,7 +43,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
             BasicProxyInterface proxyInterface = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
             String property = proxyInterface.property();
 
             assertEquals("test.value.1", property);
@@ -70,7 +60,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
             BasicProxyInterface proxyInterface = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
             String property = proxyInterface.propertyWithDefaultValue();
 
             assertEquals("test.value", property);
@@ -87,7 +77,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
             BasicProxyInterface proxyInterface = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
 
             String providedDefaultValue = "provided.default.value";
             String property = proxyInterface.propertyWithDefaultValueParameter(providedDefaultValue);
@@ -102,7 +92,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             BasicProxyInterface proxyInterface = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
             String property = proxyInterface.propertyWithDefaultValue();
 
             assertEquals("default.value", property);
@@ -115,7 +105,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             BasicProxyInterface proxyInterface = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
 
             String providedDefaultValue = "provided.default.value";
             String property = proxyInterface.propertyWithDefaultValueParameter(providedDefaultValue);
@@ -132,7 +122,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             BasicProxyInterface proxyInterface = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
 
             String property = proxyInterface.propertyWithNoAnnotationButWithDefaultValue();
 
@@ -149,7 +139,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             BasicProxyInterface proxyInterface = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
 
             String providedDefaultValue = "provided.default.value";
             String property = proxyInterface.propertyWithNoAnnotationButWithDefaultValueParameter(
@@ -166,9 +156,9 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             BasicProxyInterface proxyInterface = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
 
-            assertThrows(UnresolvedExternalizedPropertyException.class, () -> {
+            assertThrows(UnresolvedPropertyException.class, () -> {
                 proxyInterface.property();
             });
         }
@@ -180,15 +170,15 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             BasicProxyInterface proxyInterface = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
 
-            assertThrows(UnresolvedExternalizedPropertyException.class, () -> {
+            assertThrows(UnresolvedPropertyException.class, () -> {
                 proxyInterface.propertyWithNoAnnotationAndNoDefaultValue();
             });
         }
 
         @Test
-        @DisplayName("should convert a non-String property via ResolvedPropertyConverter.")
+        @DisplayName("should convert a non-String property via Converter.")
         public void test10() {
             Map<String, String> map = new HashMap<>();
             map.put("property.integer.wrapper", "1");
@@ -197,7 +187,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
             PrimitiveProxyInterface proxyInterface = 
-                externalizedProperties.initialize(PrimitiveProxyInterface.class);
+                externalizedProperties.proxy(PrimitiveProxyInterface.class);
 
             // Support for wrapper types.
             Integer property = proxyInterface.integerWrapperProperty();
@@ -223,7 +213,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
             VariableProxyInterface proxyInterface = 
-                externalizedProperties.initialize(VariableProxyInterface.class);
+                externalizedProperties.proxy(VariableProxyInterface.class);
             String variableProperty = proxyInterface.variableProperty();
 
             assertEquals("property.value", variableProperty);
@@ -238,11 +228,11 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
             VariableProxyInterface proxyInterface = 
-                externalizedProperties.initialize(VariableProxyInterface.class);
+                externalizedProperties.proxy(VariableProxyInterface.class);
             
             // There is no custom-variable-value property.
             // Property name of VariableProxyInterface.variableProperty() won't be able to be expanded.
-            assertThrows(StringVariableExpansionException.class, 
+            assertThrows(VariableExpansionException.class, 
                 () -> proxyInterface.variableProperty()
             );
         }
@@ -260,7 +250,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
             OptionalProxyInterface proxyInterface = 
-                externalizedProperties.initialize(OptionalProxyInterface.class);
+                externalizedProperties.proxy(OptionalProxyInterface.class);
             Optional<String> property = proxyInterface.optionalProperty();
 
             assertTrue(property.isPresent());
@@ -276,7 +266,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
             OptionalProxyInterface proxyInterface = 
-                externalizedProperties.initialize(OptionalProxyInterface.class);
+                externalizedProperties.proxy(OptionalProxyInterface.class);
             Optional<String> property = proxyInterface.optionalPropertyWithDefaultValue();
 
             assertTrue(property.isPresent());
@@ -294,7 +284,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
             OptionalProxyInterface proxyInterface = 
-                externalizedProperties.initialize(OptionalProxyInterface.class);
+                externalizedProperties.proxy(OptionalProxyInterface.class);
 
             String providedDefaultValue = "provided.default.value";
             Optional<String> property = 
@@ -311,7 +301,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             OptionalProxyInterface proxyInterface = 
-                externalizedProperties.initialize(OptionalProxyInterface.class);
+                externalizedProperties.proxy(OptionalProxyInterface.class);
             Optional<String> property = proxyInterface.optionalPropertyWithDefaultValue();
 
             assertTrue(property.isPresent());
@@ -325,7 +315,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             OptionalProxyInterface proxyInterface = 
-                externalizedProperties.initialize(OptionalProxyInterface.class);
+                externalizedProperties.proxy(OptionalProxyInterface.class);
 
             String providedDefaultValue = "provided.default.value";
             Optional<String> property = 
@@ -344,7 +334,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             OptionalProxyInterface proxyInterface = 
-                externalizedProperties.initialize(OptionalProxyInterface.class);
+                externalizedProperties.proxy(OptionalProxyInterface.class);
 
             Optional<String> property = 
                 proxyInterface.optionalPropertyWithNoAnnotationAndWithDefaultValue();
@@ -363,7 +353,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             OptionalProxyInterface proxyInterface = 
-                externalizedProperties.initialize(OptionalProxyInterface.class);
+                externalizedProperties.proxy(OptionalProxyInterface.class);
 
             String providedDefaultValue = "provided.default.value";
             Optional<String> property = 
@@ -384,7 +374,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             OptionalProxyInterface proxyInterface = 
-                externalizedProperties.initialize(OptionalProxyInterface.class);
+                externalizedProperties.proxy(OptionalProxyInterface.class);
 
             Optional<String> property = proxyInterface.optionalProperty();
 
@@ -400,7 +390,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             OptionalProxyInterface proxyInterface = 
-                externalizedProperties.initialize(OptionalProxyInterface.class);
+                externalizedProperties.proxy(OptionalProxyInterface.class);
 
             Optional<String> property = proxyInterface.optionalPropertyWithNoAnnotationAndNoDefaultValue();
             
@@ -408,7 +398,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
         }
 
         @Test
-        @DisplayName("should convert a non-String Optional property via ResolvedPropertyConverter.")
+        @DisplayName("should convert a non-String Optional property via Converter.")
         public void testOptional10() {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional.nonstring", "1");
@@ -416,7 +406,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
             OptionalProxyInterface proxyInterface = 
-                externalizedProperties.initialize(OptionalProxyInterface.class);
+                externalizedProperties.proxy(OptionalProxyInterface.class);
             Optional<Integer> property = proxyInterface.nonStringOptionalProperty();
 
             assertTrue(property.isPresent());
@@ -430,7 +420,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             BasicProxyInterface proxyInterface = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
 
             assertTrue(proxyInterface.equals(proxyInterface));
         }
@@ -442,9 +432,9 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             BasicProxyInterface proxyInterface1 = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
             BasicProxyInterface proxyInterface2 = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
 
             assertFalse(proxyInterface1.equals(proxyInterface2));
         }
@@ -456,7 +446,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             BasicProxyInterface proxyInterface = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
 
             assertEquals(
                 System.identityHashCode(proxyInterface),
@@ -471,7 +461,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties(Collections.emptyMap());
 
             BasicProxyInterface proxyInterface = 
-                externalizedProperties.initialize(BasicProxyInterface.class);
+                externalizedProperties.proxy(BasicProxyInterface.class);
 
             assertEquals(
                 standardToStringFormat(proxyInterface),
@@ -488,27 +478,27 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
     private ExternalizedProperties externalizedProperties(
             Map<String, String> propertySource,
-            ResolvedPropertyConversionHandler<?>... resolvedPropertyConversionHandlers
+            ConversionHandler<?>... conversionHandlers
     ) {
         return externalizedProperties(
             Arrays.asList(new MapPropertyResolver(propertySource)),
-            Arrays.asList(resolvedPropertyConversionHandlers)
+            Arrays.asList(conversionHandlers)
         );
     }
 
     private ExternalizedProperties externalizedProperties(
             Collection<ExternalizedPropertyResolver> resolvers,
-            Collection<ResolvedPropertyConversionHandler<?>> resolvedPropertyConversionHandlers
+            Collection<ConversionHandler<?>> conversionHandlers
     ) {
-        CompositePropertyResolver compositeResolver = new CompositePropertyResolver(resolvers);
+        ExternalizedPropertyResolver resolver = CompositePropertyResolver.flatten(resolvers);
         
-        ExternalizedProperties.Builder builder = 
-            ExternalizedProperties.builder()
-                .resolvers(compositeResolver)
-                .conversionHandlers(resolvedPropertyConversionHandlers)
-                .withCachingResolver(Duration.ofMinutes(5), expiryScheduler);
+        ExternalizedPropertiesBuilder builder = 
+            ExternalizedPropertiesBuilder.newBuilder()
+                .resolvers(resolver)
+                .conversionHandlers(conversionHandlers)
+                .withCaching(Duration.ofMinutes(5));
 
-        if (resolvedPropertyConversionHandlers.size() == 0) {
+        if (conversionHandlers.size() == 0) {
             builder.withDefaultConversionHandlers();
         }
 

@@ -4,7 +4,6 @@ import io.github.jeyjeyemem.externalizedproperties.core.annotations.Externalized
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -60,6 +59,20 @@ public interface ExternalizedPropertyMethodInfo {
     Type genericReturnType();
 
     /**
+     * The externalized property method generic parameter types.
+     * 
+     * @return The externalized property method generic parameter types.
+     */
+    Class<?>[] parameterTypes();
+
+    /**
+     * The externalized property method generic parameter types.
+     * 
+     * @return The externalized property method generic parameter types.
+     */
+    Type[] genericParameterTypes();
+
+    /**
      * Check if the externalized property method return type matches the given type. 
      * 
      * @param type The class to match against the externalized property method's return type.
@@ -95,7 +108,7 @@ public interface ExternalizedPropertyMethodInfo {
      * @return The list of generic return type parameters, if the return type is a generic type 
      * e.g. {@code Optional<String>}.
      */
-    List<Type> genericReturnTypeParameters();
+    Type[] genericReturnTypeGenericTypeParameters();
 
     /**
      * <p>The externalized property method return type's generic type parameter, if the return type is
@@ -108,24 +121,8 @@ public interface ExternalizedPropertyMethodInfo {
      * @return The generic return type parameter, if the return type is a generic type 
      * e.g. {@code Optional<String>}.
      */
-    Optional<Type> genericReturnTypeParameter(int typeParameterIndex);
-
-    /**
-     * <p>The externalized property method return type's generic type parameter, if the return type is
-     * a generic type e.g. {@code Optional<String>}. 
-     * 
-     * <p>For example, we have a property method: {@code Optional<String> awesomeMethod();},
-     * {@code Class<String>} shall be returned when this method is invoked.
-     * 
-     * <p>However, if the return type is not a generic type e.g. {@code String awesomeMethod();}, 
-     * the method's return type via {@link #returnType()} shall be returned - {@code Class<String>}.
-     * 
-     * @param typeParameterIndex The type parameter index to get.
-     * @return The generic return type parameter, if the return type is a generic type 
-     * e.g. {@code Optional<String>}. Otherwise, the method's return type.
-     */
-    Type genericReturnTypeParameterOrReturnType(int typeParameterIndex);
-
+    Optional<Type> genericReturnTypeGenericTypeParameter(int typeParameterIndex);
+    
     /**
      * Check whether the externalized property method is a default interface method.
      * 

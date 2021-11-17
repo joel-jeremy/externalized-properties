@@ -7,9 +7,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Method handle factory to creating {@link MethodHandle} for methods.
@@ -45,43 +44,30 @@ public class MethodHandleFactory {
         }
     }
 
-    // Diferrent cache for every declaring class.
-    private final ClassValue<ConcurrentMap<MethodKey, MethodHandle>> classMethodCache = 
-        new ClassValue<ConcurrentMap<MethodKey, MethodHandle>>() {
-            @Override
-            protected ConcurrentMap<MethodKey, MethodHandle> computeValue(Class<?> type) {
-                // Separate cache for a given type.
-                return new ConcurrentHashMap<>();
-            }
-        };
+    private final Map<Method, MethodHandle> weakMethodHandleCache = new WeakHashMap<>(); 
 
     /**
      * Build a method handle from the given target and method.
      * 
-     * @param target The target object to bind the generated method handle to.
      * @param method The method to build the method handle from.
      * @return The generated {@link MethodHandle} for the method. 
      * This method handle has been binded to the target object. 
      */
-    public MethodHandle createMethodHandle(Object target, Method method) {
-        ConcurrentMap<MethodKey, MethodHandle> methodHandleCache = 
-            classMethodCache.get(method.getDeclaringClass());
-
-        MethodHandle methodHandle = methodHandleCache.computeIfAbsent(
-            new MethodKey(method.getName(), method.getParameterTypes()), 
-            key -> buildMethodHandleInternal(target, method)
-        );
-
+    public MethodHandle createMethodHandle(Method method) {
+        MethodHandle methodHandle = weakMethodHandleCache.get(method);
+        if (methodHandle == null) {
+            methodHandle = buildMethodHandleInternal(method);
+            weakMethodHandleCache.putIfAbsent(method, methodHandle);
+        }
         return methodHandle;
     }
 
-    private static MethodHandle buildMethodHandleInternal(Object target, Method method) {
+    private static MethodHandle buildMethodHandleInternal(Method method) {
         if (IS_RUNNING_ON_JAVA_9_OR_LATER) {
             Lookup privateLookup = getPrivateLookup(method.getDeclaringClass());
             try {
                 return privateLookup.in(method.getDeclaringClass())
-                    .unreflectSpecial(method, method.getDeclaringClass())
-                    .bindTo(target);
+                    .unreflectSpecial(method, method.getDeclaringClass());
             } catch (Throwable ex) {
                 throw new ExternalizedPropertiesException(
                     String.format(
@@ -105,8 +91,7 @@ public class MethodHandleFactory {
             constructor.setAccessible(false);
             
             return lookup.in(method.getDeclaringClass())
-                .unreflectSpecial(method, method.getDeclaringClass())
-                .bindTo(target);
+                .unreflectSpecial(method, method.getDeclaringClass());
         } catch (Throwable ex) {
             throw new ExternalizedPropertiesException(
                 "Error occurred while trying to build method handle.", 
@@ -140,57 +125,5 @@ public class MethodHandleFactory {
         }
 
         return privateLookup;
-    }
-
-    private static class MethodKey {
-        private final String methodName;
-        private final String parameterTypesDescriptor;
-        private final int hash;
-
-        public MethodKey(String methodName, Class<?>[] parameterTypes) {
-            this.methodName = methodName;
-            this.parameterTypesDescriptor = buildParameterTypeDescriptor(parameterTypes);
-            this.hash = Objects.hash(methodName, parameterTypesDescriptor);
-        }
-
-        @Override
-        public int hashCode() {
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            if (other != null && other instanceof MethodKey) {
-                MethodKey otherKey = (MethodKey)other;
-                return methodName.equals(otherKey.methodName) &&
-                    parameterTypesDescriptor.equals(otherKey.parameterTypesDescriptor);
-            }
-
-            return false;
-        }
-
-        @Override
-        public String toString() {
-            return methodName + parameterTypesDescriptor;
-        }
-
-        private String buildParameterTypeDescriptor(Class<?>[] parameterTypes) {
-            StringBuilder sb = new StringBuilder();
-            
-            sb.append("(");
-            separateWithCommas(parameterTypes, sb);
-            sb.append(")");
-
-            return sb.toString();
-        }
-
-        private void separateWithCommas(Class<?>[] parameterTypes, StringBuilder sb) {
-            for (int j = 0; j < parameterTypes.length; j++) {
-                sb.append(parameterTypes[j].getTypeName());
-                if (j < (parameterTypes.length - 1)) {
-                    sb.append(",");
-                }
-            }
-        }
     }
 }

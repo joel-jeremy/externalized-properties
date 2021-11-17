@@ -6,9 +6,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Type-related utility methods.
@@ -106,18 +103,16 @@ public class TypeUtilities {
      * @param type The type to extract type parameters from.
      * @return The list of generic type parameters if the given type has any.
      */
-    public static List<Type> getTypeParameters(Type type) {
+    public static Type[] getTypeParameters(Type type) {
         ParameterizedType pt = asParameterizedType(type);
         if (pt != null) {
             // Return generic type parameters.
             // For example, if type is List<String>, String shall be returned.
-            return Arrays.asList(
-                pt.getActualTypeArguments()
-            );
+            return pt.getActualTypeArguments();
         }
         
         // Class has no generic type parameters.
-        return Collections.emptyList();
+        return new Type[0];
     }
 
     /**

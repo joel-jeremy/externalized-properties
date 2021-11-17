@@ -46,15 +46,10 @@ public class StringUtilities {
         requireNonNull(variablePattern, "variablePattern");
         requireNonNull(variableValueProvider, "variableValueProvider");
 
-        StringBuilder output = new StringBuilder();
-
+        StringBuffer output = new StringBuffer();
         Matcher matcher = variablePattern.matcher(value);
-        int currentIndex = 0;
+        
         while (matcher.find()) {
-            // Get text before matched variable.
-            String textBeforeMatchedVariable = 
-                value.substring(currentIndex, matcher.start());
-            
             // Resolve property from variable.
             String propertyNameVariable = matcher.group(1);
             
@@ -72,16 +67,12 @@ public class StringUtilities {
                     "Unable to find value for variable: " + propertyNameVariable
                 );
             }
-            
-            // Append text before matched variable and the replacement value.
-            output.append(textBeforeMatchedVariable).append(propertyValue);
-            
-            // Move on to find next variable starting from the new currentIndex.
-            currentIndex = matcher.end();
+
+            matcher.appendReplacement(output, Matcher.quoteReplacement(propertyValue));
         }
 
         // Append any text after the variable if there are any.
-        return output.append(value.substring(currentIndex)).toString();
+        return matcher.appendTail(output).toString();
     }
 
     private static boolean isNullOrEmpty(String value) {

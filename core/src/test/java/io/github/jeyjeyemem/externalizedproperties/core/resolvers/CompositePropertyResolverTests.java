@@ -12,28 +12,30 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CompositePropertyResolverTests {
     @Nested
-    class Constructor {
+    class FromMethod {
         @Test
         @DisplayName("should throw when resolvers collection argument is null or empty")
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new CompositePropertyResolver(
+                () -> CompositePropertyResolver.from(
                     (Collection<ExternalizedPropertyResolver>)null
                 )
             );
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new CompositePropertyResolver(Collections.emptyList())
+                () -> CompositePropertyResolver.from(Collections.emptyList())
             );
         }
 
@@ -42,20 +44,261 @@ public class CompositePropertyResolverTests {
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new CompositePropertyResolver(
+                () -> CompositePropertyResolver.from(
                     (ExternalizedPropertyResolver[])null
                 )
             );
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new CompositePropertyResolver(new ExternalizedPropertyResolver[0])
+                () -> CompositePropertyResolver.from(new ExternalizedPropertyResolver[0])
             );
         }
     }
 
     @Nested
-    class ResolveMethod {
+    class FlattenMethod {
+        @Test
+        @DisplayName("should throw when resolvers collection argument is null or empty")
+        public void test1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> CompositePropertyResolver.flatten(
+                    (Collection<ExternalizedPropertyResolver>)null
+                )
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> CompositePropertyResolver.flatten(Collections.emptyList())
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when resolvers varargs argument is null or empty")
+        public void test2() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> CompositePropertyResolver.flatten(
+                    (ExternalizedPropertyResolver[])null
+                )
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> CompositePropertyResolver.flatten(new ExternalizedPropertyResolver[0])
+            );
+        }
+
+        @Test
+        @DisplayName("should discard any nested composite property resolvers")
+        public void test3() {
+            CompositePropertyResolver resolver1 = 
+                CompositePropertyResolver.from(new SystemPropertyResolver());
+            CompositePropertyResolver resolver2 =
+                CompositePropertyResolver.from(resolver1);
+            CompositePropertyResolver resolver3 =
+                CompositePropertyResolver.from(new EnvironmentPropertyResolver());
+            CompositePropertyResolver resolver4 =
+                CompositePropertyResolver.from(resolver3);
+
+            ExternalizedPropertyResolver flattenedResolver =   
+                CompositePropertyResolver.flatten(resolver2, resolver4);
+            
+            assertTrue(flattenedResolver instanceof CompositePropertyResolver);
+            
+            CompositePropertyResolver compositeResolver = 
+                (CompositePropertyResolver)flattenedResolver;
+
+            // Should discard other composite property resolvers but
+            // maintain original resolver order.
+            int resolverCount = 0;
+            for (ExternalizedPropertyResolver resolver : compositeResolver) {
+                if (resolverCount == 0) {
+                    assertTrue(resolver instanceof SystemPropertyResolver);
+                } else if (resolverCount == 1) {
+                    assertTrue(resolver instanceof EnvironmentPropertyResolver);
+                }
+                resolverCount++;
+            }
+
+            // There must be only SystemPropertyResolver and EnvironmentPropertyResolver.
+            assertEquals(2, resolverCount);
+        }
+
+        @Test
+        @DisplayName(
+            "should return the resolver instance " + 
+            "when only one resolver remained after the flattening operation"
+        )
+        public void test4() {
+            CompositePropertyResolver resolver = 
+                CompositePropertyResolver.from(new SystemPropertyResolver());
+
+            ExternalizedPropertyResolver flattenedResolver =   
+                CompositePropertyResolver.flatten(resolver);
+            
+            assertTrue(flattenedResolver instanceof SystemPropertyResolver);
+        }
+    }
+
+    @Nested
+    class ResolveMethodSingleProperty {
+        @Test
+        @DisplayName("should throw when property name argument is null or empty")
+        public void validationTest1() {
+            CompositePropertyResolver compositeResolver = resolverToTest(
+                new StubExternalizedPropertyResolver()
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> compositeResolver.resolve((String)null)
+            );
+            
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> compositeResolver.resolve("")
+            );
+        }
+
+        @Test
+        @DisplayName("should resolve property value from the child resolver")
+        public void test1() {
+            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver();
+            
+            CompositePropertyResolver compositeResolver = resolverToTest(resolver);
+
+            Optional<ResolvedProperty>  result = compositeResolver.resolve("property.name");
+
+            assertTrue(resolver.resolvedPropertyNames().contains("property.name"));
+            assertNotNull(result);
+            assertTrue(result.isPresent());
+            assertEquals(
+                resolver.valueResolver().apply("property.name"), 
+                result.get().value()
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should return empty Optional " + 
+            "when property is not found from any of the child resolvers"
+        )
+        public void test2() {
+            StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
+                propertyName -> null // Not resolved
+            );
+
+            StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
+                propertyName -> null // Not resolved
+            );
+            
+            CompositePropertyResolver compositeResolver = resolverToTest(
+                resolver1,
+                resolver2
+            );
+
+            Optional<ResolvedProperty>  result = compositeResolver.resolve(
+                "property.nonexistent"
+            );
+
+            assertFalse(resolver1.resolvedPropertyNames().contains("property.nonexistent"));
+            assertNotNull(result);
+            assertFalse(result.isPresent());
+        }
+
+        @Test
+        @DisplayName("should be able to resolve property value from one or more child resolvers")
+        public void test3() {
+            StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
+                propertyName -> propertyName.endsWith("1") ? 
+                    "resolver-1-result" :
+                    null
+            );
+
+            StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
+                propertyName -> propertyName.endsWith("2") ? 
+                    "resolver-2-result" :
+                    null
+            );
+
+            StubExternalizedPropertyResolver resolver3 = new StubExternalizedPropertyResolver(
+                propertyName -> propertyName.endsWith("3") ?
+                    "resolver-3-result" :
+                    null
+            );
+            
+            CompositePropertyResolver compositeResolver = resolverToTest(
+                resolver1,
+                resolver2,
+                resolver3
+            );
+
+            // Should resolve from resolver2.
+            Optional<ResolvedProperty>  result = compositeResolver.resolve("property.name.2");
+
+            // property.name.2 resolved from resolver2
+            assertFalse(resolver2.resolvedPropertyNames().contains("property.name.1"));
+            assertTrue(resolver2.resolvedPropertyNames().contains("property.name.2"));
+            assertFalse(resolver2.resolvedPropertyNames().contains("property.name.3"));
+
+            assertNotNull(result);
+            assertTrue(result.isPresent());
+            assertEquals(
+                resolver2.valueResolver().apply("property.name.2"), 
+                result.get().value()
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should skip resolving from downstream resolvers " + 
+            "when the property has already been resolved"
+        )
+        public void test4() {
+            StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
+                propertyName -> propertyName.endsWith("1") ? 
+                    "resolver-1-result" :
+                    null
+            );
+
+            StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
+                propertyName -> propertyName.endsWith("2") ? 
+                    "resolver-2-result" :
+                    null
+            );
+
+            StubExternalizedPropertyResolver resolver3 = new StubExternalizedPropertyResolver(
+                propertyName -> propertyName.endsWith("3") ?
+                    "resolver-3-result" :
+                    null
+            );
+            
+            CompositePropertyResolver compositeResolver = resolverToTest(
+                resolver1,
+                resolver2,
+                resolver3
+            );
+
+            Optional<ResolvedProperty>  result = compositeResolver.resolve("property.name.1");
+
+            // property.name.1 and resolved from resolver1 and not from subsequent resolvers.
+            assertTrue(resolver1.resolvedPropertyNames().contains("property.name.1"));
+            assertFalse(resolver2.resolvedPropertyNames().contains("property.name.1"));
+            assertFalse(resolver3.resolvedPropertyNames().contains("property.name.1"));
+
+            assertNotNull(result);
+            assertTrue(result.isPresent());
+            assertEquals(
+                resolver1.valueResolver().apply("property.name.1"), 
+                result.get().value()
+            );
+        }
+    }
+
+    @Nested
+    class ResolveMethodMultipleProperties {
         @Test
         @DisplayName("should throw when property names collection argument is null or empty")
         public void validationTest1() {
@@ -93,59 +336,28 @@ public class CompositePropertyResolverTests {
         }
 
         @Test
-        @DisplayName(
-            "should throw when property names collection contains any null or empty values"
-        )
-        public void validationTest3() {
-            CompositePropertyResolver resolver = resolverToTest(
-                new StubExternalizedPropertyResolver()
-            );
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> resolver.resolve(Arrays.asList("property", null))
-            );
-            
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> resolver.resolve(Arrays.asList("property", ""))
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when property names varargs contain any null or empty values")
-        public void validationTest4() {
-            CompositePropertyResolver resolver = resolverToTest(
-                new StubExternalizedPropertyResolver()
-            );
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> resolver.resolve(new String[] { "property", null })
-            );
-            
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> resolver.resolve(new String[] { "property", "" })
-            );
-        }
-
-        @Test
-        @DisplayName("should resolve values from the child resolver")
+        @DisplayName("should resolve property values from the child resolver")
         public void test1() {
             StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver();
             
             CompositePropertyResolver compositeResolver = resolverToTest(resolver);
 
-            ExternalizedPropertyResolverResult result = compositeResolver.resolve("property.name");
+            ExternalizedPropertyResolverResult result = compositeResolver.resolve(
+                "property.name1",
+                "property.name2"
+            );
 
-            assertTrue(resolver.resolvedPropertyNames().contains("property.name"));
+            assertTrue(resolver.resolvedPropertyNames().contains("property.name1"));
+            assertTrue(resolver.resolvedPropertyNames().contains("property.name2"));
 
             assertEquals(
-                resolver.valueResolver().apply("property.name"), 
-                result.findResolvedProperty("property.name")
-                    .map(ResolvedProperty::value)
-                    .orElse(null)
+                resolver.valueResolver().apply("property.name1"), 
+                result.findRequiredPropertyValue("property.name1")
+            );
+
+            assertEquals(
+                resolver.valueResolver().apply("property.name2"), 
+                result.findRequiredPropertyValue("property.name2")
             );
         }
 
@@ -168,18 +380,22 @@ public class CompositePropertyResolverTests {
                 resolver2
             );
 
-            ExternalizedPropertyResolverResult result = compositeResolver.resolve("property.nonexistent");
+            ExternalizedPropertyResolverResult result = compositeResolver.resolve(
+                "property.nonexistent1",
+                "property.nonexistent2"
+            );
 
             assertFalse(result.hasResolvedProperties());
             assertTrue(result.hasUnresolvedProperties());
-            assertTrue(result.unresolvedPropertyNames().contains("property.nonexistent"));
+            assertTrue(result.unresolvedPropertyNames().contains("property.nonexistent1"));
+            assertTrue(result.unresolvedPropertyNames().contains("property.nonexistent2"));
 
-            assertFalse(resolver1.resolvedPropertyNames().contains("property.nonexistent"));
-            assertFalse(resolver2.resolvedPropertyNames().contains("property.nonexistent"));
+            assertFalse(resolver1.resolvedPropertyNames().contains("property.nonexistent1"));
+            assertFalse(resolver2.resolvedPropertyNames().contains("property.nonexistent2"));
         }
 
         @Test
-        @DisplayName("should be able to resolve values from one or more child resolvers")
+        @DisplayName("should be able to resolve property values from one or more child resolvers")
         public void test3() {
             StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
                 propertyName -> propertyName.endsWith("1") ? 
@@ -230,25 +446,19 @@ public class CompositePropertyResolverTests {
             // result1 has same value as resolver1.
             assertEquals(
                 resolver1.valueResolver().apply("property.name.1"), 
-                result.findResolvedProperty("property.name.1")
-                    .map(ResolvedProperty::value)
-                    .orElse(null)
+                result.findRequiredPropertyValue("property.name.1")
             );
 
             // result2 has same value as resolver2.
             assertEquals(
                 resolver2.valueResolver().apply("property.name.2"), 
-                result.findResolvedProperty("property.name.2")
-                    .map(ResolvedProperty::value)
-                    .orElse(null)
+                result.findRequiredPropertyValue("property.name.2")
             );
 
             // result3 has same value as resolver3.
             assertEquals(
                 resolver3.valueResolver().apply("property.name.3"), 
-                result.findResolvedProperty("property.name.3")
-                    .map(ResolvedProperty::value)
-                    .orElse(null)
+                result.findRequiredPropertyValue("property.name.3")
             );
         }
 
@@ -306,17 +516,13 @@ public class CompositePropertyResolverTests {
             // result1 has same value as resolver1.
             assertEquals(
                 resolver1.valueResolver().apply("property.name.1"), 
-                result.findResolvedProperty("property.name.1")
-                    .map(ResolvedProperty::value)
-                    .orElse(null)
+                result.findRequiredPropertyValue("property.name.1")
             );
 
             // result2 has same value as resolver1.
             assertEquals(
                 resolver1.valueResolver().apply("property.name.2"), 
-                result.findResolvedProperty("property.name.2")
-                    .map(ResolvedProperty::value)
-                    .orElse(null)
+                result.findRequiredPropertyValue("property.name.2")
             );
 
             /**
@@ -326,9 +532,7 @@ public class CompositePropertyResolverTests {
             // result3 has same value as resolver3.
             assertEquals(
                 resolver3.valueResolver().apply("property.name.3"), 
-                result.findResolvedProperty("property.name.3")
-                    .map(ResolvedProperty::value)
-                    .orElse(null)
+                result.findRequiredPropertyValue("property.name.3")
             );
         }
     }
@@ -340,8 +544,8 @@ public class CompositePropertyResolverTests {
         public void test1() {
             List<ExternalizedPropertyResolver> resolvers = Arrays.asList(
                 new SystemPropertyResolver(),
-                new EnvironmentVariablePropertyResolver(),
-                new CompositePropertyResolver(new MapPropertyResolver(Collections.emptyMap()))
+                new EnvironmentPropertyResolver(),
+                CompositePropertyResolver.from(new MapPropertyResolver(Collections.emptyMap()))
             );
 
             CompositePropertyResolver resolver = resolverToTest(
@@ -355,6 +559,6 @@ public class CompositePropertyResolverTests {
     private CompositePropertyResolver resolverToTest(
             ExternalizedPropertyResolver... externalizedPropertyResolvers
     ) {
-        return new CompositePropertyResolver(externalizedPropertyResolvers);
+        return CompositePropertyResolver.from(externalizedPropertyResolvers);
     }
 }

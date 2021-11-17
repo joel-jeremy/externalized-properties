@@ -46,4 +46,22 @@ public interface PrimitiveProxyInterface {
 
     @ExternalizedProperty("property.double.wrapper")
     Double doubleWrapperProperty();
+
+    @ExternalizedProperty("property.boolean.primitive")
+    boolean booleanPrimitiveProperty();
+
+    @ExternalizedProperty("property.boolean.wrapper")
+    Boolean booleanWrapperProperty();
+
+    @ExternalizedProperty("property.short.primitive")
+    short shortPrimitiveProperty();
+
+    @ExternalizedProperty("property.short.wrapper")
+    Short shortWrapperProperty();
+
+    @ExternalizedProperty("property.byte.primitive")
+    byte bytePrimitiveProperty();
+
+    @ExternalizedProperty("property.byte.wrapper")
+    Byte byteWrapperProperty();
 }

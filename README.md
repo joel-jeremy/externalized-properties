@@ -1,5 +1,8 @@
 # Externalized Properties
 
+[![Gradle Build](https://github.com/jeyjeyemem/externalized-properties/actions/workflows/gradle-build.yaml/badge.svg)](https://github.com/jeyjeyemem/externalized-properties/actions/workflows/gradle-build.yaml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/jeyjeyemem/externalized-properties/blob/main/LICENSE)
+
 A lightweight and extensible library to resolve application properties from various external sources.
 
 ## [Twelve Factor Methodology](https://12factor.net)
@@ -32,6 +35,8 @@ implementation 'io.github.jeyjeyemem.externalizedproperties:core:1.0.0-SNAPSHOT'
 
 Externalized Properties makes the best of of Java's strong typing by proxying an interface and using that as a facade to resolve properties.
 
+### Interface Proxying
+
 Given an interface:
 
 ```java
@@ -47,6 +52,20 @@ We can initialize and start resolving external configurations/properties by:
 
 ```java
 public static void main(String[] args) {
+    ExternalizedProperties externalizedProperties = buildExternalizedProperties();
+
+    // Proxied interface.
+    ApplicationProperties props = externalizedProperties.proxy(ApplicationProperties.class);
+
+    // Use properties.
+    String databaseUrl = props.databaseUrl();
+    String databaseDriver = props.databaseDriver();
+
+    System.out.println("Database URL: " + databaseUrl);
+    System.out.println("Database Driver: " + databaseDriver);
+}
+
+private ExternalizedProperties buildExternalizedProperties() {
     // Create the ExternalizedProperties instance with default and additional resolvers.
     // Default resolvers include system properties and environment variable resolvers.
     // AWS SSM Resolver and Database Resolver are not part of the core module. They 
@@ -59,12 +78,24 @@ public static void main(String[] args) {
             new DatabaseResolver(entityManagerFactory)
         ) 
         .build();
+    
+    return externalizedProperties;
+}
+```
+
+### Direct Property Resolution
+
+Another option is to resolve properties directly from the `ExternalizedProperties` instance if you want to avoid overhead of using proxies:
+
+```java
+public static void main(String[] args) {
+    ExternalizedProperties externalizedProperties = buildExternalizedProperties();
 
     // Proxied interface.
-    ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
+    Optional<ResolvedProperty> property = externalizedProperties.resolveProperty("database.url");
 
-    // Use properties.
-    String databaseUrl = props.databaseUrl();
-    String databaseDriver = props.databaseDriver();
+    // Use property:
+    System.out.println("Property Name: " + property.name());
+    System.out.println("Property Value: " + property.value());
 }
 ```

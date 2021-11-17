@@ -1,8 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.utils;
 
 import java.util.Collection;
-import java.util.Objects;
-import java.util.function.Predicate;
 
 /**
  * Arguments-related utility methods.
@@ -20,31 +18,8 @@ public class Arguments {
      * @return The argument.
      */
     public static <T> T requireNonNull(T arg, String argName) {
-        if (isNullOrEmpty(argName))
-            throw new IllegalArgumentException("argName must not be null or empty.");
-
-        return require(arg, Objects::nonNull, argName + " must not be null.");
-    }
-
-    /**
-     * Require argument to satisfy the requirement.
-     * 
-     * @param <T> The type of the argument.
-     * @param arg The argument.
-     * @param requirement The requirement predicate.
-     * @param exceptionMessage The exception message to be used in building the 
-     * {@link IllegalArgumentException} if the argument failed validation.
-     * @return The argument.
-     */
-    public static <T> T require(T arg, Predicate<T> requirement, String exceptionMessage) {
-        if (requirement == null)
-            throw new IllegalArgumentException("requirement must not be null.");
-
-        if (isNullOrEmpty(exceptionMessage))
-            throw new IllegalArgumentException("exceptionMessage must not be null or empty.");
-
-        if (!requirement.test(arg)) {
-            throw new IllegalArgumentException(exceptionMessage);
+        if (arg == null) {
+            throw new IllegalArgumentException("Argument " + argName + " must not be null.");
         }
 
         return arg;
@@ -59,14 +34,11 @@ public class Arguments {
      * @return The {@link String} argument.
      */
     public static String requireNonNullOrEmptyString(String arg, String argName) {
-        if (isNullOrEmpty(argName))
-            throw new IllegalArgumentException("argName must not be null or empty.");
+        if (isNullOrEmpty(arg)) {
+            throw new IllegalArgumentException("Argument " + argName + " must not be null or empty.");
+        }
 
-        return require(
-            arg,
-            a -> a != null && !a.isEmpty(),
-            argName + " must not be null or empty."
-        );
+        return arg;
     }
 
     /**
@@ -82,14 +54,11 @@ public class Arguments {
             Collection<T> arg, 
             String argName
     ) {
-        if (isNullOrEmpty(argName))
-            throw new IllegalArgumentException("argName must not be null or empty.");
+        if (arg == null || arg.isEmpty()) {
+            throw new IllegalArgumentException("Argument " + argName + " must not be null or empty.");
+        }
 
-        return require(
-            arg,
-            a -> a != null && !a.isEmpty(),
-            argName + " must not be null or empty."
-        );
+        return arg;
     }
 
     private static boolean isNullOrEmpty(String string) {
