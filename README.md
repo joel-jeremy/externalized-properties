@@ -151,10 +151,10 @@ public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = buildExternalizedProperties();
 
     // Use properties.
-    int numberOfThreads = externalizedProperties.resolveProperty("number-of-threads", int.class);
-    List<Integer> validNumbers = externalizedProperties.resolveProperty("valid-numbers", new TypeReference<List<Integer>>(){});
+    Optional<Integer> numberOfThreads = externalizedProperties.resolveProperty("number-of-threads", int.class);
+    Optional<List<Integer>> validNumbers = externalizedProperties.resolveProperty("valid-numbers", new TypeReference<List<Integer>>(){});
 
-    System.out.println("Number of threads: " + numberOfThreads);
-    System.out.println("Valid numbers: " + validNumbers);
+    System.out.println("Number of threads: " + numberOfThreads.get());
+    System.out.println("Valid numbers: " + validNumbers.get());
 }
 ```
