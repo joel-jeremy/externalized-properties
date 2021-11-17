@@ -1,29 +1,28 @@
 package io.github.jeyjeyemem.externalizedproperties.core.testentities;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.StringVariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalStringVariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Optional;
 
 public class StubExternalizedPropertyMethodInfo
         implements ExternalizedPropertyMethodInfo {
 
     private final Method method;
-    private final StringVariableExpander variableExpander;
+    private final VariableExpander variableExpander;
 
     private StubExternalizedPropertyMethodInfo(Method method) {
-        this(method, new InternalStringVariableExpander(new SystemPropertyResolver()));
+        this(method, new InternalVariableExpander(new SystemPropertyResolver()));
     }
 
-    private StubExternalizedPropertyMethodInfo(Method method, StringVariableExpander variableExpander) {
+    private StubExternalizedPropertyMethodInfo(Method method, VariableExpander variableExpander) {
         if (method == null) {
             throw new IllegalArgumentException("method must not be null.");
         }
@@ -77,7 +76,7 @@ public class StubExternalizedPropertyMethodInfo
     }
 
     @Override
-    public List<Type> genericReturnTypeParameters() {
+    public Type[] genericReturnTypeGenericTypeParameters() {
         Type returnType = method.getGenericReturnType();
         return TypeUtilities.getTypeParameters(returnType);
     }
@@ -93,18 +92,23 @@ public class StubExternalizedPropertyMethodInfo
     }
     
     @Override
-    public Optional<Type> genericReturnTypeParameter(int typeParameterIndex) {
-        List<Type> genericTypeParameters = genericReturnTypeParameters();
-        if (genericTypeParameters.isEmpty() || typeParameterIndex >= genericTypeParameters.size()) {
+    public Optional<Type> genericReturnTypeGenericTypeParameter(int typeParameterIndex) {
+        Type[] genericTypeParameters = genericReturnTypeGenericTypeParameters();
+        if (genericTypeParameters.length == 0 || typeParameterIndex >= genericTypeParameters.length) {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(genericTypeParameters.get(typeParameterIndex));
+        return Optional.ofNullable(genericTypeParameters[typeParameterIndex]);
     }
 
     @Override
-    public Type genericReturnTypeParameterOrReturnType(int typeParameterIndex) {
-        return genericReturnTypeParameter(typeParameterIndex).orElse(returnType());
+    public Class<?>[] parameterTypes() {
+        return method.getParameterTypes();
+    }
+
+    @Override
+    public Type[] genericParameterTypes() {
+        return method.getGenericParameterTypes();
     }
 
     public static StubExternalizedPropertyMethodInfo fromMethod(
@@ -128,7 +132,7 @@ public class StubExternalizedPropertyMethodInfo
 
     public static StubExternalizedPropertyMethodInfo fromMethod(
         Method propertyMethod,
-        StringVariableExpander variableExpander
+        VariableExpander variableExpander
     ) {
         return new StubExternalizedPropertyMethodInfo(propertyMethod, variableExpander);
     }

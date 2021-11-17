@@ -1,1 +1,9 @@
 description = 'Externalized Properties Core.'
+
+jar {
+  manifest {
+    attributes(
+      'Automatic-Module-Name': 'io.github.jeyjeyemem.externalizedproperties.core'
+    )
+  }
+}

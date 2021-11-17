@@ -1,11 +1,14 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertyException;
+
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
@@ -30,12 +33,14 @@ public class ExternalizedPropertyResolverResult {
         requireNonNull(propertiesToResolve, "propertiesToResolve");
         requireNonNull(resolvedProperties, "resolvedProperties");
 
-        this.resolvedPropertiesByName = resolvedProperties.stream()
-            .collect(Collectors.toMap(ResolvedProperty::name, rp -> rp));
-        
+        this.resolvedPropertiesByName = new HashMap<>(resolvedProperties.size());
+        for (ResolvedProperty resolvedProperty : resolvedProperties) {
+            resolvedPropertiesByName.put(resolvedProperty.name(), resolvedProperty);
+        }
+
         this.unresolvedPropertyNames = getUnresolvedPropertyNames(
             propertiesToResolve, 
-            resolvedProperties
+            resolvedPropertiesByName.keySet()
         );
     }
 
@@ -79,18 +84,56 @@ public class ExternalizedPropertyResolverResult {
      * Find resolved property with the given name.
      * 
      * @param name The name of the property.
-     * @return An optional {@link ResolvedProperty} instance if it exists. Otherwise, false.
+     * @return An optional {@link ResolvedProperty} instance if it exists. 
+     * Otherwise, an empty optional instance.
      */
     public Optional<ResolvedProperty> findResolvedProperty(String name) {
         return Optional.ofNullable(resolvedPropertiesByName.get(name));
     }
 
+    /**
+     * Find resolved property with the given name.
+     * 
+     * @param name The name of the property.
+     * @return An optional containing the property value if it exists. 
+     * Otherwise, an empty optional instance.
+     */
+    public Optional<String> findResolvedPropertyValue(String name) {
+        return findResolvedProperty(name).map(ResolvedProperty::value);
+    }
+
+    /**
+     * Find resolved property with the given name or else throw an exception 
+     * if the property has not been resolved.
+     * 
+     * @param name The name of the property.
+     * @return The required property value.
+     */
+    public String findRequiredPropertyValue(String name) {
+        ResolvedProperty resolvedProperty = resolvedPropertiesByName.get(name);
+        if (resolvedProperty == null) {
+            throw new UnresolvedPropertyException(
+                name,
+                "Requested property named " + name + " has not been resolved."
+            );
+        }
+        return resolvedProperty.value();
+    }
+
     private static Set<String> getUnresolvedPropertyNames(
             Collection<String> propertiesToResolve,
-            Collection<ResolvedProperty> resolvedProperties) 
+            Set<String> resolvedPropertyNames) 
     {
-        return propertiesToResolve.stream()
-            .filter(pn -> resolvedProperties.stream().noneMatch(rp -> rp.name().equals(pn)))
-            .collect(Collectors.toSet());
+        Set<String> unresolvedPropertyNames = new HashSet<>(
+            propertiesToResolve.size() - resolvedPropertyNames.size()
+        );
+
+        for (String propertyName : propertiesToResolve) {
+            if (!resolvedPropertyNames.contains(propertyName)) {
+                unresolvedPropertyNames.add(propertyName);
+            }
+        }
+
+        return unresolvedPropertyNames;
     }
 }

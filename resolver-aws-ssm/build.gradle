@@ -5,3 +5,11 @@ dependencies {
   implementation platform('software.amazon.awssdk:bom:2.17.19')
   implementation 'software.amazon.awssdk:ssm'
 }
+
+jar {
+  manifest {
+    attributes(
+      'Automatic-Module-Name': 'io.github.jeyjeyemem.externalizedproperties.resolvers.awsssm'
+    )
+  }
+}

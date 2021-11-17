@@ -6,3 +6,11 @@ dependencies {
   testImplementation 'org.hibernate:hibernate-core-jakarta:5.5.7.Final'
   testRuntimeOnly 'com.h2database:h2:1.4.200'
 }
+
+jar {
+  manifest {
+    attributes(
+      'Automatic-Module-Name': 'io.github.jeyjeyemem.externalizedproperties.resolvers.database'
+    )
+  }
+}

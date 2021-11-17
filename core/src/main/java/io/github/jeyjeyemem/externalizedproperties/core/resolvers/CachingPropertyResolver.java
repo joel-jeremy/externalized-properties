@@ -3,6 +3,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.DaemonThreadFactory;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -11,11 +12,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNullOrEmptyCollection;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNullOrEmptyString;
 
 /**
  * An {@link ExternalizedPropertyResolver} decorator which caches resolved properties
@@ -25,21 +28,22 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
     private final ExternalizedPropertyResolver decorated;
     private final Duration cacheItemLifetime;
     private final CacheStrategy cacheStrategy;
-    private final ScheduledExecutorService expiryScheduler;
+    private final ScheduledExecutorService expiryScheduler =
+        Executors.newSingleThreadScheduledExecutor(
+            new DaemonThreadFactory(CachingPropertyResolver.class.getName())
+        );
 
     /**
      * Constructor.
      * 
      * @param decorated The decorated resolver where properties will actually be resolved from.
      * @param cacheItemLifetime The duration of cache items in the cache.
-     * @param expiryScheduler The cache item expiry scheduler.
      */
     public CachingPropertyResolver(
             ExternalizedPropertyResolver decorated, 
-            Duration cacheItemLifetime,
-            ScheduledExecutorService expiryScheduler
+            Duration cacheItemLifetime
     ) {
-        this(decorated, cacheItemLifetime, expiryScheduler, new ConcurrentMapCacheStrategy());
+        this(decorated, cacheItemLifetime, new ConcurrentMapCacheStrategy());
     }
 
     /**
@@ -47,19 +51,43 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
      * 
      * @param decorated The decorated resolver where properties will actually be resolved from.
      * @param cacheItemLifetime The duration of cache items in the cache.
-     * @param expiryScheduler The cache item expiry scheduler.
      * @param cacheStrategy The cache strategy.
      */
     public CachingPropertyResolver(
             ExternalizedPropertyResolver decorated,
             Duration cacheItemLifetime,
-            ScheduledExecutorService expiryScheduler,
             CacheStrategy cacheStrategy
     ) {
         this.decorated = requireNonNull(decorated, "decorated");
         this.cacheItemLifetime = requireNonNull(cacheItemLifetime, "cacheItemLifetime");
-        this.expiryScheduler = requireNonNull(expiryScheduler, "expiryScheduler");
         this.cacheStrategy = requireNonNull(cacheStrategy, "cacheStrategy");
+    }
+
+    /**
+     * Resolve property from the decorated {@link ExternalizedPropertyResolver} 
+     * and caches the resolved property. If requested property is already in the cache,
+     * the cached property will be returned.
+     * 
+     * @param propertyName The property name.
+     * @return The resolved property value. Otherwise, an empty {@link Optional}.
+     */
+    @Override
+    public Optional<ResolvedProperty> resolve(String propertyName) {
+        requireNonNullOrEmptyString(propertyName, "propertyName");
+
+        Optional<ResolvedProperty> cached = cacheStrategy.getFromCache(propertyName);
+        if (cached.isPresent()) {
+            return cached;
+        }
+
+        Optional<ResolvedProperty> resolved = decorated.resolve(propertyName);
+        if (resolved.isPresent()) {
+            // Cache.
+            cache(resolved.get());
+            return resolved;
+        }
+
+        return Optional.empty();
     }
 
     /**
@@ -68,36 +96,35 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
      * the cached properties will be returned. Any uncached properties will be resolved from 
      * the decorated {@link ExternalizedPropertyResolver}.
      * 
+     * @param propertyNames The property names.
      * @return The {@link ExternalizedPropertyResolverResult} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
     public ExternalizedPropertyResolverResult resolve(Collection<String> propertyNames) {
-        validate(propertyNames);
+        requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
 
         List<String> nonCachedProperties = new ArrayList<>(propertyNames.size());
         List<ResolvedProperty> resolvedProperties = new ArrayList<>(propertyNames.size());
 
-        propertyNames.forEach(propertyName -> {
+        for (String propertyName : propertyNames) {
+            throwIfNullOrEmptyValue(propertyName);
             Optional<ResolvedProperty> cached = cacheStrategy.getFromCache(propertyName);
             if (cached.isPresent()) {
                 resolvedProperties.add(cached.get());
             } else  {
                 nonCachedProperties.add(propertyName);
             }
-        });
+        }
 
         // Need to resolve remaining non-cached properties.
         if (!nonCachedProperties.isEmpty()) {
             ExternalizedPropertyResolverResult result = decorated.resolve(nonCachedProperties);
-            result.resolvedProperties().forEach(resolvedProperty -> {
-                // Cache new resolved property.
-                cacheStrategy.cache(resolvedProperty);
-                // Schedule for expiry.
-                scheduleForExpiration(resolvedProperty);
-
+            for (ResolvedProperty resolvedProperty : result.resolvedProperties()) {
+                // Cache.
+                cache(resolvedProperty);
                 resolvedProperties.add(resolvedProperty);
-            });
+            }
         }
 
         return new ExternalizedPropertyResolverResult(
@@ -106,30 +133,24 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
         );
     }
 
-    private void scheduleForExpiration(ResolvedProperty resolvedProperty) {
-        scheduleCacheExpiryTask(new CacheExpiryTask(
-            resolvedProperty, 
-            cacheStrategy,
-            cacheItemLifetime
-        ));
+    private void cache(ResolvedProperty resolvedProperty) {
+        // Cache new resolved property.
+        cacheStrategy.cache(resolvedProperty);
+        // Schedule for expiry.
+        scheduleForExpiration(() -> cacheStrategy.expire(resolvedProperty));
     }
 
-    private void scheduleCacheExpiryTask(CacheExpiryTask cacheExpiryTask) {
+    private void scheduleForExpiration(Runnable expiryAction) {
         expiryScheduler.schedule(
-            cacheExpiryTask, 
-            cacheExpiryTask.cacheLifetime().toMillis(),
+            expiryAction, 
+            cacheItemLifetime.toMillis(),
             TimeUnit.MILLISECONDS
         );
     }
 
-    private void validate(Collection<String> propertyNames) {
-        requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
-        propertyNames.forEach(this::throwWhenNullOrEmptyValue);
-    }
-
-    private void throwWhenNullOrEmptyValue(String propertyName) {
+    private void throwIfNullOrEmptyValue(String propertyName) {
         if (propertyName == null || propertyName.isEmpty()) {
-            throw new IllegalArgumentException("Property names must not be null or empty.");
+            throw new IllegalArgumentException("Property name entries must not be null or empty.");
         }
     }
 
@@ -192,7 +213,7 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
          */
         @Override
         public void cache(ResolvedProperty resolvedProperty) {
-            cache.put(resolvedProperty.name(), resolvedProperty);
+            cache.putIfAbsent(resolvedProperty.name(), resolvedProperty);
         }
 
         /**
@@ -209,31 +230,6 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
         @Override
         public void expire(ResolvedProperty resolvedProperty) {
             cache.remove(resolvedProperty.name());
-        }
-    }
-
-    private static class CacheExpiryTask implements Runnable {
-        private final ResolvedProperty resolvedProperty;
-        private final CacheStrategy cacheStrategy;
-        private final Duration cacheLifetime;
-
-        private CacheExpiryTask(
-                ResolvedProperty resolvedProperty,
-                CacheStrategy cacheStrategy,
-                Duration cacheLifetime
-        ) {
-            this.resolvedProperty = resolvedProperty;
-            this.cacheStrategy = cacheStrategy;
-            this.cacheLifetime = cacheLifetime;
-        }
-
-        @Override
-        public void run() {
-            cacheStrategy.expire(resolvedProperty);  
-        }
-
-        public Duration cacheLifetime() {
-            return cacheLifetime;
         }
     }
 }

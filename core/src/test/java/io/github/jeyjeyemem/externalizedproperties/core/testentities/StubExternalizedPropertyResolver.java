@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -29,6 +30,24 @@ public class StubExternalizedPropertyResolver implements ExternalizedPropertyRes
     }
 
     @Override
+    public Optional<ResolvedProperty> resolve(String propertyName) {
+        if (propertyName == null || propertyName.isEmpty()) {
+            throw new IllegalArgumentException("propertyName must not be null or empty.");
+        }
+
+        String value = valueResolver.apply(propertyName);
+        if (value != null) {
+            // Add for tracking.
+            resolvedPropertyNames.add(propertyName);
+            
+            return Optional.of(
+                ResolvedProperty.with(propertyName, value)
+            );
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public ExternalizedPropertyResolverResult resolve(Collection<String> propertyNames) {
         if (propertyNames == null || propertyNames.isEmpty()) {
             throw new IllegalArgumentException("propertyNames must not be null or empty.");
@@ -38,7 +57,7 @@ public class StubExternalizedPropertyResolver implements ExternalizedPropertyRes
             .map(pn -> {
                 String value = valueResolver.apply(pn);
                 if (value != null) {
-                    return ResolvedProperty.with(pn, valueResolver.apply(pn));
+                    return ResolvedProperty.with(pn, value);
                 }
                 
                 return null;

@@ -4,10 +4,12 @@ import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyReso
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import software.amazon.awssdk.services.ssm.SsmClient;
+import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
 import software.amazon.awssdk.services.ssm.model.GetParametersResponse;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +30,21 @@ public class AwsSsmPropertyResolver implements ExternalizedPropertyResolver {
         }
 
         this.awsSsmClient = awsSsmClient;
+    }
+    /**
+     * Resolve properties from AWS SSM.
+     * 
+     * @return The {@link ExternalizedPropertyResolverResult} which contains the resolved properties
+     * and unresolved properties, if there are any.
+     */
+    @Override
+    public Optional<ResolvedProperty> resolve(String propertyName) {
+        GetParameterResponse response = awsSsmClient.getParameter(
+            request -> request.name(propertyName).withDecryption(true)
+        );
+        return Optional.ofNullable(
+            ResolvedProperty.with(propertyName, response.parameter().value())
+        );
     }
 
     /**

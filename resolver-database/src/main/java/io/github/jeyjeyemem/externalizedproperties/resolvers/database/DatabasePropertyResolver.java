@@ -7,9 +7,11 @@ import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecu
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * {@link ExternalizedPropertyResolver} implementation which resolves requested properties 
@@ -51,6 +53,21 @@ public class DatabasePropertyResolver implements ExternalizedPropertyResolver {
         
         this.entityManagerFactory = entityManagerFactory;
         this.queryRunner = queryRunner;
+    }
+
+    /**
+     * Resolve property from database.
+     * 
+     * @return The {@link ExternalizedPropertyResolverResult} which contains the resolved properties
+     * and unresolved properties, if there are any.
+     */
+    @Override
+    public Optional<ResolvedProperty> resolve(String propertyName) {
+        if (propertyName == null || propertyName.isEmpty()) {
+            throw new IllegalArgumentException("propertyName must not be null or empty.");
+        }
+        ExternalizedPropertyResolverResult result = getFromDatabase(Arrays.asList(propertyName));
+        return result.findResolvedProperty(propertyName);
     }
 
     /**

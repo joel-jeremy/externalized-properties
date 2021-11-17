@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -20,14 +21,22 @@ public class ExternalizedPropertyResolverTests {
             AtomicReference<Collection<String>> propertyNamesCollectionRef = 
                 new AtomicReference<>();
             
-            ExternalizedPropertyResolver resolver = propertyNamesCollection -> {
-                // Track propertyName collection for assertion.
-                propertyNamesCollectionRef.set(propertyNamesCollection);
-                // Dummy result.
-                return new ExternalizedPropertyResolverResult(
-                    Collections.emptyList(), 
-                    Collections.emptyList()
-                );
+            ExternalizedPropertyResolver resolver = new ExternalizedPropertyResolver() {
+                @Override
+                public Optional<ResolvedProperty> resolve(String propertyName) {
+                    return Optional.empty();
+                }
+
+                @Override
+                public ExternalizedPropertyResolverResult resolve(Collection<String> propertyNames) {
+                    // Track propertyName collection for assertion.
+                    propertyNamesCollectionRef.set(propertyNames);
+                    // Dummy result.
+                    return new ExternalizedPropertyResolverResult(
+                        Collections.emptyList(), 
+                        Collections.emptyList()
+                    );
+                }
             };
 
             // This shall be converted to a empty collection
