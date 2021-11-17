@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core.internal;
+package io.github.jeyjeyemem.externalizedproperties.core.internal.invocationhandlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBuilder;
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-// Let ExternalizedPropertiesexternalizedProperties.proxy(Class<?> proxyInterface) 
+// Let ExternalizedProperties.proxy(Class<?> proxyInterface) 
 // create the proxy for these test cases.
 public class ExternalizedPropertyInvocationHandlerTests {
     @Nested
