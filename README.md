@@ -33,9 +33,27 @@ implementation 'io.github.jeyjeyemem.externalizedproperties:core:1.0.0-SNAPSHOT'
 </dependency>
 ```
 
-Externalized Properties makes the best of of Java's strong typing by proxying an interface and using that as a facade to resolve properties.
+### Java 9 Module Names
+
+Externalized Properties jars are published with Automatic-Module-Name manifest attribute:
+
+- Core - `io.github.jeyjeyemem.externalizedproperties.core`
+- AWS SSM Resolver - `io.github.jeyjeyemem.externalizedproperties.resolvers.awsssm`
+- Database Resolver - `io.github.jeyjeyemem.externalizedproperties.resolvers.database`
+
+Module authors can use above module names in their module-info.java:
+
+```java
+module foo.bar {
+    requires io.github.jeyjeyemem.externalizedproperties.core;
+    requires io.github.jeyjeyemem.externalizedproperties.resolvers.awsssm;
+    requires io.github.jeyjeyemem.externalizedproperties.resolvers.database;
+}
+```
 
 ## Features
+
+Externalized Properties makes the best of of Java's strong typing by proxying an interface and using that as a facade to resolve properties.
 
 ### Interface Proxying
 
@@ -127,7 +145,7 @@ To convert a property via the proxy interface, just set the method return type t
 
 ```java
 public interface ApplicationProperties {
-    @ExternalizedProperties("thread-count")
+    @ExternalizedProperty("thread-count")
     int numberOfThreads();
 }
 
