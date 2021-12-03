@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SystemPropertyResolverTests {
     @Nested
-    class ResolveMethodSingleProperty {
+    class ResolveMethod {
         @Test
         @DisplayName("should resolve property value from system properties")
         public void test1() {
@@ -44,25 +44,28 @@ public class SystemPropertyResolverTests {
     }
 
     @Nested
-    class ResolveMethodMultipleProperties {
+    class ResolveMethodWithVarArgsOverload {
         @Test
         @DisplayName("should resolve values from system properties")
         public void test1() {
             SystemPropertyResolver resolver = resolverToTest();
-            SystemPropertyResolver.Result result = resolver.resolve("java.version", "java.home");
+
+            String[] propertiesToResolve = new String[] {
+                "java.version", 
+                "java.home"
+            };
+
+            SystemPropertyResolver.Result result = resolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
 
-            assertEquals(
-                System.getProperty("java.version"), 
-                result.findRequiredProperty("java.version")
-            );
-
-            assertEquals(
-                System.getProperty("java.home"), 
-                result.findRequiredProperty("java.home")
-            );
+            for (String propertyName : propertiesToResolve) {
+                assertEquals(
+                    System.getProperty(propertyName), 
+                    result.findRequiredProperty(propertyName)
+                );
+            }
         }
 
         @Test
@@ -71,14 +74,24 @@ public class SystemPropertyResolverTests {
         )
         public void test2() {
             SystemPropertyResolver resolver = resolverToTest();
-            SystemPropertyResolver.Result result = resolver.resolve(
+
+            String[] propertiesToResolve = new String[] {
                 "nonexisting.property1", 
                 "nonexisting.property2"
+            };
+
+            SystemPropertyResolver.Result result = resolver.resolve(
+                propertiesToResolve
             );
             
+            assertFalse(result.hasResolvedProperties());
             assertTrue(result.hasUnresolvedProperties());
-            assertTrue(result.unresolvedPropertyNames().contains("nonexisting.property1"));
-            assertTrue(result.unresolvedPropertyNames().contains("nonexisting.property2"));
+            
+            for (String propertyName : propertiesToResolve) {
+                assertTrue(
+                    result.unresolvedPropertyNames().contains(propertyName)
+                );
+            }
         }
     }
 

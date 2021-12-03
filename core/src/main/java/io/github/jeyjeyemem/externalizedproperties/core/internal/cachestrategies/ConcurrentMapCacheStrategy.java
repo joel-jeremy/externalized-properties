@@ -41,7 +41,7 @@ public class ConcurrentMapCacheStrategy<K, V> implements CacheStrategy<K, V> {
 
     /** {@inheritDoc} */
     @Override
-    public Optional<V> getFromCache(K cacheKey) {
+    public Optional<V> get(K cacheKey) {
         return Optional.ofNullable(cache.get(cacheKey));
     }
 

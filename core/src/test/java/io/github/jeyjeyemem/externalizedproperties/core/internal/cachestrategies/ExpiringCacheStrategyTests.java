@@ -88,7 +88,7 @@ public class ExpiringCacheStrategyTests {
     }
 
     @Nested
-    class GetFromCacheMethod {
+    class GetMethod {
         @Test
         @DisplayName("should return cached value from the decorated cache strategy")
         public void test1() {
@@ -105,7 +105,7 @@ public class ExpiringCacheStrategyTests {
                 );
     
             Optional<String> cachedPropertyValue = 
-                cacheStrategy.getFromCache(cacheKey);
+                cacheStrategy.get(cacheKey);
     
             assertTrue(cachedPropertyValue.isPresent());
             assertSame(
@@ -130,7 +130,7 @@ public class ExpiringCacheStrategyTests {
                 );
     
             Optional<String> cachedPropertyValue = 
-                cacheStrategy.getFromCache(cacheKey);
+                cacheStrategy.get(cacheKey);
     
             assertFalse(cachedPropertyValue.isPresent());
         }

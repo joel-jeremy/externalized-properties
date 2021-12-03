@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
@@ -63,6 +64,53 @@ public class EnumConversionHandlerTests {
         @DisplayName("should convert resolved property to the conversion handler's enum class.")
         public void test2() {
             EnumConversionHandler<TestEnum> handler = handlerToTest(TestEnum.class);
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                TestEnum.ONE.name(),
+                TestEnum.class
+            );
+
+            TestEnum testEnum = handler.convert(context);
+            
+            assertNotNull(testEnum);
+            assertEquals(TestEnum.ONE, testEnum);
+        }
+
+        @Test
+        @DisplayName("should throw when property value is not a valid enum value.")
+        public void test3() {
+            EnumConversionHandler<TestEnum> handler = handlerToTest(TestEnum.class);
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                "INVALID_ENUM_VALUE",
+                TestEnum.class
+            );
+
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(context);
+            });
+        }
+    }
+
+    @Nested
+    class ConvertMethodWithPropertyMethodConversionContextOverload {
+        @Test
+        @DisplayName("should throw when context is null.")
+        public void test1() {
+            EnumConversionHandler<TestEnum> handler = handlerToTest(TestEnum.class);
+            assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
+        }
+
+        @Test
+        @DisplayName("should convert resolved property to the conversion handler's enum class.")
+        public void test2() {
+            EnumConversionHandler<TestEnum> handler = handlerToTest(TestEnum.class);
 
             ExternalizedPropertyMethodInfo propertyMethodInfo = 
                 StubExternalizedPropertyMethodInfo.fromMethod(
@@ -70,8 +118,7 @@ public class EnumConversionHandlerTests {
                     "enumProperty"
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext context = 
                 new PropertyMethodConversionContext(
@@ -97,8 +144,7 @@ public class EnumConversionHandlerTests {
                     "enumProperty"
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext context = 
                 new PropertyMethodConversionContext(

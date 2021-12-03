@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EnvironmentPropertyResolverTests {
     @Nested
-    class ResolveMethodSingleProperty {
+    class ResolveMethod {
         @Test
         @DisplayName("should resolve property value from environment variables")
         public void test1() {
@@ -46,7 +47,7 @@ public class EnvironmentPropertyResolverTests {
     }
 
     @Nested
-    class ResolveMethodMultipleProperties {
+    class ResolveMethodWithVarArgsOverload {
         @Test
         @DisplayName("should resolve property values from environment variables")
         public void test1() {
@@ -81,6 +82,53 @@ public class EnvironmentPropertyResolverTests {
                 "NON_EXISTING_ENVVAR2"
             );
             
+            assertTrue(result.hasUnresolvedProperties());
+            assertTrue(result.unresolvedPropertyNames().contains("NON_EXISTING_ENVVAR1"));
+            assertTrue(result.unresolvedPropertyNames().contains("NON_EXISTING_ENVVAR2"));
+        }
+    }
+
+    @Nested
+    class ResolveMethodWithCollectionOverload {
+        @Test
+        @DisplayName("should resolve property values from environment variables")
+        public void test1() {
+            EnvironmentPropertyResolver resolver = resolverToTest();
+            EnvironmentPropertyResolver.Result result = resolver.resolve(
+                Arrays.asList(
+                    "PATH",
+                    "HOME"
+                )
+            );
+
+            assertTrue(result.hasResolvedProperties());
+            assertFalse(result.hasUnresolvedProperties());
+
+            assertEquals(
+                System.getenv("PATH"), 
+                result.findRequiredProperty("PATH")
+            );
+
+            assertEquals(
+                System.getenv("HOME"), 
+                result.findRequiredProperty("HOME")
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should return result with unresolved properties when environment variable is not found"
+        )
+        public void test2() {
+            EnvironmentPropertyResolver resolver = resolverToTest();
+            EnvironmentPropertyResolver.Result result = resolver.resolve(
+                Arrays.asList(
+                    "NON_EXISTING_ENVVAR1",
+                    "NON_EXISTING_ENVVAR2"
+                )
+            );
+            
+            assertFalse(result.hasResolvedProperties());
             assertTrue(result.hasUnresolvedProperties());
             assertTrue(result.unresolvedPropertyNames().contains("NON_EXISTING_ENVVAR1"));
             assertTrue(result.unresolvedPropertyNames().contains("NON_EXISTING_ENVVAR2"));

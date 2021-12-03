@@ -47,7 +47,7 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
     public Optional<String> resolve(String propertyName) {
         requireNonNullOrEmptyString(propertyName, "propertyName");
 
-        Optional<String> cached = cacheStrategy.getFromCache(propertyName);
+        Optional<String> cached = cacheStrategy.get(propertyName);
         if (cached.isPresent()) {
             return cached;
         }
@@ -81,7 +81,7 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
 
         for (String propertyName : propertyNames) {
             throwIfNullOrEmptyValue(propertyName);
-            Optional<String> cachedValue = cacheStrategy.getFromCache(propertyName);
+            Optional<String> cachedValue = cacheStrategy.get(propertyName);
             if (cachedValue.isPresent()) {
                 resultBuilder.add(propertyName, cachedValue.get());
             } else  {

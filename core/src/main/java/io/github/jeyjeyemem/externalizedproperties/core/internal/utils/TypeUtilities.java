@@ -7,6 +7,8 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
+
 /**
  * Type-related utility methods.
  */
@@ -31,8 +33,7 @@ public class TypeUtilities {
      * @throws IllegalArgumentException if the type is unsupported.
      */
     public static Class<?> getRawType(Type type) {
-        if (type == null)
-            return null;
+        requireNonNull(type, "Cannot get raw type of null.");
 
         if (isClass(type)) {
             return (Class<?>)type;
@@ -236,9 +237,6 @@ public class TypeUtilities {
      */
     private static Class<?> getRawArrayType(Type type) {
         Class<?> rawType = getRawType(type);
-        if (rawType != null) {
-            return ARRAY_TYPE_CACHE.get(rawType);
-        }
-        throw new IllegalArgumentException("Illegal or unsupported type: " + type.getTypeName());
+        return ARRAY_TYPE_CACHE.get(rawType);
     }
 }

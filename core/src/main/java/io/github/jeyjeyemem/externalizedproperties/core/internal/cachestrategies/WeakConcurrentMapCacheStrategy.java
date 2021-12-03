@@ -44,7 +44,7 @@ public class WeakConcurrentMapCacheStrategy<K, V> implements CacheStrategy<K, V>
 
     /** {@inheritDoc} */
     @Override
-    public Optional<V> getFromCache(K cacheKey) {
+    public Optional<V> get(K cacheKey) {
         purgeKeys();
         return Optional.ofNullable(
             cache.get(new WeakKey<>(cacheKey))
@@ -117,5 +117,4 @@ public class WeakConcurrentMapCacheStrategy<K, V> implements CacheStrategy<K, V>
             return hashCode;
         }
     }
-    
 }

@@ -159,9 +159,9 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
 
     private String tableNameOrThrow() {
         String tableName = tableName();
-        if (tableName == null || tableName.isEmpty()) {
+        if (tableName == null || tableName.trim().isEmpty()) {
             throw new IllegalStateException(
-                "tableName() method must not return null or empty."
+                "tableName() method must not return null or blank."
             );
         }
         return tableName;
@@ -169,9 +169,9 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
 
     private String propertyNameColumnOrThrow() {
         String propertyNameColumn = propertyNameColumn();
-        if (propertyNameColumn == null || propertyNameColumn.isEmpty()) {
+        if (propertyNameColumn == null || propertyNameColumn.trim().isEmpty()) {
             throw new IllegalStateException(
-                "propertyNameColumn() method must not return null or empty."
+                "propertyNameColumn() method must not return null or blank."
             );
         }
         return propertyNameColumn;
@@ -179,9 +179,9 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
 
     private String propertyValueColumnOrThrow() {
         String propertyValueColumn = propertyValueColumn();
-        if (propertyValueColumn == null || propertyValueColumn.isEmpty()) {
+        if (propertyValueColumn == null || propertyValueColumn.trim().isEmpty()) {
             throw new IllegalStateException(
-                "propertyValueColumn() method must not return null or empty."
+                "propertyValueColumn() method must not return null or blank."
             );
         }
         return propertyValueColumn;

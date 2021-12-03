@@ -4,6 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -62,7 +64,7 @@ public class PropertiesPropertyResolverTests {
     }
 
     @Nested
-    class ResolveMethodSingleProperty {
+    class ResolveMethod {
         @Test
         @DisplayName("should resolve property value from the given properties")
         public void test1() {
@@ -129,32 +131,33 @@ public class PropertiesPropertyResolverTests {
     }
 
     @Nested
-    class ResolveMethodMultipleProperties {
+    class ResolveMethodWithVarArgsOverload {
         @Test
         @DisplayName("should resolve property values from the given properties")
         public void test1() {
             Properties props = new Properties();
             props.setProperty("property.name1", "property.value1");
             props.setProperty("property.name2", "property.value2");
+
+            String[] propertiesToResolve = new String[] {
+                "property.name1",
+                "property.name2"
+            };
             
             PropertiesPropertyResolver resolver = resolverToTest(props);
             PropertiesPropertyResolver.Result result = resolver.resolve(
-                "property.name1",
-                "property.name2"
+                propertiesToResolve
             );
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
 
-            assertEquals(
-                props.getProperty("property.name1"), 
-                result.findRequiredProperty("property.name1")
-            );
-
-            assertEquals(
-                props.getProperty("property.name2"), 
-                result.findRequiredProperty("property.name2")
-            );
+            for (String propertyName : propertiesToResolve) {
+                assertEquals(
+                    props.getProperty(propertyName), 
+                    result.findRequiredProperty(propertyName)
+                );
+            }
         }
 
         @Test
@@ -164,14 +167,24 @@ public class PropertiesPropertyResolverTests {
         )
         public void test2() {
             PropertiesPropertyResolver resolver = resolverToTest(EMPTY_PROPERTIES);
-            PropertiesPropertyResolver.Result result = resolver.resolve(
+
+            String[] propertiesToResolve = new String[] {
                 "nonexisting.property1",
                 "nonexisting.property2"
+            };
+
+            PropertiesPropertyResolver.Result result = resolver.resolve(
+                propertiesToResolve
             );
             
+            assertFalse(result.hasResolvedProperties());
             assertTrue(result.hasUnresolvedProperties());
-            assertTrue(result.unresolvedPropertyNames().contains("nonexisting.property1"));
-            assertTrue(result.unresolvedPropertyNames().contains("nonexisting.property2"));
+
+            for (String propertyName : propertiesToResolve) {
+                assertTrue(
+                    result.unresolvedPropertyNames().contains(propertyName)
+                );
+            }
         }
 
         @Test
@@ -193,24 +206,123 @@ public class PropertiesPropertyResolverTests {
                 unresolvedPropertyHandler
             );
 
-            PropertiesPropertyResolver.Result result = 
-                resolver.resolve(
-                    "property.unresolvedhandler1", 
-                    "property.unresolvedhandler2"
-                );
+            String[] propertiesToResolve = new String[] {
+                "property.unresolvedhandler1", 
+                "property.unresolvedhandler2"
+            };
+
+            PropertiesPropertyResolver.Result result = resolver.resolve(
+                propertiesToResolve
+            );
             
             assertTrue(unresolvedPropertyHandlerInvoked.get());
             assertTrue(result.hasResolvedProperties());
+            assertFalse(result.hasUnresolvedProperties());
 
-            assertEquals(
-                unresolvedPropertyHandler.apply("property.unresolvedhandler1"), 
-                result.findRequiredProperty("property.unresolvedhandler1")
+            for (String propertyName : propertiesToResolve) {
+                assertEquals(
+                    unresolvedPropertyHandler.apply(propertyName), 
+                    result.findRequiredProperty(propertyName)
+                );
+            }
+        }
+    }
+
+    @Nested
+    class ResolveMethodWithCollectionOverload {
+        @Test
+        @DisplayName("should resolve property values from the given properties")
+        public void test1() {
+            Properties props = new Properties();
+            props.setProperty("property.name1", "property.value1");
+            props.setProperty("property.name2", "property.value2");
+
+            List<String> propertiesToResolve = Arrays.asList(
+                "property.name1",
+                "property.name2"
+            );
+            
+            PropertiesPropertyResolver resolver = resolverToTest(props);
+            PropertiesPropertyResolver.Result result = resolver.resolve(
+                propertiesToResolve
             );
 
-            assertEquals(
-                unresolvedPropertyHandler.apply("property.unresolvedhandler2"), 
-                result.findRequiredProperty("property.unresolvedhandler2")
+            assertTrue(result.hasResolvedProperties());
+            assertFalse(result.hasUnresolvedProperties());
+
+            for (String propertyName : propertiesToResolve) {
+                assertEquals(
+                    props.getProperty(propertyName), 
+                    result.findRequiredProperty(propertyName)
+                );
+            }
+        }
+
+        @Test
+        @DisplayName(
+            "should return result with unresolved properties " + 
+            "when property is not found from the given properties"
+        )
+        public void test2() {
+            PropertiesPropertyResolver resolver = resolverToTest(EMPTY_PROPERTIES);
+
+            List<String> propertiesToResolve = Arrays.asList(
+                "nonexisting.property1",
+                "nonexisting.property2"
             );
+
+            PropertiesPropertyResolver.Result result = resolver.resolve(
+                propertiesToResolve
+            );
+            
+            assertFalse(result.hasResolvedProperties());
+            assertTrue(result.hasUnresolvedProperties());
+
+            for (String propertyName : propertiesToResolve) {
+                assertTrue(
+                    result.unresolvedPropertyNames().contains(propertyName)
+                );
+            }
+        }
+
+        @Test
+        @DisplayName(
+            "should invoke unresolved property handler " + 
+            "when property is not found from the given properties"
+        )
+        public void test3() {
+            AtomicBoolean unresolvedPropertyHandlerInvoked = new AtomicBoolean(false);
+
+            Function<String, String> unresolvedPropertyHandler = 
+                propertyName -> {
+                    unresolvedPropertyHandlerInvoked.set(true);
+                    return propertyName + "-default-value";
+                };
+
+            PropertiesPropertyResolver resolver = resolverToTest(
+                EMPTY_PROPERTIES,
+                unresolvedPropertyHandler
+            );
+
+            List<String> propertiesToResolve = Arrays.asList(
+                "property.unresolvedhandler1", 
+                "property.unresolvedhandler2"
+            );
+
+            PropertiesPropertyResolver.Result result = resolver.resolve(
+                propertiesToResolve
+            );
+            
+            assertTrue(unresolvedPropertyHandlerInvoked.get());
+            assertTrue(result.hasResolvedProperties());
+            assertFalse(result.hasUnresolvedProperties());
+
+            for (String propertyName : propertiesToResolve) {
+                assertEquals(
+                    unresolvedPropertyHandler.apply(propertyName), 
+                    result.findRequiredProperty(propertyName)
+                );
+            }
         }
     }
 

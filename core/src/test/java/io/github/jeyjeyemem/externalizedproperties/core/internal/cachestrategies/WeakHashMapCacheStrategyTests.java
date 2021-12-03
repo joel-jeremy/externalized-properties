@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
@@ -13,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Nested
@@ -58,36 +60,41 @@ public class WeakHashMapCacheStrategyTests {
         }
 
         @Test
-        @DisplayName("should automatically remove cache key when weak reference is cleared")
+        @DisplayName("should automatically remove cache key when weak references are cleared")
         public void test2() throws InterruptedException {
             // Use String constructor to explicitly create
             // new String instance and prevent string interning.
             // This allows GC to clear this reference when set to null.
-            String cacheKey = new String("cache.key");
+            String cacheKey1 = new String("cache.key.1");
+            String cacheKey2 = new String("cache.key.2");
     
             WeakHashMap<String, String> cache = new WeakHashMap<>();
             CacheStrategy<String, String> cacheStrategy = 
                 new WeakHashMapCacheStrategy<>(cache);
     
-            cacheStrategy.cache(cacheKey, "cache.value");
+            cacheStrategy.cache(cacheKey1, "cache.value.1");
+            cacheStrategy.cache(cacheKey2, "cache.value.2");
 
-            assertTrue(cache.containsKey(cacheKey));
+            assertTrue(cache.containsKey(cacheKey1));
+            assertTrue(cache.containsKey(cacheKey2));
 
-            // Clear reference.
-            cacheKey = null;
+            // Clear references.
+            cacheKey1 = null;
+            cacheKey2 = null;
 
-            // Wait for GC to clear reference.
-            int i = 0;
-            while (i++ < 1000 && !cache.isEmpty()) {
-                System.gc();
-            }
-
+            assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
+                // Wait for GC to clear references.
+                while (!cache.isEmpty()) {
+                    System.gc();
+                }
+            });
+            
             assertTrue(cache.isEmpty());
         }
     }
 
     @Nested
-    class GetFromCacheMethod {
+    class GetMethod {
         @Test
         @DisplayName("should return cached value from the cache map")
         public void test1() {
@@ -101,7 +108,7 @@ public class WeakHashMapCacheStrategyTests {
                 new WeakHashMapCacheStrategy<>(cache);
     
             Optional<String> cachedPropertyValue = 
-                cacheStrategy.getFromCache(cacheKey);
+                cacheStrategy.get(cacheKey);
     
             assertTrue(cachedPropertyValue.isPresent());
             assertSame(
@@ -121,7 +128,7 @@ public class WeakHashMapCacheStrategyTests {
                 new WeakHashMapCacheStrategy<>(empty);
     
             Optional<String> cachedPropertyValue = 
-                cacheStrategy.getFromCache(cacheKey);
+                cacheStrategy.get(cacheKey);
     
             assertFalse(cachedPropertyValue.isPresent());
         }

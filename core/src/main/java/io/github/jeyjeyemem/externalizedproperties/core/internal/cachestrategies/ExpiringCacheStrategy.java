@@ -53,8 +53,8 @@ public class ExpiringCacheStrategy<K, V> implements CacheStrategy<K, V> {
 
     /** {@inheritDoc} */
     @Override
-    public Optional<V> getFromCache(K cacheKey) {
-        return decorated.getFromCache(cacheKey);
+    public Optional<V> get(K cacheKey) {
+        return decorated.get(cacheKey);
     }
 
     /** {@inheritDoc} */

@@ -24,8 +24,11 @@ public class TypeUtilitiesTests {
     class GetRawTypeMethod {
         @Test
         @DisplayName("should return null when type argument is null.")
-        public void test() {
-            assertNull(TypeUtilities.getRawType(null));
+        public void nullTest() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> TypeUtilities.getRawType(null)
+            );
         }
 
         @Test
@@ -225,11 +228,30 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should throw when type argument is an unrecognized type")
-        public void unrecognizedType() {
+        public void unrecognizedTypeTest() {
             // For any reason JDK decides to add a new type.
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> TypeUtilities.getRawType(new IllegalType())
+                () -> TypeUtilities.getRawType(new UnsupportedType())
+            );
+        }
+
+
+
+        @Test
+        @DisplayName("should throw when type argument is an unrecognized type")
+        public void unrecognizedGenericArrayComponentTypeTest() {
+            GenericArrayType genericArrayType = new GenericArrayType() {
+                @Override
+                public Type getGenericComponentType() {
+                    // For any generic component type returns null.
+                    return null;
+                }
+        
+            };
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> TypeUtilities.getRawType(genericArrayType)
             );
         }
     }
@@ -566,5 +588,5 @@ public class TypeUtilitiesTests {
         List<? super String> wildcardTypeReturnTypeSuper();
     }
 
-    public static class IllegalType implements Type {}
+    public static class UnsupportedType implements Type {}
 }

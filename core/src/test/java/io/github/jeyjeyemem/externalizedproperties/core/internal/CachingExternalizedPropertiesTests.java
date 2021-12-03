@@ -160,7 +160,7 @@ public class CachingExternalizedPropertiesTests {
             assertTrue(resolved.isPresent());
             assertEquals(propertyName + "-value", resolved.get());
 
-            Optional<Optional<?>> cached = resolvedPropertiesCacheStrategy.getFromCache(propertyName);
+            Optional<Optional<?>> cached = resolvedPropertiesCacheStrategy.get(propertyName);
             assertTrue(cached.isPresent());
             assertEquals(Optional.of(propertyName + "-value"), cached.get());
         }
@@ -300,7 +300,7 @@ public class CachingExternalizedPropertiesTests {
             assertTrue(resolved.isPresent());
             assertEquals(1, resolved.get());
 
-            Optional<Optional<?>> cached = resolvedPropertiesCacheStrategy.getFromCache(propertyName);
+            Optional<Optional<?>> cached = resolvedPropertiesCacheStrategy.get(propertyName);
             assertTrue(cached.isPresent());
             assertEquals(Optional.of(1), cached.get());
         }
@@ -473,7 +473,7 @@ public class CachingExternalizedPropertiesTests {
             assertTrue(resolved.isPresent());
             assertEquals(1, resolved.get());
 
-            Optional<Optional<?>> cached = resolvedPropertiesCacheStrategy.getFromCache(propertyName);
+            Optional<Optional<?>> cached = resolvedPropertiesCacheStrategy.get(propertyName);
             assertTrue(cached.isPresent());
             assertEquals(Optional.of(1), cached.get());
         }
@@ -646,7 +646,7 @@ public class CachingExternalizedPropertiesTests {
             assertTrue(resolved.isPresent());
             assertEquals(1, resolved.get());
 
-            Optional<Optional<?>> cached = resolvedPropertiesCacheStrategy.getFromCache(propertyName);
+            Optional<Optional<?>> cached = resolvedPropertiesCacheStrategy.get(propertyName);
             assertTrue(cached.isPresent());
             assertEquals(Optional.of(1), cached.get());
         }
@@ -810,7 +810,7 @@ public class CachingExternalizedPropertiesTests {
 
             assertEquals(propertyName + ".myvar.variable", expanded);
 
-            Optional<String> cached = variableExpansionCacheStrategy.getFromCache(sourceString);
+            Optional<String> cached = variableExpansionCacheStrategy.get(sourceString);
             assertTrue(cached.isPresent());
             assertEquals(propertyName + ".myvar.variable", cached.get());
         }

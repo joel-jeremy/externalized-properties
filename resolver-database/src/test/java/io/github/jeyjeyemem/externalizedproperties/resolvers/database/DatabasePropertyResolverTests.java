@@ -1,5 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.AbstractNameValueQueryExecutor;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.testentities.H2DataSourceConnectionProvider;
@@ -29,7 +30,7 @@ public class DatabasePropertyResolverTests {
     // Use DB_CLOSE_DELAY=-1 so that h2 in-memory database contents are not lost when closing. 
     private static final ConnectionProvider CONNECTION_PROVIDER = 
         new H2DataSourceConnectionProvider(
-            "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", 
+            "jdbc:h2:mem:DatabasePropertyResolverTests;DB_CLOSE_DELAY=-1", 
             "sa", 
             ""
         );
@@ -72,13 +73,17 @@ public class DatabasePropertyResolverTests {
         }
 
         @Test
-        @DisplayName("should throw when propertyName argument is empty")
+        @DisplayName("should throw when propertyName argument is blank")
         public void test2() {
             DatabasePropertyResolver databasePropertyResolver = 
                 new DatabasePropertyResolver(CONNECTION_PROVIDER);
                 
             assertThrows(IllegalArgumentException.class, () -> {
                 databasePropertyResolver.resolve("");
+            });
+
+            assertThrows(IllegalArgumentException.class, () -> {
+                databasePropertyResolver.resolve(" ");
             });
         }
 
@@ -140,6 +145,30 @@ public class DatabasePropertyResolverTests {
             assertTrue(result.isPresent());
             assertNotNull(result.get());
         }
+
+        @Test
+        @DisplayName("should wrap and propagate any SQL exceptions")
+        public void test6() {
+            // Invalid credentials to simulate SQL exception.
+            ConnectionProvider invalidConnectionProvider = 
+                new H2DataSourceConnectionProvider(
+                    "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", 
+                    "invalid_user", 
+                    "invalid_password"
+                );
+            
+            DatabasePropertyResolver databasePropertyResolver = 
+                new DatabasePropertyResolver(invalidConnectionProvider);
+
+            String propertyName = "test.property";
+
+            ExternalizedPropertiesException exception = assertThrows(
+                ExternalizedPropertiesException.class, 
+                () -> databasePropertyResolver.resolve(propertyName)
+            );
+
+            assertTrue(exception.getCause() instanceof SQLException);
+        }
     }
 
     @Nested
@@ -167,8 +196,26 @@ public class DatabasePropertyResolverTests {
         }
 
         @Test
-        @DisplayName("should resolve all properties from database")
+        @DisplayName("should throw when propertyNames argument contains null or blank values")
         public void test3() {
+            DatabasePropertyResolver databasePropertyResolver = 
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+
+            List<String> propertiesToResolve = Arrays.asList(
+                null, 
+                "", 
+                " ", 
+                "test.property"
+            );
+
+            assertThrows(IllegalArgumentException.class, () -> {
+                databasePropertyResolver.resolve(propertiesToResolve);
+            });
+        }
+
+        @Test
+        @DisplayName("should resolve all properties from database")
+        public void test4() {
             DatabasePropertyResolver databasePropertyResolver = 
                 new DatabasePropertyResolver(CONNECTION_PROVIDER);
 
@@ -182,7 +229,7 @@ public class DatabasePropertyResolverTests {
             
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
-            
+
             assertTrue(result.resolvedPropertyNames().stream()
                 .allMatch(resolved -> propertiesToResolve.contains(resolved))
             );
@@ -199,8 +246,10 @@ public class DatabasePropertyResolverTests {
         }
 
         @Test
-        @DisplayName("should return result with resolved and unresolved properties from database")
-        public void test4() {
+        @DisplayName(
+            "should return result with resolved and unresolved properties from database"
+        )
+        public void test5() {
             DatabasePropertyResolver databasePropertyResolver = 
                 new DatabasePropertyResolver(CONNECTION_PROVIDER);
 
@@ -231,7 +280,7 @@ public class DatabasePropertyResolverTests {
 
         @Test
         @DisplayName("should use provided custom query executor")
-        public void test5() {
+        public void test6() {
             DatabasePropertyResolver databasePropertyResolver = 
                 new DatabasePropertyResolver(
                     CONNECTION_PROVIDER,
@@ -266,6 +315,34 @@ public class DatabasePropertyResolverTests {
             assertTrue(result.resolvedPropertyNames().stream()
                 .allMatch(resolved -> propertiesToResolve.contains(resolved))
             );
+        }
+
+        @Test
+        @DisplayName("should wrap and propagate any SQL exceptions")
+        public void test7() {
+            // Invalid credentials to simulate SQL exception.
+            ConnectionProvider invalidConnectionProvider = 
+                new H2DataSourceConnectionProvider(
+                    "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", 
+                    "invalid_user", 
+                    "invalid_password"
+                );
+            
+            DatabasePropertyResolver databasePropertyResolver = 
+                new DatabasePropertyResolver(invalidConnectionProvider);
+
+
+            List<String> propertiesToResolve = Arrays.asList(
+                "test.property.1",
+                "test.property.2"
+            );
+
+            ExternalizedPropertiesException exception = assertThrows(
+                ExternalizedPropertiesException.class, 
+                () -> databasePropertyResolver.resolve(propertiesToResolve)
+            );
+
+            assertTrue(exception.getCause() instanceof SQLException);
         }
     }
 
@@ -295,8 +372,26 @@ public class DatabasePropertyResolverTests {
         }
 
         @Test
-        @DisplayName("should resolve all properties from database")
+        @DisplayName("should throw when propertyNames argument contains null or blank values")
         public void test3() {
+            DatabasePropertyResolver databasePropertyResolver = 
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            
+            String[] propertiesToResolve = new String[] {
+                "",
+                " ",
+                null,
+                "test.property.2"
+            };
+                
+            assertThrows(IllegalArgumentException.class, () -> {
+                databasePropertyResolver.resolve(propertiesToResolve);
+            });
+        }
+
+        @Test
+        @DisplayName("should resolve all properties from database")
+        public void test4() {
             DatabasePropertyResolver databasePropertyResolver = 
                 new DatabasePropertyResolver(CONNECTION_PROVIDER);
 
@@ -317,7 +412,7 @@ public class DatabasePropertyResolverTests {
 
         @Test
         @DisplayName("should return result with resolved and unresolved properties from database")
-        public void test4() {
+        public void test5() {
             DatabasePropertyResolver databasePropertyResolver = 
                 new DatabasePropertyResolver(CONNECTION_PROVIDER);
 
@@ -337,7 +432,7 @@ public class DatabasePropertyResolverTests {
 
         @Test
         @DisplayName("should use provided custom query executor")
-        public void test5() {
+        public void test6() {
             DatabasePropertyResolver databasePropertyResolver = 
                 new DatabasePropertyResolver(
                     CONNECTION_PROVIDER,
@@ -372,6 +467,34 @@ public class DatabasePropertyResolverTests {
             assertTrue(result.resolvedPropertyNames().stream()
                 .allMatch(resolved -> Arrays.asList(propertiesToResolve).contains(resolved))
             );
+        }
+
+        @Test
+        @DisplayName("should wrap and propagate any SQL exceptions")
+        public void test7() {
+            // Invalid credentials to simulate SQL exception.
+            ConnectionProvider invalidConnectionProvider = 
+                new H2DataSourceConnectionProvider(
+                    "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", 
+                    "invalid_user", 
+                    "invalid_password"
+                );
+            
+            DatabasePropertyResolver databasePropertyResolver = 
+                new DatabasePropertyResolver(invalidConnectionProvider);
+
+
+            String[] propertiesToResolve = new String[] {
+                "test.property.1",
+                "test.property.2"
+            };
+
+            ExternalizedPropertiesException exception = assertThrows(
+                ExternalizedPropertiesException.class, 
+                () -> databasePropertyResolver.resolve(propertiesToResolve)
+            );
+
+            assertTrue(exception.getCause() instanceof SQLException);
         }
     }
 

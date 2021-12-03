@@ -1,6 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.TypeReference;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +67,227 @@ public class OptionalConversionHandlerTests {
         @DisplayName("should convert resolved property to an Optional.")
         public void test2() {
             OptionalConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            Type optionalType = new TypeReference<Optional<String>>(){}.type();
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                "value",
+                optionalType
+            );
+
+            Optional<?> optional = handler.convert(context);
+            
+            assertNotNull(optional);
+            assertTrue(optional.isPresent());
+            assertTrue(optional.get() instanceof String);
+            assertEquals("value", optional.get());
+        }
+
+        @Test
+        @DisplayName(
+            "should convert resolved property according to the Optional's generic type parameter."
+        )
+        public void test3() {
+            OptionalConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(
+                handler,
+                new PrimitiveConversionHandler()
+            );
+
+            Type optionalType = new TypeReference<Optional<Integer>>(){}.type();
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                "1",
+                optionalType
+            );
+
+            Optional<?> optional = handler.convert(context);
+            
+            assertNotNull(optional);
+            assertTrue(optional.isPresent());
+            assertTrue(optional.get() instanceof Integer);
+            assertEquals(1, optional.get());
+        }
+
+        @Test
+        @DisplayName("should return String value when Optional's generic type parameter is Object.")
+        public void test4() {
+            OptionalConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            Type optionalType = new TypeReference<Optional<Object>>(){}.type();
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                "value",
+                optionalType
+            );
+
+            Optional<?> optional = handler.convert(context);
+            
+            assertNotNull(optional);
+            assertTrue(optional.isPresent());
+            assertTrue(optional.get() instanceof String);
+            assertEquals("value", optional.get());
+        }
+
+        @Test
+        @DisplayName("should return String value when expected type is a raw Optional.")
+        public void test5() {
+            OptionalConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                "value",
+                Optional.class
+            );
+
+            Optional<?> optional = handler.convert(context);
+            
+            assertNotNull(optional);
+            assertTrue(optional.isPresent());
+            assertTrue(optional.get() instanceof String);
+            assertEquals("value", optional.get());
+        }
+
+        @Test
+        @DisplayName(
+            "should return String value when Optional's generic type parameter is a wildcard."
+        )
+        public void test6() {
+            OptionalConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            Type optionalType = new TypeReference<Optional<?>>(){}.type();
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                "value",
+                optionalType
+            );
+
+            Optional<?> optional = handler.convert(context);
+            
+            assertNotNull(optional);
+            assertTrue(optional.isPresent());
+            assertTrue(optional.get() instanceof String);
+            assertEquals("value", optional.get());
+        }
+
+        @Test
+        @DisplayName("should throw when expected type has a type variable e.g. Optional<T>.")
+        public <T> void test7() {
+            OptionalConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            Type optionalType = new TypeReference<Optional<T>>(){}.type();
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                "value",
+                optionalType
+            );
+                
+            assertThrows(
+                ConversionException.class, 
+                () -> handler.convert(context)
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should convert resolved property according to the Optional's generic type parameter. " + 
+            "Generic type parameter is also a parameterized type e.g. Optional<List<String>>"
+        )
+        public void test8() {
+            OptionalConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(
+                handler,
+                new CollectionConversionHandler() // Register additional List handler.
+            );
+
+
+            Type optionalType = new TypeReference<Optional<List<String>>>(){}.type();
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                "value1,value2,value3",
+                optionalType
+            );
+
+            Optional<?> optional = handler.convert(context);
+            
+            assertNotNull(optional);
+            assertTrue(optional.isPresent());
+            assertTrue(optional.get() instanceof List<?>);
+            assertIterableEquals(
+                Arrays.asList("value1", "value2", "value3"), 
+                (List<?>)optional.get()
+            );
+        }
+        
+        @Test
+        @DisplayName(
+            "should convert resolved property according to the Optional's generic type parameter. " + 
+            "Generic type parameter is a generic array e.g. Optional<Optional<String>[]>."
+        )
+        public void test9() {
+            OptionalConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(
+                handler,
+                new ArrayConversionHandler() // Register additional array handler.
+            );
+
+            Type optionalType = new TypeReference<Optional<Optional<String>[]>>(){}.type();
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                "value1,value2,value3",
+                optionalType
+            );
+
+            Optional<?> optional = handler.convert(context);
+            
+            assertNotNull(optional);
+            assertTrue(optional.isPresent());
+            assertTrue(optional.get() instanceof Optional<?>[]);
+            // Optional returns an array (Optional<?>[])
+            assertArrayEquals(
+                new Optional[] { 
+                    Optional.of("value1"), 
+                    Optional.of("value2"), 
+                    Optional.of("value3") 
+                }, 
+                (Optional<?>[])optional.get()
+            );
+        }
+    }
+
+    @Nested
+    class ConvertMethodWithPropertyMethodConversionContextOverload {
+        @Test
+        @DisplayName("should throw when context is null.")
+        public void test1() {
+            OptionalConversionHandler handler = handlerToTest();
+            assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
+        }
+
+        @Test
+        @DisplayName("should convert resolved property to an Optional.")
+        public void test2() {
+            OptionalConversionHandler handler = handlerToTest();
 
             ExternalizedPropertyMethodInfo propertyMethodInfo = 
                 StubExternalizedPropertyMethodInfo.fromMethod(
@@ -71,8 +295,7 @@ public class OptionalConversionHandlerTests {
                     "optionalProperty"
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext context = 
                 new PropertyMethodConversionContext(
@@ -133,8 +356,7 @@ public class OptionalConversionHandlerTests {
                     "optionalPropertyObject"
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext context = 
                 new PropertyMethodConversionContext(
@@ -164,8 +386,7 @@ public class OptionalConversionHandlerTests {
                     "optionalPropertyWildcard"
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext context = 
                 new PropertyMethodConversionContext(
@@ -193,8 +414,7 @@ public class OptionalConversionHandlerTests {
                     "optionalPropertyT"
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext context = 
                 new PropertyMethodConversionContext(
@@ -211,40 +431,10 @@ public class OptionalConversionHandlerTests {
 
         @Test
         @DisplayName(
-            "should throw when there is no expected type generic type parameters in context."
-        )
-        public void test7() {
-            OptionalConversionHandler handler = handlerToTest();
-
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    OptionalProxyInterface.class,
-                    "optionalProperty"
-                );
-            
-            Converter converter = 
-                new InternalConverter(handler);
-
-            PropertyMethodConversionContext context = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    propertyMethodInfo,
-                    "value",
-                    Optional.class
-                );
-                
-            assertThrows(
-                ConversionException.class, 
-                () -> handler.convert(context)
-            );
-        }
-
-        @Test
-        @DisplayName(
             "should convert resolved property according to the Optional's generic type parameter. " + 
             "Generic type parameter is also a parameterized type e.g. Optional<List<String>>"
         )
-        public void test8() {
+        public void test7() {
             OptionalConversionHandler handler = handlerToTest();
 
             ExternalizedPropertyMethodInfo propertyMethodInfo = 
@@ -281,7 +471,7 @@ public class OptionalConversionHandlerTests {
             "should convert resolved property according to the Optional's generic type parameter. " + 
             "Generic type parameter is a generic array e.g. Optional<Optional<String>[]>."
         )
-        public void test9() {
+        public void test8() {
             OptionalConversionHandler handler = handlerToTest();
 
             ExternalizedPropertyMethodInfo propertyMethodInfo = 

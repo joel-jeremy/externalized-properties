@@ -20,6 +20,9 @@ public class DataSourceConnectionProvider implements ConnectionProvider {
      * @param dataSource The data source to get connections from.
      */
     public DataSourceConnectionProvider(DataSource dataSource) {
+        if (dataSource == null) {
+            throw new IllegalArgumentException("dataSource must not be null.");
+        }
         this.dataSource = dataSource;
         this.username = null;
         this.password = null;
@@ -58,7 +61,7 @@ public class DataSourceConnectionProvider implements ConnectionProvider {
      */
     @Override
     public Connection getConnection() throws SQLException {
-        if (username != null && password != null) {
+        if (username != null) {
             return dataSource.getConnection(username, password);
         }
         return dataSource.getConnection();

@@ -139,7 +139,7 @@ public class InternalVariableExpanderTests {
         @Test
         @DisplayName("should throw when variable cannot be resolver from any resolvers")
         public void test4() {
-            InternalVariableExpander variableExpander =  variableExpander(
+            InternalVariableExpander variableExpander = variableExpander(
                 new SystemPropertyResolver()
             );
 
@@ -152,7 +152,7 @@ public class InternalVariableExpanderTests {
         @Test
         @DisplayName("should return empty when value is empty")
         public void test5() {
-            InternalVariableExpander variableExpander =  variableExpander(
+            InternalVariableExpander variableExpander = variableExpander(
                 new SystemPropertyResolver()
             );
 
@@ -174,15 +174,13 @@ public class InternalVariableExpanderTests {
             assertEquals("test-${}", result);
         }
 
-
-
         @Test
         @DisplayName(
             "should skip expansion " + 
             "when there is there is a variable prefix detected but no variable suffix"
         )
         public void test7() {
-            InternalVariableExpander variableExpander =  variableExpander(
+            InternalVariableExpander variableExpander = variableExpander(
                 new SystemPropertyResolver()
             );
 
@@ -190,11 +188,45 @@ public class InternalVariableExpanderTests {
 
             assertEquals("test-${variable", result);
         }
+        
+        @Test
+        @DisplayName(
+            "should expand variable with value from resolver using custom prefix and suffix"
+        )
+        public void test8() {
+            SystemPropertyResolver resolver = new SystemPropertyResolver();
+            InternalVariableExpander variableExpander = variableExpander(
+                resolver,
+                "#",
+                "^"
+            );
+
+            String result = variableExpander.expandVariables("property-#java.version^");
+
+            String propertyValue = resolver.resolve("java.version").orElse(null);
+
+            assertEquals(
+                "property-" + propertyValue, 
+                result
+            );
+        }
     }
 
     private InternalVariableExpander variableExpander(
             ExternalizedPropertyResolver externalizedPropertyResolver
     ) {
         return new InternalVariableExpander(externalizedPropertyResolver);
+    }
+
+    private InternalVariableExpander variableExpander(
+            ExternalizedPropertyResolver externalizedPropertyResolver,
+            String variablePrefix,
+            String variableSuffix
+    ) {
+        return new InternalVariableExpander(
+            externalizedPropertyResolver,
+            variablePrefix,
+            variableSuffix
+        );
     }
 }

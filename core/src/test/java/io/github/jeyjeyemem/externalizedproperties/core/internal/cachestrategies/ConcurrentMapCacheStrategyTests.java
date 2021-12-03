@@ -60,7 +60,7 @@ public class ConcurrentMapCacheStrategyTests {
     }
 
     @Nested
-    class GetFromCacheMethod {
+    class GetMethod {
         @Test
         @DisplayName("should return cached value from the cache map")
         public void test1() {
@@ -74,7 +74,7 @@ public class ConcurrentMapCacheStrategyTests {
                 new ConcurrentMapCacheStrategy<>(cache);
     
             Optional<String> cachedPropertyValue = 
-                cacheStrategy.getFromCache(cacheKey);
+                cacheStrategy.get(cacheKey);
     
             assertTrue(cachedPropertyValue.isPresent());
             assertSame(
@@ -94,7 +94,7 @@ public class ConcurrentMapCacheStrategyTests {
                 new ConcurrentMapCacheStrategy<>(empty);
     
             Optional<String> cachedPropertyValue = 
-                cacheStrategy.getFromCache(cacheKey);
+                cacheStrategy.get(cacheKey);
     
             assertFalse(cachedPropertyValue.isPresent());
         }

@@ -22,14 +22,9 @@ public abstract class TypeReference<T> {
      */
     protected TypeReference() {
         Type selfType = getClass().getGenericSuperclass();
-        ParameterizedType parameterizedType = TypeUtilities.asParameterizedType(selfType);
-        if (parameterizedType != null) {
-            type = parameterizedType.getActualTypeArguments()[0];
-        } else {
-            throw new IllegalStateException(
-                "Type reference is not a parameterized type."
-            );
-        }
+        // Should not fail because TypeReference is a parameterized type.
+        ParameterizedType parameterizedType = (ParameterizedType)selfType;
+        type = parameterizedType.getActualTypeArguments()[0];
     }
 
     /**

@@ -7,7 +7,6 @@ import io.github.jeyjeyemem.externalizedproperties.core.internal.MethodHandleFac
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
@@ -65,8 +64,7 @@ public class ExternalizedPropertyInvocationHandler implements InvocationHandler 
         if ("toString".equals(method.getName())) {
             return proxyToString(proxy, args);
         }
-        else if ("equals".equals(method.getName()) && 
-                hasMethodParameters(method, Object.class)) {
+        else if ("equals".equals(method.getName()) && method.getParameterTypes().length == 1) {
             return proxyEquals(proxy, args);
         }
         else if ("hashCode".equals(method.getName())) {
@@ -88,9 +86,5 @@ public class ExternalizedPropertyInvocationHandler implements InvocationHandler 
     private static String proxyToString(Object proxy, Object[] args) {
         return proxy.getClass().getName() + '@' + 
             Integer.toHexString(proxyHashCode(proxy, args));
-    }
-
-    private static boolean hasMethodParameters(Method method, Class<?>... parameterTypes) {
-        return Arrays.equals(method.getParameterTypes(), parameterTypes);
     }
 }

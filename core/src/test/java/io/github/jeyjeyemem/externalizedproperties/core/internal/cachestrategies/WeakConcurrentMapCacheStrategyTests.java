@@ -1,18 +1,22 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.WeakConcurrentMapCacheStrategy.WeakKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Nested
@@ -52,40 +56,54 @@ public class WeakConcurrentMapCacheStrategyTests {
     
             assertEquals(
                 cacheValue, 
-                cacheStrategy.getFromCache(cacheKey).get()
+                cacheStrategy.get(cacheKey).get()
             );
         }
 
         @Test
-        @DisplayName("should automatically remove cache key when weak reference is cleared")
+        @DisplayName("should automatically remove cache key when weak references are cleared")
         public void test2() {
             // Use String constructor to explicitly create
             // new String instance and prevent string interning.
             // This allows GC to clear this reference when set to null.
-            String cacheKey = new String("cache.key");
+            String cacheKey1 = new String("cache.key.1");
+            String cacheKey2 = new String("cache.key.2");
     
+            ConcurrentMap<WeakKey<String>, String> cache = 
+                new ConcurrentHashMap<>();
             CacheStrategy<String, String> cacheStrategy = 
-                new WeakConcurrentMapCacheStrategy<>();
+                new WeakConcurrentMapCacheStrategy<>(cache);
     
-            cacheStrategy.cache(cacheKey, "cache.value");
+            cacheStrategy.cache(cacheKey1, "cache.value.1");
+            cacheStrategy.cache(cacheKey2, "cache.value.2");
 
-            assertTrue(cacheStrategy.getFromCache(cacheKey).isPresent());
+            assertTrue(cacheStrategy.get(cacheKey1).isPresent());
+            assertTrue(cacheStrategy.get(cacheKey2).isPresent());
 
-            // Clear reference.
-            cacheKey = null;
+            // Clear references.
+            cacheKey1 = null;
+            cacheKey2 = null;
 
-            // Wait for GC to clear reference.
-            int i = 0;
-            while (i++ < 1000 && cacheStrategy.getFromCache("cache.key").isPresent()) {
-                System.gc();
-            }
+            assertTimeoutPreemptively(Duration.ofSeconds(86400), () -> {
+                // Wait for GC to clear references.
+                // Call get here so cache strategy does its internal purging of keys.
+                // Use string literals here because original cache key instances were nulled.
+                while (cacheStrategy.get("cache.key.1").isPresent() ||
+                    cacheStrategy.get("cache.key.2").isPresent()
+                ) {
+                    System.gc();
+                }
+            });
 
-            assertFalse(cacheStrategy.getFromCache("cache.key").isPresent());
+            // Use string literals here because original cache key instances were nulled.
+            assertFalse(cacheStrategy.get("cache.key.1").isPresent());
+            assertFalse(cacheStrategy.get("cache.key.2").isPresent());
+            assertTrue(cache.isEmpty());
         }
     }
 
     @Nested
-    class GetFromCacheMethod {
+    class GetMethod {
         @Test
         @DisplayName("should return cached value from the cache map")
         public void test1() {
@@ -100,7 +118,7 @@ public class WeakConcurrentMapCacheStrategyTests {
     
             // Retrieve.
             Optional<String> cachedPropertyValue = 
-                cacheStrategy.getFromCache(cacheKey);
+                cacheStrategy.get(cacheKey);
     
             assertTrue(cachedPropertyValue.isPresent());
             assertSame(
@@ -119,7 +137,7 @@ public class WeakConcurrentMapCacheStrategyTests {
                 new WeakConcurrentMapCacheStrategy<>();
     
             Optional<String> cachedPropertyValue = 
-                cacheStrategy.getFromCache(cacheKey);
+                cacheStrategy.get(cacheKey);
     
             assertFalse(cachedPropertyValue.isPresent());
         }
@@ -146,7 +164,7 @@ public class WeakConcurrentMapCacheStrategyTests {
             cacheStrategy.expire(cacheKey);
     
             // Deleted from cache map.
-            assertFalse(cacheStrategy.getFromCache(cacheKey).isPresent());
+            assertFalse(cacheStrategy.get(cacheKey).isPresent());
         }
     }
 
@@ -168,12 +186,12 @@ public class WeakConcurrentMapCacheStrategyTests {
             cacheStrategy.expireAll();
     
             // All items deleted from cache map.
-            assertFalse(cacheStrategy.getFromCache(cacheKey).isPresent());
+            assertFalse(cacheStrategy.get(cacheKey).isPresent());
         }
     }
 
     @Nested
-    class WeakKey {
+    class WeakKeyClass {
         @Nested
         class EqualsMethod {
             @Test
@@ -214,4 +232,6 @@ public class WeakConcurrentMapCacheStrategyTests {
             }
         }
     }
+
+    public static class CacheKey {}
 }

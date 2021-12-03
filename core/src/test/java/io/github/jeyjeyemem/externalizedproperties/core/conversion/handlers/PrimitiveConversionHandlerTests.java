@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.awt.List;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -117,6 +118,460 @@ public class PrimitiveConversionHandlerTests {
         @DisplayName("should throw when expected type is not a primitive type.")
         public void test2() {
             PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+            
+            ConversionContext context = new ConversionContext(
+                converter,
+                "a,b,c",
+                List.class // Not a primitive.
+            );
+            
+            assertThrows(
+                ConversionException.class, 
+                () -> handler.convert(context)
+            );
+        }
+
+        @Test
+        @DisplayName("should convert resolved property to an Integer or primitive int.")
+        public void test3() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "1",
+                Integer.class
+            );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "2",
+                int.class
+            );
+
+            Object wrapperValue = handler.convert(wrapperContext);
+            Object primitiveValue = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperValue);
+            assertNotNull(primitiveValue);
+
+            assertTrue(wrapperValue instanceof Integer);
+            assertTrue(primitiveValue instanceof Integer);
+
+            assertEquals(1, (Integer)wrapperValue);
+            assertEquals(2, (int)primitiveValue);
+        }
+
+        @Test
+        @DisplayName("should convert resolved property to a Long or primitive long.")
+        public void test4() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "1",
+                Long.class
+            );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "2",
+                long.class
+            );
+
+            Object wrapperValue = handler.convert(wrapperContext);
+            Object primitiveValue = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperValue);
+            assertNotNull(primitiveValue);
+
+            assertTrue(wrapperValue instanceof Long);
+            assertTrue(primitiveValue instanceof Long);
+
+            assertEquals(1L, (Long)wrapperValue);
+            assertEquals(2L, (long)primitiveValue);
+        }
+
+        @Test
+        @DisplayName("should convert resolved property to a Float or primitive float.")
+        public void test5() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "1.0",
+                Float.class
+            );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "2.0",
+                float.class
+            );
+
+            Object wrapperValue = handler.convert(wrapperContext);
+            Object primitiveValue = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperValue);
+            assertNotNull(primitiveValue);
+
+            assertTrue(wrapperValue instanceof Float);
+            assertTrue(primitiveValue instanceof Float);
+
+            assertEquals(1.0F, (Float)wrapperValue);
+            assertEquals(2.0F, (float)primitiveValue);
+        }
+
+        @Test
+        @DisplayName("should convert resolved property to a Double or primitive double.")
+        public void test6() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "1.0",
+                Double.class
+            );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "2.0",
+                double.class
+            );
+
+            Object wrapperValue = handler.convert(wrapperContext);
+            Object primitiveValue = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperValue);
+            assertNotNull(primitiveValue);
+
+            assertTrue(wrapperValue instanceof Double);
+            assertTrue(primitiveValue instanceof Double);
+
+            assertEquals(1.0D, (Double)wrapperValue);
+            assertEquals(2.0D, (double)primitiveValue);
+        }
+
+        @Test
+        @DisplayName("should convert resolved property to a Short or primitive short.")
+        public void test7() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "1",
+                Short.class
+            );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "2",
+                short.class
+            );
+
+            Object wrapperValue = handler.convert(wrapperContext);
+            Object primitiveValue = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperValue);
+            assertNotNull(primitiveValue);
+
+            assertTrue(wrapperValue instanceof Short);
+            assertTrue(primitiveValue instanceof Short);
+
+            assertEquals((short)1, (Short)wrapperValue);
+            assertEquals((short)2, (short)primitiveValue);
+        }
+
+        @Test
+        @DisplayName("should convert resolved property to a Boolean or primitive boolean.")
+        public void test8() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "true",
+                Boolean.class
+            );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "false",
+                boolean.class
+            );
+
+            Object wrapperValue = handler.convert(wrapperContext);
+            Object primitiveValue = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperValue);
+            assertNotNull(primitiveValue);
+
+            assertTrue(wrapperValue instanceof Boolean);
+            assertTrue(primitiveValue instanceof Boolean);
+
+            assertEquals(true, (Boolean)wrapperValue);
+            assertEquals(false, (boolean)primitiveValue);
+        }
+
+        @Test
+        @DisplayName("should convert to false when property value is not a valid Boolean/boolean.")
+        public void test9() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "invalid_boolean",
+                Boolean.class
+            );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "invalid_boolean",
+                boolean.class
+            );
+
+            Object wrapperValue = handler.convert(wrapperContext);
+            Object primitiveValue = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperValue);
+            assertNotNull(primitiveValue);
+
+            assertTrue(wrapperValue instanceof Boolean);
+            assertTrue(primitiveValue instanceof Boolean);
+
+            assertEquals(false, (Boolean)wrapperValue);
+            assertEquals(false, (boolean)primitiveValue);
+        }
+
+        @Test
+        @DisplayName("should convert resolved property to a Byte or primitive byte.")
+        public void test10() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "1",
+                Byte.class
+            );
+            
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "2",
+                byte.class
+            );
+
+            Object wrapperValue = handler.convert(wrapperContext);
+            Object primitiveValue = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperValue);
+            assertNotNull(primitiveValue);
+
+            assertTrue(wrapperValue instanceof Byte);
+            assertTrue(primitiveValue instanceof Byte);
+
+            assertEquals((byte)1, (Byte)wrapperValue);
+            assertEquals((byte)2, (byte)primitiveValue);
+        }
+
+        @Test
+        @DisplayName("should throw when property value is not a valid Byte/byte.")
+        public void test11() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "invalid_byte",
+                Byte.class
+            );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "invalid_byte",
+                byte.class
+            );
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(wrapperContext);
+            });
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(primitiveContext);
+            });
+        }
+
+        @Test
+        @DisplayName("should throw when property value is not a valid Short/short.")
+        public void test12() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "invalid_short",
+                Short.class
+            );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "invalid_short",
+                short.class
+            );
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(wrapperContext);
+            });
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(primitiveContext);
+            });
+        }
+
+        @Test
+        @DisplayName("should throw when property value is not a valid Integer/int.")
+        public void test13() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "invalid_int",
+                Integer.class
+            );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "invalid_int",
+                int.class
+            );
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(wrapperContext);
+            });
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(primitiveContext);
+            });
+        }
+
+        @Test
+        @DisplayName("should throw when property value is not a valid Long/long.")
+        public void test14() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "invalid_long",
+                Long.class
+            );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "invalid_long",
+                int.class
+            );
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(wrapperContext);
+            });
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(primitiveContext);
+            });
+        }
+
+        @Test
+        @DisplayName("should throw when property value is not a valid Float/float.")
+        public void test15() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = new ConversionContext(
+                converter,
+                "invalid_float",
+                Float.class
+            );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "invalid_float",
+                float.class
+            );
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(wrapperContext);
+            });
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(primitiveContext);
+            });
+        }
+        
+        @Test
+        @DisplayName("should throw when property value is not a valid Double/double.")
+        public void test16() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext wrapperContext = 
+                new ConversionContext(
+                    converter,
+                    "invalid_double",
+                    Double.class
+                );
+
+            ConversionContext primitiveContext = new ConversionContext(
+                converter,
+                "invalid_double",
+                double.class
+            );
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(wrapperContext);
+            });
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(primitiveContext);
+            });
+        }
+    }
+
+    @Nested
+    class ConvertMethodWithPropertyMethodConversionContextOverload {
+        @Test
+        @DisplayName("should throw when context is null.")
+        public void test1() {
+            PrimitiveConversionHandler handler = handlerToTest();
+            assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
+        }
+
+        @Test
+        @DisplayName("should throw when expected type is not a primitive type.")
+        public void test2() {
+            PrimitiveConversionHandler handler = handlerToTest();
 
             ExternalizedPropertyMethodInfo propertyMethodInfo = 
                 StubExternalizedPropertyMethodInfo.fromMethod(
@@ -124,8 +579,7 @@ public class PrimitiveConversionHandlerTests {
                     "listProperty" // This method returns a List class
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext context = 
                 new PropertyMethodConversionContext(
@@ -158,8 +612,7 @@ public class PrimitiveConversionHandlerTests {
                     "intPrimitiveProperty" // This method returns an int primitive
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(
@@ -205,8 +658,7 @@ public class PrimitiveConversionHandlerTests {
                     "longPrimitiveProperty" // This method returns an long primitive
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(
@@ -252,8 +704,7 @@ public class PrimitiveConversionHandlerTests {
                     "floatPrimitiveProperty" // This method returns an float primitive
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(
@@ -299,8 +750,7 @@ public class PrimitiveConversionHandlerTests {
                     "doublePrimitiveProperty" // This method returns a double primitive
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(
@@ -393,8 +843,7 @@ public class PrimitiveConversionHandlerTests {
                     "booleanPrimitiveProperty" // This method returns a boolean primitive
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(
@@ -440,8 +889,7 @@ public class PrimitiveConversionHandlerTests {
                     "booleanPrimitiveProperty" // This method returns a primitive boolean
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(
@@ -487,8 +935,7 @@ public class PrimitiveConversionHandlerTests {
                     "bytePrimitiveProperty" // This method returns a byte primitive
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(
@@ -534,8 +981,7 @@ public class PrimitiveConversionHandlerTests {
                     "bytePrimitiveProperty" // This method returns a primitive byte
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(
@@ -577,8 +1023,7 @@ public class PrimitiveConversionHandlerTests {
                     "shortPrimitiveProperty" // This method returns a primitive short
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(
@@ -620,8 +1065,7 @@ public class PrimitiveConversionHandlerTests {
                     "intPrimitiveProperty" // This method returns a primitive int
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(
@@ -663,8 +1107,7 @@ public class PrimitiveConversionHandlerTests {
                     "longPrimitiveProperty" // This method returns a primitive long
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(
@@ -706,8 +1149,7 @@ public class PrimitiveConversionHandlerTests {
                     "floatPrimitiveProperty" // This method returns a primitive float
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(
@@ -749,8 +1191,7 @@ public class PrimitiveConversionHandlerTests {
                     "doublePrimitiveProperty" // This method returns a primitive double
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             PropertyMethodConversionContext wrapperContext = 
                 new PropertyMethodConversionContext(

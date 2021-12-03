@@ -58,7 +58,7 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
     /** {@inheritDoc} */
     @Override
     public Optional<String> resolveProperty(String propertyName) {
-        Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.getFromCache(propertyName);
+        Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.get(propertyName);
         if (cached.isPresent()) {
             @SuppressWarnings("unchecked")
             Optional<String> result = (Optional<String>)cached.get();
@@ -90,7 +90,7 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
             String propertyName, 
             Type expectedType
     ) {
-        Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.getFromCache(propertyName);
+        Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.get(propertyName);
         if (cached.isPresent()) {
             @SuppressWarnings("unchecked")
             Optional<T> result = (Optional<T>)cached.get();
@@ -109,7 +109,7 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
     /** {@inheritDoc} */
     @Override
     public String expandVariables(String source) {
-        Optional<String> cached = variableExpansionCacheStrategy.getFromCache(source);
+        Optional<String> cached = variableExpansionCacheStrategy.get(source);
         if (cached.isPresent()) {
             return cached.get();
         }

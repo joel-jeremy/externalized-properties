@@ -40,29 +40,28 @@ public class OptionalConversionHandler implements ConversionHandler<Optional<?>>
 
         try {
             Type[] genericTypeParams = context.expectedTypeGenericTypeParameters();
-            if (genericTypeParams.length == 0) {
-                throw new ConversionException(
-                    "Optional generic type parameter is required."
-                );
+            
+            // Assume initially as Optional of string type.
+            Type targetOptionalType = String.class;
+            if (genericTypeParams.length > 0) {
+                targetOptionalType = genericTypeParams[0];
+                // Do not allow Optional<T>, Optional<T extends ...>, etc.
+                throwIfOptionalHasTypeVariable(targetOptionalType);
             }
 
-            Type optionalGenericTypeParameter = genericTypeParams[0];
-
-            // Do not allow Optional<T>, Optional<T extends ...>, etc.
-            throwIfOptionalHasTypeVariable(optionalGenericTypeParameter);
-
             String value = context.value();
-            Class<?> rawOptionalType = TypeUtilities.getRawType(optionalGenericTypeParameter);
+            Class<?> rawTargetOptionalType = TypeUtilities.getRawType(targetOptionalType);
 
             // If Optional<String> or Optional<Object>, return String value.
-            if (String.class.equals(rawOptionalType) || Object.class.equals(rawOptionalType)) {
+            if (String.class.equals(rawTargetOptionalType) || 
+                    Object.class.equals(rawTargetOptionalType)) {
                 return Optional.of(value);
             }
 
             return convertToOptionalType(
                 context, 
                 value, 
-                optionalGenericTypeParameter
+                targetOptionalType
             );
         } catch (Exception ex) {
             throw new ConversionException(String.format(

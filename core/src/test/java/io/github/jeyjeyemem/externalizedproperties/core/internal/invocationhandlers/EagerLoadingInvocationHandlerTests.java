@@ -133,7 +133,7 @@ public class EagerLoadingInvocationHandlerTests {
                 ExternalizedProperty externalizedProperty =
                     method.getAnnotation(ExternalizedProperty.class);
                 if (externalizedProperty != null) {
-                    Optional<Object> cachedValue = cacheStrategy.getFromCache(method);
+                    Optional<Object> cachedValue = cacheStrategy.get(method);
 
                     assertTrue(cachedValue.isPresent());
                     assertEquals(
@@ -237,7 +237,7 @@ public class EagerLoadingInvocationHandlerTests {
             // Resolved from decorated invocation handler.
             assertEquals("value-from-decorated-handler", result);
             // Resolved value was cached.
-            assertTrue(cacheStrategy.getFromCache(stubMethod).isPresent());
+            assertTrue(cacheStrategy.get(stubMethod).isPresent());
         }
 
         @Test
@@ -283,7 +283,7 @@ public class EagerLoadingInvocationHandlerTests {
 
             assertNull(result);
             // Not cached.
-            assertFalse(cacheStrategy.getFromCache(stubMethod).isPresent());
+            assertFalse(cacheStrategy.get(stubMethod).isPresent());
         }
 
         @SuppressWarnings("unchecked")

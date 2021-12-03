@@ -11,9 +11,9 @@ import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionExc
 import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -61,35 +61,33 @@ public class CollectionConversionHandler implements ConversionHandler<List<?>> {
     ) {
         try {
             Type[] genericTypeParams = context.expectedTypeGenericTypeParameters();
-            if (genericTypeParams.length == 0) {
-                throw new ConversionException(
-                    "List generic type parameter is required."
-                );
+
+            // Assume initially as List of strings.
+            Type targetListType = String.class;
+            if (genericTypeParams.length > 0) {
+                targetListType = genericTypeParams[0];
+                // Do not allow List<T>, List<T extends ...>, etc.
+                throwIfListHasTypeVariable(targetListType);
             }
-
-            Type listGenericTypeParameter = genericTypeParams[0];
-
-            // Do not allow List<T>, List<T extends ...>, etc.
-            throwIfListHasTypeVariable(listGenericTypeParameter);
 
             String propertyValue = context.value();
             if (propertyValue.isEmpty()) {
-                return Collections.emptyList();
+                return new ArrayList<>(0);
             }
 
             final String[] values = getValues(context, externalizedPropertyMethodInfo);
             
-            Class<?> rawListType = TypeUtilities.getRawType(listGenericTypeParameter);
+            Class<?> rawTargetListType = TypeUtilities.getRawType(targetListType);
 
             // If List<String> or List<Object>, return String values.
-            if (String.class.equals(rawListType) || Object.class.equals(rawListType)) {
+            if (String.class.equals(rawTargetListType) || Object.class.equals(rawTargetListType)) {
                 return Arrays.asList(values);
             }
 
             return convertValuesToListType(
                 context, 
                 values, 
-                listGenericTypeParameter
+                targetListType
             );
         } catch (Exception ex) {
             throw new ConversionException(

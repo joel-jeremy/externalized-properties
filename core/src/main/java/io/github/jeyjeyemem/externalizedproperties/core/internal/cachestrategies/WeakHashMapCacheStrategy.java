@@ -40,7 +40,7 @@ public class WeakHashMapCacheStrategy<K, V> implements CacheStrategy<K, V> {
 
     /** {@inheritDoc} */
     @Override
-    public Optional<V> getFromCache(K cacheKey) {
+    public Optional<V> get(K cacheKey) {
         return Optional.ofNullable(weakCache.get(cacheKey));
     }
 

@@ -115,7 +115,7 @@ public class CachingInvocationHandlerTests {
             // Resolved from decorated invocation handler.
             assertEquals("value-from-decorated-handler", result);
             // Resolved value was cached.
-            assertTrue(cacheStrategy.getFromCache(stubMethod).isPresent());
+            assertTrue(cacheStrategy.get(stubMethod).isPresent());
         }
 
         @Test
@@ -148,7 +148,7 @@ public class CachingInvocationHandlerTests {
 
             assertNull(result);
             // Not cached.
-            assertFalse(cacheStrategy.getFromCache(stubMethod).isPresent());
+            assertFalse(cacheStrategy.get(stubMethod).isPresent());
         }
 
         private StubProxyInterface stubProxy(StubInvocationHandler decorated) {

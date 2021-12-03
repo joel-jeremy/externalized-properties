@@ -1,6 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.TypeReference;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -60,6 +63,245 @@ public class ArrayConversionHandlerTests {
         }
 
         @Test
+        @DisplayName("should convert resolved property to an array.")
+        public void test2() {
+            ArrayConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            Object[] array = handler.convert(new ConversionContext(
+                converter,
+                "value1,value2,value3",
+                String[].class
+            ));
+            
+            assertNotNull(array);
+            assertTrue(array.length == 3);
+            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
+            assertArrayEquals(
+                new String[] { "value1", "value2", "value3" }, 
+                array
+            );
+        }
+
+        @Test
+        @DisplayName("should convert resolved property according to the array's component type.")
+        public void test4() {
+            ArrayConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(
+                handler,
+                new PrimitiveConversionHandler()
+            );
+            
+            Object[] array = handler.convert(
+                new ConversionContext(
+                    converter,
+                    "1,2,3",
+                    Integer[].class
+                )
+            );
+            
+            assertNotNull(array);
+            assertTrue(array.length == 3);
+            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof Integer));
+            assertArrayEquals(
+                new Integer[] { 1, 2, 3 }, 
+                array
+            );
+        }
+
+        @Test
+        @DisplayName("should return empty array when property value is empty.")
+        public void test5() {
+            ArrayConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+            
+            Object[] array = handler.convert(
+                new ConversionContext(
+                    converter,
+                    "", // Empty value.
+                    String[].class
+                )
+            );
+            
+            assertNotNull(array);
+            assertTrue(array.length == 0);
+        }
+
+        @Test
+        @DisplayName("should retain empty values from property value.")
+        public void test6() {
+            ArrayConversionHandler handler = handlerToTest();
+
+            Converter converter = new InternalConverter(handler);
+            
+            Object[] array = handler.convert(
+                new ConversionContext(
+                    converter,
+                    "value1,,value3,,value5", // Has empty values.
+                    String[].class
+                )
+            );
+            
+            assertNotNull(array);
+            assertTrue(array.length == 5);
+            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
+            assertArrayEquals(
+                new String[] { "value1", "", "value3", "", "value5" }, 
+                array
+            );
+        }
+
+        @Test
+        @DisplayName("should return Strings when array component type is Object.")
+        public void test8() {
+            ArrayConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+            
+            Object[] array = handler.convert(
+                new ConversionContext(
+                    converter,
+                    "value1,value2,value3",
+                    Object[].class
+                )
+            );
+            
+            assertNotNull(array);
+            assertTrue(array.length == 3);
+            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
+            assertArrayEquals(
+                new String[] { "value1", "value2", "value3" }, 
+                array
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when no conversion handler is registered that can handle " + 
+            "the array's component type."
+        )
+        public void test9() {
+            ArrayConversionHandler handler = handlerToTest();
+            
+            // No registered handler for integer.
+            Converter converter = new InternalConverter(handler);
+            
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(
+                    new ConversionContext(
+                        converter,
+                        "1,2,3,4,5",
+                        Integer[].class
+                    )
+                );
+            });
+        }
+
+        @Test
+        @DisplayName(
+            "should convert resolved property according to the generic array's component type."
+        )
+        public void test11() {
+            ArrayConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(
+                handler,
+                new OptionalConversionHandler() // Register additional Optional handler.
+            );
+
+            Type genericArrayType = new TypeReference<Optional<String>[]>(){}.type();
+            
+            Object[] array = handler.convert(
+                new ConversionContext(
+                    converter,
+                    "value1,value2,value3",
+                    genericArrayType
+                )
+            );
+            
+            assertNotNull(array);
+            assertTrue(array.length == 3);
+            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof Optional));
+            assertArrayEquals(
+                new Optional[] { 
+                    Optional.of("value1"), 
+                    Optional.of("value2"), 
+                    Optional.of("value3")
+                }, 
+                array
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should convert generic array wildcards to Strings."
+        )
+        public void test12() {
+            ArrayConversionHandler handler = handlerToTest();
+
+            Type wildcardGenericArrayType = new TypeReference<Optional<?>[]>(){}.type();
+            
+            Converter converter = new InternalConverter(
+                handler,
+                new OptionalConversionHandler() // Register additional Optional handler.
+            );
+            
+            Object[] array = handler.convert(
+                new ConversionContext(
+                    converter,
+                    "value1,value2,value3",
+                    wildcardGenericArrayType
+                )
+            );
+            
+            assertNotNull(array);
+            assertTrue(array.length == 3);
+            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof Optional));
+            assertArrayEquals(
+                new Optional[] { 
+                    Optional.of("value1"), 
+                    Optional.of("value2"), 
+                    Optional.of("value3")
+                }, 
+                array
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when expected type has a type variable e.g. List<T>.")
+        public <T> void test13() {
+            ArrayConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            Type typeVariableArrayType = new TypeReference<T[]>(){}.type();
+            
+            ConversionContext context = new ConversionContext(
+                converter,
+                "value1,value2,value3",
+                typeVariableArrayType
+            );
+            
+            assertThrows(
+                ConversionException.class, 
+                () -> handler.convert(context)
+            );
+        }
+    }
+
+    @Nested
+    class ConvertMethodWithPropertyMethodConversionContextOverload {
+        @Test
+        @DisplayName("should throw when context is null.")
+        public void test1() {
+            ArrayConversionHandler handler = handlerToTest();
+            assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
+        }
+
+        @Test
         @DisplayName("should throw when method does not return an array.")
         public void test2() {
             ArrayConversionHandler handler = handlerToTest();
@@ -71,9 +313,7 @@ public class ArrayConversionHandlerTests {
                     "listProperty"
                 );
             
-            Converter converter = new InternalConverter(
-                handler
-            );
+            Converter converter = new InternalConverter(handler);
 
             // Method return type is a List and not an array
             assertThrows(ConversionException.class, () -> {
@@ -96,8 +336,7 @@ public class ArrayConversionHandlerTests {
                     "arrayProperty"
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             Object[] array = handler.convert(new PropertyMethodConversionContext(
                 converter,
@@ -158,8 +397,7 @@ public class ArrayConversionHandlerTests {
                     "arrayProperty"
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
             
             Object[] array = handler.convert(
                 new PropertyMethodConversionContext(
@@ -184,8 +422,7 @@ public class ArrayConversionHandlerTests {
                     "arrayProperty"
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
             
             Object[] array = handler.convert(
                 new PropertyMethodConversionContext(
@@ -215,8 +452,7 @@ public class ArrayConversionHandlerTests {
                     "arrayPropertyStripEmpty"
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
             
             Object[] array = handler.convert(
                 new PropertyMethodConversionContext(
@@ -246,8 +482,7 @@ public class ArrayConversionHandlerTests {
                     "arrayPropertyObject"
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
             
             Object[] array = handler.convert(
                 new PropertyMethodConversionContext(
@@ -280,9 +515,8 @@ public class ArrayConversionHandlerTests {
                     "arrayIntegerWrapper"
                 );
             
-            // No registered handler for integer.
-            Converter converter = 
-                new InternalConverter(handler);
+            // No registered handler for Integer.
+            Converter converter = new InternalConverter(handler);
             
             assertThrows(ConversionException.class, () -> {
                 handler.convert(
@@ -306,8 +540,7 @@ public class ArrayConversionHandlerTests {
                     "arrayCustomDelimiter"
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
             
             Object[] array = handler.convert(
                 new PropertyMethodConversionContext(
@@ -339,11 +572,10 @@ public class ArrayConversionHandlerTests {
                     "arrayPropertyGeneric" // Returns a generic type array Optional<String>[]
                 );
             
-            Converter converter = 
-                new InternalConverter(
-                    handler,
-                    new OptionalConversionHandler() // Register additional Optional handler.
-                );
+            Converter converter = new InternalConverter(
+                handler,
+                new OptionalConversionHandler() // Register additional Optional handler.
+            );
             
             Object[] array = handler.convert(
                 new PropertyMethodConversionContext(
@@ -379,11 +611,10 @@ public class ArrayConversionHandlerTests {
                     "arrayPropertyGenericWildcard" // Returns a generic type array Optional<?>[]
                 );
             
-            Converter converter = 
-                new InternalConverter(
-                    handler,
-                    new OptionalConversionHandler() // Register additional Optional handler.
-                );
+            Converter converter = new InternalConverter(
+                handler,
+                new OptionalConversionHandler() // Register additional Optional handler.
+            );
             
             Object[] array = handler.convert(
                 new PropertyMethodConversionContext(
@@ -417,10 +648,7 @@ public class ArrayConversionHandlerTests {
                     "arrayPropertyT" // Returns a generic type array <T> T[]
                 );
             
-            Converter converter = 
-                new InternalConverter(
-                    handler
-                );
+            Converter converter = new InternalConverter(handler);
             
             PropertyMethodConversionContext context = 
                 new PropertyMethodConversionContext(

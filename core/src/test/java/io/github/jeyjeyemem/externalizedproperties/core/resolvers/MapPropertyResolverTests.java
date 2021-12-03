@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -125,27 +126,11 @@ public class MapPropertyResolverTests {
     }
 
     @Nested
-    class ResolveMethodMultipleProperties {
-        @Test
-        @DisplayName("should throw when property names collection argument is null or empty")
-        public void validationTest1() {
-        MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> resolver.resolve((Collection<String>)null)
-            );
-            
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> resolver.resolve(Collections.emptyList())
-            );
-        }
-
+    class ResolveMethodWithVarArgsOverload {
         @Test
         @DisplayName("should throw when property names varargs argument is null or empty")
-        public void validationTest2() {
-        MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
+        public void validationTest1() {
+            MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -159,26 +144,8 @@ public class MapPropertyResolverTests {
         }
 
         @Test
-        @DisplayName(
-            "should throw when property names collection contains any null or empty values"
-        )
-        public void validationTest3() {
-            MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> resolver.resolve(Arrays.asList("property", null))
-            );
-            
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> resolver.resolve(Arrays.asList("property", ""))
-            );
-        }
-
-        @Test
         @DisplayName("should throw when property names varargs contain any null or empty values")
-        public void validationTest4() {
+        public void validationTest2() {
             MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
             
             assertThrows(
@@ -198,25 +165,26 @@ public class MapPropertyResolverTests {
             Map<String, String> map = new HashMap<>();
             map.put("property.name1", "property.value1");
             map.put("property.name2", "property.value2");
+
+            String[] propertiesToResolve = new String[] {
+                "property.name1",
+                "property.name2"
+            };
             
             MapPropertyResolver resolver = resolverToTest(map);
             MapPropertyResolver.Result result = resolver.resolve(
-                "property.name1",
-                "property.name2"
+                propertiesToResolve
             );
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
 
-            assertEquals(
-                map.get("property.name1"), 
-                result.findRequiredProperty("property.name1")
-            );
-
-            assertEquals(
-                map.get("property.name2"), 
-                result.findRequiredProperty("property.name2")
-            );
+            for (String propertyName : propertiesToResolve) {
+                assertEquals(
+                    map.get(propertyName), 
+                    result.findRequiredProperty(propertyName)
+                );
+            }
         }
 
         @Test
@@ -226,14 +194,24 @@ public class MapPropertyResolverTests {
         )
         public void test2() {
             MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
-            MapPropertyResolver.Result result = resolver.resolve(
+
+            String[] propertiesToResolve = new String[] {
                 "nonexisting.property1",
                 "nonexisting.property2"
+            };
+
+            MapPropertyResolver.Result result = resolver.resolve(
+                propertiesToResolve
             );
             
+            assertFalse(result.hasResolvedProperties());
             assertTrue(result.hasUnresolvedProperties());
-            assertTrue(result.unresolvedPropertyNames().contains("nonexisting.property1"));
-            assertTrue(result.unresolvedPropertyNames().contains("nonexisting.property2"));
+
+            for (String propertyName : propertiesToResolve) {
+                assertTrue(
+                    result.unresolvedPropertyNames().contains(propertyName)
+                );
+            }
         }
 
         @Test
@@ -255,24 +233,157 @@ public class MapPropertyResolverTests {
                 unresolvedPropertyHandler
             );
 
-            MapPropertyResolver.Result result = 
-                resolver.resolve(
-                    "property.unresolvedhandler1",
-                    "property.unresolvedhandler2"
-                );
+            String[] propertiesToResolve = new String[] {
+                "property.unresolvedhandler1",
+                "property.unresolvedhandler2"
+            };
+
+            MapPropertyResolver.Result result = resolver.resolve(
+                propertiesToResolve
+            );
             
             assertTrue(unresolvedPropertyHandlerInvoked.get());
             assertTrue(result.hasResolvedProperties());
+            assertFalse(result.hasUnresolvedProperties());
 
-            assertEquals(
-                unresolvedPropertyHandler.apply("property.unresolvedhandler1"), 
-                result.findRequiredProperty("property.unresolvedhandler1")
+            for (String propertyName : propertiesToResolve) {
+                assertEquals(
+                    unresolvedPropertyHandler.apply(propertyName), 
+                    result.findRequiredProperty(propertyName)
+                );
+            }
+        }
+    }
+
+    @Nested
+    class ResolveMethodWithCollectionOverload {
+        @Test
+        @DisplayName("should throw when property names collection argument is null or empty")
+        public void validationTest1() {
+        MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> resolver.resolve((Collection<String>)null)
+            );
+            
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> resolver.resolve(Collections.emptyList())
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when property names collection contains any null or empty values"
+        )
+        public void validationTest2() {
+            MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> resolver.resolve(Arrays.asList("property", null))
+            );
+            
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> resolver.resolve(Arrays.asList("property", ""))
+            );
+        }
+
+        @Test
+        @DisplayName("should resolve values from the given map")
+        public void test1() {
+            Map<String, String> map = new HashMap<>();
+            map.put("property.name1", "property.value1");
+            map.put("property.name2", "property.value2");
+
+            List<String> propertiesToResolve = Arrays.asList(
+                "property.name1",
+                "property.name2"
+            );
+            
+            MapPropertyResolver resolver = resolverToTest(map);
+            MapPropertyResolver.Result result = resolver.resolve(
+                propertiesToResolve
             );
 
-            assertEquals(
-                unresolvedPropertyHandler.apply("property.unresolvedhandler2"), 
-                result.findRequiredProperty("property.unresolvedhandler2")
+            assertTrue(result.hasResolvedProperties());
+            assertFalse(result.hasUnresolvedProperties());
+
+            for (String propertyName : propertiesToResolve) {
+                assertEquals(
+                    map.get(propertyName), 
+                    result.findRequiredProperty(propertyName)
+                );
+            }
+        }
+
+        @Test
+        @DisplayName(
+            "should return result with unresolved properties " + 
+            "when property is not found from the given map"
+        )
+        public void test2() {
+            MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
+
+            List<String> propertiesToResolve = Arrays.asList(
+                "nonexisting.property1",
+                "nonexisting.property2"
             );
+
+            MapPropertyResolver.Result result = resolver.resolve(
+                propertiesToResolve
+            );
+            
+            assertFalse(result.hasResolvedProperties());
+            assertTrue(result.hasUnresolvedProperties());
+
+            for (String propertyName : propertiesToResolve) {
+                assertTrue(
+                    result.unresolvedPropertyNames().contains(propertyName)
+                );
+            }
+        }
+
+        @Test
+        @DisplayName(
+            "should invoke unresolved property handler " + 
+            "when property is not found from the given map"
+        )
+        public void test3() {
+            AtomicBoolean unresolvedPropertyHandlerInvoked = new AtomicBoolean(false);
+
+            Function<String, String> unresolvedPropertyHandler = 
+                propertyName -> {
+                    unresolvedPropertyHandlerInvoked.set(true);
+                    return propertyName + "-default-value";
+                };
+
+            MapPropertyResolver resolver = resolverToTest(
+                Collections.emptyMap(),
+                unresolvedPropertyHandler
+            );
+
+            List<String> propertiesToResolve = Arrays.asList(
+                "property.unresolvedhandler1",
+                "property.unresolvedhandler2"
+            );
+
+            MapPropertyResolver.Result result = resolver.resolve(
+                propertiesToResolve
+            );
+            
+            assertTrue(unresolvedPropertyHandlerInvoked.get());
+            assertTrue(result.hasResolvedProperties());
+            assertFalse(result.hasUnresolvedProperties());
+
+            for (String propertyName : propertiesToResolve) {
+                assertEquals(
+                    unresolvedPropertyHandler.apply(propertyName), 
+                    result.findRequiredProperty(propertyName)
+                );
+            }
         }
     }
 

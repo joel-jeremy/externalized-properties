@@ -21,7 +21,7 @@ public interface CacheStrategy<K, V> {
      * @return The cached value if it exists in the cache.
      * Otherwise, an empty {@link Optional} is returned.
      */
-    Optional<V> getFromCache(K cacheKey);
+    Optional<V> get(K cacheKey);
 
     /**
      * Expire the cached value associated to the cache key.

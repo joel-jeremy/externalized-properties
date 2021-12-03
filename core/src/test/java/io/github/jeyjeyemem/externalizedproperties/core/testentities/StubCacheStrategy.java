@@ -25,7 +25,7 @@ public class StubCacheStrategy<K, V> implements CacheStrategy<K, V> {
     }
 
     @Override
-    public Optional<V> getFromCache(K cacheKey) {
+    public Optional<V> get(K cacheKey) {
         return Optional.ofNullable(cache.get(cacheKey));
     }
 

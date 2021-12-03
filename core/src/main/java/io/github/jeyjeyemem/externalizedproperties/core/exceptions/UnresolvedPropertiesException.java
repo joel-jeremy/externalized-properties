@@ -1,6 +1,5 @@
 package io.github.jeyjeyemem.externalizedproperties.core.exceptions;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -23,7 +22,8 @@ public class UnresolvedPropertiesException extends ExternalizedPropertiesExcepti
             String unresolvedPropertyName, 
             String message
     ) {
-        this(Collections.singleton(unresolvedPropertyName), message);
+        super(message);
+        this.unresolvedPropertyNames = Collections.singleton(unresolvedPropertyName);
     }
 
     /**
@@ -38,7 +38,8 @@ public class UnresolvedPropertiesException extends ExternalizedPropertiesExcepti
             String message, 
             Throwable cause
     ) {
-        this(Collections.singleton(unresolvedPropertyName), message, cause);
+        super(message, cause);
+        this.unresolvedPropertyNames = Collections.singleton(unresolvedPropertyName);
     }
 
     /**
@@ -80,7 +81,7 @@ public class UnresolvedPropertiesException extends ExternalizedPropertiesExcepti
      * 
      * @return The collection of unresolved property names.
      */
-    public Collection<String> getUnresolvedPropertyNames() {
+    public Set<String> unresolvedPropertyNames() {
         return unresolvedPropertyNames;
     }
 }

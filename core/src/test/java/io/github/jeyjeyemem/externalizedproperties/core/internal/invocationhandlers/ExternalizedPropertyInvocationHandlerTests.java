@@ -737,6 +737,38 @@ public class ExternalizedPropertyInvocationHandlerTests {
         }
 
         @Test
+        @DisplayName(
+            "should treat equals method with different signature as a externalized property method"
+        )
+        public void proxyEqualsMethod3() throws Throwable {
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(Collections.emptyMap());
+
+            EqualsProxyInterfaceTest proxy = 
+                externalizedProperties.proxy(EqualsProxyInterfaceTest.class);
+
+            Method objectEqualsMethod = 
+                StubExternalizedPropertyMethodInfo.getMethod(
+                    EqualsProxyInterfaceTest.class,
+                    "equals"
+                );
+
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            // equals method treated as externalized property method
+            // instead of an Object method due to different signature.
+            assertThrows(
+                UnresolvedPropertiesException.class,
+                () -> handler.invoke(
+                    proxy, 
+                    objectEqualsMethod, 
+                    new Object[] { proxy }
+                )
+            );
+        }
+
+        @Test
         @DisplayName("should return proxy's identity hash code")
         public void proxyHashCodeMethod() throws Throwable {
             ExternalizedProperties externalizedProperties = 
@@ -795,6 +827,10 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 toStringResult
             );
         }
+    }
+
+    private static interface EqualsProxyInterfaceTest {
+        public boolean equals();
     }
 
     private ExternalizedProperties externalizedProperties(

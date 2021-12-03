@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -59,7 +58,7 @@ public class DatabasePropertyResolver implements ExternalizedPropertyResolver {
      */
     @Override
     public Optional<String> resolve(String propertyName) {
-        if (propertyName == null || propertyName.isEmpty()) {
+        if (propertyName == null || propertyName.trim().isEmpty()) {
             throw new IllegalArgumentException("propertyName must not be null or empty.");
         }
         
@@ -81,14 +80,12 @@ public class DatabasePropertyResolver implements ExternalizedPropertyResolver {
      * and unresolved properties, if there are any.
      */
     @Override
-    public Result resolve(
-            Collection<String> propertyNames
-    ) {
+    public Result resolve(Collection<String> propertyNames) {
         if (propertyNames == null || propertyNames.isEmpty()) {
             throw new IllegalArgumentException("propertyNames must not be null or empty.");
         }
-        if (propertyNames.stream().anyMatch(Objects::isNull)) {
-            throw new IllegalArgumentException("propertyNames must not contain null values.");
+        if (propertyNames.stream().anyMatch(pn -> pn == null || pn.trim().isEmpty())) {
+            throw new IllegalArgumentException("propertyNames must not contain null or empty values.");
         }
         try {
             return getFromDatabase(propertyNames);
@@ -100,9 +97,7 @@ public class DatabasePropertyResolver implements ExternalizedPropertyResolver {
         }
     }
 
-    private Result getFromDatabase(
-            Collection<String> propertyNames
-    ) throws SQLException {
+    private Result getFromDatabase(Collection<String> propertyNames) throws SQLException {
         try (Connection connection = connectionProvider.getConnection()) {
             List<ResolvedProperty> resolvedProperties = 
                 queryExecutor.queryProperties(connection, propertyNames);
