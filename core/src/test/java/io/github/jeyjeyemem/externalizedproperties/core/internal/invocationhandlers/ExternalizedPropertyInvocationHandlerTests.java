@@ -4,10 +4,11 @@ import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBuilder;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertyException;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositePropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,97 +37,157 @@ public class ExternalizedPropertyInvocationHandlerTests {
     class InvokeMethod {
         @Test
         @DisplayName("should resolve property")
-        public void test1() {
+        public void test1() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property", "test.value.1");
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            BasicProxyInterface proxyInterface = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
-            String property = proxyInterface.property();
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                BasicProxyInterface.class,
+                "property"
+            );
 
-            assertEquals("test.value.1", property);
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            Object result = handler.invoke(
+                externalizedProperties.proxy(BasicProxyInterface.class), 
+                proxyMethod, 
+                new Object[0]
+            );
+
+            assertEquals("test.value.1", result);
         }
         
         @Test
         @DisplayName(
             "should resolve property from map and not from default interface method value"
         )
-        public void test2() {
+        public void test2() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.with.default.value", "test.value");
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            BasicProxyInterface proxyInterface = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
-            String property = proxyInterface.propertyWithDefaultValue();
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                BasicProxyInterface.class,
+                "propertyWithDefaultValue"
+            );
 
-            assertEquals("test.value", property);
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            Object result = handler.invoke(
+                externalizedProperties.proxy(BasicProxyInterface.class), 
+                proxyMethod, 
+                new Object[0]
+            );
+
+            assertEquals("test.value", result);
         }
 
         @Test
         @DisplayName(
             "should resolve property from map and not from default interface method value parameter"
         )
-        public void test3() {
+        public void test3() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.with.default.value", "test.value");
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            BasicProxyInterface proxyInterface = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                BasicProxyInterface.class,
+                "propertyWithDefaultValueParameter",
+                String.class
+            );
+
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
 
             String providedDefaultValue = "provided.default.value";
-            String property = proxyInterface.propertyWithDefaultValueParameter(providedDefaultValue);
+            Object result = handler.invoke(
+                externalizedProperties.proxy(BasicProxyInterface.class), 
+                proxyMethod, 
+                new Object[] { providedDefaultValue }
+            );
 
-            assertEquals("test.value", property);
+            assertEquals("test.value", result);
         }
 
         @Test
         @DisplayName("should resolve default value from default interface method")
-        public void test4() {
+        public void test4() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
-            String property = proxyInterface.propertyWithDefaultValue();
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                BasicProxyInterface.class,
+                "propertyWithDefaultValue"
+            );
 
-            assertEquals("default.value", property);
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            Object result = handler.invoke(
+                externalizedProperties.proxy(BasicProxyInterface.class), 
+                proxyMethod, 
+                new Object[0]
+            );
+
+            assertEquals("default.value", result);
         }
 
         @Test
         @DisplayName("should resolve default value from default interface method parameter")
-        public void test5() {
+        public void test5() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                BasicProxyInterface.class,
+                "propertyWithDefaultValueParameter",
+                String.class
+            );
 
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            // Pass default value.
             String providedDefaultValue = "provided.default.value";
-            String property = proxyInterface.propertyWithDefaultValueParameter(providedDefaultValue);
+            Object result = handler.invoke(
+                externalizedProperties.proxy(BasicProxyInterface.class), 
+                proxyMethod, 
+                new Object[] { providedDefaultValue }
+            );
 
-            assertEquals(providedDefaultValue, property);
+            assertEquals(providedDefaultValue, result);
         }
 
         @Test
         @DisplayName(
             "should always return default value from default interface method when not annotated"
         )
-        public void test6() {
+        public void test6() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                BasicProxyInterface.class,
+                "propertyWithNoAnnotationButWithDefaultValue"
+            );
 
-            String property = proxyInterface.propertyWithNoAnnotationButWithDefaultValue();
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
 
-            assertEquals("default.value", property);
+            Object result = handler.invoke(
+                externalizedProperties.proxy(BasicProxyInterface.class), 
+                proxyMethod, 
+                new Object[0]
+            );
+
+            assertEquals("default.value", result);
         }
 
         @Test
@@ -134,19 +195,28 @@ public class ExternalizedPropertyInvocationHandlerTests {
             "should always return default value from default interface method parameter " + 
             "when not annotated"
         )
-        public void test7() {
+        public void test7() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
-
-            String providedDefaultValue = "provided.default.value";
-            String property = proxyInterface.propertyWithNoAnnotationButWithDefaultValueParameter(
-                providedDefaultValue
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                BasicProxyInterface.class,
+                "propertyWithNoAnnotationButWithDefaultValueParameter",
+                String.class
             );
 
-            assertEquals(providedDefaultValue, property);
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            // Pass default value.
+            String providedDefaultValue = "provided.default.value";
+            Object result = handler.invoke(
+                externalizedProperties.proxy(BasicProxyInterface.class), 
+                proxyMethod, 
+                new Object[] { providedDefaultValue }
+            );
+
+            assertEquals(providedDefaultValue, result);
         }
 
         @Test
@@ -155,11 +225,20 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                BasicProxyInterface.class,
+                "property"
+            );
 
-            assertThrows(UnresolvedPropertyException.class, () -> {
-                proxyInterface.property();
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            assertThrows(UnresolvedPropertiesException.class, () -> {
+                handler.invoke(
+                    externalizedProperties.proxy(BasicProxyInterface.class), 
+                    proxyMethod, 
+                    new Object[0]
+                );
             });
         }
 
@@ -169,42 +248,73 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                BasicProxyInterface.class,
+                "propertyWithNoAnnotationAndNoDefaultValue"
+            );
 
-            assertThrows(UnresolvedPropertyException.class, () -> {
-                proxyInterface.propertyWithNoAnnotationAndNoDefaultValue();
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            assertThrows(UnresolvedPropertiesException.class, () -> {
+                handler.invoke(
+                    externalizedProperties.proxy(BasicProxyInterface.class), 
+                    proxyMethod, 
+                    new Object[0]
+                );
             });
         }
 
         @Test
         @DisplayName("should convert a non-String property via Converter.")
-        public void test10() {
+        public void test10() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.integer.wrapper", "1");
             map.put("property.integer.primitive", "2");
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            PrimitiveProxyInterface proxyInterface = 
+            PrimitiveProxyInterface proxy = 
                 externalizedProperties.proxy(PrimitiveProxyInterface.class);
 
-            // Support for wrapper types.
-            Integer property = proxyInterface.integerWrapperProperty();
-            // Support for primitive types.
-            int intProperty = proxyInterface.intPrimitiveProperty();
+            Method intWrapperMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                PrimitiveProxyInterface.class,
+                "integerWrapperProperty"
+            );
 
-            assertEquals(1, property);
-            assertEquals(2, intProperty);
+            Method intPrimitiveMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                PrimitiveProxyInterface.class,
+                "intPrimitiveProperty"
+            );
+
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            Object intWrapperResult = handler.invoke(
+                proxy, 
+                intWrapperMethod,
+                new Object[0]
+            );
+
+            Object intPrimitiveResult = handler.invoke(
+                proxy, 
+                intPrimitiveMethod,
+                new Object[0]
+            );
+
+            assertEquals(1, (Integer)intWrapperResult);
+            // Support for primitive types.
+            assertEquals(2, (int)intPrimitiveResult);
         }
 
         /**
          * Variable expansion tests.
+         * @throws Throwable
          */
 
         @Test
         @DisplayName("should expand variable in property name.")
-        public void testVariableExpansion1() {
+        public void testVariableExpansion1() throws Throwable {
             Map<String, String> map = new HashMap<>();
             String customVariableValue = "custom-variable";
             map.put("custom.variable", customVariableValue);
@@ -212,11 +322,21 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            VariableProxyInterface proxyInterface = 
-                externalizedProperties.proxy(VariableProxyInterface.class);
-            String variableProperty = proxyInterface.variableProperty();
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                VariableProxyInterface.class,
+                "variableProperty"
+            );
 
-            assertEquals("property.value", variableProperty);
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            Object result = handler.invoke(
+                externalizedProperties.proxy(VariableProxyInterface.class), 
+                proxyMethod, 
+                new Object[0]
+            );
+
+            assertEquals("property.value", result);
         }
 
         @Test
@@ -227,120 +347,209 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            VariableProxyInterface proxyInterface = 
-                externalizedProperties.proxy(VariableProxyInterface.class);
-            
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                VariableProxyInterface.class,
+                "variableProperty"
+            );
+
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
             // There is no custom-variable-value property.
             // Property name of VariableProxyInterface.variableProperty() won't be able to be expanded.
             assertThrows(VariableExpansionException.class, 
-                () -> proxyInterface.variableProperty()
+                () -> handler.invoke(
+                    externalizedProperties.proxy(VariableProxyInterface.class), 
+                    proxyMethod, 
+                    new Object[0]
+                )
             );
         }
 
         /**
          * Optional property test cases.
+         * @throws Throwable
          */
 
         @Test
         @DisplayName("should resolve property")
-        public void testOptional1() {
+        public void testOptional1() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional", "test.value");
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            OptionalProxyInterface proxyInterface = 
-                externalizedProperties.proxy(OptionalProxyInterface.class);
-            Optional<String> property = proxyInterface.optionalProperty();
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                OptionalProxyInterface.class,
+                "optionalProperty"
+            );
 
-            assertTrue(property.isPresent());
-            assertEquals("test.value", property.get());
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            Object result = handler.invoke(
+                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                proxyMethod, 
+                new Object[0]
+            );
+
+            assertTrue(result instanceof Optional<?>);
+
+            Optional<?> optional = (Optional<?>)result;
+
+            assertTrue(optional.isPresent());
+            assertEquals("test.value", optional.get());
         }
 
         @Test
         @DisplayName("should resolve property from map and not from default interface method value")
-        public void testOptional2() {
+        public void testOptional2() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional.with.default.value", "test.value");
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
+            
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                OptionalProxyInterface.class,
+                "optionalPropertyWithDefaultValue"
+            );
 
-            OptionalProxyInterface proxyInterface = 
-                externalizedProperties.proxy(OptionalProxyInterface.class);
-            Optional<String> property = proxyInterface.optionalPropertyWithDefaultValue();
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
 
-            assertTrue(property.isPresent());
-            assertEquals("test.value", property.get());
+            Object result = handler.invoke(
+                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                proxyMethod, 
+                new Object[0]
+            );
+
+            assertTrue(result instanceof Optional<?>);
+
+            Optional<?> optional = (Optional<?>)result;
+
+            assertTrue(optional.isPresent());
+            assertEquals("test.value", optional.get());
         }
 
         @Test
         @DisplayName(
             "should resolve property from map and not from default interface method value parameter"
         )
-        public void testOptional3() {
+        public void testOptional3() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional.with.default.value", "test.value");
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
+            
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                OptionalProxyInterface.class,
+                "optionalPropertyWithDefaultValue"
+            );
 
-            OptionalProxyInterface proxyInterface = 
-                externalizedProperties.proxy(OptionalProxyInterface.class);
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
 
             String providedDefaultValue = "provided.default.value";
-            Optional<String> property = 
-                proxyInterface.optionalPropertyWithDefaultValueParameter(providedDefaultValue);
+            Object result = handler.invoke(
+                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                proxyMethod, 
+                new Object[] { providedDefaultValue }
+            );
 
-            assertTrue(property.isPresent());
-            assertEquals("test.value", property.get());
+            assertTrue(result instanceof Optional<?>);
+
+            Optional<?> optional = (Optional<?>)result;
+
+            assertTrue(optional.isPresent());
+            assertEquals("test.value", optional.get());
         }
 
         @Test
         @DisplayName("should resolve default value from default interface method")
-        public void testOptional4() {
+        public void testOptional4() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            OptionalProxyInterface proxyInterface = 
-                externalizedProperties.proxy(OptionalProxyInterface.class);
-            Optional<String> property = proxyInterface.optionalPropertyWithDefaultValue();
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                OptionalProxyInterface.class,
+                "optionalPropertyWithDefaultValue"
+            );
 
-            assertTrue(property.isPresent());
-            assertEquals("default.value", property.get());
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            Object result = handler.invoke(
+                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                proxyMethod, 
+                new Object[0]
+            );
+
+            assertTrue(result instanceof Optional<?>);
+
+            Optional<?> optional = (Optional<?>)result;
+
+            assertTrue(optional.isPresent());
+            assertEquals("default.value", optional.get());
         }
 
         @Test
         @DisplayName("should resolve default value from default interface method parameter")
-        public void testOptional5() {
+        public void testOptional5() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            OptionalProxyInterface proxyInterface = 
-                externalizedProperties.proxy(OptionalProxyInterface.class);
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                OptionalProxyInterface.class,
+                "optionalPropertyWithDefaultValueParameter",
+                String.class
+            );
+
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
 
             String providedDefaultValue = "provided.default.value";
-            Optional<String> property = 
-                proxyInterface.optionalPropertyWithDefaultValueParameter(providedDefaultValue);
+            Object result = handler.invoke(
+                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                proxyMethod, 
+                new Object[] { providedDefaultValue }
+            );
 
-            assertTrue(property.isPresent());
-            assertEquals(providedDefaultValue, property.get());
+            assertTrue(result instanceof Optional<?>);
+
+            Optional<?> optional = (Optional<?>)result;
+
+            assertTrue(optional.isPresent());
+            assertEquals(providedDefaultValue, optional.get());
         }
 
         @Test
         @DisplayName(
             "should always return default value from default interface method when not annotated"
         )
-        public void testOptional6() {
+        public void testOptional6() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            OptionalProxyInterface proxyInterface = 
-                externalizedProperties.proxy(OptionalProxyInterface.class);
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                OptionalProxyInterface.class,
+                "optionalPropertyWithNoAnnotationAndWithDefaultValue"
+            );
 
-            Optional<String> property = 
-                proxyInterface.optionalPropertyWithNoAnnotationAndWithDefaultValue();
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
 
-            assertTrue(property.isPresent());
-            assertEquals("default.value", property.get());
+            Object result = handler.invoke(
+                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                proxyMethod, 
+                new Object[0]
+            );
+
+            assertTrue(result instanceof Optional<?>);
+
+            Optional<?> optional = (Optional<?>)result;
+
+            assertTrue(optional.isPresent());
+            assertEquals("default.value", optional.get());
         }
 
         @Test
@@ -348,131 +557,243 @@ public class ExternalizedPropertyInvocationHandlerTests {
             "should always return default value from default interface method parameter " + 
             "when not annotated"
         )
-        public void testOptional7() {
+        public void testOptional7() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            OptionalProxyInterface proxyInterface = 
-                externalizedProperties.proxy(OptionalProxyInterface.class);
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                OptionalProxyInterface.class,
+                "optionalPropertyWithNoAnnotationAndWithDefaultValueParameter",
+                String.class
+            );
+
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
 
             String providedDefaultValue = "provided.default.value";
-            Optional<String> property = 
-                proxyInterface.optionalPropertyWithNoAnnotationAndWithDefaultValueParameter(
-                    providedDefaultValue
-                );
+            Object result = handler.invoke(
+                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                proxyMethod, 
+                new Object[] { providedDefaultValue }
+            );
 
-            assertTrue(property.isPresent());
-            assertEquals(providedDefaultValue, property.get());
+            assertTrue(result instanceof Optional<?>);
+
+            Optional<?> optional = (Optional<?>)result;
+
+            assertTrue(optional.isPresent());
+            assertEquals(providedDefaultValue, optional.get());
         }
 
         @Test
         @DisplayName(
             "should return empty Optional when an annotated Optional property cannot be resolved."
         )
-        public void testOptional8() {
+        public void testOptional8() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            OptionalProxyInterface proxyInterface = 
-                externalizedProperties.proxy(OptionalProxyInterface.class);
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                OptionalProxyInterface.class,
+                "optionalProperty"
+            );
 
-            Optional<String> property = proxyInterface.optionalProperty();
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
 
-            assertFalse(property.isPresent());
+            Object result = handler.invoke(
+                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                proxyMethod, 
+                new Object[0]
+            );
+
+            assertTrue(result instanceof Optional<?>);
+
+            Optional<?> optional = (Optional<?>)result;
+
+            assertFalse(optional.isPresent());
         }
 
         @Test
         @DisplayName(
             "should return empty Optional when an unannotated Optional property cannot be resolved."
         )
-        public void testOptional9() {
+        public void testOptional9() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            OptionalProxyInterface proxyInterface = 
-                externalizedProperties.proxy(OptionalProxyInterface.class);
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                OptionalProxyInterface.class,
+                "optionalPropertyWithNoAnnotationAndNoDefaultValue"
+            );
 
-            Optional<String> property = proxyInterface.optionalPropertyWithNoAnnotationAndNoDefaultValue();
-            
-            assertFalse(property.isPresent());
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            Object result = handler.invoke(
+                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                proxyMethod, 
+                new Object[0]
+            );
+
+            assertTrue(result instanceof Optional<?>);
+
+            Optional<?> optional = (Optional<?>)result;
+
+            assertFalse(optional.isPresent());
         }
 
         @Test
         @DisplayName("should convert a non-String Optional property via Converter.")
-        public void testOptional10() {
+        public void testOptional10() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional.nonstring", "1");
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            OptionalProxyInterface proxyInterface = 
-                externalizedProperties.proxy(OptionalProxyInterface.class);
-            Optional<Integer> property = proxyInterface.nonStringOptionalProperty();
+            Method proxyMethod = StubExternalizedPropertyMethodInfo.getMethod(
+                OptionalProxyInterface.class,
+                "nonStringOptionalProperty"
+            );
 
-            assertTrue(property.isPresent());
-            assertEquals(1, property.get());
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            Object result = handler.invoke(
+                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                proxyMethod, 
+                new Object[0]
+            );
+
+            assertTrue(result instanceof Optional<?>);
+
+            Optional<?> optional = (Optional<?>)result;
+
+            assertTrue(optional.isPresent());
+            assertTrue(optional.get() instanceof Integer);
+            assertEquals(1, (Integer)optional.get());
         }
 
         @Test
-        @DisplayName("should return true when object references are the same")
-        public void proxyEqualsMethod1() {
+        @DisplayName("should return true when proxy object references are the same")
+        public void proxyEqualsMethod1() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = 
+            BasicProxyInterface proxy = 
                 externalizedProperties.proxy(BasicProxyInterface.class);
 
-            assertTrue(proxyInterface.equals(proxyInterface));
+            Method objectEqualsMethod = 
+                StubExternalizedPropertyMethodInfo.getMethod(
+                    Object.class,
+                    "equals",
+                    Object.class
+                );
+
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            // proxy == proxy
+            Object isEqual = handler.invoke(
+                proxy, 
+                objectEqualsMethod, 
+                new Object[] { proxy }
+            );
+
+            assertTrue(isEqual instanceof Boolean);
+            assertTrue((boolean)isEqual);
         }
 
         @Test
-        @DisplayName("should return false when object references are not same")
-        public void proxyEqualsMethod2() {
+        @DisplayName("should return false when proxy object references are not same")
+        public void proxyEqualsMethod2() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface1 = 
+            BasicProxyInterface proxy1 = 
                 externalizedProperties.proxy(BasicProxyInterface.class);
-            BasicProxyInterface proxyInterface2 = 
+            BasicProxyInterface proxy2 = 
                 externalizedProperties.proxy(BasicProxyInterface.class);
 
-            assertFalse(proxyInterface1.equals(proxyInterface2));
+            Method objectEqualsMethod = 
+                StubExternalizedPropertyMethodInfo.getMethod(
+                    Object.class,
+                    "equals",
+                    Object.class
+                );
+
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            // proxy1 != proxy2
+            Object isEqual = handler.invoke(
+                proxy1, 
+                objectEqualsMethod, 
+                new Object[] { proxy2 }
+            );
+
+            assertTrue(isEqual instanceof Boolean);
+            assertFalse((boolean)isEqual);
         }
 
         @Test
         @DisplayName("should return proxy's identity hash code")
-        public void proxyHashCodeMethod() {
+        public void proxyHashCodeMethod() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = 
+            BasicProxyInterface proxy = 
                 externalizedProperties.proxy(BasicProxyInterface.class);
 
+            Method objectHashCodeMethod = 
+                StubExternalizedPropertyMethodInfo.getMethod(
+                    Object.class,
+                    "hashCode"
+                );
+
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            Object hashCode = handler.invoke(
+                proxy, 
+                objectHashCodeMethod, 
+                new Object[0]
+            );
+
             assertEquals(
-                System.identityHashCode(proxyInterface),
-                proxyInterface.hashCode()
+                System.identityHashCode(proxy),
+                hashCode
             );
         }
 
         @Test
         @DisplayName("should return standard Object.toString() format")
-        public void proxyToStringMethod() {
+        public void proxyToStringMethod() throws Throwable {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            BasicProxyInterface proxyInterface = 
+            BasicProxyInterface proxy = 
                 externalizedProperties.proxy(BasicProxyInterface.class);
 
-            assertEquals(
-                standardToStringFormat(proxyInterface),
-                proxyInterface.toString()
-            );
-        }
+            Method objectToStringMethod = 
+                StubExternalizedPropertyMethodInfo.getMethod(
+                    Object.class,
+                    "toString"
+                );
 
-        // Matches implementation of Object.toString()
-        private String standardToStringFormat(BasicProxyInterface proxyInterface) {
-            return proxyInterface.getClass().getName() + "@" + 
-                Integer.toHexString(proxyInterface.hashCode());
+            ExternalizedPropertyInvocationHandler handler = 
+                new ExternalizedPropertyInvocationHandler(externalizedProperties);
+
+            Object toStringResult = handler.invoke(
+                proxy, 
+                objectToStringMethod, 
+                new Object[0]
+            );
+
+            assertEquals(
+                objectToStringMethod.invoke(proxy),
+                toStringResult
+            );
         }
     }
 
@@ -495,8 +816,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
         ExternalizedPropertiesBuilder builder = 
             ExternalizedPropertiesBuilder.newBuilder()
                 .resolvers(resolver)
-                .conversionHandlers(conversionHandlers)
-                .withCaching(Duration.ofMinutes(5));
+                .conversionHandlers(conversionHandlers);
 
         if (conversionHandlers.size() == 0) {
             builder.withDefaultConversionHandlers();

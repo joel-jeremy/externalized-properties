@@ -1,26 +1,36 @@
 package io.github.jeyjeyemem.externalizedproperties.core.testentities;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
+/**
+ * A stub {@link ExternalizedPropertyResolver} implemenation that resolves properties based on 
+ * a provider value resolver function. By default, it will defaul any property by returning the 
+ * property name suffixed with "-value".
+ */
 public class StubExternalizedPropertyResolver implements ExternalizedPropertyResolver {
 
-    private final Set<String> resolvedPropertyNames = new HashSet<>();
+    public static final String DEFAULT_PROPERTY_NAME_SUFFIX = "-value";
+
+    // Return property name as value suffixed with "-value".
+    public static final Function<String, String> DEFAULT_VALUE_RESOLVER = 
+        propertyName -> propertyName + DEFAULT_PROPERTY_NAME_SUFFIX;
+
+    public static final Function<String, String> NULL_VALUE_RESOLVER = 
+        propertyName -> null;
+
+    private final Map<String, String> trackedResolvedProperties = new HashMap<>();
     private final Function<String, String> valueResolver;
 
     public StubExternalizedPropertyResolver() {
-        // Return property name as value.
-        this(propertyName -> propertyName);
+        this(DEFAULT_VALUE_RESOLVER);
     }
 
     public StubExternalizedPropertyResolver(
@@ -30,7 +40,7 @@ public class StubExternalizedPropertyResolver implements ExternalizedPropertyRes
     }
 
     @Override
-    public Optional<ResolvedProperty> resolve(String propertyName) {
+    public Optional<String> resolve(String propertyName) {
         if (propertyName == null || propertyName.isEmpty()) {
             throw new IllegalArgumentException("propertyName must not be null or empty.");
         }
@@ -38,47 +48,40 @@ public class StubExternalizedPropertyResolver implements ExternalizedPropertyRes
         String value = valueResolver.apply(propertyName);
         if (value != null) {
             // Add for tracking.
-            resolvedPropertyNames.add(propertyName);
+            trackedResolvedProperties.put(propertyName, value);
             
-            return Optional.of(
-                ResolvedProperty.with(propertyName, value)
-            );
+            return Optional.of(value);
         }
         return Optional.empty();
     }
 
     @Override
-    public ExternalizedPropertyResolverResult resolve(Collection<String> propertyNames) {
+    public Result resolve(Collection<String> propertyNames) {
         if (propertyNames == null || propertyNames.isEmpty()) {
             throw new IllegalArgumentException("propertyNames must not be null or empty.");
         }
+        Result.Builder resultBuilder = Result.builder(propertyNames);
 
-        List<ResolvedProperty> resolved = propertyNames.stream()
-            .map(pn -> {
-                String value = valueResolver.apply(pn);
-                if (value != null) {
-                    return ResolvedProperty.with(pn, value);
-                }
-                
-                return null;
-            })
-            .filter(Objects::nonNull) // Discard nulls.
-            .collect(Collectors.toList());
+        for (String propertyName : propertyNames) {
+            String resolvedValue = valueResolver.apply(propertyName);
+            if (resolvedValue != null) {
+                resultBuilder.add(propertyName, resolvedValue);
+            }
+        }
+
+        Result result = resultBuilder.build();
 
         // Add for tracking.
-        resolved.forEach(r -> resolvedPropertyNames.add(r.name()));
+        trackedResolvedProperties.putAll(result.resolvedProperties());
 
-        return new ExternalizedPropertyResolverResult(
-            propertyNames, 
-            resolved
-        );
+        return result;
     }
 
-    public Function<String, String> valueResolver() {
-        return valueResolver;
+    public Map<String, String> resolvedProperties() {
+        return Collections.unmodifiableMap(trackedResolvedProperties);
     }
 
     public Set<String> resolvedPropertyNames() {
-        return java.util.Collections.unmodifiableSet(resolvedPropertyNames);
+        return java.util.Collections.unmodifiableSet(trackedResolvedProperties.keySet());
     }
 }

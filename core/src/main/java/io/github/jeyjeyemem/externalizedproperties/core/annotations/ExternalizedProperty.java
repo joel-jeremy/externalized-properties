@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.annotations;
 
-import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalExternalizedProperties;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Fields marked with this annotation will allow {@link InternalExternalizedProperties} 
+ * Fields marked with this annotation will allow {@link ExternalizedProperties} 
  * to load their values from external sources.
  */
 @Retention(RetentionPolicy.RUNTIME)

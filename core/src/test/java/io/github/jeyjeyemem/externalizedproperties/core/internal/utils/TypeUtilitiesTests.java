@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TypeUtilitiesTests {
@@ -219,6 +220,16 @@ public class TypeUtilitiesTests {
             assertEquals(
                 String.class, 
                 TypeUtilities.getRawType(wildcardType)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when type argument is an unrecognized type")
+        public void unrecognizedType() {
+            // For any reason JDK decides to add a new type.
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> TypeUtilities.getRawType(new IllegalType())
             );
         }
     }
@@ -554,4 +565,6 @@ public class TypeUtilitiesTests {
         List<? extends String> wildcardTypeReturnTypeExtends();
         List<? super String> wildcardTypeReturnTypeSuper();
     }
+
+    public static class IllegalType implements Type {}
 }

@@ -1,9 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
@@ -79,7 +78,7 @@ public class OptionalConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.optional", "value")
+                    "value"
                 );
 
             Optional<?> optional = handler.convert(context);
@@ -112,7 +111,7 @@ public class OptionalConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.optional.nonstring", "1")
+                    "1"
                 );
 
             Optional<?> optional = handler.convert(context);
@@ -141,7 +140,7 @@ public class OptionalConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.optional.object", "value")
+                    "value"
                 );
 
             Optional<?> optional = handler.convert(context);
@@ -172,7 +171,7 @@ public class OptionalConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.optional.wildcard", "value")
+                    "value"
                 );
 
             Optional<?> optional = handler.convert(context);
@@ -201,7 +200,7 @@ public class OptionalConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.optional.T", "value")
+                    "value"
                 );
                 
             assertThrows(
@@ -230,7 +229,7 @@ public class OptionalConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.optional", "value"),
+                    "value",
                     Optional.class
                 );
                 
@@ -263,10 +262,7 @@ public class OptionalConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with(
-                        "property.optional.nested.generics", 
-                        "value1,value2,value3"
-                    )
+                    "value1,value2,value3"
                 );
 
             Optional<?> optional = handler.convert(context);
@@ -303,10 +299,7 @@ public class OptionalConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with(
-                        "property.optional.nested.generics.array", 
-                        "value1,value2,value3"
-                    )
+                    "value1,value2,value3"
                 );
 
             Optional<?> optional = handler.convert(context);

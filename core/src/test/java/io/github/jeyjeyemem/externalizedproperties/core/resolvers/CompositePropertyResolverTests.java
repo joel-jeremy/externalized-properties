@@ -1,8 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -169,14 +167,14 @@ public class CompositePropertyResolverTests {
             
             CompositePropertyResolver compositeResolver = resolverToTest(resolver);
 
-            Optional<ResolvedProperty>  result = compositeResolver.resolve("property.name");
+            Optional<String> result = compositeResolver.resolve("property.name");
 
             assertTrue(resolver.resolvedPropertyNames().contains("property.name"));
             assertNotNull(result);
             assertTrue(result.isPresent());
             assertEquals(
-                resolver.valueResolver().apply("property.name"), 
-                result.get().value()
+                resolver.resolvedProperties().get("property.name"), 
+                result.get()
             );
         }
 
@@ -187,11 +185,11 @@ public class CompositePropertyResolverTests {
         )
         public void test2() {
             StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
-                propertyName -> null // Not resolved
+                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
             );
 
             StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
-                propertyName -> null // Not resolved
+                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
             );
             
             CompositePropertyResolver compositeResolver = resolverToTest(
@@ -199,7 +197,7 @@ public class CompositePropertyResolverTests {
                 resolver2
             );
 
-            Optional<ResolvedProperty>  result = compositeResolver.resolve(
+            Optional<String> result = compositeResolver.resolve(
                 "property.nonexistent"
             );
 
@@ -236,7 +234,7 @@ public class CompositePropertyResolverTests {
             );
 
             // Should resolve from resolver2.
-            Optional<ResolvedProperty>  result = compositeResolver.resolve("property.name.2");
+            Optional<String> result = compositeResolver.resolve("property.name.2");
 
             // property.name.2 resolved from resolver2
             assertFalse(resolver2.resolvedPropertyNames().contains("property.name.1"));
@@ -246,8 +244,8 @@ public class CompositePropertyResolverTests {
             assertNotNull(result);
             assertTrue(result.isPresent());
             assertEquals(
-                resolver2.valueResolver().apply("property.name.2"), 
-                result.get().value()
+                resolver2.resolvedProperties().get("property.name.2"), 
+                result.get()
             );
         }
 
@@ -281,7 +279,7 @@ public class CompositePropertyResolverTests {
                 resolver3
             );
 
-            Optional<ResolvedProperty>  result = compositeResolver.resolve("property.name.1");
+            Optional<String> result = compositeResolver.resolve("property.name.1");
 
             // property.name.1 and resolved from resolver1 and not from subsequent resolvers.
             assertTrue(resolver1.resolvedPropertyNames().contains("property.name.1"));
@@ -291,8 +289,8 @@ public class CompositePropertyResolverTests {
             assertNotNull(result);
             assertTrue(result.isPresent());
             assertEquals(
-                resolver1.valueResolver().apply("property.name.1"), 
-                result.get().value()
+                resolver1.resolvedProperties().get("property.name.1"), 
+                result.get()
             );
         }
     }
@@ -342,7 +340,7 @@ public class CompositePropertyResolverTests {
             
             CompositePropertyResolver compositeResolver = resolverToTest(resolver);
 
-            ExternalizedPropertyResolverResult result = compositeResolver.resolve(
+            CompositePropertyResolver.Result result = compositeResolver.resolve(
                 "property.name1",
                 "property.name2"
             );
@@ -351,13 +349,13 @@ public class CompositePropertyResolverTests {
             assertTrue(resolver.resolvedPropertyNames().contains("property.name2"));
 
             assertEquals(
-                resolver.valueResolver().apply("property.name1"), 
-                result.findRequiredPropertyValue("property.name1")
+                resolver.resolvedProperties().get("property.name1"), 
+                result.findRequiredProperty("property.name1")
             );
 
             assertEquals(
-                resolver.valueResolver().apply("property.name2"), 
-                result.findRequiredPropertyValue("property.name2")
+                resolver.resolvedProperties().get("property.name2"), 
+                result.findRequiredProperty("property.name2")
             );
         }
 
@@ -368,11 +366,11 @@ public class CompositePropertyResolverTests {
         )
         public void test2() {
             StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
-                propertyName -> null // Not resolved
+                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
             );
 
             StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
-                propertyName -> null // Not resolved
+                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
             );
             
             CompositePropertyResolver compositeResolver = resolverToTest(
@@ -380,7 +378,7 @@ public class CompositePropertyResolverTests {
                 resolver2
             );
 
-            ExternalizedPropertyResolverResult result = compositeResolver.resolve(
+            CompositePropertyResolver.Result result = compositeResolver.resolve(
                 "property.nonexistent1",
                 "property.nonexistent2"
             );
@@ -421,7 +419,7 @@ public class CompositePropertyResolverTests {
                 resolver3
             );
 
-            ExternalizedPropertyResolverResult result = compositeResolver.resolve(
+            CompositePropertyResolver.Result result = compositeResolver.resolve(
                 "property.name.1",
                 "property.name.2",
                 "property.name.3"
@@ -445,20 +443,20 @@ public class CompositePropertyResolverTests {
 
             // result1 has same value as resolver1.
             assertEquals(
-                resolver1.valueResolver().apply("property.name.1"), 
-                result.findRequiredPropertyValue("property.name.1")
+                resolver1.resolvedProperties().get("property.name.1"), 
+                result.findRequiredProperty("property.name.1")
             );
 
             // result2 has same value as resolver2.
             assertEquals(
-                resolver2.valueResolver().apply("property.name.2"), 
-                result.findRequiredPropertyValue("property.name.2")
+                resolver2.resolvedProperties().get("property.name.2"), 
+                result.findRequiredProperty("property.name.2")
             );
 
             // result3 has same value as resolver3.
             assertEquals(
-                resolver3.valueResolver().apply("property.name.3"), 
-                result.findRequiredPropertyValue("property.name.3")
+                resolver3.resolvedProperties().get("property.name.3"), 
+                result.findRequiredProperty("property.name.3")
             );
         }
 
@@ -492,7 +490,7 @@ public class CompositePropertyResolverTests {
                 resolver3
             );
 
-            ExternalizedPropertyResolverResult result = compositeResolver.resolve(
+            CompositePropertyResolver.Result result = compositeResolver.resolve(
                 "property.name.1",
                 "property.name.2",
                 "property.name.3"
@@ -515,14 +513,14 @@ public class CompositePropertyResolverTests {
 
             // result1 has same value as resolver1.
             assertEquals(
-                resolver1.valueResolver().apply("property.name.1"), 
-                result.findRequiredPropertyValue("property.name.1")
+                resolver1.resolvedProperties().get("property.name.1"), 
+                result.findRequiredProperty("property.name.1")
             );
 
             // result2 has same value as resolver1.
             assertEquals(
-                resolver1.valueResolver().apply("property.name.2"), 
-                result.findRequiredPropertyValue("property.name.2")
+                resolver1.resolvedProperties().get("property.name.2"), 
+                result.findRequiredProperty("property.name.2")
             );
 
             /**
@@ -531,8 +529,8 @@ public class CompositePropertyResolverTests {
 
             // result3 has same value as resolver3.
             assertEquals(
-                resolver3.valueResolver().apply("property.name.3"), 
-                result.findRequiredPropertyValue("property.name.3")
+                resolver3.resolvedProperties().get("property.name.3"), 
+                result.findRequiredProperty("property.name.3")
             );
         }
     }

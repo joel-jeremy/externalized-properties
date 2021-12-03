@@ -1,7 +1,5 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -68,7 +66,7 @@ public class MapPropertyResolverTests {
             map.put("property.name", "property.value");
             
             MapPropertyResolver resolver = resolverToTest(map);
-            Optional<ResolvedProperty> result = resolver.resolve(
+            Optional<String> result = resolver.resolve(
                 "property.name"
             );
 
@@ -76,7 +74,7 @@ public class MapPropertyResolverTests {
             assertTrue(result.isPresent());
             assertEquals(
                 map.get("property.name"), 
-                result.get().value()    
+                result.get()   
             );
         }
 
@@ -87,7 +85,7 @@ public class MapPropertyResolverTests {
         )
         public void test2() {
             MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
-            Optional<ResolvedProperty> result = resolver.resolve(
+            Optional<String> result = resolver.resolve(
                 "nonexisting.property"
             );
             
@@ -114,14 +112,14 @@ public class MapPropertyResolverTests {
                 unresolvedPropertyHandler
             );
 
-            Optional<ResolvedProperty> result = 
+            Optional<String> result = 
                 resolver.resolve("property.unresolvedhandler");
             
             assertNotNull(result);
             assertTrue(result.isPresent());
             assertEquals(
                 unresolvedPropertyHandler.apply("property.unresolvedhandler"), 
-                result.get().value()    
+                result.get()    
             );
         }
     }
@@ -202,7 +200,7 @@ public class MapPropertyResolverTests {
             map.put("property.name2", "property.value2");
             
             MapPropertyResolver resolver = resolverToTest(map);
-            ExternalizedPropertyResolverResult result = resolver.resolve(
+            MapPropertyResolver.Result result = resolver.resolve(
                 "property.name1",
                 "property.name2"
             );
@@ -212,12 +210,12 @@ public class MapPropertyResolverTests {
 
             assertEquals(
                 map.get("property.name1"), 
-                result.findRequiredPropertyValue("property.name1")
+                result.findRequiredProperty("property.name1")
             );
 
             assertEquals(
                 map.get("property.name2"), 
-                result.findRequiredPropertyValue("property.name2")
+                result.findRequiredProperty("property.name2")
             );
         }
 
@@ -228,7 +226,7 @@ public class MapPropertyResolverTests {
         )
         public void test2() {
             MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
-            ExternalizedPropertyResolverResult result = resolver.resolve(
+            MapPropertyResolver.Result result = resolver.resolve(
                 "nonexisting.property1",
                 "nonexisting.property2"
             );
@@ -257,7 +255,7 @@ public class MapPropertyResolverTests {
                 unresolvedPropertyHandler
             );
 
-            ExternalizedPropertyResolverResult result = 
+            MapPropertyResolver.Result result = 
                 resolver.resolve(
                     "property.unresolvedhandler1",
                     "property.unresolvedhandler2"
@@ -268,12 +266,12 @@ public class MapPropertyResolverTests {
 
             assertEquals(
                 unresolvedPropertyHandler.apply("property.unresolvedhandler1"), 
-                result.findRequiredPropertyValue("property.unresolvedhandler1")
+                result.findRequiredProperty("property.unresolvedhandler1")
             );
 
             assertEquals(
                 unresolvedPropertyHandler.apply("property.unresolvedhandler2"), 
-                result.findRequiredPropertyValue("property.unresolvedhandler2")
+                result.findRequiredProperty("property.unresolvedhandler2")
             );
         }
     }

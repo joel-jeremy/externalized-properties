@@ -14,7 +14,7 @@ public class StringUtilities {
      * Default variable pattern for detecting variables in strings.
      * This matches the pattern: ${variable}
      */
-    public static final Pattern DEFAULT_VARIABLE_PATTERN = Pattern.compile("\\$\\{(.*?)\\}");
+    public static final Pattern DEFAULT_VARIABLE_PATTERN = Pattern.compile("\\$\\{(.+?)\\}");
 
     private StringUtilities() {}
 
@@ -52,14 +52,6 @@ public class StringUtilities {
         while (matcher.find()) {
             // Resolve property from variable.
             String propertyNameVariable = matcher.group(1);
-            
-            if (isNullOrEmpty(propertyNameVariable)) {
-                // e.g. for default variable pattern, an empty '${}' was matched.
-                throw new IllegalStateException(
-                    "Variable pattern matched with an null/empty capturing group value. " + 
-                    "Variable pattern used in matching: " + variablePattern.pattern()
-                );
-            }
 
             String propertyValue = variableValueProvider.apply(propertyNameVariable);
             if (propertyValue == null) {
@@ -73,9 +65,5 @@ public class StringUtilities {
 
         // Append any text after the variable if there are any.
         return matcher.appendTail(output).toString();
-    }
-
-    private static boolean isNullOrEmpty(String value) {
-        return value == null || value.isEmpty();
     }
 }

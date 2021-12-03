@@ -1,8 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,11 +45,11 @@ public class CompositePropertyResolver
      * @return The resolved property value. Otherwise, an empty {@link Optional}.
      */
     @Override
-    public Optional<ResolvedProperty> resolve(String propertyName) {
+    public Optional<String> resolve(String propertyName) {
         requireNonNullOrEmptyString(propertyName, "propertyName");
 
         for (ExternalizedPropertyResolver resolver : resolvers) {
-            Optional<ResolvedProperty> resolved = resolver.resolve(propertyName);
+            Optional<String> resolved = resolver.resolve(propertyName);
             if (resolved.isPresent()) {
                 return resolved;
             }
@@ -63,33 +62,36 @@ public class CompositePropertyResolver
      * Resolve properties from a collection of {@link ExternalizedPropertyResolver}s.
      * 
      * @param propertyNames The property names.
-     * @return The {@link ExternalizedPropertyResolverResult} which contains the resolved properties
+     * @return The {@link Result} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
-    public ExternalizedPropertyResolverResult resolve(Collection<String> propertyNames) {
+    public Result resolve(Collection<String> propertyNames) {
         requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
 
-        List<ResolvedProperty> resolvedProperties = new ArrayList<>(propertyNames.size());
-        List<String> unresolvedProperties = new ArrayList<>(propertyNames);
+        Result.Builder resultBuilder = Result.builder(propertyNames);
+        List<String> unresolvedPropertyNames = new ArrayList<>(propertyNames);
 
         for (ExternalizedPropertyResolver resolver : resolvers) {
-            ExternalizedPropertyResolverResult result = resolver.resolve(unresolvedProperties);
-            for (ResolvedProperty newResolvedProperty : result.resolvedProperties()) {
+            Result result = resolver.resolve(unresolvedPropertyNames);
+            for (Map.Entry<String, String> newResolvedProperty : result.resolvedProperties().entrySet()) {
                 LOGGER.log(
                     Level.FINE,
                     "Resolved {0} externalized property from {1}.",
                     new Object[] {
-                        newResolvedProperty.name(),
+                        newResolvedProperty.getKey(),
                         resolver.getClass()
                     }
                 );
-                unresolvedProperties.remove(newResolvedProperty.name());
-                resolvedProperties.add(newResolvedProperty);
+                unresolvedPropertyNames.remove(newResolvedProperty.getKey());
+                resultBuilder.add(
+                    newResolvedProperty.getKey(), 
+                    newResolvedProperty.getValue()
+                );
             }
 
             // Stop when all properties are already resolved.
-            if (unresolvedProperties.isEmpty()) {
+            if (unresolvedPropertyNames.isEmpty()) {
                 LOGGER.log(
                     Level.FINE,
                     "All externalized properties have been resolved: {0}",
@@ -99,10 +101,7 @@ public class CompositePropertyResolver
             }
         }
 
-        return new ExternalizedPropertyResolverResult(
-            propertyNames,
-            resolvedProperties
-        );
+        return resultBuilder.build();
     }
 
     /**
@@ -159,14 +158,14 @@ public class CompositePropertyResolver
     }
 
     /**
-     * Factory method to create a {@link CompositePropertyResolver} instance with the
+     * Factory method to create a {@link ExternalizedPropertyResolver} instance with the
      * provided externalized property resolvers. This will do some flattening to discard nested 
      * instances of {@link CompositePropertyResolver}.
      * 
      * @implNote This may not necessarily return a {@link CompositePropertyResolver} instance. 
      * If the flattening operation resulted in a single resolver remaining, 
      * that resolver instance will be returned. Otherwise, a {@link CompositePropertyResolver} 
-     * instance will be returned which is composed of all the remaining resolvers.
+     * instance will be returned which is composed of all the flattened resolvers.
      * 
      * @param resolvers The externalized property resolvers.
      * @return The {@link ExternalizedPropertyResolver} instance.
@@ -184,9 +183,7 @@ public class CompositePropertyResolver
         return from(flattened);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Iterator<ExternalizedPropertyResolver> iterator() {
         return resolvers.iterator();

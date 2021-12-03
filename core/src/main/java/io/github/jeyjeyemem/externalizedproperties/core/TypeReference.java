@@ -1,14 +1,13 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
- * This class can be used to specify a type (possibly be generic type) when resolving
- * properties via the {@link InternalExternalizedProperties#resolveProperty(String, TypeReference)}
+ * This class can be used to specify a type (possibly a generic type) when resolving
+ * properties via the {@link ExternalizedProperties#resolveProperty(String, TypeReference)}
  * method.
  * 
  * @apiNote This needs to be instantiated as an anonymous class in order for the 
@@ -17,27 +16,25 @@ import java.lang.reflect.Type;
  */
 public abstract class TypeReference<T> {
     private final Type type;
-    private final Class<?> rawType;
-    private final Type[] genericTypeParameters;
 
     /**
      * Constructor.
      */
-    protected TypeReference()
-    {
-        Type superClass = getClass().getGenericSuperclass();
-        if (superClass instanceof ParameterizedType) {
-            type = ((ParameterizedType)superClass).getActualTypeArguments()[0];
+    protected TypeReference() {
+        Type selfType = getClass().getGenericSuperclass();
+        ParameterizedType parameterizedType = TypeUtilities.asParameterizedType(selfType);
+        if (parameterizedType != null) {
+            type = parameterizedType.getActualTypeArguments()[0];
         } else {
-            type = null;
+            throw new IllegalStateException(
+                "Type reference is not a parameterized type."
+            );
         }
-
-        rawType = TypeUtilities.getRawType(type);
-        genericTypeParameters = TypeUtilities.getTypeParameters(type);
     }
 
     /**
      * The referenced type.
+     * 
      * @return The referenced type.
      */
     public Type type() { 
@@ -46,10 +43,11 @@ public abstract class TypeReference<T> {
 
     /**
      * The raw referenced type.
+     * 
      * @return The raw referenced type.
      */
     public Class<?> rawType() {
-        return rawType;
+        return TypeUtilities.getRawType(type);
     }
 
     /**
@@ -58,6 +56,6 @@ public abstract class TypeReference<T> {
      * @return The generic type parameters of the referenced type.
      */
     public Type[] genericTypeParameters() {
-        return genericTypeParameters;
+        return TypeUtilities.getTypeParameters(type);
     }
 }

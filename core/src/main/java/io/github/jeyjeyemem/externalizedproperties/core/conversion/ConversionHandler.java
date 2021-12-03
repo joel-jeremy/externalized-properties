@@ -28,7 +28,6 @@ public interface ConversionHandler<T> {
      */
     T convert(ConversionContext context);
 
-
     /**
      * Convert resolved property to the expected type.
      * 

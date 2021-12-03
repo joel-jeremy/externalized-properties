@@ -1,73 +1,55 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.StringUtilities;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.QueryExecutor;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Tuple;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.metamodel.EntityType;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
  * Abstract query executor that will build and run a database query based on
- * the specified entity class and it's property name and value column mappings.
+ * the specified table name and it's property name and value column mappings.
  */
 public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
-    private static final String QUERY_TEMPLATE = 
-        "SELECT entity.${propertyNameColumn} as ${propertyNameColumn}, " +
-        "entity.${propertyValueColumn} as ${propertyValueColumn} " + 
-        "FROM ${entityName} entity " +
-        "WHERE entity.${propertyNameColumn} IN :${propertyNamesQueryParameterName}";
-
-    private final ConcurrentHashMap<Class<?>, String> entityNamesByClass = new ConcurrentHashMap<>();
-
-    /**
-     * Constructor.
-     */
-    public AbstractNameValueQueryExecutor() {
-        if (entityClass() == null) {
-            throw new IllegalStateException("entityClass() must not return null.");
-        }
-
-        if (propertyNameColumn() == null) {
-            throw new IllegalStateException("propertyNameColumn() must not return null.");
-        }
-
-        if (propertyValueColumn() == null) {
-            throw new IllegalStateException("propertyValueColumn() must not return null.");
-        }
-    }
+    // Params in order: 
+    // 1. property name column
+    // 2. property value column
+    // 3. table name
+    // 4. property name column
+    // 5. property names mapped to comma-separated ?
+    private static final String DEFAULT_QUERY_TEMPLATE = "SELECT %s, %s FROM %s WHERE %s IN (%s)";
 
     /**
-     * Query properties from the database using the specified entity class
-     * and it's property name and value column mappings.
+     * Query properties from the database.
+     * 
+     * @param connection The JDBC connection.
+     * @param propertyNamesToResolve The names of the properties to resolve from database.
+     * @throws SQLException if a database-related error has occurred.
      */
     @Override
     public List<ResolvedProperty> queryProperties(
-            EntityManager entityManager,
+            Connection connection,
             Collection<String> propertyNamesToResolve
-    ) {
-        return runQuery(
-            buildQuery(entityManager, propertyNamesToResolve)
+    ) throws SQLException {
+        PreparedStatement preparedStatement = prepareStatement(
+            connection, 
+            propertyNamesToResolve
         );
+        return runQuery(preparedStatement);
     }
 
     /**
-     * The JPA entity class. This must be a valid/managed JPA entity that
-     * is registered in the persistence configuration.
+     * Name of the database table.
      * 
-     * @return The entity class that is managed by JPA.
+     * @return The name of the database table.
      */
-    protected abstract Class<?> entityClass();
+    protected abstract String tableName();
 
     /**
      * Name of property name column.
@@ -84,90 +66,130 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
     protected abstract String propertyValueColumn();
 
     /**
-     * Name of the property names parameter in the JPQL.
+     * Run the query.
      * 
-     * @return The name of the property names parameter in the JPQL.
-     */
-    protected String propertyNamesQueryParameterName() {
-        return "propertyNames";
-    }
-
-    /**
-     * Build a query to resolve the specified property names.
-     * 
-     * @param entityManager The entity manager for this query.
-     * @param propertyNamesToResolve The names of the properties to be resolved from the database.
-     * @return The built query.
-     */
-    protected TypedQuery<Tuple> buildQuery(
-            EntityManager entityManager, 
-            Collection<String> propertyNamesToResolve
-    ) {
-        String jpql = buildJpql(entityManager);
-
-        return entityManager.createQuery(jpql, Tuple.class)
-            .setParameter(propertyNamesQueryParameterName(), propertyNamesToResolve)
-            .setMaxResults(propertyNamesToResolve.size());
-    }
-
-    /**
-     * Run the built query.
-     * 
-     * @param query The built query.
+     * @param preparedStatement The prepared statement.
      * @return The list of properties resolved from the database.
+     * @throws SQLException if a database-related error has occurred.
      */
-    protected List<ResolvedProperty> runQuery(TypedQuery<Tuple> query) {
-        List<Tuple> result = query.getResultList();
-        return result.stream()
-            .map(this::mapResult)
-            .collect(Collectors.toList());
+    protected List<ResolvedProperty> runQuery(
+            PreparedStatement preparedStatement
+    ) throws SQLException {
+        List<ResolvedProperty> resolvedProperties = new ArrayList<>();
+        try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                resolvedProperties.add(mapResult(resultSet));
+            }
+        }
+        return resolvedProperties;
     }
 
     /**
      * Map the query result to a {@link ResolvedProperty}.
      * 
-     * @param tuple The query result in the form of a tuple.
+     * @param resultSet The query result set.
      * @return The mapped {@link ResolvedProperty}.
+     * @throws SQLException if a database-related error has occurred.
      */
-    protected ResolvedProperty mapResult(Tuple tuple) {
-        String name = tuple.get(propertyNameColumn(), String.class);
-        String value = tuple.get(propertyValueColumn(), String.class);
+    protected ResolvedProperty mapResult(ResultSet resultSet) throws SQLException {
+        String name = resultSet.getString(propertyNameColumn());
+        String value = resultSet.getString(propertyValueColumn());
         return ResolvedProperty.with(name, value);
     }
 
     /**
-     * Get name of managed JPA entity.
+     * Prepare statement to query properties from the database.
      * 
-     * @param entityManager The entity manager.
-     * @param entityClass The entity class.
-     * @return The name of the managed JPA entity.
+     * @param connection The JDBC connection.
+     * @param propertyNamesToResolve The names of the properties to 
+     * resolve from database.
+     * @return The prepared statement to query properties from the database.
+     * @throws SQLException if a database-related error has occurred.
      */
-    private Optional<String> getManagedEntityName(EntityManager entityManager, Class<?> entityClass) {
-        Set<EntityType<?>> jpaEntities = entityManager.getMetamodel().getEntities();
-        // Cache entity names for faster subsequent invocations.
-        String entityName = entityNamesByClass.computeIfAbsent(entityClass, 
-            ec -> jpaEntities.stream()
-                .filter(je -> ec.equals(je.getJavaType()))
-                .map(je -> je.getName())
-                .findFirst()
-                .orElse(null)
-        );
+    protected PreparedStatement prepareStatement(
+            Connection connection,
+            Collection<String> propertyNamesToResolve
+    ) throws SQLException {
+        String query = generateSqlQuery(propertyNamesToResolve);
 
-        return Optional.ofNullable(entityName);
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        
+        configureStatementParameters(preparedStatement, propertyNamesToResolve);
+
+        return preparedStatement;
     }
 
-    private String buildJpql(EntityManager entityManager) {
-        String entityName = getManagedEntityName(entityManager, entityClass())
-            .orElseThrow(() -> new IllegalStateException(
-                "Invalid JPA entity returned by entityClass() method. Please check persistence configuration."
-            ));
+    /**
+     * Generate SQL query to use in querying the properties from database.
+     * 
+     * @param propertyNamesToResolve The names of the properties to resolve from database.
+     * @return The SQL query to use in querying the properties from database.
+     */
+    protected String generateSqlQuery(Collection<String> propertyNamesToResolve) {
+        return String.format(
+            DEFAULT_QUERY_TEMPLATE, 
+            propertyNameColumnOrThrow(),
+            propertyValueColumnOrThrow(),
+            tableNameOrThrow(),
+            propertyNameColumnOrThrow(),
+            buildInClause(propertyNamesToResolve) // Builds ?,?,?...
+        );
+    }
 
-        Map<String, String> variables = new HashMap<>();
-        variables.put("propertyNameColumn", propertyNameColumn());
-        variables.put("propertyValueColumn", propertyValueColumn());
-        variables.put("entityName", entityName);
-        variables.put("propertyNamesQueryParameterName", propertyNamesQueryParameterName());
+    /**
+     * Set prepared statement parameters.
+     * By default this will set all property names to resolve as 
+     * string parameters and will set JDBC fetch size to the number 
+     * of properties to resolve.
+     * 
+     * @param preparedStatement The prepared statement.
+     * @param propertyNamesToResolve The names of the properties to resolve from database.
+     * @throws SQLException if a database-related error has occurred.
+     */
+    protected void configureStatementParameters(
+        PreparedStatement preparedStatement, 
+        Collection<String> propertyNamesToResolve
+    ) throws SQLException {
+        int i = 1;
+        for (String propertyName : propertyNamesToResolve) {
+            preparedStatement.setString(i++, propertyName);
+        }
+        preparedStatement.setFetchSize(propertyNamesToResolve.size());
+    }
 
-        return StringUtilities.replaceVariables(QUERY_TEMPLATE, variables::get);
+    private String tableNameOrThrow() {
+        String tableName = tableName();
+        if (tableName == null || tableName.isEmpty()) {
+            throw new IllegalStateException(
+                "tableName() method must not return null or empty."
+            );
+        }
+        return tableName;
+    }
+
+    private String propertyNameColumnOrThrow() {
+        String propertyNameColumn = propertyNameColumn();
+        if (propertyNameColumn == null || propertyNameColumn.isEmpty()) {
+            throw new IllegalStateException(
+                "propertyNameColumn() method must not return null or empty."
+            );
+        }
+        return propertyNameColumn;
+    }
+
+    private String propertyValueColumnOrThrow() {
+        String propertyValueColumn = propertyValueColumn();
+        if (propertyValueColumn == null || propertyValueColumn.isEmpty()) {
+            throw new IllegalStateException(
+                "propertyValueColumn() method must not return null or empty."
+            );
+        }
+        return propertyValueColumn;
+    }
+
+    private String buildInClause(Collection<String> propertyNamesToResolve) {
+        return propertyNamesToResolve.stream()
+            .map(p -> "?")
+            .collect(Collectors.joining(","));
     }
 }

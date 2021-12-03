@@ -1,16 +1,13 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.awsssm;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
 import software.amazon.awssdk.services.ssm.model.GetParametersResponse;
+import software.amazon.awssdk.services.ssm.model.ParameterNotFoundException;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * {@link ExternalizedPropertyResolver} implementation which resolves requested properties 
@@ -34,27 +31,33 @@ public class AwsSsmPropertyResolver implements ExternalizedPropertyResolver {
     /**
      * Resolve properties from AWS SSM.
      * 
-     * @return The {@link ExternalizedPropertyResolverResult} which contains the resolved properties
+     * @return The {@link Result} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
-    public Optional<ResolvedProperty> resolve(String propertyName) {
-        GetParameterResponse response = awsSsmClient.getParameter(
-            request -> request.name(propertyName).withDecryption(true)
-        );
-        return Optional.ofNullable(
-            ResolvedProperty.with(propertyName, response.parameter().value())
-        );
+    public Optional<String> resolve(String propertyName) {
+        if (propertyName == null || propertyName.isEmpty()) {
+            throw new IllegalArgumentException("propertyName must not be null or empty.");
+        }
+
+        try {
+            GetParameterResponse response = awsSsmClient.getParameter(
+                request -> request.name(propertyName).withDecryption(true)
+            );
+            return Optional.ofNullable(response.parameter().value());
+        } catch (ParameterNotFoundException ex) {
+            return Optional.empty();
+        }
     }
 
     /**
      * Resolve properties from AWS SSM.
      * 
-     * @return The {@link ExternalizedPropertyResolverResult} which contains the resolved properties
+     * @return The {@link Result} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
-    public ExternalizedPropertyResolverResult resolve(Collection<String> propertyNames) {
+    public Result resolve(Collection<String> propertyNames) {
         if (propertyNames == null || propertyNames.isEmpty()) {
             throw new IllegalArgumentException("propertyNames must not be null or empty.");
         }
@@ -71,13 +74,12 @@ public class AwsSsmPropertyResolver implements ExternalizedPropertyResolver {
         //     throw new AwsSsmInvalidPropertyException(exceptionMessage);
         // }
 
-        List<ResolvedProperty> resolvedProperties = response.parameters().stream()
-            .map(p -> ResolvedProperty.with(p.name(), p.value()))
-            .collect(Collectors.toList());
+        Result.Builder resultBuilder = Result.builder(propertyNames);
 
-        return new ExternalizedPropertyResolverResult(
-            propertyNames,
-            resolvedProperties
+        response.parameters().forEach(p -> 
+            resultBuilder.add(p.name(), p.value())
         );
+
+        return resultBuilder.build();
     }
 }

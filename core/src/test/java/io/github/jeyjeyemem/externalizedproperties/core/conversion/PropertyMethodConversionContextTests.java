@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
+import io.github.jeyjeyemem.externalizedproperties.core.TypeReference;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,9 +33,8 @@ public class PropertyMethodConversionContextTests {
                 () -> new PropertyMethodConversionContext(
                     null,
                     propertyMethod, 
-                    ResolvedProperty.with("name", "value"), 
-                    Optional.class,
-                    String.class
+                    "value", 
+                    propertyMethod.genericReturnType()
                 )
             );
         }
@@ -51,9 +49,8 @@ public class PropertyMethodConversionContextTests {
                 () -> new PropertyMethodConversionContext(
                     converter,
                     null, 
-                    ResolvedProperty.with("name", "value"), 
-                    Optional.class,
-                    String.class
+                    "value", 
+                    Optional.class
                 )
             );
         }
@@ -75,8 +72,7 @@ public class PropertyMethodConversionContextTests {
                     converter,
                     propertyMethod, 
                     null, 
-                    propertyMethod.genericReturnType(),
-                    propertyMethod.genericReturnTypeGenericTypeParameters()
+                    propertyMethod.genericReturnType()
                 )
             );
         }
@@ -96,16 +92,16 @@ public class PropertyMethodConversionContextTests {
                 () -> new PropertyMethodConversionContext(
                     converter,
                     propertyMethod, 
-                    ResolvedProperty.with("name", "value"), 
-                    null,
-                    propertyMethod.genericReturnTypeGenericTypeParameters()
+                    "value", 
+                    null
                 )
             );
         }
 
         @Test
         @DisplayName(
-            "should throw when expected type generic type parameters argument is null"
+            "should use property method's generic return type " + 
+            "when expected type argument is not set."
         )
         public void test6() {
             Converter converter = new InternalConverter();
@@ -115,21 +111,23 @@ public class PropertyMethodConversionContextTests {
                     "optionalProperty"
                 );
             
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> new PropertyMethodConversionContext(
+            PropertyMethodConversionContext context =
+                new PropertyMethodConversionContext(
                     converter,
                     propertyMethod, 
-                    ResolvedProperty.with("name", "value"), 
-                    propertyMethod.genericReturnType(),
-                    (Type[])null
-                )
+                    "value"
+                );
+
+            assertEquals(propertyMethod.genericReturnType(), context.expectedType());
+            assertArrayEquals(
+                propertyMethod.returnTypeGenericTypeParameters(), 
+                context.expectedTypeGenericTypeParameters()
             );
         }
 
         @Test
         @DisplayName(
-            "should throw when expected type generic type parameters varargs argument is null"
+            "should allow expected type to be different from property method's return type."
         )
         public void test7() {
             Converter converter = new InternalConverter();
@@ -139,64 +137,12 @@ public class PropertyMethodConversionContextTests {
                     "optionalProperty"
                 );
             
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> new PropertyMethodConversionContext(
-                    converter,
-                    propertyMethod,
-                    ResolvedProperty.with("name", "value"),
-                    propertyMethod.genericReturnType(),
-                    (Type[])null
-                )
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should use property method's generic return type and generic return type generic type parameters " + 
-            "when expected type and expected type generic type parameters are not set."
-        )
-        public void test8() {
-            Converter converter = new InternalConverter();
-            StubExternalizedPropertyMethodInfo propertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    OptionalProxyInterface.class, 
-                    "optionalProperty"
-                );
-            
             PropertyMethodConversionContext context =
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethod, 
-                    ResolvedProperty.with("name", "value")
-                );
-
-            assertEquals(propertyMethod.genericReturnType(), context.expectedType());
-            assertArrayEquals(
-                propertyMethod.genericReturnTypeGenericTypeParameters(), 
-                context.expectedTypeGenericTypeParameters()
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should allow expected type to be different from property method's return type."
-        )
-        public void test9() {
-            Converter converter = new InternalConverter();
-            StubExternalizedPropertyMethodInfo propertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    OptionalProxyInterface.class, 
-                    "optionalProperty"
-                );
-            
-            PropertyMethodConversionContext context =
-                new PropertyMethodConversionContext(
-                    converter,
-                    propertyMethod, 
-                    ResolvedProperty.with("name", "value"),
-                    List.class,
-                    String.class
+                    "value",
+                    new TypeReference<List<String>>(){}.type()
                 );
 
             assertNotEquals(propertyMethod.returnType(), context.expectedType());
@@ -204,7 +150,7 @@ public class PropertyMethodConversionContextTests {
 
         @Test
         @DisplayName(
-            "should allow generic expected type generic type parameters to be different " + 
+            "should allow generic type parameters of expected type to be different " + 
             "from property method's generic return type generic type parameters."
         )
         public void test10() {
@@ -219,9 +165,8 @@ public class PropertyMethodConversionContextTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethod, 
-                    ResolvedProperty.with("name", "value"),
-                    List.class,
-                    Integer.class
+                    "value",
+                    new TypeReference<List<Integer>>(){}.type()
                 );
 
             assertArrayEquals(

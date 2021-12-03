@@ -1,26 +1,47 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
-
-import java.util.WeakHashMap;
-import java.util.function.Function;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
 /**
- * Primitive property conversion handler which supports converting to Java's primitive types.
+ * Supports conversion of values to Java's primitive types.
  */
 public class PrimitiveConversionHandler implements ConversionHandler<Object> {
-    private final WeakHashMap<Class<?>, Function<String, Object>> conversionMapping = 
-        getConversionMapping();
+    // private final WeakHashMap<Class<?>, Function<String, Object>> conversionMapping = 
+    //     getConversionMapping();
 
     /** {@inheritDoc} */
     @Override
-    public boolean canConvertTo(Class<?> expectedType) {
-        return conversionMapping.containsKey(expectedType);
+    public boolean canConvertTo(Class<?> targetType) {
+        if (targetType == null) {
+            return false;
+        }
+
+        if (targetType.isPrimitive()) {
+            return true;
+        }
+
+        if (Boolean.class.equals(targetType)) {
+            return true;
+        } else if (Integer.class.equals(targetType)) {
+            return true;
+        } else if (Short.class.equals(targetType)) {
+            return true;
+        } else if (Long.class.equals(targetType)) {
+            return true;
+        } else if (Float.class.equals(targetType)) {
+            return true;
+        } else if (Double.class.equals(targetType)) {
+            return true;
+        } else if (Byte.class.equals(targetType)) {
+            return true;
+        }
+
+        return false;
     }
 
     /** {@inheritDoc} */
@@ -29,9 +50,7 @@ public class PrimitiveConversionHandler implements ConversionHandler<Object> {
         return convertInternal(context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Object convert(PropertyMethodConversionContext context) {
         return convertInternal(context);
@@ -39,69 +58,82 @@ public class PrimitiveConversionHandler implements ConversionHandler<Object> {
 
     private Object convertInternal(ConversionContext context) {
         requireNonNull(context, "context");
-        Function<String, Object> conversion = conversionMapping.get(context.rawExpectedType());
-        
-        if (conversion == null) {
-            // Means classes used as map key were unloaded/GCed.
-            conversion = getConversionFunction(context.rawExpectedType());
-            conversionMapping.putIfAbsent(context.rawExpectedType(), conversion);
-        }
+
+        Class<?> targetType = context.rawExpectedType();
 
         try {
-            return conversion.apply(context.resolvedProperty().value());
+            if (Boolean.class.equals(targetType) || Boolean.TYPE.equals(targetType)) {
+                return Boolean.parseBoolean(context.value());
+            } else if (Integer.class.equals(targetType) || Integer.TYPE.equals(targetType)) {
+                return Integer.parseInt(context.value());
+            } else if (Short.class.equals(targetType) || Short.TYPE.equals(targetType)) {
+                return Short.parseShort(context.value());
+            } else if (Long.class.equals(targetType) || Long.TYPE.equals(targetType)) {
+                return Long.parseLong(context.value());
+            } else if (Float.class.equals(targetType) || Float.TYPE.equals(targetType)) {
+                return Float.parseFloat(context.value());
+            } else if (Double.class.equals(targetType) || Double.TYPE.equals(targetType)) {
+                return Double.parseDouble(context.value());
+            } else if (Byte.class.equals(targetType) || Byte.TYPE.equals(targetType)) {
+                return Byte.parseByte(context.value());
+            }
+    
+            throw new ConversionException(
+                "Type is not a primitive/primitive wrapper type: " + 
+                targetType
+            );
         } catch (Exception ex) {
             throw new ConversionException(
                 String.format(
-                    "Failed to convert property %s to a %s. Property value: %s",
-                    context.resolvedProperty().name(),
+                    "Failed to convert value to %s type: %s",
                     context.expectedType(),
-                    context.resolvedProperty().value()
+                    context.value()
                 ),  
                 ex
             );
         }
     }
 
-    private static WeakHashMap<Class<?>, Function<String, Object>> getConversionMapping() {
-        // Weak hash map as to not prevent GC from collecting the classes used as keys.
-        WeakHashMap<Class<?>, Function<String, Object>> conversionMapping = new WeakHashMap<>();
-        conversionMapping.put(Boolean.class, getConversionFunction(Boolean.class));
-        conversionMapping.put(Boolean.TYPE, getConversionFunction(Boolean.TYPE));
-        conversionMapping.put(Byte.class, getConversionFunction(Byte.class));
-        conversionMapping.put(Byte.TYPE, getConversionFunction(Byte.TYPE));
-        conversionMapping.put(Short.class, getConversionFunction(Short.class));
-        conversionMapping.put(Short.TYPE, getConversionFunction(Short.TYPE));
-        conversionMapping.put(Integer.class, getConversionFunction(Integer.class));
-        conversionMapping.put(Integer.TYPE, getConversionFunction(Integer.TYPE));
-        conversionMapping.put(Long.class, getConversionFunction(Long.class));
-        conversionMapping.put(Long.TYPE, getConversionFunction(Long.TYPE));
-        conversionMapping.put(Float.class, getConversionFunction(Float.class));
-        conversionMapping.put(Float.TYPE, getConversionFunction(Float.TYPE));
-        conversionMapping.put(Double.class, getConversionFunction(Double.class));
-        conversionMapping.put(Double.TYPE, getConversionFunction(Double.TYPE));
-        return conversionMapping;
-    }
+    // private static WeakHashMap<Class<?>, Function<String, Object>> getConversionMapping() {
+    //     // Weak hash map as to not prevent GC from collecting the classes used as keys.
+    //     WeakHashMap<Class<?>, Function<String, Object>> conversionMapping = new WeakHashMap<>();
+    //     conversionMapping.put(Boolean.class, conversionFunction(Boolean.class));
+    //     conversionMapping.put(Boolean.TYPE, conversionFunction(Boolean.TYPE));
+    //     conversionMapping.put(Byte.class, conversionFunction(Byte.class));
+    //     conversionMapping.put(Byte.TYPE, conversionFunction(Byte.TYPE));
+    //     conversionMapping.put(Short.class, conversionFunction(Short.class));
+    //     conversionMapping.put(Short.TYPE, conversionFunction(Short.TYPE));
+    //     conversionMapping.put(Integer.class, conversionFunction(Integer.class));
+    //     conversionMapping.put(Integer.TYPE, conversionFunction(Integer.TYPE));
+    //     conversionMapping.put(Long.class, conversionFunction(Long.class));
+    //     conversionMapping.put(Long.TYPE, conversionFunction(Long.TYPE));
+    //     conversionMapping.put(Float.class, conversionFunction(Float.class));
+    //     conversionMapping.put(Float.TYPE, conversionFunction(Float.TYPE));
+    //     conversionMapping.put(Double.class, conversionFunction(Double.class));
+    //     conversionMapping.put(Double.TYPE, conversionFunction(Double.TYPE));
+    //     return conversionMapping;
+    // }
 
-    private static Function<String, Object> getConversionFunction(Class<?> targetType) {
-        if (Boolean.class.equals(targetType) || Boolean.TYPE.equals(targetType)) {
-            return Boolean::parseBoolean;
-        } else if (Integer.class.equals(targetType) || Integer.TYPE.equals(targetType)) {
-            return Integer::parseInt;
-        } else if (Short.class.equals(targetType) || Short.TYPE.equals(targetType)) {
-            return Short::parseShort;
-        } else if (Long.class.equals(targetType) || Long.TYPE.equals(targetType)) {
-            return Long::parseLong;
-        } else if (Float.class.equals(targetType) || Float.TYPE.equals(targetType)) {
-            return Float::parseFloat;
-        } else if (Double.class.equals(targetType) || Double.TYPE.equals(targetType)) {
-            return Double::parseDouble;
-        } else if (Byte.class.equals(targetType) || Byte.TYPE.equals(targetType)) {
-            return Byte::parseByte;
-        }
+    // private static Function<String, Object> conversionFunction(Class<?> targetType) {
+    //     if (Boolean.class.equals(targetType) || Boolean.TYPE.equals(targetType)) {
+    //         return Boolean::parseBoolean;
+    //     } else if (Integer.class.equals(targetType) || Integer.TYPE.equals(targetType)) {
+    //         return Integer::parseInt;
+    //     } else if (Short.class.equals(targetType) || Short.TYPE.equals(targetType)) {
+    //         return Short::parseShort;
+    //     } else if (Long.class.equals(targetType) || Long.TYPE.equals(targetType)) {
+    //         return Long::parseLong;
+    //     } else if (Float.class.equals(targetType) || Float.TYPE.equals(targetType)) {
+    //         return Float::parseFloat;
+    //     } else if (Double.class.equals(targetType) || Double.TYPE.equals(targetType)) {
+    //         return Double::parseDouble;
+    //     } else if (Byte.class.equals(targetType) || Byte.TYPE.equals(targetType)) {
+    //         return Byte::parseByte;
+    //     }
 
-        throw new ConversionException(
-            "Type is not a primitive/primitive wrapper type: " + 
-            targetType
-        );
-    }
+    //     throw new ConversionException(
+    //         "Type is not a primitive/primitive wrapper type: " + 
+    //         targetType
+    //     );
+    // }
 }

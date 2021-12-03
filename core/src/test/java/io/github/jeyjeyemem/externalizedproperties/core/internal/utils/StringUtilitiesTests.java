@@ -72,13 +72,13 @@ public class StringUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should throw when matched placeholder does not contain a variable name.")
+        @DisplayName("should not expand when matched placeholder does not contain a variable name.")
         public void test6() {
             Function<String, String> variableValueProvider = name -> name + "-variable-value";
 
-            assertThrows(
-                IllegalStateException.class, 
-                () -> StringUtilities.replaceVariables("${}-test", variableValueProvider)
+            assertEquals(
+                "${}-test",
+                StringUtilities.replaceVariables("${}-test", variableValueProvider)
             );
         }
     }
@@ -126,7 +126,7 @@ public class StringUtilitiesTests {
             Function<String, String> variableValueProvider = name -> name + "-variable-value";
 
             // Custom pattern matches #(variable)
-            Pattern pattern = Pattern.compile("\\#\\((.*?)\\)");
+            Pattern pattern = Pattern.compile("\\#\\((.+?)\\)");
 
             String result = 
                 StringUtilities.replaceVariables(
@@ -147,7 +147,7 @@ public class StringUtilitiesTests {
             Function<String, String> noValueProvider = name -> null;
 
             // Custom pattern matches #(variable)
-            Pattern pattern = Pattern.compile("\\#\\((.*?)\\)");
+            Pattern pattern = Pattern.compile("\\#\\((.+?)\\)");
 
             assertThrows(
                 IllegalStateException.class, 
@@ -168,7 +168,7 @@ public class StringUtilitiesTests {
                 };
             
             // Custom pattern matches #(variable)
-            Pattern pattern = Pattern.compile("\\#\\((.*?)\\)");
+            Pattern pattern = Pattern.compile("\\#\\((.+?)\\)");
 
             assertThrows(
                 ExternalizedPropertiesException.class, 
@@ -177,20 +177,6 @@ public class StringUtilitiesTests {
                     pattern, 
                     throwingProvider
                 )
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when matched placeholder does not contain a variable name.")
-        public void test7() {
-            Function<String, String> variableValueProvider = name -> name + "-variable-value";
-
-            // Custom pattern matches #(variable)
-            Pattern pattern = Pattern.compile("\\#\\((.*?)\\)");
-
-            assertThrows(
-                IllegalStateException.class, 
-                () -> StringUtilities.replaceVariables("#()-test", pattern, variableValueProvider)
             );
         }
     }

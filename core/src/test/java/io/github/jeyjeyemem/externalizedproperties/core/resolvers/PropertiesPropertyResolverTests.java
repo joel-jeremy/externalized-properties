@@ -1,7 +1,5 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -49,7 +47,7 @@ public class PropertiesPropertyResolverTests {
             props.put("property.name", "property.value");
 
             PropertiesPropertyResolver resolver = resolverToTest(props);
-            ExternalizedPropertyResolverResult result = 
+            PropertiesPropertyResolver.Result result = 
                 resolver.resolve("property.nonstring", "property.name");
 
             assertTrue(result.hasResolvedProperties());
@@ -58,7 +56,7 @@ public class PropertiesPropertyResolverTests {
 
             assertEquals(
                 props.get("property.name"), 
-                result.findRequiredPropertyValue("property.name")
+                result.findRequiredProperty("property.name")
             );
         }
     }
@@ -72,7 +70,7 @@ public class PropertiesPropertyResolverTests {
             props.setProperty("property.name", "property.value");
             
             PropertiesPropertyResolver resolver = resolverToTest(props);
-            Optional<ResolvedProperty> result = resolver.resolve(
+            Optional<String> result = resolver.resolve(
                 "property.name"
             );
 
@@ -80,7 +78,7 @@ public class PropertiesPropertyResolverTests {
             assertTrue(result.isPresent());
             assertEquals(
                 props.getProperty("property.name"), 
-                result.get().value()
+                result.get()
             );
         }
 
@@ -91,7 +89,7 @@ public class PropertiesPropertyResolverTests {
         )
         public void test2() {
             PropertiesPropertyResolver resolver = resolverToTest(EMPTY_PROPERTIES);
-            Optional<ResolvedProperty> result = resolver.resolve(
+            Optional<String> result = resolver.resolve(
                 "nonexisting.property"
             );
             
@@ -118,14 +116,14 @@ public class PropertiesPropertyResolverTests {
                 unresolvedPropertyHandler
             );
 
-            Optional<ResolvedProperty> result = 
+            Optional<String> result = 
                 resolver.resolve("property.unresolvedhandler");
             
             assertNotNull(result);
             assertTrue(result.isPresent());
             assertEquals(
                 unresolvedPropertyHandler.apply("property.unresolvedhandler"), 
-                result.get().value()
+                result.get()
             );
         }
     }
@@ -140,7 +138,7 @@ public class PropertiesPropertyResolverTests {
             props.setProperty("property.name2", "property.value2");
             
             PropertiesPropertyResolver resolver = resolverToTest(props);
-            ExternalizedPropertyResolverResult result = resolver.resolve(
+            PropertiesPropertyResolver.Result result = resolver.resolve(
                 "property.name1",
                 "property.name2"
             );
@@ -150,12 +148,12 @@ public class PropertiesPropertyResolverTests {
 
             assertEquals(
                 props.getProperty("property.name1"), 
-                result.findRequiredPropertyValue("property.name1")
+                result.findRequiredProperty("property.name1")
             );
 
             assertEquals(
                 props.getProperty("property.name2"), 
-                result.findRequiredPropertyValue("property.name2")
+                result.findRequiredProperty("property.name2")
             );
         }
 
@@ -166,7 +164,7 @@ public class PropertiesPropertyResolverTests {
         )
         public void test2() {
             PropertiesPropertyResolver resolver = resolverToTest(EMPTY_PROPERTIES);
-            ExternalizedPropertyResolverResult result = resolver.resolve(
+            PropertiesPropertyResolver.Result result = resolver.resolve(
                 "nonexisting.property1",
                 "nonexisting.property2"
             );
@@ -195,7 +193,7 @@ public class PropertiesPropertyResolverTests {
                 unresolvedPropertyHandler
             );
 
-            ExternalizedPropertyResolverResult result = 
+            PropertiesPropertyResolver.Result result = 
                 resolver.resolve(
                     "property.unresolvedhandler1", 
                     "property.unresolvedhandler2"
@@ -206,12 +204,12 @@ public class PropertiesPropertyResolverTests {
 
             assertEquals(
                 unresolvedPropertyHandler.apply("property.unresolvedhandler1"), 
-                result.findRequiredPropertyValue("property.unresolvedhandler1")
+                result.findRequiredProperty("property.unresolvedhandler1")
             );
 
             assertEquals(
                 unresolvedPropertyHandler.apply("property.unresolvedhandler2"), 
-                result.findRequiredPropertyValue("property.unresolvedhandler2")
+                result.findRequiredProperty("property.unresolvedhandler2")
             );
         }
     }

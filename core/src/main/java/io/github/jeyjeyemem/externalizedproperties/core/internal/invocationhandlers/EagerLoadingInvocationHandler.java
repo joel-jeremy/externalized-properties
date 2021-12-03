@@ -1,19 +1,12 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.invocationhandlers;
 
+import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.DaemonThreadFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.WeakHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
@@ -23,13 +16,8 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Ar
  */
 public class EagerLoadingInvocationHandler implements InvocationHandler {
 
-    private final ScheduledExecutorService expiryScheduler = 
-        Executors.newSingleThreadScheduledExecutor(
-            new DaemonThreadFactory(EagerLoadingInvocationHandler.class.getName())
-        );
     private final InvocationHandler decorated;
-    private final WeakHashMap<Method, Object> weakCache;
-    private final Duration cacheItemLifetime;
+    private final CacheStrategy<Method, Object> cacheStrategy;
 
     /**
      * Constructor.
@@ -38,65 +26,47 @@ public class EagerLoadingInvocationHandler implements InvocationHandler {
      * @param externalizedProperties The externalized properties instance.
      * @param proxyInterface The proxy interface whose methods are annotated with
      * {@link ExternalizedProperty} annotations.
-     * @param cache The cache map.
-     * @param cacheItemLifetime The duration of cache items in the cache.
+     * @param cacheStrategy The cache strategy keyed by a {@link Method} and whose values
+     * are the eagerly resolved properties. This cache strategy should weakly hold on to the 
+     * {@link Method} key in order to avoid leaks and class unloading issues. 
      */
     public EagerLoadingInvocationHandler(
             InvocationHandler decorated,
             ExternalizedProperties externalizedProperties,
             Class<?> proxyInterface,
-            Map<Method, Object> cache,
-            Duration cacheItemLifetime
+            CacheStrategy<Method, Object> cacheStrategy
     ) {
-        requireNonNull(decorated, "decorated");
-        requireNonNull(externalizedProperties, "externalizedProperties");
-        requireNonNull(proxyInterface, "proxyInterface");
-
         this.decorated = requireNonNull(decorated, "decorated");
-        this.weakCache = new WeakHashMap<>(requireNonNull(cache, "cache"));
-        this.cacheItemLifetime = requireNonNull(cacheItemLifetime, "cacheItemLifetime");
+        this.cacheStrategy = requireNonNull(cacheStrategy, "cacheStrategy");
 
-        eagerLoadProperties(externalizedProperties, proxyInterface);
+        eagerLoadProperties(
+            requireNonNull(externalizedProperties, "externalizedProperties"),
+            cacheStrategy,
+            requireNonNull(proxyInterface, "proxyInterface")
+        );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Object cached = weakCache.get(method);
-        if (cached != null) {
-            return cached;
+        Optional<Object> cached = cacheStrategy.getFromCache(method);
+        if (cached.isPresent()) {
+            return cached.get();
         }
 
         Object result = decorated.invoke(proxy, method, args);
         if (result != null) {
-            weakCache.putIfAbsent(method, result);
-            scheduleForExpiry(() -> weakCache.remove(method));
+            cacheStrategy.cache(method, result);
         }
 
         return result;
     }
 
-    private void eagerLoadProperties(
+    private static void eagerLoadProperties(
             ExternalizedProperties externalizedProperties,
+            CacheStrategy<Method, Object> cacheStrategy,
             Class<?> proxyInterface
     ) {
-        Map<Method, Object> resolvedProperties = resolveProperties(
-            externalizedProperties,
-            proxyInterface
-        );
-
-        weakCache.putAll(resolvedProperties);
-        scheduleForExpiry(() -> weakCache.clear());
-    }
-
-    private Map<Method, Object> resolveProperties(
-            ExternalizedProperties externalizedProperties,
-            Class<?> proxyInterface
-    ) {
-        Map<Method, Object> resolvedValuesByMethod = new HashMap<>();
-
         for (Method method : proxyInterface.getDeclaredMethods()) {
             if (!method.isAnnotationPresent(ExternalizedProperty.class)) {
                 continue;
@@ -114,18 +84,8 @@ public class EagerLoadingInvocationHandler implements InvocationHandler {
             );
 
             if (result.isPresent()) {
-                resolvedValuesByMethod.put(method, result.get());
+                cacheStrategy.cache(method, result.get());
             }
         }
-
-        return resolvedValuesByMethod;
-    }
-
-    private void scheduleForExpiry(Runnable expiryAction) {
-        expiryScheduler.schedule(
-            expiryAction, 
-            cacheItemLifetime.toMillis(), 
-            TimeUnit.MILLISECONDS
-        );
     }
 }

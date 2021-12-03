@@ -4,7 +4,8 @@ import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBuilder;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertyException;
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.JavaPropertiesProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
@@ -89,6 +90,23 @@ public class ExternalizedPropertyMethodTests {
                     externalizedProperties,
                     null
                 ));
+        }
+    }
+
+    @Nested
+    class NameMethod {
+        @Test
+        @DisplayName("should return method name")
+        public void test1() {
+            String methodName = "property";
+
+            ExternalizedPropertyMethod externalizedPropertyMethod = 
+                externalizedPropertyMethod(
+                    BasicProxyInterface.class, 
+                    methodName
+                );
+            
+            assertEquals(methodName, externalizedPropertyMethod.name());
         }
     }
 
@@ -395,7 +413,7 @@ public class ExternalizedPropertyMethodTests {
                 );
 
             Type[] genericTypeParameters = 
-                externalizedPropertyMethod.genericReturnTypeGenericTypeParameters();
+                externalizedPropertyMethod.returnTypeGenericTypeParameters();
 
             // Optional has <String> generic type parameter
             assertTrue(genericTypeParameters.length > 0);
@@ -415,7 +433,7 @@ public class ExternalizedPropertyMethodTests {
                 );
 
             Type[] genericTypeParameters = 
-                externalizedPropertyMethod.genericReturnTypeGenericTypeParameters();
+                externalizedPropertyMethod.returnTypeGenericTypeParameters();
 
             // BasicProxyInterface.property returns a String which is not generic.
             assertTrue(genericTypeParameters.length == 0);
@@ -437,7 +455,7 @@ public class ExternalizedPropertyMethodTests {
                 );
 
             Optional<Type> genericTypeParameter = 
-                externalizedPropertyMethod.genericReturnTypeGenericTypeParameter(0);
+                externalizedPropertyMethod.returnTypeGenericTypeParameter(0);
 
             // Optional has <String> generic type parameter
             assertTrue(genericTypeParameter.isPresent());
@@ -458,7 +476,7 @@ public class ExternalizedPropertyMethodTests {
 
             // Index out of bounds. 
             Optional<Type> genericTypeParameter = 
-                externalizedPropertyMethod.genericReturnTypeGenericTypeParameter(99);
+                externalizedPropertyMethod.returnTypeGenericTypeParameter(99);
 
             assertFalse(genericTypeParameter.isPresent());
         }
@@ -476,7 +494,7 @@ public class ExternalizedPropertyMethodTests {
                 );
 
             Optional<Type> genericTypeParameter = 
-                externalizedPropertyMethod.genericReturnTypeGenericTypeParameter(0);
+                externalizedPropertyMethod.returnTypeGenericTypeParameter(0);
 
             // BasicProxyInterface.property returns a String which is not generic.
             assertFalse(genericTypeParameter.isPresent());
@@ -612,13 +630,13 @@ public class ExternalizedPropertyMethodTests {
 
         @Test
         @DisplayName(
-            "should rethrow same exception when default interface method throws an exception"
+            "should rethrow same runtime exception when default interface method throws an exception"
         )
         public void test3() {
             ExternalizedPropertyMethod externalizedPropertyMethod = 
                 externalizedPropertyMethod(
                     ThrowingProxyInterface.class, 
-                    "throwingProperty"
+                    "throwRuntimeException"
                 );
 
             assertThrows(
@@ -628,8 +646,25 @@ public class ExternalizedPropertyMethodTests {
         }
 
         @Test
-        @DisplayName("should receive method arguments")
+        @DisplayName(
+            "should wrap non-runtime exception thrown by default interface method"
+        )
         public void test4() {
+            ExternalizedPropertyMethod externalizedPropertyMethod = 
+                externalizedPropertyMethod(
+                    ThrowingProxyInterface.class, 
+                    "throwException"
+                );
+
+            assertThrows(
+                ExternalizedPropertiesException.class, 
+                () -> externalizedPropertyMethod.invokeDefaultInterfaceMethod(new String[0])
+            );
+        }
+
+        @Test
+        @DisplayName("should receive method arguments")
+        public void test5() {
             ExternalizedPropertyMethod externalizedPropertyMethod = 
                 externalizedPropertyMethod(
                     BasicProxyInterface.class, 
@@ -695,7 +730,7 @@ public class ExternalizedPropertyMethodTests {
                 );
 
             assertThrows(
-                UnresolvedPropertyException.class, 
+                UnresolvedPropertiesException.class, 
                 () -> externalizedPropertyMethod.determineDefaultValue(new String[0])
             );
         }

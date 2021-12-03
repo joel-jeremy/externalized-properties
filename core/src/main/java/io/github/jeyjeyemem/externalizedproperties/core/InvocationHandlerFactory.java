@@ -27,7 +27,7 @@ public interface InvocationHandlerFactory {
     default InvocationHandlerFactory compose(ComposeFunction compose) {
         return (externalizedProperties, proxyInterface) -> 
             compose.compose(
-                this::createInvocationHandler, 
+                createInvocationHandler(externalizedProperties, proxyInterface), 
                 externalizedProperties, 
                 proxyInterface
             );
@@ -41,13 +41,13 @@ public interface InvocationHandlerFactory {
          * Create an {@link InvocationHandler} based from the result of another 
          * invocation handler factory. 
          * 
-         * @param toDecorate The invocation handler factory to build from.
+         * @param toDecorate The invocation handler to build from.
          * @param externalizedProperties The externalized properties.
          * @param proxyInterface The proxy interface.
          * @return The {@link InvocationHandler} for the specified proxy interface.
          */
         InvocationHandler compose(
-            InvocationHandlerFactory toDecorate, 
+            InvocationHandler toDecorate, 
             ExternalizedProperties externalizedProperties,
             Class<?> proxyInterface
         );

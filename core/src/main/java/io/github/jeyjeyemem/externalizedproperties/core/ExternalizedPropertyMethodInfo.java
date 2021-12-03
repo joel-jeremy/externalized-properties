@@ -3,7 +3,11 @@ package io.github.jeyjeyemem.externalizedproperties.core;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.Optional;
 
 /**
@@ -43,6 +47,13 @@ public interface ExternalizedPropertyMethodInfo {
      * with the specified annotation. Otherwise, {@code false}.
      */
     <T extends Annotation> boolean hasAnnotation(Class<T> annotationClass);
+
+    /**
+     * The externalized property method name.
+     * 
+     * @return The externalized property method name.
+     */
+    String name();
 
     /**
      * The externalized property method return type.
@@ -92,23 +103,27 @@ public interface ExternalizedPropertyMethodInfo {
 
     /**
      * <p>The externalized property method return type's generic type parameters, 
-     * if the return type is a generic type e.g. {@code Optional<String>}. 
+     * if the return type is a generic parameterized type e.g. {@code List<String>}. 
      * 
      * <p>For example, if {@link #genericReturnType()} returns a parameterized type 
-     * e.g. {@code List<String>}, this method shall return a list containing a {@code String} type/class.
+     * e.g. {@code List<String>}, this method shall return an array containing a {@code String} type/class.
      * 
-     * <p>Another example is if {@link #genericReturnType()} returns an array with a 
-     * generic component type e.g. {@code Optional<Integer>[]}, this method shall return a 
-     * list containing an {@code Integer} type/class.
+     * <p>Another example is if {@link #genericReturnType()} returns an array type with a 
+     * generic component type e.g. {@code Optional<Integer>[]}, this method shall return an 
+     * array containing an {@code Integer} type/class.
      * 
      * <p>It is also possible to have {@link #genericReturnType()} return a parameterized type 
      * which contains another parameterized type parameter e.g. {@code Optional<List<String>>}, 
-     * in this case, this method shall return a list containing a {@code List<String>} parameterized type.
+     * in this case, this method shall return an array containing a {@code List<String>} parameterized type.
      * 
-     * @return The list of generic return type parameters, if the return type is a generic type 
+     * @return The array of generic return type parameters, if the return type is a generic parameterized type 
      * e.g. {@code Optional<String>}.
+     * @see ParameterizedType
+     * @see GenericArrayType
+     * @see WildcardType
+     * @see TypeVariable
      */
-    Type[] genericReturnTypeGenericTypeParameters();
+    Type[] returnTypeGenericTypeParameters();
 
     /**
      * <p>The externalized property method return type's generic type parameter, if the return type is
@@ -121,7 +136,7 @@ public interface ExternalizedPropertyMethodInfo {
      * @return The generic return type parameter, if the return type is a generic type 
      * e.g. {@code Optional<String>}.
      */
-    Optional<Type> genericReturnTypeGenericTypeParameter(int typeParameterIndex);
+    Optional<Type> returnTypeGenericTypeParameter(int typeParameterIndex);
     
     /**
      * Check whether the externalized property method is a default interface method.

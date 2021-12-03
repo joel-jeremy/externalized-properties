@@ -1,9 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
@@ -78,7 +77,7 @@ public class EnumConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.enum", "ONE")
+                    TestEnum.ONE.name()
                 );
 
             TestEnum testEnum = handler.convert(context);
@@ -105,7 +104,7 @@ public class EnumConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.enum", "INVALID_ENUM_VALUE")
+                    "INVALID_ENUM_VALUE"
                 );
 
             assertThrows(ConversionException.class, () -> {

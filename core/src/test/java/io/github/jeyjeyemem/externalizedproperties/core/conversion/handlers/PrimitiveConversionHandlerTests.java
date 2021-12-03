@@ -1,9 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
@@ -132,9 +131,8 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.list", "a,b,c"),
-                    List.class, // Expected type is a List.
-                    String.class
+                    "a,b,c",
+                    propertyMethodInfo.genericReturnType() // Expected type is a List
                 );
             
             assertThrows(
@@ -167,14 +165,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethod,
-                    ResolvedProperty.with("property.integer.wrapper", "1")
+                    "1"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethod,
-                    ResolvedProperty.with("property.integer.primitive", "2")
+                    "2"
                 );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -214,14 +212,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethod,
-                    ResolvedProperty.with("property.long.wrapper", "1")
+                    "1"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethod,
-                    ResolvedProperty.with("property.long.primitive", "2")
+                    "2"
                 );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -261,14 +259,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethod,
-                    ResolvedProperty.with("property.float.wrapper", "1.0")
+                    "1.0"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethod,
-                    ResolvedProperty.with("property.float.primitive", "2.0")
+                    "2.0"
                 );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -308,14 +306,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethod,
-                    ResolvedProperty.with("property.double.wrapper", "1.0")
+                    "1.0"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethod,
-                    ResolvedProperty.with("property.double.primitive", "2.0")
+                    "2.0"
                 );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -355,14 +353,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethod,
-                    ResolvedProperty.with("property.short.wrapper", "1")
+                    "1"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethod,
-                    ResolvedProperty.with("property.short.primitive", "2")
+                    "2"
                 );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -402,14 +400,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethod,
-                    ResolvedProperty.with("property.boolean.wrapper", "true")
+                    "true"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethod,
-                    ResolvedProperty.with("property.boolean.primitive", "false")
+                    "false"
                 );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -449,14 +447,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethodInfo,
-                    ResolvedProperty.with("property.boolean.wrapper", "invalid_boolean")
+                    "invalid_boolean"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethodInfo,
-                    ResolvedProperty.with("property.boolean.primitive", "invalid_boolean")
+                    "invalid_boolean"
                 );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -496,14 +494,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethod,
-                    ResolvedProperty.with("property.byte.wrapper", "1")
+                    "1"
                 );
             
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethod,
-                    ResolvedProperty.with("property.byte.primitive", "2")
+                    "2"
                 );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -543,14 +541,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethodInfo,
-                    ResolvedProperty.with("property.byte.wrapper", "invalid_byte")
+                    "invalid_byte"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethodInfo,
-                    ResolvedProperty.with("property.byte.primitive", "invalid_byte")
+                    "invalid_byte"
                 );
             
             assertThrows(ConversionException.class, () -> {
@@ -586,14 +584,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethodInfo,
-                    ResolvedProperty.with("property.short.wrapper", "invalid_short")
+                    "invalid_short"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethodInfo,
-                    ResolvedProperty.with("property.short.primitive", "invalid_short")
+                    "invalid_short"
                 );
             
             assertThrows(ConversionException.class, () -> {
@@ -629,14 +627,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethodInfo,
-                    ResolvedProperty.with("property.int.wrapper", "invalid_int")
+                    "invalid_int"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethodInfo,
-                    ResolvedProperty.with("property.int.primitive", "invalid_int")
+                    "invalid_int"
                 );
             
             assertThrows(ConversionException.class, () -> {
@@ -672,14 +670,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethodInfo,
-                    ResolvedProperty.with("property.long.wrapper", "invalid_long")
+                    "invalid_long"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethodInfo,
-                    ResolvedProperty.with("property.long.primitive", "invalid_long")
+                    "invalid_long"
                 );
             
             assertThrows(ConversionException.class, () -> {
@@ -715,14 +713,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethodInfo,
-                    ResolvedProperty.with("property.float.wrapper", "invalid_float")
+                    "invalid_float"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethodInfo,
-                    ResolvedProperty.with("property.float.primitive", "invalid_float")
+                    "invalid_float"
                 );
             
             assertThrows(ConversionException.class, () -> {
@@ -758,14 +756,14 @@ public class PrimitiveConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     wrapperPropertyMethodInfo,
-                    ResolvedProperty.with("property.double.wrapper", "invalid_double")
+                    "invalid_double"
                 );
 
             PropertyMethodConversionContext primitiveContext = 
                 new PropertyMethodConversionContext(
                     converter,
                     primitivePropertyMethodInfo,
-                    ResolvedProperty.with("property.double.primitive", "invalid_double")
+                    "invalid_double"
                 );
             
             assertThrows(ConversionException.class, () -> {

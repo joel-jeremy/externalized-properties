@@ -1,15 +1,10 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.invocationhandlers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.internal.DaemonThreadFactory;
+import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.time.Duration;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.Optional;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
@@ -19,54 +14,37 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Ar
 public class CachingInvocationHandler implements InvocationHandler {
 
     private final InvocationHandler decorated;
-    private final WeakHashMap<Method, Object> weakCache;
-    private final Duration cacheItemLifetime;
-    private final ScheduledExecutorService expiryScheduler = 
-        Executors.newSingleThreadScheduledExecutor(
-            new DaemonThreadFactory(CachingInvocationHandler.class.getName())
-        );
+    private final CacheStrategy<Method, Object> cacheStrategy;
 
     /**
      * Constructor.
      * 
      * @param decorated The decorated {@link InvocationHandler} instance.
-     * @param cache The cache map.
-     * @param cacheItemLifetime The duration of cache items in the cache.
+     * @param cacheStrategy The cache strategy keyed by a {@link Method} and whose values
+     * are the resolved properties. This cache strategy should weakly hold on to the 
+     * {@link Method} key in order to avoid leaks and class unloading issues. 
      */
     public CachingInvocationHandler(
             InvocationHandler decorated,
-            Map<Method, Object> cache,
-            Duration cacheItemLifetime
+            CacheStrategy<Method, Object> cacheStrategy
     ) {
         this.decorated = requireNonNull(decorated, "decorated");
-        this.weakCache = new WeakHashMap<>(requireNonNull(cache, "cache"));
-        this.cacheItemLifetime = requireNonNull(cacheItemLifetime, "cacheItemLifetime");
+        this.cacheStrategy = requireNonNull(cacheStrategy, "cacheStrategy");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Object cached = weakCache.get(method);
-        if (cached != null) {
-            return cached;
+        Optional<Object> cached = cacheStrategy.getFromCache(method);
+        if (cached.isPresent()) {
+            return cached.get();
         }
 
         Object result = decorated.invoke(proxy, method, args);
         if (result != null) {
-            weakCache.putIfAbsent(method, result);
-            scheduleForExpiry(() -> weakCache.remove(method));
+            cacheStrategy.cache(method, result);
         }
 
         return result;
-    }
-
-    private void scheduleForExpiry(Runnable expireTask) {
-        expiryScheduler.schedule(
-            expireTask, 
-            cacheItemLifetime.toMillis(), 
-            TimeUnit.MILLISECONDS
-        );
     }
 }

@@ -1,11 +1,10 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ListProxyInterface;
@@ -90,7 +89,7 @@ public class CollectionConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.list", "value1,value2,value3")
+                    "value1,value2,value3"
                 );
 
             List<?> list = handler.convert(context);
@@ -122,7 +121,7 @@ public class CollectionConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.list", "value1#value2#value3")
+                    "value1#value2#value3"
                 );
 
             List<?> list = handler.convert(context);
@@ -157,7 +156,7 @@ public class CollectionConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.list.integer", "1,2,3")
+                    "1,2,3"
                 );
             
             List<?> list = handler.convert(context);
@@ -190,7 +189,7 @@ public class CollectionConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.list.wildcard", "value1,value2,value3")
+                    "value1,value2,value3"
                 );
 
             List<?> list = handler.convert(context);
@@ -223,10 +222,7 @@ public class CollectionConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with(
-                        "property.list.object", 
-                        "value1,value2,value3"
-                    )
+                    "value1,value2,value3"
                 );
 
             List<?> list = handler.convert(context);
@@ -259,7 +255,7 @@ public class CollectionConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.list", "") // Empty value.
+                    "" // Empty value.
                 );
 
             List<?> list = handler.convert(context);
@@ -286,7 +282,7 @@ public class CollectionConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.list", "value1,,value3,,value5") // Has empty values.
+                    "value1,,value3,,value5" // Has empty values.
                 );
 
             List<?> list = handler.convert(context);
@@ -319,10 +315,7 @@ public class CollectionConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with(
-                        "property.list.stripempty", 
-                        "value1,,value3,,value5" // Has empty values.
-                    )
+                    "value1,,value3,,value5" // Has empty values.
                 );
 
             List<?> list = handler.convert(context);
@@ -359,7 +352,7 @@ public class CollectionConversionHandlerTests {
                     new PropertyMethodConversionContext(
                         converter,
                         propertyMethodInfo,
-                        ResolvedProperty.with("property.list.integer", "1,2,3,4,5")
+                        "1,2,3,4,5"
                     )
                 );
             });
@@ -389,10 +382,7 @@ public class CollectionConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with(
-                        "property.list.nested.generics", 
-                        "value1,value2,value3"
-                    )
+                    "value1,value2,value3"
                 );
 
             List<?> list = handler.convert(context);
@@ -435,10 +425,7 @@ public class CollectionConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with(
-                        "property.list.nested.generics.array", 
-                        "value1,value2,value3"
-                    )
+                    "value1,value2,value3"
                 );
 
             List<?> list = handler.convert(context);
@@ -487,7 +474,7 @@ public class CollectionConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.list.T", "value")
+                    "value"
                 );
                 
             assertThrows(
@@ -516,7 +503,7 @@ public class CollectionConversionHandlerTests {
                 new PropertyMethodConversionContext(
                     converter,
                     propertyMethodInfo,
-                    ResolvedProperty.with("property.list", "value1,value2,value3"),
+                    "value1,value2,value3",
                     List.class
                 );
                 

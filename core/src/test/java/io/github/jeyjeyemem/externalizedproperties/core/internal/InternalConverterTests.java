@@ -1,9 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.PrimitiveConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
@@ -54,7 +53,7 @@ public class InternalConverterTests {
     class ConvertMethod {
         @Test
         @DisplayName(
-            "should throw when conversion context argument is null."
+            "should throw when value argument is null."
         )
         public void test1() {
             InternalConverter converter = converter(
@@ -63,7 +62,22 @@ public class InternalConverterTests {
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> converter.convert(null)
+                () -> converter.convert(null, Integer.class)
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when expected type argument is null."
+        )
+        public void test2() {
+            InternalConverter converter = converter(
+                new PrimitiveConversionHandler()
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> converter.convert("value", null)
             );
         }
 
@@ -71,7 +85,7 @@ public class InternalConverterTests {
         @DisplayName(
             "should correctly convert to expected type."
         )
-        public void test2() {
+        public void test3() {
             InternalConverter converter = converter(
                 new PrimitiveConversionHandler()
             );
@@ -82,20 +96,14 @@ public class InternalConverterTests {
                     "intPrimitiveProperty"
                 );
 
-            Class<Integer> expectedType = Integer.class;
-
-            PropertyMethodConversionContext context = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    propertyMethod, 
-                    ResolvedProperty.with("property.integer.primitive", "1"), 
-                    expectedType
-                );
-
-            Object convertedValue = converter.convert(context);
+            Object convertedValue = converter.convert(
+                propertyMethod,
+                "1",
+                propertyMethod.genericReturnType()
+            );
 
             assertNotNull(convertedValue);
-            assertEquals(expectedType, convertedValue.getClass());
+            assertEquals(Integer.class, convertedValue.getClass());
             assertEquals(1, convertedValue);
         }
 
@@ -103,7 +111,7 @@ public class InternalConverterTests {
         @DisplayName(
             "should throw when there is no handler that can convert to expected type."
         )
-        public void test3() {
+        public void test4() {
             InternalConverter converter = converter(
                 new PrimitiveConversionHandler()
             );
@@ -115,19 +123,13 @@ public class InternalConverterTests {
                 );
 
             // No handler registered to convert to TestEnum.
-            Class<?> expectedType = TestEnum.class;
-
-            PropertyMethodConversionContext context = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    propertyMethod, 
-                    ResolvedProperty.with("enumProperty", TestEnum.ONE.name()), 
-                    expectedType
-                );
-
             assertThrows(
                 ConversionException.class, 
-                () -> converter.convert(context)
+                () -> converter.convert(
+                    propertyMethod, 
+                    TestEnum.ONE.name(), 
+                    propertyMethod.genericReturnType()
+                )
             );
         }
 
@@ -135,7 +137,7 @@ public class InternalConverterTests {
         @DisplayName(
             "should wrap and re-throw when handler has thrown an exception."
         )
-        public void test4() {
+        public void test5() {
             // Handler that can convert anything but always throws.
             ConversionHandler<?> throwingHandler = 
                 new ConversionHandler<Object>() {
@@ -164,19 +166,13 @@ public class InternalConverterTests {
                     "intPrimitiveProperty"
                 );
 
-            Class<?> expectedType = Integer.class;
-
-            PropertyMethodConversionContext context = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    propertyMethod, 
-                    ResolvedProperty.with("property.integer.primitive", "1"), 
-                    expectedType
-                );
-
             assertThrows(
                 ConversionException.class, 
-                () -> converter.convert(context)
+                () -> converter.convert(
+                    propertyMethod,
+                    "1",
+                    propertyMethod.genericReturnType()
+                )
             );
         }
 

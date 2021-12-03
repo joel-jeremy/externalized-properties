@@ -30,6 +30,9 @@ public interface ArrayProxyInterface {
     @ExternalizedProperty("property.array.generic")
     Optional<String>[] arrayPropertyGeneric();
 
+    @ExternalizedProperty("property.array.generic.nested")
+    Optional<Optional<String>>[] arrayPropertyNestedGeneric();
+
     @ExternalizedProperty("property.array.generic.wildcard")
     Optional<?>[] arrayPropertyGenericWildcard();
 

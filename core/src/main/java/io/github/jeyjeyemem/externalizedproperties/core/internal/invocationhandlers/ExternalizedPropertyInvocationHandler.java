@@ -7,8 +7,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.internal.MethodHandleFac
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.Arrays;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
@@ -19,13 +18,6 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Ar
 public class ExternalizedPropertyInvocationHandler implements InvocationHandler {
     private final ExternalizedProperties externalizedProperties;
     private final MethodHandleFactory methodHandleFactory = new MethodHandleFactory();
-    // Take care not holding a strong reference to the Method instance inside
-    // the ExternalizedPropertyMethod.
-    private final Map<Method, ExternalizedPropertyMethod> weakMethodCache = 
-        new WeakHashMap<>();
-    // 3 native object methods handling: equals, hashCode, toString
-    private final Map<Method, ObjectMethod> nativeObjectMethods =
-        new WeakHashMap<>(3);
 
     /**
      * Constructor.
@@ -39,24 +31,6 @@ public class ExternalizedPropertyInvocationHandler implements InvocationHandler 
             externalizedProperties,
             "externalizedProperties"
         );
-
-        // Native object method functions.
-        try {
-            nativeObjectMethods.put(
-                Object.class.getDeclaredMethod("equals", Object.class), 
-                ExternalizedPropertyInvocationHandler::proxyEquals
-            );
-            nativeObjectMethods.put(
-                Object.class.getDeclaredMethod("toString"), 
-                ExternalizedPropertyInvocationHandler::proxyToString
-            );
-            nativeObjectMethods.put(
-                Object.class.getDeclaredMethod("hashCode"), 
-                ExternalizedPropertyInvocationHandler::proxyHashCode
-            );
-        } catch (Exception ex) {
-            throw new IllegalStateException("Failed to load Object methods.", ex);
-        }
     }
 
     /**
@@ -71,23 +45,35 @@ public class ExternalizedPropertyInvocationHandler implements InvocationHandler 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // Handle invocations to native Object methods:
         // toString, equals, hashCode
-        ObjectMethod objectMethod = nativeObjectMethods.get(method);
-        if (objectMethod != null) {
-            return objectMethod.invoke(proxy, args);
+        Object objectMethodResult = handleIfObjectMethod(proxy, method, args);
+        if (objectMethodResult != null) {
+            return objectMethodResult;
         }
 
-        ExternalizedPropertyMethod propertyMethod = weakMethodCache.get(method);
-        if (propertyMethod == null) {
-            propertyMethod = ExternalizedPropertyMethod.create(
-                proxy, 
-                method,
-                externalizedProperties,
-                methodHandleFactory
-            );
-            weakMethodCache.putIfAbsent(method, propertyMethod);
-        }
+        ExternalizedPropertyMethod propertyMethod = ExternalizedPropertyMethod.create(
+            proxy, 
+            method,
+            externalizedProperties,
+            methodHandleFactory
+        );
 
         return propertyMethod.resolveProperty(args);
+    }
+    
+    // Avoid calling methods in proxy object to avoid recursion.
+    private static Object handleIfObjectMethod(Object proxy, Method method, Object[] args) {
+        if ("toString".equals(method.getName())) {
+            return proxyToString(proxy, args);
+        }
+        else if ("equals".equals(method.getName()) && 
+                hasMethodParameters(method, Object.class)) {
+            return proxyEquals(proxy, args);
+        }
+        else if ("hashCode".equals(method.getName())) {
+            return proxyHashCode(proxy, args);
+        }
+
+        return null;
     }
 
     private static int proxyHashCode(Object proxy, Object[] args) {
@@ -104,7 +90,7 @@ public class ExternalizedPropertyInvocationHandler implements InvocationHandler 
             Integer.toHexString(proxyHashCode(proxy, args));
     }
 
-    private static interface ObjectMethod {
-        Object invoke(Object proxy, Object[] args);
+    private static boolean hasMethodParameters(Method method, Class<?>... parameterTypes) {
+        return Arrays.equals(method.getParameterTypes(), parameterTypes);
     }
 }

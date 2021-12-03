@@ -1,11 +1,10 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.StripEmptyValues;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
@@ -21,7 +20,7 @@ import java.util.stream.IntStream;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
 /**
- * Supports conversion of resolved properties to an array.
+ * Supports conversion of values to an array.
  * 
  * @implNote By default, this uses ',' as default delimiter when splitting resolved property values.
  * This can overriden by annotating the externalized property method with {@link Delimiter} annotation
@@ -39,6 +38,7 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
         return expectedType != null && expectedType.isArray();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Object[] convert(ConversionContext context) {
         requireNonNull(context, "context");
@@ -74,19 +74,15 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
                 return values;
             }
 
-            // Generic array component type handling.
+            // Generic array component type handling e.g. Optional<String>[]
             GenericArrayType genericArrayType = TypeUtilities.asGenericArrayType(context.expectedType());
             if (genericArrayType != null) {
                 Type genericArrayComponentType = genericArrayType.getGenericComponentType();
-                
-                Type[] genericTypeParametersOfGenericArrayComponentType = 
-                    TypeUtilities.getTypeParameters(genericArrayComponentType);
             
                 return convertValuesToArrayComponentType(
                     context,
                     values, 
-                    genericArrayComponentType,
-                    genericTypeParametersOfGenericArrayComponentType
+                    genericArrayComponentType
                 );
             }
 
@@ -94,15 +90,13 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
             return convertValuesToArrayComponentType(
                 context,
                 values, 
-                rawArrayComponentType,
-                new Type[0]
+                rawArrayComponentType
             );
         } catch (Exception ex) {
             throw new ConversionException(
                 String.format(
-                    "Failed to convert property %s to an array. Property value: %s",
-                    context.resolvedProperty().name(),
-                    context.resolvedProperty().value()
+                    "Failed to convert value to an array: %s",
+                    context.value()
                 ),  
                 ex
             );
@@ -112,26 +106,17 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
     private Object[] convertValuesToArrayComponentType(
             ConversionContext context, 
             String[] values,
-            Type arrayComponentType, 
-            Type[] arrayComponentTypeGenericTypeParameters
+            Type arrayComponentType
     ) {
         Converter converter = context.converter();
 
         // Convert and return values.
-        return IntStream.range(0, values.length).mapToObj(i -> {
-            String value = values[i];
-            return converter.convert(
-                new ConversionContext(
-                    converter,
-                    ResolvedProperty.with(
-                        indexedName(context.resolvedProperty().name(), i),
-                        value
-                    ), 
-                    arrayComponentType,
-                    arrayComponentTypeGenericTypeParameters
-                )
-            );
-        })
+        return IntStream.range(0, values.length).mapToObj(i ->
+            converter.convert(
+                values[i], 
+                arrayComponentType
+            )
+        )
         .toArray(arrayLength -> (Object[])Array.newInstance(
             TypeUtilities.getRawType(arrayComponentType), 
             arrayLength
@@ -142,8 +127,8 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
             ConversionContext context,
             ExternalizedPropertyMethodInfo externalizedPropertyMethodInfo
     ) {
-        String propertyValue = context.resolvedProperty().value();
-        if (propertyValue.isEmpty()) {
+        String value = context.value();
+        if (value.isEmpty()) {
             return new String[0];
         }
 
@@ -155,14 +140,14 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
 
             if (externalizedPropertyMethodInfo.hasAnnotation(StripEmptyValues.class)) {
                 // Filter empty values.
-                return Arrays.stream(propertyValue.split(delimiter))
+                return Arrays.stream(value.split(delimiter))
                     .filter(v -> !v.isEmpty())
                     .toArray(String[]::new);
             }
-            return propertyValue.split(Pattern.quote(delimiter));
+            return value.split(Pattern.quote(delimiter));
         }
 
-        return propertyValue.split(Pattern.quote(DEFAULT_DELIMITER));
+        return value.split(Pattern.quote(DEFAULT_DELIMITER));
     }
 
     private void throwIfArrayHasTypeVariables(ConversionContext context) {
@@ -175,9 +160,5 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
                 );
             }
         }
-    }
-
-    private static String indexedName(String name, int index) {
-        return name + "[" + index + "]";
     }
 }

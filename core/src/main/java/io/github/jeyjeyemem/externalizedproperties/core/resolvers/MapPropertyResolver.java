@@ -1,13 +1,9 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -34,7 +30,7 @@ public class MapPropertyResolver implements ExternalizedPropertyResolver {
      */
     public MapPropertyResolver(Map<String, String> propertySource) {
         this(
-            requireNonNull(propertySource, "propertySource"), 
+            propertySource, 
             NULL_UNRESOLVED_PROPERTY_HANDLER
         );
     }
@@ -46,7 +42,7 @@ public class MapPropertyResolver implements ExternalizedPropertyResolver {
      * @param unresolvedPropertyHandler Any properties not found in the source properties will tried 
      * to be resolved via this handler. This should accept a property name and return the property value 
      * for the given property name. {@code null} return values are allowed but will be discarded when 
-     * building the {@link ExternalizedPropertyResolverResult}.
+     * building the {@link Result}.
      */
     public MapPropertyResolver(
             Map<String, String> propertySource,
@@ -68,7 +64,7 @@ public class MapPropertyResolver implements ExternalizedPropertyResolver {
      * @return The resolved property value. Otherwise, an empty {@link Optional}.
      */
     @Override
-    public Optional<ResolvedProperty> resolve(String propertyName) {
+    public Optional<String> resolve(String propertyName) {
         requireNonNullOrEmptyString(propertyName, "propertyName");
 
         return Optional.ofNullable(getPropertyOrNull(propertyName));
@@ -77,30 +73,27 @@ public class MapPropertyResolver implements ExternalizedPropertyResolver {
     /**
      * Resolve properties from a given properties map.
      * 
-     * @return The {@link ExternalizedPropertyResolverResult} which contains the resolved properties
+     * @return The {@link Result} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
-    public ExternalizedPropertyResolverResult resolve(Collection<String> propertyNames) {
+    public Result resolve(Collection<String> propertyNames) {
         requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
 
-        List<ResolvedProperty> resolvedProperties = new ArrayList<>(propertyNames.size());
+        Result.Builder resultBuilder = Result.builder(propertyNames);
 
         for (String propertyName : propertyNames) {
             throwIfNullOrEmptyValue(propertyName);
-            ResolvedProperty resolved = getPropertyOrNull(propertyName);
-            if (resolved != null) {
-                resolvedProperties.add(resolved);
+            String resolvedPropertyValue = getPropertyOrNull(propertyName);
+            if (resolvedPropertyValue != null) {
+                resultBuilder.add(propertyName, resolvedPropertyValue);
             }
         }
 
-        return new ExternalizedPropertyResolverResult(
-            propertyNames, 
-            resolvedProperties
-        );
+        return resultBuilder.build();
     }
 
-    private ResolvedProperty getPropertyOrNull(String propertyName) {
+    private String getPropertyOrNull(String propertyName) {
         String propertyValue = propertySource.get(propertyName);
         if (propertyValue == null) {
             // Try to resolve from unresolved handler and cache result.
@@ -113,7 +106,7 @@ public class MapPropertyResolver implements ExternalizedPropertyResolver {
             propertySource.putIfAbsent(propertyName, propertyValue);
         }
         
-        return ResolvedProperty.with(propertyName, propertyValue);
+        return propertyValue;
     }
 
     private void throwIfNullOrEmptyValue(String propertyName) {

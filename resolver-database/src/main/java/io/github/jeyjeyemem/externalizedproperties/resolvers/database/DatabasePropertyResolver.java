@@ -1,12 +1,12 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -18,66 +18,70 @@ import java.util.Optional;
  * from a database.
  */
 public class DatabasePropertyResolver implements ExternalizedPropertyResolver {
-    private final EntityManagerFactory entityManagerFactory;
-    private final QueryExecutor queryRunner;
+    private final ConnectionProvider connectionProvider;
+    private final QueryExecutor queryExecutor;
 
     /**
-     * Constructor.
+     * Constructor. This will use {@link SimpleNameValueQueryExecutor} to
+     * execute queries when resolving properties.
      * 
-     * @param entityManagerFactory The entity manager factory.
+     * @param connectionProvider The connection provider.
      */
-    public DatabasePropertyResolver(EntityManagerFactory entityManagerFactory) {
-        this(
-            entityManagerFactory, 
-            new SimpleNameValueQueryExecutor()
-        );
+    public DatabasePropertyResolver(ConnectionProvider connectionProvider) {
+        this(connectionProvider, new SimpleNameValueQueryExecutor());
     }
 
     /**
      * Constructor.
      * 
-     * @param entityManagerFactory The entity manager factory.
-     * @param queryRunner The query runner which handles the actual database query.
+     * @param connectionProvider The connection provider.
+     * @param queryExecutor The query executor to resolve properties from the database.
      */
     public DatabasePropertyResolver(
-            EntityManagerFactory entityManagerFactory,
-            QueryExecutor queryRunner
+            ConnectionProvider connectionProvider,
+            QueryExecutor queryExecutor
     ) {
-        if (entityManagerFactory == null) {
-            throw new IllegalArgumentException("entityManagerFactory must not be null.");
+        if (connectionProvider == null) {
+            throw new IllegalArgumentException("connectionProvider must not be null.");
         }
-
-        if (queryRunner == null) {
-            throw new IllegalArgumentException("queryRunner must not be null.");
+        if (queryExecutor == null) {
+            throw new IllegalArgumentException("queryExecutor must not be null.");
         }
-        
-        this.entityManagerFactory = entityManagerFactory;
-        this.queryRunner = queryRunner;
+        this.connectionProvider = connectionProvider;
+        this.queryExecutor = queryExecutor;
     }
 
     /**
      * Resolve property from database.
      * 
-     * @return The {@link ExternalizedPropertyResolverResult} which contains the resolved properties
+     * @return The {@link Result} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
-    public Optional<ResolvedProperty> resolve(String propertyName) {
+    public Optional<String> resolve(String propertyName) {
         if (propertyName == null || propertyName.isEmpty()) {
             throw new IllegalArgumentException("propertyName must not be null or empty.");
         }
-        ExternalizedPropertyResolverResult result = getFromDatabase(Arrays.asList(propertyName));
-        return result.findResolvedProperty(propertyName);
+        
+        try {
+            Result result = getFromDatabase(Arrays.asList(propertyName));
+            return result.findResolvedProperty(propertyName);
+        } catch (SQLException e) {
+            throw new ExternalizedPropertiesException(
+                "Exception occurred while trying to resolve properties from database.",
+                e
+            );
+        }
     }
 
     /**
      * Resolve properties from database.
      * 
-     * @return The {@link ExternalizedPropertyResolverResult} which contains the resolved properties
+     * @return The {@link Result} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
-    public ExternalizedPropertyResolverResult resolve(
+    public Result resolve(
             Collection<String> propertyNames
     ) {
         if (propertyNames == null || propertyNames.isEmpty()) {
@@ -86,25 +90,30 @@ public class DatabasePropertyResolver implements ExternalizedPropertyResolver {
         if (propertyNames.stream().anyMatch(Objects::isNull)) {
             throw new IllegalArgumentException("propertyNames must not contain null values.");
         }
-        return getFromDatabase(propertyNames);
+        try {
+            return getFromDatabase(propertyNames);
+        } catch (SQLException e) {
+            throw new ExternalizedPropertiesException(
+                "Exception occurred while trying to resolve properties from database.",
+                e
+            );
+        }
     }
 
-    private ExternalizedPropertyResolverResult getFromDatabase(
+    private Result getFromDatabase(
             Collection<String> propertyNames
-    ) {
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-        try {
+    ) throws SQLException {
+        try (Connection connection = connectionProvider.getConnection()) {
             List<ResolvedProperty> resolvedProperties = 
-                queryRunner.queryProperties(entityManager, propertyNames);
+                queryExecutor.queryProperties(connection, propertyNames);
 
-            return new ExternalizedPropertyResolverResult(
-                propertyNames,
-                resolvedProperties
+            Result.Builder resultBuilder = Result.builder(propertyNames);
+            
+            resolvedProperties.forEach(resolved -> 
+                resultBuilder.add(resolved.name(), resolved.value())
             );
-        } finally {
-            if (entityManager.isOpen()) {
-                entityManager.close();
-            }
+            
+            return resultBuilder.build();
         }
     }
 }

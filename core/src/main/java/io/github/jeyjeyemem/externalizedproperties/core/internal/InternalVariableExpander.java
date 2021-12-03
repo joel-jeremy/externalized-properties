@@ -1,12 +1,11 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.StringUtilities;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNullOrEmptyString;
 
 /**
  * The default {@link VariableExpander} implementation.
@@ -15,34 +14,59 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Ar
  * @implNote By default, this will match the basic pattern: ${variable}
  */
 public class InternalVariableExpander implements VariableExpander {
+
+    private static final String DEFAULT_VARIABLE_PREFIX = "${";
+    private static final String DEFAULT_VARIABLE_END_SUFFIX = "}";
+
     private final ExternalizedPropertyResolver externalizedPropertyResolver;
+    private final String variablePrefix;
+    private final String variableSuffix;
 
     /**
      * Construct a string variable expander which looks up variable values
      * from the externalized property resolver.
      * 
-     * @param externalizedPropertyResolver The externalized property resolver to lookup variable values from.
+     * @param externalizedPropertyResolver The externalized property resolver to 
+     * lookup variable values from.
      */
-    public InternalVariableExpander(ExternalizedPropertyResolver externalizedPropertyResolver) {
-        this.externalizedPropertyResolver = requireNonNull(
+    public InternalVariableExpander(
+            ExternalizedPropertyResolver externalizedPropertyResolver
+    ) {
+        this(
             externalizedPropertyResolver, 
-            "externalizedPropertyResolver"
+            DEFAULT_VARIABLE_PREFIX, 
+            DEFAULT_VARIABLE_END_SUFFIX
         );
     }
 
     /**
-     * {@inheritDoc}
+     * Construct a string variable expander which uses a custom variable prefix and suffix 
+     * and looks up variable values from the externalized property resolver.
+     * 
+     * @param externalizedPropertyResolver The externalized property resolver to 
+     * lookup variable values from.
+     * @param variablePrefix The variable prefix to look for when expanding variables.
+     * @param variableSuffix The variable suffix to look for when expanding variables.
      */
+    public InternalVariableExpander(
+            ExternalizedPropertyResolver externalizedPropertyResolver,
+            String variablePrefix,
+            String variableSuffix
+    ) {
+        this.externalizedPropertyResolver = requireNonNull(
+            externalizedPropertyResolver,
+            "externalizedPropertyResolver"
+        );
+        this.variablePrefix = requireNonNullOrEmptyString(variablePrefix, "variablePrefix");
+        this.variableSuffix = requireNonNullOrEmptyString(variableSuffix, "variableSuffix");
+    }
+
+    /** {@inheritDoc} */
     @Override
     public String expandVariables(String value) {
         requireNonNull(value, "value");
-        
-        if (value.isEmpty()) {
-            return value;
-        }
-
         try {
-            return StringUtilities.replaceVariables(value, this::resolvePropertyValue);
+            return expandVariables(new StringBuilder(value)).toString();
         } catch (Exception ex) {
             throw new VariableExpansionException(
                 "Exception occurred while trying to expand value: " + value,
@@ -51,13 +75,35 @@ public class InternalVariableExpander implements VariableExpander {
         }
     }
 
-    private String resolvePropertyValue(String propertyName) {
-        return externalizedPropertyResolver.resolve(propertyName)
-            .map(ResolvedProperty::value)
+    private StringBuilder expandVariables(StringBuilder builder) {
+        int startIndex = builder.indexOf(variablePrefix);
+        if (startIndex == -1) {
+            return builder;
+        }
+
+        int variableNameStartIndex = startIndex + variablePrefix.length();
+
+        int endIndex = builder.indexOf(variableSuffix, variableNameStartIndex);
+        if (endIndex == -1 || variableNameStartIndex == endIndex) {
+            // No end tag or no variable name in between start and end tags.
+            // e.g. "${test" or "${}"
+            return builder;
+        }
+
+        String variableName = builder.substring(variableNameStartIndex, endIndex);
+
+        String variableValue = resolvePropertyValue(variableName);
+
+        builder.replace(startIndex, endIndex + 1, variableValue);
+
+        return expandVariables(builder);
+    }
+
+    private String resolvePropertyValue(String variableName) {
+        return externalizedPropertyResolver.resolve(variableName)
             .orElseThrow(() -> new VariableExpansionException(
-                "Failed to expand \"" + propertyName + "\" variable in property name. " +
+                "Failed to expand \"" + variableName + "\" variable. " +
                 "Variable value cannot be resolved from any of the externalized property resolvers."
             ));
     }
-    
 }

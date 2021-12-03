@@ -1,8 +1,9 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import jakarta.persistence.EntityManager;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,12 +18,13 @@ public interface QueryExecutor {
     /**
      * Query properties from the database.
      * 
-     * @param entityManager The entity manager.
+     * @param connection The JDBC connection.
      * @param propertyNamesToResolve The names of the properties to resolve.
      * @return The list of {@link ResolvedProperty}.
+     * @throws SQLException if a database-related exception occurred.
      */
     List<ResolvedProperty> queryProperties(
-        EntityManager entityManager, 
+        Connection connection, 
         Collection<String> propertyNamesToResolve
-    );
+    ) throws SQLException;
 }

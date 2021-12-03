@@ -9,7 +9,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
 /**
- * Supports conversion of resolved properties to an enum.
+ * Supports conversion of values to an enum.
  */
 public class EnumConversionHandler<T extends Enum<T>> implements ConversionHandler<T> {
 
@@ -36,6 +36,7 @@ public class EnumConversionHandler<T extends Enum<T>> implements ConversionHandl
         return convertInternal(context);
     }
 
+    /** {@inheritDoc} */
     @Override
     public T convert(PropertyMethodConversionContext context) {
         return convertInternal(context);
@@ -45,13 +46,12 @@ public class EnumConversionHandler<T extends Enum<T>> implements ConversionHandl
         requireNonNull(context, "context");
 
         try {
-            return Enum.valueOf(enumClass, context.resolvedProperty().value());
+            return Enum.valueOf(enumClass, context.value());
         } catch (Exception ex) {
             throw new ConversionException(String.format(
-                    "Failed to convert property %s to an enum of type %s. Property value: %s",
-                    context.resolvedProperty().name(),
+                    "Failed to convert value to an enum of type %s: %s",
                     enumClass,
-                    context.resolvedProperty().value()
+                    context.value()
                 ),
                 ex
             );

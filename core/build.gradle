@@ -1,3 +1,5 @@
+apply plugin: 'me.champeau.jmh'
+
 description = 'Externalized Properties Core.'
 
 jar {

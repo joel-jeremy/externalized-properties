@@ -11,7 +11,7 @@ import java.util.List;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
 /**
- * Default property converter which delegates to the following converters:
+ * Default property converter which delegates to the following conversion handlers:
  * <ul>
  *  <li>{@link PrimitiveConversionHandler}</li>
  *  <li>{@link CollectionConversionHandler}</li>
@@ -57,9 +57,7 @@ public class DefaultConversionHandler implements ConversionHandler<Object> {
         return converter.convert(context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Object convert(PropertyMethodConversionContext context) {
         requireNonNull(context, "context");
@@ -71,8 +69,9 @@ public class DefaultConversionHandler implements ConversionHandler<Object> {
     private ConversionHandler<?> getConversionHandler(
             ConversionContext context
     ) {
+        Class<?> rawExpectedType = context.rawExpectedType();
         for (ConversionHandler<?> handler : defaultConversionHandlers) {
-            if (handler.canConvertTo(context.rawExpectedType())) {
+            if (handler.canConvertTo(rawExpectedType)) {
                 return handler;
             }
         }

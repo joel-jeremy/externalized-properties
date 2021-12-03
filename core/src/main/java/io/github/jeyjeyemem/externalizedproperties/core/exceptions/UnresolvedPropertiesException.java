@@ -2,13 +2,12 @@ package io.github.jeyjeyemem.externalizedproperties.core.exceptions;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Exception is thrown when a property cannot be resolved.
+ * Exception is thrown when properties cannot be resolved.
  */
-public class UnresolvedPropertyException extends ExternalizedPropertiesException {
+public class UnresolvedPropertiesException extends ExternalizedPropertiesException {
     /**
      * The unresolved property names.
      */
@@ -20,7 +19,7 @@ public class UnresolvedPropertyException extends ExternalizedPropertiesException
      * @param unresolvedPropertyName The unresolved property name.
      * @param message The exception message.
      */
-    public UnresolvedPropertyException(
+    public UnresolvedPropertiesException(
             String unresolvedPropertyName, 
             String message
     ) {
@@ -34,7 +33,7 @@ public class UnresolvedPropertyException extends ExternalizedPropertiesException
      * @param message The exception message.
      * @param cause The underlying cause.
      */
-    public UnresolvedPropertyException(
+    public UnresolvedPropertiesException(
             String unresolvedPropertyName, 
             String message, 
             Throwable cause
@@ -48,12 +47,14 @@ public class UnresolvedPropertyException extends ExternalizedPropertiesException
      * @param unresolvedPropertyNames The unresolved property names.
      * @param message The exception message.
      */
-    public UnresolvedPropertyException(
-            Collection<String> unresolvedPropertyNames, 
+    public UnresolvedPropertiesException(
+            Set<String> unresolvedPropertyNames, 
             String message
     ) {
         super(message);
-        this.unresolvedPropertyNames = new HashSet<>(unresolvedPropertyNames);
+        this.unresolvedPropertyNames = Collections.unmodifiableSet(
+            unresolvedPropertyNames
+        );
     }
 
     /**
@@ -63,13 +64,15 @@ public class UnresolvedPropertyException extends ExternalizedPropertiesException
      * @param message The exception message.
      * @param cause The underlying cause.
      */
-    public UnresolvedPropertyException(
-            Collection<String> unresolvedPropertyNames, 
+    public UnresolvedPropertiesException(
+            Set<String> unresolvedPropertyNames, 
             String message, 
             Throwable cause
     ) {
         super(message, cause);
-        this.unresolvedPropertyNames = new HashSet<>(unresolvedPropertyNames);
+        this.unresolvedPropertyNames = Collections.unmodifiableSet(
+            unresolvedPropertyNames
+        );
     }
 
     /**

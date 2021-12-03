@@ -1,7 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
 
 import java.util.Hashtable;
 import java.util.Properties;
@@ -31,7 +30,7 @@ public class PropertiesPropertyResolver extends MapPropertyResolver {
      */
     public PropertiesPropertyResolver(Properties properties) {
         super(
-            filterNonStringProperties(requireNonNull(properties, "properties"))
+            ignoreNonStringProperties(requireNonNull(properties, "properties"))
         );
     }
 
@@ -49,19 +48,19 @@ public class PropertiesPropertyResolver extends MapPropertyResolver {
      * @param unresolvedPropertyHandler Any properties not found in the source properties will tried 
      * to be resolved via this handler. This should accept a property name and return the property value 
      * for the given property name. {@code null} return values are allowed but will be discarded when 
-     * building the {@link ExternalizedPropertyResolverResult}.
+     * building the {@link Result}.
      */
     public PropertiesPropertyResolver(
             Properties properties, 
             Function<String, String> unresolvedPropertyHandler
     ) {
         super(
-            filterNonStringProperties(requireNonNull(properties, "properties")),
+            ignoreNonStringProperties(requireNonNull(properties, "properties")),
             requireNonNull(unresolvedPropertyHandler, "unresolvedPropertyHandler")
         );
     }
 
-    private static ConcurrentMap<String, String> filterNonStringProperties(
+    private static ConcurrentMap<String, String> ignoreNonStringProperties(
             Properties properties
     ) {
         return properties.entrySet()

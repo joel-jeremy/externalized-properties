@@ -1,108 +1,81 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
+import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeReference;
 
 import java.lang.reflect.Type;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
 /**
- * {@code ExternalizedProperties} decorator to enable property resolution caching.
+ * {@link ExternalizedProperties} decorator to enable property resolution caching.
  */
 public class CachingExternalizedProperties implements ExternalizedProperties {
 
     private final ExternalizedProperties decorated;
-    private final Map<String, Object> cache;
-    private final Duration cacheItemLifetime;
-    private final ScheduledExecutorService expiryScheduler = 
-        Executors.newSingleThreadScheduledExecutor(
-            new DaemonThreadFactory(CachingExternalizedProperties.class.getName())
-        );
+    private final CacheStrategy<String, Optional<?>> resolvedPropertyCacheStrategy;
+    private final CacheStrategy<String, String> variableExpansionCacheStrategy;
 
     /**
      * Constructor.
      * 
      * @param decorated The decorated {@link ExternalizedProperties} instance.
-     * @param cacheItemLifetime The duration of cache items in the cache.
+     * @param resolvedPropertyCacheStrategy The resolved property cache strategy
+     * keyed by property name and whose values are the resolved property values. 
+     * @param variableExpansionCacheStrategy The variable expansion cache strategy
+     * keyed by source/unexpanded string and whose values are the expanded string. 
      */
     public CachingExternalizedProperties(
             ExternalizedProperties decorated,
-            Duration cacheItemLifetime
-    ) {
-        this(decorated, new HashMap<>(), cacheItemLifetime);
-    }
-
-    /**
-     * Constructor.
-     * 
-     * @param decorated The decorated {@link ExternalizedProperties} instance.
-     * @param cache The cache map.
-     * @param cacheItemLifetime The duration of cache items in the cache.
-     */
-    public CachingExternalizedProperties(
-            ExternalizedProperties decorated,
-            Map<String, Object> cache,
-            Duration cacheItemLifetime
+            CacheStrategy<String, Optional<?>> resolvedPropertyCacheStrategy,
+            CacheStrategy<String, String> variableExpansionCacheStrategy
     ) {
         this.decorated = requireNonNull(decorated, "decorated");
-        this.cache = requireNonNull(cache, "cache");
-        this.cacheItemLifetime = requireNonNull(
-            cacheItemLifetime,
-            "cacheItemLifetime"
+        this.resolvedPropertyCacheStrategy = requireNonNull(
+            resolvedPropertyCacheStrategy, 
+            "resolvedPropertyCacheStrategy"
+        );
+        this.variableExpansionCacheStrategy = requireNonNull(
+            variableExpansionCacheStrategy, 
+            "variableExpansionCacheStrategy"
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public <T> T proxy(Class<T> proxyInterface) {
         return decorated.proxy(proxyInterface);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public <T> T proxy(Class<T> proxyInterface, ClassLoader classLoader) {
         return decorated.proxy(proxyInterface, classLoader);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Optional<String> resolveProperty(String propertyName) {
-        Object cached = cache.get(propertyName);
-        if (cached != null) {
+        Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.getFromCache(propertyName);
+        if (cached.isPresent()) {
             @SuppressWarnings("unchecked")
-            Optional<String> result = (Optional<String>)cached;
+            Optional<String> result = (Optional<String>)cached.get();
             return result;
         }
 
         Optional<String> resolved = decorated.resolveProperty(propertyName);
-        return cache(propertyName, resolved);
+        return cacheResolvedValue(propertyName, resolved);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public <T> Optional<T> resolveProperty(String propertyName, Class<T> expectedType) {
         return resolveProperty(propertyName, (Type)expectedType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public <T> Optional<T> resolveProperty(
             String propertyName, 
@@ -111,18 +84,16 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
         return resolveProperty(propertyName, expectedType.type());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public <T> Optional<T> resolveProperty(
             String propertyName, 
             Type expectedType
     ) {
-        Object cached = cache.get(propertyName);
-        if (cached != null) {
+        Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.getFromCache(propertyName);
+        if (cached.isPresent()) {
             @SuppressWarnings("unchecked")
-            Optional<T> result = (Optional<T>)cached;
+            Optional<T> result = (Optional<T>)cached.get();
             return result;
         }
 
@@ -132,28 +103,28 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
             expectedType
         );
 
-        return cache(propertyName, resolved);
+        return cacheResolvedValue(propertyName, resolved);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public String expandVariables(String source) {
-        return decorated.expandVariables(source);
+        Optional<String> cached = variableExpansionCacheStrategy.getFromCache(source);
+        if (cached.isPresent()) {
+            return cached.get();
+        }
+
+        String expanded = decorated.expandVariables(source);
+        return cacheExpandedValue(source, expanded);
     }
 
-    private <T> Optional<T> cache(String propertyName, Optional<T> resolved) {
-        cache.putIfAbsent(propertyName, resolved);
-        scheduleForExpiry(() -> cache.remove(propertyName));
+    private String cacheExpandedValue(String source, String expanded) {
+        variableExpansionCacheStrategy.cache(source, expanded);
+        return expanded;
+    }
+
+    private <T> Optional<T> cacheResolvedValue(String propertyName, Optional<T> resolved) {
+        resolvedPropertyCacheStrategy.cache(propertyName, resolved);
         return resolved;
-    }
-
-    private void scheduleForExpiry(Runnable expiryAction) {
-        expiryScheduler.schedule(
-            expiryAction, 
-            cacheItemLifetime.toMillis(), 
-            TimeUnit.MILLISECONDS
-        );
     }
 }

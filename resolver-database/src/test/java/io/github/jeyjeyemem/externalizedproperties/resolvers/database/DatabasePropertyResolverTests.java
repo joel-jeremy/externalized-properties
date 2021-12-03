@@ -1,56 +1,51 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.resolvers.database.entities.SimpleNameValuePropertyEntity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
+import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.AbstractNameValueQueryExecutor;
+import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
+import io.github.jeyjeyemem.externalizedproperties.resolvers.database.testentities.H2DataSourceConnectionProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DatabasePropertyResolverTests {
 
-    private static final SimpleNameValuePropertyEntity TEST_CONFIG_ENTITY_1 = 
-        new SimpleNameValuePropertyEntity(
-            "test.property.1", 
-            "/test/property/value/1",
-            "Test Property 1 Description"
+    private static final int NUMBER_OF_TEST_ENTRIES = 2;
+    // Use DB_CLOSE_DELAY=-1 so that h2 in-memory database contents are not lost when closing. 
+    private static final ConnectionProvider CONNECTION_PROVIDER = 
+        new H2DataSourceConnectionProvider(
+            "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", 
+            "sa", 
+            ""
         );
-
-    private static final SimpleNameValuePropertyEntity TEST_CONFIG_ENTITY_2 = 
-        new SimpleNameValuePropertyEntity(
-            "test.property.2", 
-            "/test/property/value/2",
-            "Test Property 2 Description"
-        );
-
-    private static final EntityManagerFactory ENTITY_MANAGER_FACTORY = 
-        Persistence.createEntityManagerFactory("TestExternalizedPropertiesPU");
-
+    
     @BeforeAll
-    public static void setup() {
+    public static void setup() throws SQLException {
         createTestDatabaseConfigurationEntries();
     }
 
     @Nested
     class Constructor {
         @Test
-        @DisplayName("should throw when entity manager factory is null")
+        @DisplayName("should throw when connection provider argument is null")
         public void test1() {
             assertThrows(IllegalArgumentException.class, () -> {
-                new DatabasePropertyResolver(null);
+                new DatabasePropertyResolver(null, new SimpleNameValueQueryExecutor());
             });
         }
 
@@ -58,18 +53,102 @@ public class DatabasePropertyResolverTests {
         @DisplayName("should throw when query runner is null")
         public void test2() {
             assertThrows(IllegalArgumentException.class, () -> {
-                new DatabasePropertyResolver(ENTITY_MANAGER_FACTORY, null);
+                new DatabasePropertyResolver(CONNECTION_PROVIDER, null);
             });
         }
     }
 
     @Nested
-    class ResolvePropertiesMethod {
+    class ResolveMethod {
+        @Test
+        @DisplayName("should throw when propertyName argument is null")
+        public void test1() {
+            DatabasePropertyResolver databasePropertyResolver = 
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+
+            assertThrows(IllegalArgumentException.class, () -> {
+                databasePropertyResolver.resolve((String)null);
+            });
+        }
+
+        @Test
+        @DisplayName("should throw when propertyName argument is empty")
+        public void test2() {
+            DatabasePropertyResolver databasePropertyResolver = 
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+                
+            assertThrows(IllegalArgumentException.class, () -> {
+                databasePropertyResolver.resolve("");
+            });
+        }
+
+        @Test
+        @DisplayName("should resolve all properties from database")
+        public void test3() {
+            DatabasePropertyResolver databasePropertyResolver = 
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            
+            String propertyName = "test.property.1";
+
+            Optional<String> result = databasePropertyResolver.resolve(propertyName);
+            
+            assertTrue(result.isPresent());
+            assertNotNull(result.get());
+        }
+
+        @Test
+        @DisplayName("should return empty Optional when property is not found in database")
+        public void test4() {
+            DatabasePropertyResolver databasePropertyResolver = 
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+
+            String propertyName = "non.existent.property";
+
+            Optional<String> result = databasePropertyResolver.resolve(propertyName);
+
+            assertFalse(result.isPresent());
+        }
+
+        @Test
+        @DisplayName("should use provided custom query executor")
+        public void test5() {
+            DatabasePropertyResolver databasePropertyResolver = 
+                new DatabasePropertyResolver(
+                    CONNECTION_PROVIDER,
+                    new AbstractNameValueQueryExecutor() {
+                        @Override
+                        protected String tableName() {
+                            return "custom_properties_table";
+                        }
+
+                        @Override
+                        protected String propertyNameColumn() {
+                            return "config_key";
+                        }
+
+                        @Override
+                        protected String propertyValueColumn() {
+                            return "config_value";
+                        }
+                    }
+                );
+
+            String propertyName = "custom.table.test.property.1";
+
+            Optional<String> result = databasePropertyResolver.resolve(propertyName);
+
+            assertTrue(result.isPresent());
+            assertNotNull(result.get());
+        }
+    }
+
+    @Nested
+    class ResolveMethodWithCollectionOverload {
         @Test
         @DisplayName("should throw when propertyNames argument is null")
         public void test1() {
             DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(ENTITY_MANAGER_FACTORY);
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 databasePropertyResolver.resolve((Collection<String>)null);
@@ -80,7 +159,7 @@ public class DatabasePropertyResolverTests {
         @DisplayName("should throw when propertyNames argument is empty")
         public void test2() {
             DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(ENTITY_MANAGER_FACTORY);
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
                 
             assertThrows(IllegalArgumentException.class, () -> {
                 databasePropertyResolver.resolve(Collections.emptyList());
@@ -91,20 +170,31 @@ public class DatabasePropertyResolverTests {
         @DisplayName("should resolve all properties from database")
         public void test3() {
             DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(ENTITY_MANAGER_FACTORY);
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
 
             List<String> propertiesToResolve = Arrays.asList(
-                TEST_CONFIG_ENTITY_1.getName(), 
-                TEST_CONFIG_ENTITY_2.getName()
+                "test.property.1", 
+                "test.property.2"
             );
             
-            ExternalizedPropertyResolverResult result = 
+            DatabasePropertyResolver.Result result = 
                 databasePropertyResolver.resolve(propertiesToResolve);
             
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
-            assertTrue(result.resolvedProperties().stream()
-                .allMatch(r -> propertiesToResolve.contains(r.name()))
+            
+            assertTrue(result.resolvedPropertyNames().stream()
+                .allMatch(resolved -> propertiesToResolve.contains(resolved))
+            );
+
+            assertEquals(
+                "test/property/value/1", 
+                result.findRequiredProperty("test.property.1")
+            );
+
+            assertEquals(
+                "test/property/value/2", 
+                result.findRequiredProperty("test.property.2")
             );
         }
 
@@ -112,31 +202,81 @@ public class DatabasePropertyResolverTests {
         @DisplayName("should return result with resolved and unresolved properties from database")
         public void test4() {
             DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(ENTITY_MANAGER_FACTORY);
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
 
             List<String> propertiesToResolve = Arrays.asList(
-                TEST_CONFIG_ENTITY_1.getName(), 
-                TEST_CONFIG_ENTITY_2.getName(),
+                "test.property.1", 
+                "test.property.2",
                 "non.existent.property"
             );
 
-            ExternalizedPropertyResolverResult result = 
+            DatabasePropertyResolver.Result result = 
                 databasePropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
             assertTrue(result.hasUnresolvedProperties());
+
+            assertEquals(
+                "test/property/value/1", 
+                result.findRequiredProperty("test.property.1")
+            );
+
+            assertEquals(
+                "test/property/value/2", 
+                result.findRequiredProperty("test.property.2")
+            );
+
             assertTrue(result.unresolvedPropertyNames().contains("non.existent.property"));
+        }
+
+        @Test
+        @DisplayName("should use provided custom query executor")
+        public void test5() {
+            DatabasePropertyResolver databasePropertyResolver = 
+                new DatabasePropertyResolver(
+                    CONNECTION_PROVIDER,
+                    new AbstractNameValueQueryExecutor() {
+                        @Override
+                        protected String tableName() {
+                            return "custom_properties_table";
+                        }
+
+                        @Override
+                        protected String propertyNameColumn() {
+                            return "config_key";
+                        }
+
+                        @Override
+                        protected String propertyValueColumn() {
+                            return "config_value";
+                        }
+                    }
+                );
+
+            List<String> propertiesToResolve = Arrays.asList(
+                "custom.table.test.property.1",
+                "custom.table.test.property.2"
+            );
+
+            DatabasePropertyResolver.Result result =
+                databasePropertyResolver.resolve(propertiesToResolve);
+
+            assertTrue(result.hasResolvedProperties());
+            assertFalse(result.hasUnresolvedProperties());
+            assertTrue(result.resolvedPropertyNames().stream()
+                .allMatch(resolved -> propertiesToResolve.contains(resolved))
+            );
         }
     }
 
     @Nested
-    class ResolveVarArgsMethod {
+    class ResolveMethodWithVarArgsOverload {
 
         @Test
         @DisplayName("should throw when propertyNames varargs argument is null")
         public void test1() {
             DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(ENTITY_MANAGER_FACTORY);
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 databasePropertyResolver.resolve((String[])null);
@@ -147,7 +287,7 @@ public class DatabasePropertyResolverTests {
         @DisplayName("should throw when propertyNames varargs argument is empty")
         public void test2() {
             DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(ENTITY_MANAGER_FACTORY);
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
                 
             assertThrows(IllegalArgumentException.class, () -> {
                 databasePropertyResolver.resolve(new String[0]);
@@ -158,20 +298,20 @@ public class DatabasePropertyResolverTests {
         @DisplayName("should resolve all properties from database")
         public void test3() {
             DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(ENTITY_MANAGER_FACTORY);
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
 
             String[] propertiesToResolve = new String[] {
-                TEST_CONFIG_ENTITY_1.getName(), 
-                TEST_CONFIG_ENTITY_2.getName()
+                "test.property.1", 
+                "test.property.2"
             };
             
-            ExternalizedPropertyResolverResult result = 
+            DatabasePropertyResolver.Result result = 
                 databasePropertyResolver.resolve(propertiesToResolve);
             
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
-            assertTrue(result.resolvedProperties().stream()
-                .allMatch(r -> Arrays.asList(propertiesToResolve).contains(r.name()))
+            assertTrue(result.resolvedPropertyNames().stream()
+                .allMatch(resolved -> Arrays.asList(propertiesToResolve).contains(resolved))
             );
         }
 
@@ -179,34 +319,116 @@ public class DatabasePropertyResolverTests {
         @DisplayName("should return result with resolved and unresolved properties from database")
         public void test4() {
             DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(ENTITY_MANAGER_FACTORY);
+                new DatabasePropertyResolver(CONNECTION_PROVIDER);
 
             String[] propertiesToResolve = new String[] {
-                TEST_CONFIG_ENTITY_1.getName(), 
-                TEST_CONFIG_ENTITY_2.getName(),
+                "test.property.1", 
+                "test.property.2",
                 "non.existent.property"
             };
 
-            ExternalizedPropertyResolverResult result = 
+            DatabasePropertyResolver.Result result = 
                 databasePropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
             assertTrue(result.hasUnresolvedProperties());
             assertTrue(result.unresolvedPropertyNames().contains("non.existent.property"));
         }
+
+        @Test
+        @DisplayName("should use provided custom query executor")
+        public void test5() {
+            DatabasePropertyResolver databasePropertyResolver = 
+                new DatabasePropertyResolver(
+                    CONNECTION_PROVIDER,
+                    new AbstractNameValueQueryExecutor() {
+                        @Override
+                        protected String tableName() {
+                            return "custom_properties_table";
+                        }
+
+                        @Override
+                        protected String propertyNameColumn() {
+                            return "config_key";
+                        }
+
+                        @Override
+                        protected String propertyValueColumn() {
+                            return "config_value";
+                        }
+                    }
+                );
+
+            String[] propertiesToResolve = new String[] {
+                "custom.table.test.property.1",
+                "custom.table.test.property.2"
+            };
+
+            DatabasePropertyResolver.Result result =
+                databasePropertyResolver.resolve(propertiesToResolve);
+
+            assertTrue(result.hasResolvedProperties());
+            assertFalse(result.hasUnresolvedProperties());
+            assertTrue(result.resolvedPropertyNames().stream()
+                .allMatch(resolved -> Arrays.asList(propertiesToResolve).contains(resolved))
+            );
+        }
     }
 
-    private static void createTestDatabaseConfigurationEntries() {
-        EntityManager entityManager = ENTITY_MANAGER_FACTORY.createEntityManager();
-        EntityTransaction transaction = entityManager.getTransaction();
+    private static void createTestDatabaseConfigurationEntries() throws SQLException {
+        try (Connection connection = CONNECTION_PROVIDER.getConnection()) {
 
-        try {
-            transaction.begin();
-            entityManager.persist(TEST_CONFIG_ENTITY_1);
-            entityManager.persist(TEST_CONFIG_ENTITY_2);
-            transaction.commit();
-        } catch (Exception ex) {
-            transaction.rollback();
+            initialExternalizedPropertiesTable(connection);
+            initializeCustomPropertiesTable(connection);
+
+            connection.commit();
+        }
+    }
+
+    private static void initialExternalizedPropertiesTable(
+            Connection connection
+    ) throws SQLException {
+        // Matches the default columns and table name in
+        // SimpleNameValueQueryExecutor
+        PreparedStatement createTable = connection.prepareStatement(
+            "CREATE TABLE IF NOT EXISTS externalized_properties ( " +
+            "name VARCHAR(255), " +
+            "value VARCHAR(255), " +
+            "description VARCHAR(255))"
+        );
+        createTable.executeUpdate();
+
+        PreparedStatement insert = connection.prepareStatement(
+            "INSERT INTO externalized_properties VALUES(?,?,?)"
+        );
+
+        for (int i = 1; i <= NUMBER_OF_TEST_ENTRIES; i++) {
+            insert.setString(1, "test.property." + i);
+            insert.setString(2, "test/property/value/" + i);
+            insert.setString(3, "Test property " + i + " description");
+            insert.executeUpdate();
+        }
+
+        // Custom table with config_key and config_value property columns.
+        PreparedStatement createCustomTable = connection.prepareStatement(
+            "CREATE TABLE IF NOT EXISTS custom_properties_table ( " +
+            "config_key VARCHAR(255), " +
+            "config_value VARCHAR(255))"
+        );
+        createCustomTable.executeUpdate();
+    }
+
+    private static void initializeCustomPropertiesTable(
+            Connection connection
+    ) throws SQLException {
+        PreparedStatement insertCustomTableConfig = connection.prepareStatement(
+            "INSERT INTO custom_properties_table VALUES(?,?)"
+        );
+
+        for (int i = 1; i <= NUMBER_OF_TEST_ENTRIES; i++) {
+            insertCustomTableConfig.setString(1, "custom.table.test.property." + i);
+            insertCustomTableConfig.setString(2, "custom/table/test/property/value/" + i);
+            insertCustomTableConfig.executeUpdate();
         }
     }
 }

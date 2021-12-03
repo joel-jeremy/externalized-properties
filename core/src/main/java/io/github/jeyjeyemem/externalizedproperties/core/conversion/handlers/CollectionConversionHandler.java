@@ -1,11 +1,10 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.StripEmptyValues;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
@@ -23,7 +22,7 @@ import java.util.stream.IntStream;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
 
 /**
- * Supports conversion of resolved properties to a {@link Collection} or a {@link List}.
+ * Supports conversion of values to a {@link Collection} or a {@link List}.
  * 
  * @implNote By default, this uses ',' as default delimiter when splitting resolved property values.
  * This can overriden by annotating the externalized property method with {@link Delimiter} annotation
@@ -49,9 +48,7 @@ public class CollectionConversionHandler implements ConversionHandler<List<?>> {
         return convertInternal(context, null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public List<?> convert(PropertyMethodConversionContext context) {
         requireNonNull(context, "context");
@@ -75,7 +72,7 @@ public class CollectionConversionHandler implements ConversionHandler<List<?>> {
             // Do not allow List<T>, List<T extends ...>, etc.
             throwIfListHasTypeVariable(listGenericTypeParameter);
 
-            String propertyValue = context.resolvedProperty().value();
+            String propertyValue = context.value();
             if (propertyValue.isEmpty()) {
                 return Collections.emptyList();
             }
@@ -89,21 +86,16 @@ public class CollectionConversionHandler implements ConversionHandler<List<?>> {
                 return Arrays.asList(values);
             }
 
-            Type[] genericTypeParameterOfListType = 
-                TypeUtilities.getTypeParameters(listGenericTypeParameter);
-
             return convertValuesToListType(
                 context, 
                 values, 
-                listGenericTypeParameter,
-                genericTypeParameterOfListType
+                listGenericTypeParameter
             );
         } catch (Exception ex) {
             throw new ConversionException(
                 String.format(
-                    "Failed to convert property %s to a List/Collection. Property value: %s",
-                    context.resolvedProperty().name(),
-                    context.resolvedProperty().value()
+                    "Failed to convert value to a List/Collection: %s",
+                    context.value()
                 ),  
                 ex
             );
@@ -113,26 +105,17 @@ public class CollectionConversionHandler implements ConversionHandler<List<?>> {
     private List<?> convertValuesToListType(
             ConversionContext context,
             String[] values,
-            Type listType,
-            Type[] listTypeGenericTypeParameters
+            Type listType
     ) {
         Converter converter = context.converter();
 
         // Convert and return values.
-        return IntStream.range(0, values.length).mapToObj(i -> {
-            String value = values[i];
-            return converter.convert(
-                new ConversionContext(
-                    converter,
-                    ResolvedProperty.with(
-                        indexedName(context.resolvedProperty().name(), i),
-                        value
-                    ), 
-                    listType,
-                    listTypeGenericTypeParameters
-                )
-            );
-        })
+        return IntStream.range(0, values.length).mapToObj(i -> 
+            converter.convert(
+                values[i], 
+                listType
+            )
+        )
         .collect(Collectors.toList());
     }
 
@@ -140,7 +123,7 @@ public class CollectionConversionHandler implements ConversionHandler<List<?>> {
             ConversionContext context, 
             ExternalizedPropertyMethodInfo externalizedPropertyMethodInfo
     ) {
-        String propertyValue = context.resolvedProperty().value();
+        String value = context.value();
 
         if (externalizedPropertyMethodInfo != null) {
             // Determine delimiter.
@@ -150,18 +133,14 @@ public class CollectionConversionHandler implements ConversionHandler<List<?>> {
 
             if (externalizedPropertyMethodInfo.hasAnnotation(StripEmptyValues.class)) {
                 // Filter empty values.
-                return Arrays.stream(propertyValue.split(delimiter))
+                return Arrays.stream(value.split(delimiter))
                     .filter(v -> !v.isEmpty())
                     .toArray(String[]::new);
             }
-            return propertyValue.split(Pattern.quote(delimiter));
+            return value.split(Pattern.quote(delimiter));
         }
 
-        return propertyValue.split(DEFAULT_DELIMITER);
-    }
-
-    private static String indexedName(String name, int index) {
-        return name + "[" + index + "]";
+        return value.split(DEFAULT_DELIMITER);
     }
 
     private void throwIfListHasTypeVariable(Type listGenericTypeParameter) {

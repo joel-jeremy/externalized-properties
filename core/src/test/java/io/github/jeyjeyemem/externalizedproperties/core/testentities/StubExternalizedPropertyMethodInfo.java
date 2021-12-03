@@ -12,6 +12,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
+/**
+ * A stub {@link ExternalizedPropertyMethodInfo} implementation.
+ */
 public class StubExternalizedPropertyMethodInfo
         implements ExternalizedPropertyMethodInfo {
 
@@ -31,6 +34,10 @@ public class StubExternalizedPropertyMethodInfo
         }
         this.method = method;
         this.variableExpander = variableExpander;
+    }
+
+    public Method method() {
+        return method;
     }
 
     @Override
@@ -56,6 +63,11 @@ public class StubExternalizedPropertyMethodInfo
     }
 
     @Override
+    public String name() {
+        return method.getName();
+    }
+
+    @Override
     public Class<?> returnType() {
         return method.getReturnType();
     }
@@ -76,7 +88,7 @@ public class StubExternalizedPropertyMethodInfo
     }
 
     @Override
-    public Type[] genericReturnTypeGenericTypeParameters() {
+    public Type[] returnTypeGenericTypeParameters() {
         Type returnType = method.getGenericReturnType();
         return TypeUtilities.getTypeParameters(returnType);
     }
@@ -92,8 +104,8 @@ public class StubExternalizedPropertyMethodInfo
     }
     
     @Override
-    public Optional<Type> genericReturnTypeGenericTypeParameter(int typeParameterIndex) {
-        Type[] genericTypeParameters = genericReturnTypeGenericTypeParameters();
+    public Optional<Type> returnTypeGenericTypeParameter(int typeParameterIndex) {
+        Type[] genericTypeParameters = returnTypeGenericTypeParameters();
         if (genericTypeParameters.length == 0 || typeParameterIndex >= genericTypeParameters.length) {
             return Optional.empty();
         }
@@ -116,7 +128,7 @@ public class StubExternalizedPropertyMethodInfo
             String methodName,
             Class<?>... methodParameterTypes
     ) {
-        Method method = getProxyInterfaceMethod(
+        Method method = getMethod(
             proxyInterface, 
             methodName, 
             methodParameterTypes
@@ -137,13 +149,13 @@ public class StubExternalizedPropertyMethodInfo
         return new StubExternalizedPropertyMethodInfo(propertyMethod, variableExpander);
     }
     
-    public static Method getProxyInterfaceMethod(
-            Class<?> proxyInterface, 
+    public static Method getMethod(
+            Class<?> clazz, 
             String name, 
             Class<?>... parameterTypes
     ) {
         try {
-            return proxyInterface.getDeclaredMethod(name, parameterTypes);
+            return clazz.getDeclaredMethod(name, parameterTypes);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to find property method.", e);
         }

@@ -3,12 +3,9 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.InvocationHandlerFactory;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeReference;
 import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -59,18 +56,14 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public <T> T proxy(Class<T> proxyInterface) {
         requireNonNull(proxyInterface, "proxyInterface");
         return proxy(proxyInterface, proxyInterface.getClassLoader());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
     public <T> T proxy(Class<T> proxyInterface, ClassLoader classLoader) {
@@ -86,18 +79,13 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Optional<String> resolveProperty(String propertyName) {
-        return externalizedPropertyResolver.resolve(propertyName)
-            .map(ResolvedProperty::value);
+        return externalizedPropertyResolver.resolve(propertyName);
     }
     
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public <T> Optional<T> resolveProperty(
             String propertyName,
@@ -106,20 +94,17 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         return resolveProperty(propertyName, (Type)expectedType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public <T> Optional<T> resolveProperty(
             String propertyName,
             TypeReference<T> expectedType
     ) {
+        requireNonNull(expectedType, "expectedType");
         return resolveProperty(propertyName, expectedType.type());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public <T> Optional<T> resolveProperty(
             String propertyName,
@@ -135,12 +120,8 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
 
         return resolved.map(r -> {
             Object convertedValue = converter.convert(
-                new ConversionContext(
-                    converter, 
-                    ResolvedProperty.with(propertyName, resolved.get()), 
-                    TypeUtilities.getRawType(expectedType),
-                    TypeUtilities.getTypeParameters(expectedType)
-                )
+                resolved.get(), 
+                expectedType
             );
 
             @SuppressWarnings("unchecked")
@@ -149,9 +130,7 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public String expandVariables(String source) {
         return variableExpander.expandVariables(source);

@@ -1,6 +1,10 @@
 plugins {
-  id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+  id 'com.github.kt3k.coveralls' version '2.12.0'
+  id 'me.champeau.jmh' version '0.6.6' apply false
 }
+
+apply plugin: 'jacoco'
 
 allprojects{
   group = 'io.github.jeyjeyemem.externalizedproperties'
@@ -16,9 +20,9 @@ allprojects{
 
 subprojects {
   apply plugin: 'java-library'
-  apply plugin: 'jacoco'
   apply plugin: 'maven-publish'
   apply plugin: 'signing'
+  apply plugin: 'jacoco'
 
   dependencies {
     // Use JUnit Jupiter for testing.
@@ -27,11 +31,6 @@ subprojects {
 
   test { 
     useJUnitPlatform() 
-    finalizedBy jacocoTestReport
-  }
-
-  jacocoTestReport {
-    dependsOn test
   }
 
   java {
@@ -54,6 +53,16 @@ subprojects {
         'implSpec:a:Implementation Requirements:',
         'implNote:a:Implementation Note:'
       )
+    }
+  }
+  
+  jacocoTestReport {
+    group = 'Coverage reports'
+    description = 'Generates a test coverage report for a project'
+
+    reports {
+      html.required = true // human readable
+      xml.required = true  // required by coveralls
     }
   }
 
@@ -145,4 +154,35 @@ if (project.hasProperty('ossrh')) {
       }
     }
   }
+}
+
+def coveredProjects = subprojects.findAll()
+
+tasks.register('jacocoFullReport', JacocoReport) {
+  group = 'Coverage reports'
+  description = 'Generates an aggregate report from all subprojects'
+
+  coveredProjects.each {
+    sourceSets it.sourceSets.main
+    mustRunAfter it.tasks.withType(Test)
+    executionData fileTree(it.buildDir.absolutePath).include('jacoco/*.exec')
+  }
+
+  reports {
+    html.required = true // human readable
+    xml.required = true  // required by coveralls
+  }
+}
+
+coveralls {
+  sourceDirs = coveredProjects.sourceSets.main.allSource.srcDirs.flatten()
+  jacocoReportPath = "${buildDir}/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
+}
+
+tasks.named('coveralls').configure {
+  group = 'Coverage reports'
+  description = 'Uploads the aggregated coverage report to Coveralls'
+
+  dependsOn jacocoFullReport
+  onlyIf { System.getenv('CI') }
 }

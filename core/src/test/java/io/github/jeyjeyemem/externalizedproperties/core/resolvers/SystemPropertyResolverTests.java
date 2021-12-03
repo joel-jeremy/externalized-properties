@@ -1,7 +1,5 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,13 +18,13 @@ public class SystemPropertyResolverTests {
         @DisplayName("should resolve property value from system properties")
         public void test1() {
             SystemPropertyResolver resolver = resolverToTest();
-            Optional<ResolvedProperty> result = resolver.resolve("java.version");
+            Optional<String> result = resolver.resolve("java.version");
 
             assertNotNull(result);
             assertTrue(result.isPresent());
             assertEquals(
                 System.getProperty("java.version"), 
-                result.get().value()
+                result.get()
             );
         }
 
@@ -36,7 +34,7 @@ public class SystemPropertyResolverTests {
         )
         public void test2() {
             SystemPropertyResolver resolver = resolverToTest();
-            Optional<ResolvedProperty> result = resolver.resolve(
+            Optional<String> result = resolver.resolve(
                 "nonexisting.property"
             );
             
@@ -51,19 +49,19 @@ public class SystemPropertyResolverTests {
         @DisplayName("should resolve values from system properties")
         public void test1() {
             SystemPropertyResolver resolver = resolverToTest();
-            ExternalizedPropertyResolverResult result = resolver.resolve("java.version", "java.home");
+            SystemPropertyResolver.Result result = resolver.resolve("java.version", "java.home");
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
 
             assertEquals(
                 System.getProperty("java.version"), 
-                result.findRequiredPropertyValue("java.version")
+                result.findRequiredProperty("java.version")
             );
 
             assertEquals(
                 System.getProperty("java.home"), 
-                result.findRequiredPropertyValue("java.home")
+                result.findRequiredProperty("java.home")
             );
         }
 
@@ -73,7 +71,7 @@ public class SystemPropertyResolverTests {
         )
         public void test2() {
             SystemPropertyResolver resolver = resolverToTest();
-            ExternalizedPropertyResolverResult result = resolver.resolve(
+            SystemPropertyResolver.Result result = resolver.resolve(
                 "nonexisting.property1", 
                 "nonexisting.property2"
             );

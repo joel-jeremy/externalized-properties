@@ -1,0 +1,17 @@
+Benchmark                                                                       Mode  Cnt   Score   Error  Units
+ExternalizedPropertiesBenchmarks.baselineMap                                    avgt   10   4.931 ± 0.140  ns/op
+ExternalizedPropertiesBenchmarks.baselineMapConversion                          avgt   10   9.772 ± 0.209  ns/op
+ExternalizedPropertiesBenchmarks.direct                                         avgt   10   9.104 ± 0.296  ns/op
+ExternalizedPropertiesBenchmarks.directConversion                               avgt   10  16.496 ± 0.581  ns/op
+ExternalizedPropertiesBenchmarks.directWithCaching                              avgt   10   7.588 ± 0.048  ns/op
+ExternalizedPropertiesBenchmarks.directWithCachingConversion                    avgt   10   9.418 ± 2.802  ns/op
+ExternalizedPropertiesBenchmarks.proxyInterface                                 avgt   10  68.033 ± 2.946  ns/op
+ExternalizedPropertiesBenchmarks.proxyInterfaceConversion                       avgt   10  79.868 ± 5.023  ns/op
+ExternalizedPropertiesBenchmarks.proxyInterfaceWithCaching                      avgt   10  64.828 ± 1.252  ns/op
+ExternalizedPropertiesBenchmarks.proxyInterfaceWithCachingConversion            avgt   10  77.295 ± 1.250  ns/op
+ExternalizedPropertiesBenchmarks.proxyInterfaceWithEagerLoading                 avgt   10  18.926 ± 0.538  ns/op
+ExternalizedPropertiesBenchmarks.proxyInterfaceWithEagerLoadingConversion       avgt   10  19.564 ± 1.072  ns/op
+ExternalizedPropertiesBenchmarks.proxyInterfaceWithInvocationCaching            avgt   10  15.065 ± 0.173  ns/op
+ExternalizedPropertiesBenchmarks.proxyInterfaceWithInvocationCachingConversion  avgt   10  15.236 ± 0.443  ns/op
+ExternalizedPropertiesBenchmarks.variableExpansion                              avgt   10  80.481 ± 1.211  ns/op
+ExternalizedPropertiesBenchmarks.variableExpansionWithCaching                   avgt   10   9.828 ± 3.641  ns/op

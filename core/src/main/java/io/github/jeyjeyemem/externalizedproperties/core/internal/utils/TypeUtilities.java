@@ -26,75 +26,62 @@ public class TypeUtilities {
     /**
      * Extract raw class of the given type.
      * 
-     * @param type The type to get the raw class from.
+     * @param type The type to derive the raw class from.
      * @return The raw class of the given type.
+     * @throws IllegalArgumentException if the type is unsupported.
      */
     public static Class<?> getRawType(Type type) {
-        return getRawType(type, false);
-    }
-
-    /**
-     * Extract raw class of the given type.
-     * 
-     * @param type The type to get the raw class from.
-     * @param isArray Indicates whether raw type should ba an array type or not.
-     * @return The raw class of the given type.
-     */
-    private static Class<?> getRawType(Type type, boolean isArray) {
-        Class<?> rawType = null;
+        if (type == null)
+            return null;
 
         if (isClass(type)) {
-            rawType = asClass(type);
+            return (Class<?>)type;
         } 
-        else if (isParameterizedType(type)) {
+
+        ParameterizedType pt = asParameterizedType(type);
+        if (pt != null) {
             // Return raw type.
             // For example, if type is List<String>, raw List shall be returned.
-            ParameterizedType pt = asParameterizedType(type);
-
-            rawType = getRawType(pt.getRawType());
+            return getRawType(pt.getRawType());
         } 
-        else if (isGenericArrayType(type)) {
+        
+        GenericArrayType gat = asGenericArrayType(type);
+        if (gat != null) {
             // Return generic component type of array.
-            GenericArrayType gat = asGenericArrayType(type);
-            
             Type genericArrayComponentType = gat.getGenericComponentType();
-
-            rawType = getRawType(genericArrayComponentType, true);
+            return getRawArrayType(genericArrayComponentType);
         }
-        else if (isTypeVariable(type)) {
+
+        TypeVariable<?> tv = asTypeVariable(type);
+        if (tv != null) {
             // Return type variable upper bound.
             // For example, if type is <T>, Object shall be returned.
-            // If type is <T extends Number>, Number is returned.
+            // If type is <T extends Number>, Number shall be returned.
             // If type upper bound is a generic type <T extends List<String>>, return raw List. 
-            TypeVariable<?> tv = asTypeVariable(type);
-
+            
             // Only get first because, Java doesn't allow multiple extends as of writing.
-            rawType = getRawType(tv.getBounds()[0]);
+            return getRawType(tv.getBounds()[0]);
         }
-        else if (isWildcardType(type)) {
+
+        WildcardType wt = asWildcardType(type);
+        if (wt != null) {
             // Return type variable lower bound or upper bound.
             // If type is <? extends String>, return upper bound which is String.
             // If type if <? super String>, return lower bound which is String.
-            WildcardType wt = asWildcardType(type);
-
+            
             // Only get first of the bounds because Java doesn't allow multiple extends/super
             // as of writing.
 
-            // Return lower bounds if <T super String>, return String.
+            // Return lower bounds i.e for <T super String>, return String.
             if (wt.getLowerBounds().length > 0) {
                 return getRawType(wt.getLowerBounds()[0]);
             }
 
-            // Return upper bounds if <T extends String>, return String.
-            rawType = getRawType(wt.getUpperBounds()[0]);
+            // Return upper bounds i.e for <T extends String>, return String.
+            return getRawType(wt.getUpperBounds()[0]);
         }
 
-        // Return an array class.
-        if (rawType != null && isArray) {
-            return ARRAY_TYPE_CACHE.get(rawType);
-        }
-
-        return rawType;
+        throw new IllegalArgumentException("Illegal or unsupported type: " + type.getTypeName());
     }
 
     /**
@@ -238,5 +225,20 @@ public class TypeUtilities {
             return (WildcardType)type;
         }
         return null;
+    }
+
+    /**
+     * Extract raw array class of the given type.
+     * 
+     * @param type The type to derive the raw class from.
+     * @return The raw array class of the given type.
+     * @throws IllegalArgumentException if the type is unsupported.
+     */
+    private static Class<?> getRawArrayType(Type type) {
+        Class<?> rawType = getRawType(type);
+        if (rawType != null) {
+            return ARRAY_TYPE_CACHE.get(rawType);
+        }
+        throw new IllegalArgumentException("Illegal or unsupported type: " + type.getTypeName());
     }
 }

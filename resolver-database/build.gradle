@@ -2,9 +2,7 @@ description = 'Externalized Properties database property resolver.'
 
 dependencies {
   implementation project(':core')
-  implementation 'jakarta.persistence:jakarta.persistence-api:3.0.0'
-  testImplementation 'org.hibernate:hibernate-core-jakarta:5.5.7.Final'
-  testRuntimeOnly 'com.h2database:h2:1.4.200'
+  testImplementation 'com.h2database:h2:1.4.200'
 }
 
 jar {

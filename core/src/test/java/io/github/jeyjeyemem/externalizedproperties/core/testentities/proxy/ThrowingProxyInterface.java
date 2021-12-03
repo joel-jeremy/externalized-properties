@@ -4,7 +4,12 @@ import io.github.jeyjeyemem.externalizedproperties.core.annotations.Externalized
 
 public interface ThrowingProxyInterface {
     @ExternalizedProperty("property.that.throws")
-    default String throwingProperty() {
+    default String throwRuntimeException() {
         throw new RuntimeException("Hi from ThrowingProxyInterface.throwingProperty!");
+    }
+
+    @ExternalizedProperty("property.that.throws")
+    default String throwException() throws Exception {
+        throw new Exception("Hi from ThrowingProxyInterface.throwingProperty!");
     }
 }

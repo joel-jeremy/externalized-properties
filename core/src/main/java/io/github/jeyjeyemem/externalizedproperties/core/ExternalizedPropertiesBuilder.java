@@ -5,9 +5,12 @@ import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHan
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.DefaultConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.CachingExternalizedProperties;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalConverter;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalVariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ConcurrentMapCacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ExpiringCacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.WeakConcurrentMapCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.invocationhandlers.CachingInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.invocationhandlers.EagerLoadingInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.invocationhandlers.ExternalizedPropertyInvocationHandler;
@@ -19,7 +22,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
@@ -31,15 +33,12 @@ public class ExternalizedPropertiesBuilder {
     private List<ExternalizedPropertyResolver> resolvers = new ArrayList<>();
     private List<ConversionHandler<?>> conversionHandlers = 
         new ArrayList<>();
-
-    // Caching invocation handler settings.
-    private Duration invocationResultCacheItemLifetime;
-
-    // Eager loading settings.
-    private Duration eagerLoadedPropertyCacheItemLifetime;
-
+    
     // Caching settings.
-    private Duration cacheItemLifetime;
+    private Duration cacheDuration = getDefaultCacheDuration();
+    private boolean isCachingEnabled = false;
+    private boolean isEagerLoadingEnabled = false;
+    private boolean isInvocationCachingEnabled = false;
 
     private ExternalizedPropertiesBuilder(){}
 
@@ -47,15 +46,15 @@ public class ExternalizedPropertiesBuilder {
      * Enable default configurations. This will enable default {@link ExternalizedPropertyResolver}s 
      * and {@link ConversionHandler}s via the {@link #withDefaultResolvers()} and 
      * {@link #withDefaultConversionHandlers()} methods and enable caching via 
-     * {@link #withCaching(Duration)} and {@link #withInvocationCaching(Duration)} methods.
+     * {@link #withCaching()} and {@link #withProxyInvocationCaching()} methods.
      * 
      * @return This builder.
      */
     public ExternalizedPropertiesBuilder withDefaults() {
         return withDefaultResolvers()
             .withDefaultConversionHandlers()
-            .withCaching(Duration.ofMinutes(15))
-            .withInvocationCaching(Duration.ofMinutes(15));
+            .withCaching()
+            .withProxyInvocationCaching();
     }
 
     /**
@@ -82,32 +81,22 @@ public class ExternalizedPropertiesBuilder {
     }
 
     /**
-     * Enable caching of proxy invocation results.
+     * Enable caching of resolved properties and variable expansion results.
      * 
-     * @param cacheItemLifetime The duration of cache items in the cache 
-     * before being expired.
      * @return This builder.
      */
-    public ExternalizedPropertiesBuilder withCaching(Duration cacheItemLifetime) {
-        this.cacheItemLifetime = requireNonNull(
-            cacheItemLifetime, 
-            "cacheItemLifetime"
-        );
+    public ExternalizedPropertiesBuilder withCaching() {
+        this.isCachingEnabled = true;
         return this;
     }
 
     /**
      * Enable caching of proxy invocation results.
      * 
-     * @param cacheItemLifetime The duration of cache items in the cache 
-     * before being expired.
      * @return This builder.
      */
-    public ExternalizedPropertiesBuilder withInvocationCaching(Duration cacheItemLifetime) {
-        this.invocationResultCacheItemLifetime = requireNonNull(
-            cacheItemLifetime, 
-            "cacheItemLifetime"
-        );
+    public ExternalizedPropertiesBuilder withProxyInvocationCaching() {
+        this.isInvocationCachingEnabled = true;
         return this;
     }
 
@@ -115,15 +104,21 @@ public class ExternalizedPropertiesBuilder {
      * Eagerly resolve property values of proxy interface methods marked with 
      * {@link ExternalizedProperty} annotation.
      * 
-     * @param cacheItemLifetime The duration the eager loaded properties will 
-     * stay in the cache before being expired.
      * @return This builder.
      */
-    public ExternalizedPropertiesBuilder withEagerLoading(Duration cacheItemLifetime) {
-        this.eagerLoadedPropertyCacheItemLifetime = requireNonNull(
-            cacheItemLifetime, 
-            "cacheItemLifetime"
-        );
+    public ExternalizedPropertiesBuilder withProxyEagerLoading() {
+        this.isEagerLoadingEnabled = true;
+        return this;
+    }
+
+    /**
+     * Sets the global cache duration.
+     * 
+     * @param cacheDuration The duration of caches before being reloaded.
+     * @return This builder.
+     */
+    public ExternalizedPropertiesBuilder withCacheDuration(Duration cacheDuration) {
+        this.cacheDuration = requireNonNull(cacheDuration, "cacheDuration");
         return this;
     }
 
@@ -193,7 +188,7 @@ public class ExternalizedPropertiesBuilder {
      * @return The built {@link InternalExternalizedProperties} instance.
      */
     public ExternalizedProperties build() {
-        ExternalizedPropertyResolver resolver = configureExternalizedPropertyResolver();
+        ExternalizedPropertyResolver resolver = buildExternalizedPropertyResolver();
 
         Converter converter = new InternalConverter(
             conversionHandlers
@@ -217,10 +212,17 @@ public class ExternalizedPropertiesBuilder {
             invocationHandlerFactory
         );
 
-        if (cacheItemLifetime != null) {
+        if (isCachingEnabled) {
             return new CachingExternalizedProperties(
                 externalizedProperties,
-                cacheItemLifetime
+                new ExpiringCacheStrategy<>(
+                    new ConcurrentMapCacheStrategy<>(),
+                    cacheDuration
+                ),
+                new ExpiringCacheStrategy<>(
+                    new ConcurrentMapCacheStrategy<>(),
+                    cacheDuration
+                )
             );
         }
 
@@ -246,32 +248,36 @@ public class ExternalizedPropertiesBuilder {
                 externalizedProperties
             );
 
-        if (invocationResultCacheItemLifetime != null) {
+        if (isInvocationCachingEnabled) {
             // Decorate with CachingInvocationHandler.
-            factory = factory.compose((before, externalizedProperties, proxyInterface) -> 
+            factory = factory.compose((baseHandler, externalizedProperties, proxyInterface) -> 
                 new CachingInvocationHandler(
-                    before.createInvocationHandler(externalizedProperties, proxyInterface),
-                    new HashMap<>(),
-                    invocationResultCacheItemLifetime
+                    baseHandler,
+                    new ExpiringCacheStrategy<>(
+                        new WeakConcurrentMapCacheStrategy<>(),
+                        cacheDuration
+                    )
                 ));
         }
             
-        if (eagerLoadedPropertyCacheItemLifetime != null) {
+        if (isEagerLoadingEnabled) {
             // Decorate with EagerLoadingInvocationHandler.
-            factory = factory.compose((before, externalizedProperties, proxyInterface) -> 
+            factory = factory.compose((baseHandler, externalizedProperties, proxyInterface) -> 
                 new EagerLoadingInvocationHandler(
-                    before.createInvocationHandler(externalizedProperties, proxyInterface),
+                    baseHandler,
                     externalizedProperties,
                     proxyInterface,
-                    new HashMap<>(),
-                    eagerLoadedPropertyCacheItemLifetime
+                    new ExpiringCacheStrategy<>(
+                        new WeakConcurrentMapCacheStrategy<>(),
+                        cacheDuration
+                    )
                 ));
         }
 
         return factory;
     }
 
-    private ExternalizedPropertyResolver configureExternalizedPropertyResolver() {
+    private ExternalizedPropertyResolver buildExternalizedPropertyResolver() {
         if (resolvers.isEmpty()) {
             throw new IllegalStateException(
                 "At least one externalized property resolver is required."
@@ -279,5 +285,11 @@ public class ExternalizedPropertiesBuilder {
         }
 
         return CompositePropertyResolver.flatten(resolvers);
+    }
+
+    private Duration getDefaultCacheDuration() {
+        return Duration.ofMinutes(Integer.parseInt(
+            System.getProperty("externalizedproperties.defaultCacheDuration", "30")
+        ));
     }
 }

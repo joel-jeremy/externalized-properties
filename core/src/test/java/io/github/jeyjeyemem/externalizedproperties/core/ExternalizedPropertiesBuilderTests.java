@@ -1,9 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.EnvironmentPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ArrayProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.JavaPropertiesProxyInterface;
@@ -11,8 +10,10 @@ import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ListP
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,202 +21,241 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExternalizedPropertiesBuilderTests {
-    @Test
-    @DisplayName("should throw when externalized property resolvers collection argument is null")
-    public void test1() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> ExternalizedPropertiesBuilder.newBuilder()
-                .resolvers((Collection<ExternalizedPropertyResolver>)null)
-        );
+    @Nested
+    class NewBuilderMethod {
+        @Test
+        @DisplayName("should not return null")
+        public void test1() {
+            assertNotNull(ExternalizedPropertiesBuilder.newBuilder());
+        }
     }
 
-    @Test
-    @DisplayName("should throw when externalized property resolvers varargs argument is null")
-    public void test2() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> ExternalizedPropertiesBuilder.newBuilder()
-                .resolvers((ExternalizedPropertyResolver[])null)
-        );
+    @Nested
+    class ResolversMethod {
+        @Test
+        @DisplayName("should throw when externalized property resolvers collection argument is null")
+        public void test1() {
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> ExternalizedPropertiesBuilder.newBuilder()
+                    .resolvers((Collection<ExternalizedPropertyResolver>)null)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when externalized property resolvers varargs argument is null")
+        public void test2() {
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> ExternalizedPropertiesBuilder.newBuilder()
+                    .resolvers((ExternalizedPropertyResolver[])null)
+            );
+        }
     }
 
-    @Test
-    @DisplayName("should throw when converters collection argument is null")
-    public void test3() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> ExternalizedPropertiesBuilder.newBuilder()
-                .conversionHandlers((Collection<ConversionHandler<?>>)null)
-        );
+    @Nested
+    class ConversionHandlersMethod {
+        @Test
+        @DisplayName("should throw when converters collection argument is null")
+        public void test1() {
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> ExternalizedPropertiesBuilder.newBuilder()
+                    .conversionHandlers((Collection<ConversionHandler<?>>)null)
+            );
+        }
+    
+        @Test
+        @DisplayName("should throw when converters varargs argument is null")
+        public void test2() {
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> ExternalizedPropertiesBuilder.newBuilder()
+                    .conversionHandlers((ConversionHandler<?>[])null)
+            );
+        }
     }
 
-    @Test
-    @DisplayName("should throw when converters varargs argument is null")
-    public void test4() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> ExternalizedPropertiesBuilder.newBuilder()
-                .conversionHandlers((ConversionHandler<?>[])null)
-        );
+    @Nested
+    class BuildMethod {
+        @Test
+        @DisplayName("should throw when on build when there are no resolvers")
+        public void test1() {
+            assertThrows(
+                IllegalStateException.class,
+                () -> ExternalizedPropertiesBuilder.newBuilder().build()
+            );
+        }
+
+        // @Test
+        // @DisplayName("should allow multiple resolvers")
+        // public void test2() {
+        //     Map<String, String> map = new HashMap<>();
+        //     map.put("property", "value");
+    
+        //     ExternalizedProperties ep = ExternalizedPropertiesBuilder.newBuilder()
+        //         .resolvers(
+        //             new SystemPropertyResolver(),
+        //             new EnvironmentPropertyResolver(),
+        //             new MapPropertyResolver(map)
+        //         )
+        //         .build();
+    
+        //     JavaPropertiesProxyInterface javaProxyInterface = 
+        //         ep.proxy(JavaPropertiesProxyInterface.class);
+    
+        //     // Resolved from system properties.
+        //     assertEquals(
+        //         System.getProperty("java.version"), 
+        //         javaProxyInterface.javaVersion()
+        //     );
+    
+        //     // Resolved from environment variables.
+        //     assertEquals(
+        //         System.getenv("PATH"), 
+        //         javaProxyInterface.pathEnv()
+        //     );
+    
+        //     BasicProxyInterface basicProxyInterface = 
+        //         ep.proxy(BasicProxyInterface.class);
+    
+        //     // Resolved from map resolver.
+        //     assertEquals("value", basicProxyInterface.property());
+        // }
     }
 
-    @Test
-    @DisplayName("should throw when cache item lifetime argument is null")
-    public void test5() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> ExternalizedPropertiesBuilder.newBuilder()
-                .withCaching(null)
-        );
+    @Nested
+    class WithDefaultResolversMethod {
+        @Test
+        @DisplayName("should register default resolvers")
+        public void test1() {
+            // Default resolvers include:
+            // - System property resolver
+            // - Environment variable resolver
+            ExternalizedProperties ep = ExternalizedPropertiesBuilder.newBuilder()
+                .withDefaultResolvers()
+                .build();
+
+            testDefaultResolvers(ep);
+        }
     }
 
-    @Test
-    @DisplayName("should throw when invocation cache item lifetime argument is null")
-    public void test6() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> ExternalizedPropertiesBuilder.newBuilder()
-                .withInvocationCaching(null)
-        );
+    @Nested
+    class WithDefaultConversionHandlersMethod {
+        @Test
+        @DisplayName("should register default conversion handlers")
+        public void test1() {
+            Map<String, String> map = new HashMap<>();
+            map.put("property.integer.primitive", "1");
+            map.put("property.integer.wrapper", "1");
+            map.put("property.long.primitive", "2");
+            map.put("property.long.wrapper", "2");
+            map.put("property.double.primitive", "3.0");
+            map.put("property.double.wrapper", "3.0");
+            map.put("property.float.primitive", "4.0");
+            map.put("property.float.wrapper", "4.0");
+            map.put("property.list", "a,b,c");
+            map.put("property.collection", "c,b,a");
+            map.put("property.array", "a,b,c");
+            map.put("property.optional", "optional-value");
+    
+            // Default conversion handler includes conversion to:
+            // - Primitives
+            // - Lists/Collections
+            // - Arrays
+            // - Optionals
+            ExternalizedProperties ep = ExternalizedPropertiesBuilder.newBuilder()
+                .resolvers(new MapPropertyResolver(map))
+                .withDefaultConversionHandlers()
+                .build();
+    
+            testDefaultConversionHandlers(ep);
+        }
     }
 
-    @Test
-    @DisplayName("should throw when eager loading cache item lifetime is null")
-    public void test7() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> ExternalizedPropertiesBuilder.newBuilder()
-                .withEagerLoading(null)
-        );
+    @Nested
+    class WithDefaultsMethod {
+        @Test
+        @DisplayName("should register default resolvers and conversion handlers")
+        public void test12() {
+            // System properties.
+            System.setProperty("property.integer.primitive", "1");
+            System.setProperty("property.integer.wrapper", "1");
+            System.setProperty("property.long.primitive", "2");
+            System.setProperty("property.long.wrapper", "2");
+            System.setProperty("property.double.primitive", "3.0");
+            System.setProperty("property.double.wrapper", "3.0");
+            System.setProperty("property.float.primitive", "4.0");
+            System.setProperty("property.float.wrapper", "4.0");
+            System.setProperty("property.list", "a,b,c");
+            System.setProperty("property.collection", "c,b,a");
+            System.setProperty("property.array", "a,b,c");
+            System.setProperty("property.optional", "optional-value");
+    
+            // Default conversion handler includes conversion to:
+            // - Primitives
+            // - Lists/Collections
+            // - Arrays
+            // - Optionals
+            ExternalizedProperties ep = ExternalizedPropertiesBuilder.newBuilder()
+                .withDefaults()
+                .build();
+    
+            testDefaultResolvers(ep);
+            testDefaultConversionHandlers(ep);
+        }
     }
 
-    @Test
-    @DisplayName("should throw when on build when there are no resolvers")
-    public void test8() {
-        assertThrows(
-            IllegalStateException.class,
-            () -> ExternalizedPropertiesBuilder.newBuilder().build()
-        );
+    @Nested
+    class WithCacheDurationMethod {
+        @Test
+        @DisplayName("should throw when cache duration argument is null")
+        public void test1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ExternalizedPropertiesBuilder.newBuilder().withCacheDuration(null)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when cache duration argument is null")
+        public void test2() {
+            assertDoesNotThrow(
+                () -> ExternalizedPropertiesBuilder.newBuilder()
+                    .withCacheDuration(Duration.ofMinutes(1))
+            );
+        }
     }
 
-    @Test
-    @DisplayName("should allow multiple resolvers")
-    public void test9() {
-        Map<String, String> map = new HashMap<>();
-        map.put("property", "value");
+    @Nested
+    class WithProxyEagerLoadingMethod {
+        @Test
+        @DisplayName("should enable proxy eager loading")
+        public void test1() {
+            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver();
 
-        ExternalizedProperties ep = ExternalizedPropertiesBuilder.newBuilder()
-            .resolvers(
-                new SystemPropertyResolver(),
-                new EnvironmentPropertyResolver(),
-                new MapPropertyResolver(map)
-            )
-            .build();
+            ExternalizedProperties externalizedProperties = 
+                ExternalizedPropertiesBuilder.newBuilder()
+                    .resolvers(resolver)
+                    .withProxyEagerLoading()
+                    .build();
 
-        JavaPropertiesProxyInterface javaProxyInterface = 
-            ep.proxy(JavaPropertiesProxyInterface.class);
+            BasicProxyInterface proxy = externalizedProperties.proxy(BasicProxyInterface.class);
 
-        // Resolved from system properties.
-        assertEquals(
-            System.getProperty("java.version"), 
-            javaProxyInterface.javaVersion()
-        );
+            assertNotNull(proxy);
 
-        // Resolved from environment variables.
-        assertEquals(
-            System.getenv("PATH"), 
-            javaProxyInterface.pathEnv()
-        );
-
-        BasicProxyInterface basicProxyInterface = 
-            ep.proxy(BasicProxyInterface.class);
-
-        // Resolved from map resolver.
-        assertEquals("value", basicProxyInterface.property());
-    }
-
-    @Test
-    @DisplayName(
-        "should register default resolvers"
-    )
-    public void test10() {
-        // Default resolvers include:
-        // - System property resolver
-        // - Environment variable resolver
-        ExternalizedProperties ep = ExternalizedPropertiesBuilder.newBuilder()
-            .withDefaultResolvers()
-            .build();
-
-        testDefaultResolvers(ep);
-    }
-
-    @Test
-    @DisplayName(
-        "should register default conversion handlers"
-    )
-    public void test11() {
-        Map<String, String> map = new HashMap<>();
-        map.put("property.integer.primitive", "1");
-        map.put("property.integer.wrapper", "1");
-        map.put("property.long.primitive", "2");
-        map.put("property.long.wrapper", "2");
-        map.put("property.double.primitive", "3.0");
-        map.put("property.double.wrapper", "3.0");
-        map.put("property.float.primitive", "4.0");
-        map.put("property.float.wrapper", "4.0");
-        map.put("property.list", "a,b,c");
-        map.put("property.collection", "c,b,a");
-        map.put("property.array", "a,b,c");
-        map.put("property.optional", "optional-value");
-
-        // Default conversion handler includes conversion to:
-        // - Primitives
-        // - Lists/Collections
-        // - Arrays
-        // - Optionals
-        ExternalizedProperties ep = ExternalizedPropertiesBuilder.newBuilder()
-            .resolvers(new MapPropertyResolver(map))
-            .withDefaultConversionHandlers()
-            .build();
-
-        testDefaultConversionHandlers(ep);
-    }
-
-    @Test
-    @DisplayName("should register default resolvers and conversion handlers")
-    public void test12() {
-        // System properties.
-        System.setProperty("property.integer.primitive", "1");
-        System.setProperty("property.integer.wrapper", "1");
-        System.setProperty("property.long.primitive", "2");
-        System.setProperty("property.long.wrapper", "2");
-        System.setProperty("property.double.primitive", "3.0");
-        System.setProperty("property.double.wrapper", "3.0");
-        System.setProperty("property.float.primitive", "4.0");
-        System.setProperty("property.float.wrapper", "4.0");
-        System.setProperty("property.list", "a,b,c");
-        System.setProperty("property.collection", "c,b,a");
-        System.setProperty("property.array", "a,b,c");
-        System.setProperty("property.optional", "optional-value");
-
-        // Default conversion handler includes conversion to:
-        // - Primitives
-        // - Lists/Collections
-        // - Arrays
-        // - Optionals
-        ExternalizedProperties ep = ExternalizedPropertiesBuilder.newBuilder()
-            .withDefaults()
-            .build();
-
-        testDefaultResolvers(ep);
-        testDefaultConversionHandlers(ep);
+            // Properties were already eagerly resolved via resolver.
+            assertTrue(resolver.resolvedPropertyNames().contains("property"));
+            assertTrue(resolver.resolvedPropertyNames().contains("property.with.default.value"));
+        }
     }
 
     private void testDefaultResolvers(ExternalizedProperties ep) {

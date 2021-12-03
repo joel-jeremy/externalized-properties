@@ -1,7 +1,5 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,7 +18,7 @@ public class EnvironmentPropertyResolverTests {
         @DisplayName("should resolve property value from environment variables")
         public void test1() {
             EnvironmentPropertyResolver resolver = resolverToTest();
-            Optional<ResolvedProperty> result = resolver.resolve(
+            Optional<String> result = resolver.resolve(
                 "PATH"
             );
 
@@ -28,7 +26,7 @@ public class EnvironmentPropertyResolverTests {
             assertTrue(result.isPresent());
             assertEquals(
                 System.getenv("PATH"), 
-                result.get().value()
+                result.get()
             );
         }
 
@@ -38,7 +36,7 @@ public class EnvironmentPropertyResolverTests {
         )
         public void test2() {
             EnvironmentPropertyResolver resolver = resolverToTest();
-            Optional<ResolvedProperty> result = resolver.resolve(
+            Optional<String> result = resolver.resolve(
                 "NON_EXISTING_ENVVAR"
             );
 
@@ -53,7 +51,7 @@ public class EnvironmentPropertyResolverTests {
         @DisplayName("should resolve property values from environment variables")
         public void test1() {
             EnvironmentPropertyResolver resolver = resolverToTest();
-            ExternalizedPropertyResolverResult result = resolver.resolve(
+            EnvironmentPropertyResolver.Result result = resolver.resolve(
                 "PATH",
                 "HOME"
             );
@@ -63,12 +61,12 @@ public class EnvironmentPropertyResolverTests {
 
             assertEquals(
                 System.getenv("PATH"), 
-                result.findRequiredPropertyValue("PATH")
+                result.findRequiredProperty("PATH")
             );
 
             assertEquals(
                 System.getenv("HOME"), 
-                result.findRequiredPropertyValue("HOME")
+                result.findRequiredProperty("HOME")
             );
         }
 
@@ -78,7 +76,7 @@ public class EnvironmentPropertyResolverTests {
         )
         public void test2() {
             EnvironmentPropertyResolver resolver = resolverToTest();
-            ExternalizedPropertyResolverResult result = resolver.resolve(
+            EnvironmentPropertyResolver.Result result = resolver.resolve(
                 "NON_EXISTING_ENVVAR1",
                 "NON_EXISTING_ENVVAR2"
             );

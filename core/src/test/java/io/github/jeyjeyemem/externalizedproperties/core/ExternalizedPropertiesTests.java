@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -127,7 +126,7 @@ public class ExternalizedPropertiesTests {
             ExternalizedPropertiesBuilder.newBuilder()
                 .resolvers(resolvers)
                 .conversionHandlers(conversionHandlers)
-                .withCaching(Duration.ofMinutes(5));
+                .withCaching();
         
         if (conversionHandlers.size() == 0) {
             builder.withDefaultConversionHandlers();
