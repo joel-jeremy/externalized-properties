@@ -1,6 +1,7 @@
 # Externalized Properties
 
 [![Gradle Build](https://github.com/jeyjeyemem/externalized-properties/actions/workflows/gradle-build.yaml/badge.svg)](https://github.com/jeyjeyemem/externalized-properties/actions/workflows/gradle-build.yaml)
+[![Coverage Status](https://coveralls.io/repos/github/jeyjeyemem/externalized-properties/badge.svg?branch=prepare-v1.0.0)](https://coveralls.io/github/jeyjeyemem/externalized-properties?branch=prepare-v1.0.0)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/jeyjeyemem/externalized-properties/blob/main/LICENSE)
 
 A lightweight and extensible library to resolve application properties from various external sources.
