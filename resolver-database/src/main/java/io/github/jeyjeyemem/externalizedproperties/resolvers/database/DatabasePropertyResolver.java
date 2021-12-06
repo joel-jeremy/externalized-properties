@@ -1,7 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
 
@@ -99,7 +98,7 @@ public class DatabasePropertyResolver implements ExternalizedPropertyResolver {
 
     private Result getFromDatabase(Collection<String> propertyNames) throws SQLException {
         try (Connection connection = connectionProvider.getConnection()) {
-            List<ResolvedProperty> resolvedProperties = 
+            List<DatabaseProperty> resolvedProperties = 
                 queryExecutor.queryProperties(connection, propertyNames);
 
             Result.Builder resultBuilder = Result.builder(propertyNames);

@@ -11,29 +11,34 @@ import java.lang.reflect.WildcardType;
 import java.util.Optional;
 
 /**
- * Information about an externalized property method.
+ * Information about methods that go through Externalized Properties proxying.
  */
 public interface ExternalizedPropertyMethodInfo {
     /**
-     * The externalized property annotation, if any.
+     * The {@link ExternalizedProperty} annotation, if method is annotated.
      * 
-     * @return The externalized property annotation, if any.
+     * @return The externalized property annotation.
+     * Otherwise, an empty {@link Optional}.
      */
     Optional<ExternalizedProperty> externalizedPropertyAnnotation();
 
     /**
-     * The externalized property name, if any.
+     * The externalized property name, if method is annotated with 
+     * {@link ExternalizedProperty}. The property name is derived from
+     * {@link ExternalizedProperty#value()}.
      * 
-     * @return The externalized property name, if any.
+     * @return The externalized property name as specified in 
+     * {@link ExternalizedProperty#value()}. Otherwise, an empty {@link Optional}.
      */
-    Optional<String> propertyName();
+    Optional<String> externalizedPropertyName();
 
     /**
      * Find externalized property method annotation.
      * 
      * @param <T> The type of the annotation.
      * @param annotationClass Annotation class to find.
-     * @return The annotation matching the specified annotation class, if any.
+     * @return The annotation matching the specified annotation class.
+     * Otherwise, an empty {@link Optional}.
      */
     <T extends Annotation> Optional<T> findAnnotation(Class<T> annotationClass);
 

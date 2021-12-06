@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
+import io.github.jeyjeyemem.externalizedproperties.resolvers.database.DatabaseProperty;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.QueryExecutor;
 
 import java.sql.Connection;
@@ -33,7 +33,7 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
      * @throws SQLException if a database-related error has occurred.
      */
     @Override
-    public List<ResolvedProperty> queryProperties(
+    public List<DatabaseProperty> queryProperties(
             Connection connection,
             Collection<String> propertyNamesToResolve
     ) throws SQLException {
@@ -72,10 +72,10 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
      * @return The list of properties resolved from the database.
      * @throws SQLException if a database-related error has occurred.
      */
-    protected List<ResolvedProperty> runQuery(
+    protected List<DatabaseProperty> runQuery(
             PreparedStatement preparedStatement
     ) throws SQLException {
-        List<ResolvedProperty> resolvedProperties = new ArrayList<>();
+        List<DatabaseProperty> resolvedProperties = new ArrayList<>();
         try (ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
                 resolvedProperties.add(mapResult(resultSet));
@@ -85,16 +85,16 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
     }
 
     /**
-     * Map the query result to a {@link ResolvedProperty}.
+     * Map the query result to a {@link DatabaseProperty}.
      * 
      * @param resultSet The query result set.
-     * @return The mapped {@link ResolvedProperty}.
+     * @return The mapped {@link DatabaseProperty}.
      * @throws SQLException if a database-related error has occurred.
      */
-    protected ResolvedProperty mapResult(ResultSet resultSet) throws SQLException {
+    protected DatabaseProperty mapResult(ResultSet resultSet) throws SQLException {
         String name = resultSet.getString(propertyNameColumn());
         String value = resultSet.getString(propertyValueColumn());
-        return ResolvedProperty.with(name, value);
+        return DatabaseProperty.with(name, value);
     }
 
     /**

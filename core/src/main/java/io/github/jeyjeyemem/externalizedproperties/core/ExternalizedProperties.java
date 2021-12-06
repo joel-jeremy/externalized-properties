@@ -69,7 +69,6 @@ public interface ExternalizedProperties {
      * @param <T> The expected property type.
      * @param propertyName The property name.
      * @param expectedType The expected property type.
-     * shall be expanded.
      * @return The resolved property value. Otherwise, an empty {@link Optional}.
      */
     <T> Optional<T> resolveProperty(
@@ -80,13 +79,11 @@ public interface ExternalizedProperties {
     /**
      * Resolve property from an external source and convert to expected type.
      * 
-     * @param <T> The expected property type.
      * @param propertyName The property name.
      * @param expectedType The expected property type.
-     * shall be expanded.
      * @return The resolved property value. Otherwise, an empty {@link Optional}.
      */
-    <T> Optional<T> resolveProperty(
+    Optional<?> resolveProperty(
         String propertyName,
         Type expectedType
     );

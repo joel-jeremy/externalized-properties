@@ -565,7 +565,7 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            Optional<Integer> resolved = cachingExternalizedProperties.resolveProperty(
+            Optional<?> resolved = cachingExternalizedProperties.resolveProperty(
                 propertyName,
                 (Type)Integer.class
             );
@@ -600,7 +600,7 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            Optional<Integer> resolved = cachingExternalizedProperties.resolveProperty(
+            Optional<?> resolved = cachingExternalizedProperties.resolveProperty(
                 propertyName,
                 (Type)Integer.class
             );
@@ -638,7 +638,7 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            Optional<Integer> resolved = cachingExternalizedProperties.resolveProperty(
+            Optional<?> resolved = cachingExternalizedProperties.resolveProperty(
                 propertyName,
                 (Type)Integer.class
             );
@@ -676,7 +676,7 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            Optional<Integer> resolved = cachingExternalizedProperties.resolveProperty(
+            Optional<?> resolved = cachingExternalizedProperties.resolveProperty(
                 propertyName,
                 (Type)Integer.class
             );

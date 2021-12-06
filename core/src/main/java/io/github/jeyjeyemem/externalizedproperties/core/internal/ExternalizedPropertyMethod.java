@@ -24,6 +24,7 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
     private final ExternalizedProperties externalizedProperties;
     private final MethodHandleFactory methodHandleFactory;
 
+    private final ExternalizedProperty externalizedPropertyAnnotation;
     private final String expandedPropertyName;
     
     /**
@@ -50,8 +51,7 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
         this.externalizedProperties = externalizedProperties;
         this.methodHandleFactory = methodHandleFactory;
         
-        ExternalizedProperty externalizedPropertyAnnotation = 
-            method.getAnnotation(ExternalizedProperty.class);
+        this.externalizedPropertyAnnotation = method.getAnnotation(ExternalizedProperty.class);
         this.expandedPropertyName = externalizedPropertyAnnotation != null ?
             externalizedProperties.expandVariables(externalizedPropertyAnnotation.value()) : 
             null;
@@ -60,12 +60,12 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
     /** {@inheritDoc} */
     @Override
     public Optional<ExternalizedProperty> externalizedPropertyAnnotation() {
-        return findAnnotation(ExternalizedProperty.class);
+        return Optional.ofNullable(externalizedPropertyAnnotation);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Optional<String> propertyName() {
+    public Optional<String> externalizedPropertyName() {
         return Optional.ofNullable(expandedPropertyName);
     }
 
@@ -219,14 +219,15 @@ public class ExternalizedPropertyMethod implements ExternalizedPropertyMethodInf
             return Optional.empty();
         }
 
+        String propertyMethodName = externalizedPropertyName().orElse(null);
         // Non-optional properties will throw an exception if cannot be resolved.
         throw new UnresolvedPropertiesException(
-            propertyName().orElse(null),
+            propertyMethodName,
             String.format(
-                "Failed to resolve property (%s) for externalized property method (%s). " + 
+                "Failed to resolve property '(%s)' for externalized property method (%s). " + 
                 "To prevent exceptions when a property cannot be resolved, " +
                 "consider changing method's return type to an Optional.",
-                propertyName().orElse(null),
+                propertyMethodName,
                 methodSignatureString()
             )
         );

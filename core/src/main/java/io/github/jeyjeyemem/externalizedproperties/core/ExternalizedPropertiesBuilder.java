@@ -11,9 +11,9 @@ import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalVariabl
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ConcurrentMapCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ExpiringCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.WeakConcurrentMapCacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.invocationhandlers.CachingInvocationHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.invocationhandlers.EagerLoadingInvocationHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.invocationhandlers.ExternalizedPropertyInvocationHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.CachingInvocationHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.EagerLoadingInvocationHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.ExternalizedPropertyInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositePropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.EnvironmentPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;

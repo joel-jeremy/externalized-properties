@@ -56,7 +56,7 @@ public class StubExternalizedPropertyMethodInfo
     }
 
     @Override
-    public Optional<String> propertyName() {
+    public Optional<String> externalizedPropertyName() {
         return externalizedPropertyAnnotation().map(
             ep -> variableExpander.expandVariables(ep.value())
         );

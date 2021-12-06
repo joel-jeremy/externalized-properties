@@ -87,46 +87,44 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
     
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Optional<T> resolveProperty(
             String propertyName,
             Class<T> expectedType
     ) {
-        return resolveProperty(propertyName, (Type)expectedType);
+        return (Optional<T>)resolveProperty(propertyName, (Type)expectedType);
     }
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Optional<T> resolveProperty(
             String propertyName,
             TypeReference<T> expectedType
     ) {
-        requireNonNull(expectedType, "expectedType");
-        return resolveProperty(propertyName, expectedType.type());
+        return (Optional<T>)resolveProperty(
+            propertyName, 
+            requireNonNull(expectedType, "expectedType").type()
+        );
     }
 
     /** {@inheritDoc} */
     @Override
-    public <T> Optional<T> resolveProperty(
+    public Optional<?> resolveProperty(
             String propertyName,
             Type expectedType
     ) {
         Optional<String> resolved = resolveProperty(propertyName);
 
         if (String.class.equals(expectedType)) {
-            @SuppressWarnings("unchecked")
-            Optional<T> result = (Optional<T>)resolved;
-            return result;
+            return resolved;
         }
 
         return resolved.map(r -> {
-            Object convertedValue = converter.convert(
+            return converter.convert(
                 resolved.get(), 
                 expectedType
             );
-
-            @SuppressWarnings("unchecked")
-            T result = (T)convertedValue;
-            return result;
         });
     }
 

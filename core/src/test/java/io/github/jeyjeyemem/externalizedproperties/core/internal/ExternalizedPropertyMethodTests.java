@@ -146,7 +146,7 @@ public class ExternalizedPropertyMethodTests {
     }
 
     @Nested
-    class PropertyNameMethod {
+    class ExternalizedPropertyNameMethod {
         @Test
         @DisplayName("should return name of the property")
         public void test1() {
@@ -156,7 +156,7 @@ public class ExternalizedPropertyMethodTests {
                     "property"
                 );
             
-            Optional<String> propertyName = externalizedPropertyMethod.propertyName();
+            Optional<String> propertyName = externalizedPropertyMethod.externalizedPropertyName();
             
             assertTrue(propertyName.isPresent());
 

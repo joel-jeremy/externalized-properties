@@ -5,7 +5,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.TypeReference;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.DefaultConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.invocationhandlers.ExternalizedPropertyInvocationHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.ExternalizedPropertyInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import org.junit.jupiter.api.DisplayName;
@@ -294,7 +294,7 @@ public class InternalExternalizedPropertiesTests {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            Optional<Integer> property = externalizedProperties.resolveProperty(
+            Optional<?> property = externalizedProperties.resolveProperty(
                 "test.property",
                 (Type)Integer.class
             );

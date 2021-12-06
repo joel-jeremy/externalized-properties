@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core.internal.invocationhandlers;
+package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 

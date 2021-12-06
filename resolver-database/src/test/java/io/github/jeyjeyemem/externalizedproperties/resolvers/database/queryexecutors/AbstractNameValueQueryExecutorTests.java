@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ResolvedProperty;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.ConnectionProvider;
+import io.github.jeyjeyemem.externalizedproperties.resolvers.database.DatabaseProperty;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.testentities.H2DataSourceConnectionProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -252,7 +252,7 @@ public class AbstractNameValueQueryExecutorTests {
                     "test.property.2"
                 );
                 
-                List<ResolvedProperty> resolved = queryExecutor.queryProperties(
+                List<DatabaseProperty> resolved = queryExecutor.queryProperties(
                     CONNECTION_PROVIDER.getConnection(),
                     propertiesToQuery
                 );
@@ -263,7 +263,7 @@ public class AbstractNameValueQueryExecutorTests {
                     "test/property/value/1", 
                     resolved.stream()
                         .filter(rp -> rp.name().equals("test.property.1"))
-                        .map(ResolvedProperty::value)
+                        .map(DatabaseProperty::value)
                         .findFirst()
                         .orElse(null)
                 );
@@ -272,7 +272,7 @@ public class AbstractNameValueQueryExecutorTests {
                     "test/property/value/2", 
                     resolved.stream()
                         .filter(rp -> rp.name().equals("test.property.2"))
-                        .map(ResolvedProperty::value)
+                        .map(DatabaseProperty::value)
                         .findFirst()
                         .orElse(null)
                 );

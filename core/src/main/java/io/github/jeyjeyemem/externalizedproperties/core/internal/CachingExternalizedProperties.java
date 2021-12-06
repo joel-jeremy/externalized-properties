@@ -71,34 +71,37 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Optional<T> resolveProperty(String propertyName, Class<T> expectedType) {
-        return resolveProperty(propertyName, (Type)expectedType);
+        return (Optional<T>)resolveProperty(propertyName, (Type)expectedType);
     }
 
     /** {@inheritDoc} */
     @Override
+    @SuppressWarnings("unchecked")
     public <T> Optional<T> resolveProperty(
             String propertyName, 
             TypeReference<T> expectedType
     ) {
-        return resolveProperty(propertyName, expectedType.type());
+        return (Optional<T>)resolveProperty(
+            propertyName, 
+            requireNonNull(expectedType, "expectedType").type()
+        );
     }
 
     /** {@inheritDoc} */
     @Override
-    public <T> Optional<T> resolveProperty(
+    public Optional<?> resolveProperty(
             String propertyName, 
             Type expectedType
     ) {
         Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.get(propertyName);
         if (cached.isPresent()) {
-            @SuppressWarnings("unchecked")
-            Optional<T> result = (Optional<T>)cached.get();
-            return result;
+            return cached.get();
         }
 
         // Property name variable already expanded.
-        Optional<T> resolved = decorated.resolveProperty(
+        Optional<?> resolved = decorated.resolveProperty(
             propertyName, 
             expectedType
         );

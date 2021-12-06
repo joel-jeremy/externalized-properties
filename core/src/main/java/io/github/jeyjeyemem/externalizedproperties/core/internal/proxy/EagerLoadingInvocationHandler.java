@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core.internal.invocationhandlers;
+package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
@@ -78,7 +78,7 @@ public class EagerLoadingInvocationHandler implements InvocationHandler {
             String propertyName = externalizedProperties.expandVariables(
                 externalizedProperty.value()
             );
-            Optional<Object> result = externalizedProperties.resolveProperty(
+            Optional<?> result = externalizedProperties.resolveProperty(
                 propertyName,
                 method.getGenericReturnType()
             );
