@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNullOrEmptyString;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
 /**
  * The database property.

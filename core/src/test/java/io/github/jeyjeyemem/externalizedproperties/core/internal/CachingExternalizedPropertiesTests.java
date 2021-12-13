@@ -5,9 +5,12 @@ import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBuilder;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeReference;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -94,7 +97,8 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            Optional<String> resolved = cachingExternalizedProperties.resolveProperty(propertyName);
+            Optional<String> resolved = 
+                cachingExternalizedProperties.resolveProperty(propertyName);
 
             assertTrue(resolved.isPresent());
             assertEquals("cached.value", resolved.get());
@@ -123,7 +127,8 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            Optional<String> resolved = cachingExternalizedProperties.resolveProperty(propertyName);
+            Optional<String> resolved = 
+                cachingExternalizedProperties.resolveProperty(propertyName);
 
             assertTrue(resolved.isPresent());
             assertEquals(propertyName + "-value", resolved.get());
@@ -155,7 +160,8 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            Optional<String> resolved = cachingExternalizedProperties.resolveProperty(propertyName);
+            Optional<String> resolved = 
+                cachingExternalizedProperties.resolveProperty(propertyName);
 
             assertTrue(resolved.isPresent());
             assertEquals(propertyName + "-value", resolved.get());
@@ -190,7 +196,8 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            Optional<String> resolved = cachingExternalizedProperties.resolveProperty(propertyName);
+            Optional<String> resolved = 
+                cachingExternalizedProperties.resolveProperty(propertyName);
 
             assertFalse(resolved.isPresent());
             assertFalse(resolver.resolvedPropertyNames().contains(propertyName));
@@ -712,6 +719,245 @@ public class CachingExternalizedPropertiesTests {
                     propertyName,
                     (Type)Integer.class
                 )
+            );
+        }
+    }
+
+    @Nested
+    class ResolvePropertyMethodWithProxyMethodInfoOverload {
+        @Test
+        @DisplayName("should throw when proxy method info argument is null")
+        public void test1() {
+            ExternalizedProperties decorated = ExternalizedPropertiesBuilder.newBuilder()
+                .withDefaults()
+                .build();
+
+            CachingExternalizedProperties cachingExternalizedProperties = 
+                new CachingExternalizedProperties(
+                    decorated,
+                    new StubCacheStrategy<>(),
+                    new StubCacheStrategy<>()
+                );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> cachingExternalizedProperties.resolveProperty((ProxyMethodInfo)null)
+            );
+        }
+
+        @Test
+        @DisplayName("should return cached property value")
+        public void test2() {
+            ExternalizedProperties decorated = ExternalizedPropertiesBuilder.newBuilder()
+                .withDefaults()
+                .build();
+
+            String propertyName = "property.integer.primitive";
+
+            CacheStrategy<String, Optional<?>> resolvedPropertyCacheStrategy = 
+                new StubCacheStrategy<>();
+            resolvedPropertyCacheStrategy.cache(propertyName, Optional.of(1));
+
+            CachingExternalizedProperties cachingExternalizedProperties = 
+                new CachingExternalizedProperties(
+                    decorated,
+                    resolvedPropertyCacheStrategy,
+                    new StubCacheStrategy<>()
+                );
+            
+            StubProxyMethodInfo proxyMethodInfo = StubProxyMethodInfo.fromMethod(
+                PrimitiveProxyInterface.class, 
+                "intPrimitiveProperty"
+            );
+
+            Optional<?> resolved = 
+                cachingExternalizedProperties.resolveProperty(proxyMethodInfo);
+
+            assertTrue(resolved.isPresent());
+            assertEquals(1, (int)resolved.get());
+        }
+
+        @Test
+        @DisplayName(
+            "should resolve property from decorated externalized properties " +
+            "when property is not in cache"
+        )
+        public void test3() {
+            // Always resolves to 1.
+            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver(
+                propertyName -> "1"
+            );
+
+            ExternalizedProperties decorated = ExternalizedPropertiesBuilder.newBuilder()
+                .withDefaultConversionHandlers()
+                .resolvers(resolver)
+                .build();
+
+            // Empty cache.
+            CachingExternalizedProperties cachingExternalizedProperties = 
+                new CachingExternalizedProperties(
+                    decorated,
+                    new StubCacheStrategy<>(),
+                    new StubCacheStrategy<>()
+                );
+
+            StubProxyMethodInfo proxyMethodInfo = StubProxyMethodInfo.fromMethod(
+                PrimitiveProxyInterface.class, 
+                "intPrimitiveProperty"
+            );
+
+            Optional<?> resolved = 
+                cachingExternalizedProperties.resolveProperty(proxyMethodInfo);
+
+            assertTrue(resolved.isPresent());
+            assertEquals(1, (int)resolved.get());
+
+            String propertyName = "property.integer.primitive";
+            assertTrue(resolver.resolvedPropertyNames().contains(propertyName));
+        }
+
+        @Test
+        @DisplayName(
+            "should cache resolved properties from decorated externalized properties"
+        )
+        public void test4() {
+            // Always resolves to 1.
+            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver(
+                propertyName -> "1"
+            );
+
+            ExternalizedProperties decorated = ExternalizedPropertiesBuilder.newBuilder()
+                .withDefaultConversionHandlers()
+                .resolvers(resolver)
+                .build();
+
+            CacheStrategy<String, Optional<?>> resolvedPropertiesCacheStrategy =
+                new StubCacheStrategy<>();
+
+            // Empty cache.
+            CachingExternalizedProperties cachingExternalizedProperties = 
+                new CachingExternalizedProperties(
+                    decorated,
+                    resolvedPropertiesCacheStrategy,
+                    new StubCacheStrategy<>()
+                );
+
+            StubProxyMethodInfo proxyMethodInfo = StubProxyMethodInfo.fromMethod(
+                PrimitiveProxyInterface.class, 
+                "intPrimitiveProperty"
+            );
+
+            Optional<?> resolved = 
+                cachingExternalizedProperties.resolveProperty(proxyMethodInfo);
+
+            assertTrue(resolved.isPresent());
+            assertEquals(1, (int)resolved.get());
+
+            String propertyName = "property.integer.primitive";
+            Optional<Optional<?>> cached = resolvedPropertiesCacheStrategy.get(propertyName);
+            assertTrue(cached.isPresent());
+            assertEquals(Optional.of(1), cached.get());
+        }
+        
+        @Test
+        @DisplayName(
+            "should return empty Optional when decorated externalized properties " +
+            "cannot resolve property"
+        )
+        public void test5() {
+            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver(
+                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            );
+
+            ExternalizedProperties decorated = ExternalizedPropertiesBuilder.newBuilder()
+                .withDefaultConversionHandlers()
+                .resolvers(resolver)
+                .build();
+
+            // Empty cache.
+            CachingExternalizedProperties cachingExternalizedProperties = 
+                new CachingExternalizedProperties(
+                    decorated,
+                    new StubCacheStrategy<>(),
+                    new StubCacheStrategy<>()
+                );
+
+            StubProxyMethodInfo proxyMethodInfo = StubProxyMethodInfo.fromMethod(
+                PrimitiveProxyInterface.class, 
+                "intPrimitiveProperty"
+            );
+
+            Optional<?> resolved = 
+                cachingExternalizedProperties.resolveProperty(proxyMethodInfo);
+
+            assertFalse(resolved.isPresent());
+
+            String propertyName = "property.integer.primitive";
+            assertFalse(resolver.resolvedPropertyNames().contains(propertyName));
+        }
+
+        @Test
+        @DisplayName("should throw when property cannot be converted to the target class")
+        public void test6() {
+            // Invalid integer.
+            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver(
+                propertyName -> "invalid_integer"
+            );
+
+            ExternalizedProperties decorated = ExternalizedPropertiesBuilder.newBuilder()
+                .withDefaultConversionHandlers()
+                .resolvers(resolver)
+                .build();
+
+            CachingExternalizedProperties cachingExternalizedProperties = 
+                new CachingExternalizedProperties(
+                    decorated,
+                    new StubCacheStrategy<>(),
+                    new StubCacheStrategy<>()
+                );
+            
+            StubProxyMethodInfo proxyMethodInfo = StubProxyMethodInfo.fromMethod(
+                PrimitiveProxyInterface.class, 
+                "intPrimitiveProperty"
+            );
+
+            assertThrows(
+                ConversionException.class, 
+                () -> cachingExternalizedProperties.resolveProperty(proxyMethodInfo)
+            );
+        }
+
+
+
+        @Test
+        @DisplayName(
+            "should throw when proxy method info does not have @ExternalizedProperty annotation."
+        )
+        public void test7() {
+            // Invalid integer.
+            StubExternalizedPropertyResolver resolver = 
+                new StubExternalizedPropertyResolver();
+
+            ExternalizedProperties decorated = ExternalizedPropertiesBuilder.newBuilder()
+                .withDefaultConversionHandlers()
+                .resolvers(resolver)
+                .build();
+
+            CachingExternalizedProperties cachingExternalizedProperties = 
+                new CachingExternalizedProperties(
+                    decorated,
+                    new StubCacheStrategy<>(),
+                    new StubCacheStrategy<>()
+                );
+            
+            StubProxyMethodInfo proxyMethodInfo = StubProxyMethodInfo.fromMethod(
+                BasicProxyInterface.class, 
+                "propertyWithNoAnnotationAndNoDefaultValue"
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> cachingExternalizedProperties.resolveProperty(proxyMethodInfo)
             );
         }
     }

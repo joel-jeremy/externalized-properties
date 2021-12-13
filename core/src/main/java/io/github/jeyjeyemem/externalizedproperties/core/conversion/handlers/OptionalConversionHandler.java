@@ -1,16 +1,14 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
+import io.github.jeyjeyemem.externalizedproperties.core.TypeUtilities;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
  * Supports conversion of values to an {@link Optional}.
@@ -19,34 +17,23 @@ public class OptionalConversionHandler implements ConversionHandler<Optional<?>>
     
     /** {@inheritDoc} */
     @Override
-    public boolean canConvertTo(Class<?> expectedType) {
-        return Optional.class.equals(expectedType);
+    public boolean canConvertTo(Class<?> targetType) {
+        return Optional.class.equals(targetType);
     }
 
     /** {@inheritDoc} */
     @Override
     public Optional<?> convert(ConversionContext context) {
-        return convertInternal(context);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Optional<?> convert(PropertyMethodConversionContext context) {
-        return convertInternal(context);
-    }
-
-    private Optional<?> convertInternal(ConversionContext context) {
         requireNonNull(context, "context");
 
         try {
-            Type[] genericTypeParams = context.expectedTypeGenericTypeParameters();
+            Type[] genericTypeParams = context.targetTypeGenericTypeParameters();
             
             // Assume initially as Optional of string type.
             Type targetOptionalType = String.class;
             if (genericTypeParams.length > 0) {
-                targetOptionalType = genericTypeParams[0];
                 // Do not allow Optional<T>, Optional<T extends ...>, etc.
-                throwIfOptionalHasTypeVariable(targetOptionalType);
+                targetOptionalType = throwIfOptionalHasTypeVariable(genericTypeParams[0]);
             }
 
             String value = context.value();
@@ -59,8 +46,8 @@ public class OptionalConversionHandler implements ConversionHandler<Optional<?>>
             }
 
             return convertToOptionalType(
-                context, 
-                value, 
+                context,
+                value,
                 targetOptionalType
             );
         } catch (Exception ex) {
@@ -74,26 +61,23 @@ public class OptionalConversionHandler implements ConversionHandler<Optional<?>>
     }
 
     private Optional<?> convertToOptionalType(
-            ConversionContext context, 
+            ConversionContext context,
             String value,
             Type optionalGenericTypeParameter
     ) {
-        Converter converter = context.converter();
-
         // Convert property and wrap in Optional.
-        return Optional.ofNullable(
-            converter.convert(
-                value, 
-                optionalGenericTypeParameter
-            )
-        );
+        return Optional.ofNullable(context.converter().convert(
+            context.with(optionalGenericTypeParameter, value)
+        ));
     }
 
-    private void throwIfOptionalHasTypeVariable(Type optionalGenericTypeParameter) {
+    private Type throwIfOptionalHasTypeVariable(Type optionalGenericTypeParameter) {
         if (TypeUtilities.isTypeVariable(optionalGenericTypeParameter)) {
             throw new ConversionException(
                 "Type variables e.g. Optional<T> are not supported."
             );
         }
+
+        return optionalGenericTypeParameter;
     }
 }

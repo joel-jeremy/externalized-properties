@@ -1,24 +1,22 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.TypeReference;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalConverter;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ArrayProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ListProxyInterface;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,7 +27,7 @@ public class ArrayConversionHandlerTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return false when expected type is null.")
+        @DisplayName("should return false when target type is null.")
         public void test1() {
             ArrayConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(null);
@@ -37,7 +35,7 @@ public class ArrayConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is an array class.")
+        @DisplayName("should return true when target type is an array class.")
         public void test2() {
             ArrayConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(String[].class);
@@ -45,7 +43,7 @@ public class ArrayConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return false when expected type is not an array.")
+        @DisplayName("should return false when target type is not an array.")
         public void test3() {
             ArrayConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(String.class);
@@ -63,252 +61,13 @@ public class ArrayConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property to an array.")
-        public void test2() {
-            ArrayConversionHandler handler = handlerToTest();
-            
-            Converter converter = new InternalConverter(handler);
-
-            Object[] array = handler.convert(new ConversionContext(
-                converter,
-                "value1,value2,value3",
-                String[].class
-            ));
-            
-            assertNotNull(array);
-            assertTrue(array.length == 3);
-            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
-            assertArrayEquals(
-                new String[] { "value1", "value2", "value3" }, 
-                array
-            );
-        }
-
-        @Test
-        @DisplayName("should convert resolved property according to the array's component type.")
-        public void test4() {
-            ArrayConversionHandler handler = handlerToTest();
-            
-            Converter converter = new InternalConverter(
-                handler,
-                new PrimitiveConversionHandler()
-            );
-            
-            Object[] array = handler.convert(
-                new ConversionContext(
-                    converter,
-                    "1,2,3",
-                    Integer[].class
-                )
-            );
-            
-            assertNotNull(array);
-            assertTrue(array.length == 3);
-            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof Integer));
-            assertArrayEquals(
-                new Integer[] { 1, 2, 3 }, 
-                array
-            );
-        }
-
-        @Test
-        @DisplayName("should return empty array when property value is empty.")
-        public void test5() {
-            ArrayConversionHandler handler = handlerToTest();
-            
-            Converter converter = new InternalConverter(handler);
-            
-            Object[] array = handler.convert(
-                new ConversionContext(
-                    converter,
-                    "", // Empty value.
-                    String[].class
-                )
-            );
-            
-            assertNotNull(array);
-            assertTrue(array.length == 0);
-        }
-
-        @Test
-        @DisplayName("should retain empty values from property value.")
-        public void test6() {
-            ArrayConversionHandler handler = handlerToTest();
-
-            Converter converter = new InternalConverter(handler);
-            
-            Object[] array = handler.convert(
-                new ConversionContext(
-                    converter,
-                    "value1,,value3,,value5", // Has empty values.
-                    String[].class
-                )
-            );
-            
-            assertNotNull(array);
-            assertTrue(array.length == 5);
-            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
-            assertArrayEquals(
-                new String[] { "value1", "", "value3", "", "value5" }, 
-                array
-            );
-        }
-
-        @Test
-        @DisplayName("should return Strings when array component type is Object.")
-        public void test8() {
-            ArrayConversionHandler handler = handlerToTest();
-            
-            Converter converter = new InternalConverter(handler);
-            
-            Object[] array = handler.convert(
-                new ConversionContext(
-                    converter,
-                    "value1,value2,value3",
-                    Object[].class
-                )
-            );
-            
-            assertNotNull(array);
-            assertTrue(array.length == 3);
-            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
-            assertArrayEquals(
-                new String[] { "value1", "value2", "value3" }, 
-                array
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should throw when no conversion handler is registered that can handle " + 
-            "the array's component type."
-        )
-        public void test9() {
-            ArrayConversionHandler handler = handlerToTest();
-            
-            // No registered handler for integer.
-            Converter converter = new InternalConverter(handler);
-            
-            assertThrows(ConversionException.class, () -> {
-                handler.convert(
-                    new ConversionContext(
-                        converter,
-                        "1,2,3,4,5",
-                        Integer[].class
-                    )
-                );
-            });
-        }
-
-        @Test
-        @DisplayName(
-            "should convert resolved property according to the generic array's component type."
-        )
-        public void test11() {
-            ArrayConversionHandler handler = handlerToTest();
-            
-            Converter converter = new InternalConverter(
-                handler,
-                new OptionalConversionHandler() // Register additional Optional handler.
-            );
-
-            Type genericArrayType = new TypeReference<Optional<String>[]>(){}.type();
-            
-            Object[] array = handler.convert(
-                new ConversionContext(
-                    converter,
-                    "value1,value2,value3",
-                    genericArrayType
-                )
-            );
-            
-            assertNotNull(array);
-            assertTrue(array.length == 3);
-            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof Optional));
-            assertArrayEquals(
-                new Optional[] { 
-                    Optional.of("value1"), 
-                    Optional.of("value2"), 
-                    Optional.of("value3")
-                }, 
-                array
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should convert generic array wildcards to Strings."
-        )
-        public void test12() {
-            ArrayConversionHandler handler = handlerToTest();
-
-            Type wildcardGenericArrayType = new TypeReference<Optional<?>[]>(){}.type();
-            
-            Converter converter = new InternalConverter(
-                handler,
-                new OptionalConversionHandler() // Register additional Optional handler.
-            );
-            
-            Object[] array = handler.convert(
-                new ConversionContext(
-                    converter,
-                    "value1,value2,value3",
-                    wildcardGenericArrayType
-                )
-            );
-            
-            assertNotNull(array);
-            assertTrue(array.length == 3);
-            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof Optional));
-            assertArrayEquals(
-                new Optional[] { 
-                    Optional.of("value1"), 
-                    Optional.of("value2"), 
-                    Optional.of("value3")
-                }, 
-                array
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when expected type has a type variable e.g. List<T>.")
-        public <T> void test13() {
-            ArrayConversionHandler handler = handlerToTest();
-            
-            Converter converter = new InternalConverter(handler);
-
-            Type typeVariableArrayType = new TypeReference<T[]>(){}.type();
-            
-            ConversionContext context = new ConversionContext(
-                converter,
-                "value1,value2,value3",
-                typeVariableArrayType
-            );
-            
-            assertThrows(
-                ConversionException.class, 
-                () -> handler.convert(context)
-            );
-        }
-    }
-
-    @Nested
-    class ConvertMethodWithPropertyMethodConversionContextOverload {
-        @Test
-        @DisplayName("should throw when context is null.")
-        public void test1() {
-            ArrayConversionHandler handler = handlerToTest();
-            assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
-        }
-
-        @Test
         @DisplayName("should throw when method does not return an array.")
         public void test2() {
             ArrayConversionHandler handler = handlerToTest();
 
             // Method return type is a List and not an array e.g. String[]
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ListProxyInterface.class,
                     "listProperty"
                 );
@@ -317,35 +76,35 @@ public class ArrayConversionHandlerTests {
 
             // Method return type is a List and not an array
             assertThrows(ConversionException.class, () -> {
-                handler.convert(new PropertyMethodConversionContext(
+                handler.convert(new ConversionContext(
                     converter,
-                    propertyMethodInfo,
+                    proxyMethodInfo,
                     "value1,value2,value3"
                 ));
             });
         }
 
         @Test
-        @DisplayName("should convert resolved property to an array.")
+        @DisplayName("should convert value to an array.")
         public void test3() {
             ArrayConversionHandler handler = handlerToTest();
 
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
                     "arrayProperty"
                 );
             
             Converter converter = new InternalConverter(handler);
 
-            Object[] array = handler.convert(new PropertyMethodConversionContext(
+            Object[] array = handler.convert(new ConversionContext(
                 converter,
-                propertyMethodInfo,
+                proxyMethodInfo,
                 "value1,value2,value3"
             ));
             
             assertNotNull(array);
-            assertTrue(array.length == 3);
+            assertEquals(3, array.length);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
             assertArrayEquals(
                 new String[] { "value1", "value2", "value3" }, 
@@ -354,12 +113,12 @@ public class ArrayConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property according to the array's component type.")
+        @DisplayName("should convert value according to the array's component type.")
         public void test4() {
             ArrayConversionHandler handler = handlerToTest();
             
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
                     "arrayIntegerWrapper"
                 );
@@ -370,15 +129,15 @@ public class ArrayConversionHandlerTests {
             );
             
             Object[] array = handler.convert(
-                new PropertyMethodConversionContext(
+                new ConversionContext(
                     converter,
-                    propertyMethodInfo,
+                    proxyMethodInfo,
                     "1,2,3"
                 )
             );
             
             assertNotNull(array);
-            assertTrue(array.length == 3);
+            assertEquals(3, array.length);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof Integer));
             assertArrayEquals(
                 new Integer[] { 1, 2, 3 }, 
@@ -387,12 +146,12 @@ public class ArrayConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return empty array when property value is empty.")
+        @DisplayName("should return empty array when value is empty.")
         public void test5() {
             ArrayConversionHandler handler = handlerToTest();
             
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
                     "arrayProperty"
                 );
@@ -400,24 +159,24 @@ public class ArrayConversionHandlerTests {
             Converter converter = new InternalConverter(handler);
             
             Object[] array = handler.convert(
-                new PropertyMethodConversionContext(
+                new ConversionContext(
                     converter,
-                    propertyMethodInfo,
+                    proxyMethodInfo,
                     "" // Empty value.
                 )
             );
             
             assertNotNull(array);
-            assertTrue(array.length == 0);
+            assertEquals(0, array.length);
         }
 
         @Test
-        @DisplayName("should retain empty values from property value.")
+        @DisplayName("should retain empty values from value.")
         public void test6() {
             ArrayConversionHandler handler = handlerToTest();
             
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
                     "arrayProperty"
                 );
@@ -425,15 +184,15 @@ public class ArrayConversionHandlerTests {
             Converter converter = new InternalConverter(handler);
             
             Object[] array = handler.convert(
-                new PropertyMethodConversionContext(
+                new ConversionContext(
                     converter,
-                    propertyMethodInfo,
+                    proxyMethodInfo,
                     "value1,,value3,,value5" // Has empty values.
                 )
             );
             
             assertNotNull(array);
-            assertTrue(array.length == 5);
+            assertEquals(5, array.length);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
             assertArrayEquals(
                 new String[] { "value1", "", "value3", "", "value5" }, 
@@ -446,8 +205,8 @@ public class ArrayConversionHandlerTests {
         public void test7() {
             ArrayConversionHandler handler = handlerToTest();
             
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
                     "arrayPropertyStripEmpty"
                 );
@@ -455,15 +214,15 @@ public class ArrayConversionHandlerTests {
             Converter converter = new InternalConverter(handler);
             
             Object[] array = handler.convert(
-                new PropertyMethodConversionContext(
+                new ConversionContext(
                     converter,
-                    propertyMethodInfo,
+                    proxyMethodInfo,
                     "value1,,value3,,value5" // Has empty values.
                 )
             );
             
             assertNotNull(array);
-            assertTrue(array.length == 3);
+            assertEquals(3, array.length);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
             assertArrayEquals(
                 new String[] { "value1", "value3", "value5" }, 
@@ -476,8 +235,8 @@ public class ArrayConversionHandlerTests {
         public void test8() {
             ArrayConversionHandler handler = handlerToTest();
             
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
                     "arrayPropertyObject"
                 );
@@ -485,15 +244,15 @@ public class ArrayConversionHandlerTests {
             Converter converter = new InternalConverter(handler);
             
             Object[] array = handler.convert(
-                new PropertyMethodConversionContext(
+                new ConversionContext(
                     converter,
-                    propertyMethodInfo,
+                    proxyMethodInfo,
                     "value1,value2,value3"
                 )
             );
             
             assertNotNull(array);
-            assertTrue(array.length == 3);
+            assertEquals(3, array.length);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
             assertArrayEquals(
                 new String[] { "value1", "value2", "value3" }, 
@@ -509,8 +268,8 @@ public class ArrayConversionHandlerTests {
         public void test9() {
             ArrayConversionHandler handler = handlerToTest();
 
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
                     "arrayIntegerWrapper"
                 );
@@ -520,9 +279,9 @@ public class ArrayConversionHandlerTests {
             
             assertThrows(ConversionException.class, () -> {
                 handler.convert(
-                    new PropertyMethodConversionContext(
+                    new ConversionContext(
                         converter,
-                        propertyMethodInfo,
+                        proxyMethodInfo,
                         "1,2,3,4,5"
                     )
                 );
@@ -534,8 +293,8 @@ public class ArrayConversionHandlerTests {
         public void test10() {
             ArrayConversionHandler handler = handlerToTest();
             
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
                     "arrayCustomDelimiter"
                 );
@@ -543,15 +302,15 @@ public class ArrayConversionHandlerTests {
             Converter converter = new InternalConverter(handler);
             
             Object[] array = handler.convert(
-                new PropertyMethodConversionContext(
+                new ConversionContext(
                     converter,
-                    propertyMethodInfo,
+                    proxyMethodInfo,
                     "value1|value2|value3" // Custom delimiter
                 )
             );
             
             assertNotNull(array);
-            assertTrue(array.length == 3);
+            assertEquals(3, array.length);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
             assertArrayEquals(
                 new String[] { "value1", "value2", "value3" }, 
@@ -561,13 +320,13 @@ public class ArrayConversionHandlerTests {
 
         @Test
         @DisplayName(
-            "should convert resolved property according to the array's generic component type."
+            "should convert value according to the array's generic component type."
         )
         public void test11() {
             ArrayConversionHandler handler = handlerToTest();
             
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
                     "arrayPropertyGeneric" // Returns a generic type array Optional<String>[]
                 );
@@ -578,15 +337,15 @@ public class ArrayConversionHandlerTests {
             );
             
             Object[] array = handler.convert(
-                new PropertyMethodConversionContext(
+                new ConversionContext(
                     converter,
-                    propertyMethodInfo,
+                    proxyMethodInfo,
                     "value1,value2,value3"
                 )
             );
             
             assertNotNull(array);
-            assertTrue(array.length == 3);
+            assertEquals(3, array.length);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof Optional));
             assertArrayEquals(
                 new Optional[] { 
@@ -605,8 +364,8 @@ public class ArrayConversionHandlerTests {
         public void test12() {
             ArrayConversionHandler handler = handlerToTest();
             
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
                     "arrayPropertyGenericWildcard" // Returns a generic type array Optional<?>[]
                 );
@@ -617,15 +376,15 @@ public class ArrayConversionHandlerTests {
             );
             
             Object[] array = handler.convert(
-                new PropertyMethodConversionContext(
+                new ConversionContext(
                     converter,
-                    propertyMethodInfo,
+                    proxyMethodInfo,
                     "value1,value2,value3"
                 )
             );
             
             assertNotNull(array);
-            assertTrue(array.length == 3);
+            assertEquals(3, array.length);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof Optional));
             assertArrayEquals(
                 new Optional[] { 
@@ -638,28 +397,54 @@ public class ArrayConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should throw when expected type has a type variable e.g. List<T>.")
+        @DisplayName("should throw when target type has a type variable e.g. List<T>.")
         public void test13() {
             ArrayConversionHandler handler = handlerToTest();
             
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
                     "arrayPropertyT" // Returns a generic type array <T> T[]
                 );
             
             Converter converter = new InternalConverter(handler);
             
-            PropertyMethodConversionContext context = 
-                new PropertyMethodConversionContext(
+            ConversionContext context = 
+                new ConversionContext(
                     converter,
-                    propertyMethodInfo,
+                    proxyMethodInfo,
                     "value1,value2,value3"
                 );
             
             assertThrows(
                 ConversionException.class, 
                 () -> handler.convert(context)
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should convert using default behavior when context does not have proxy method info"
+        )
+        public void test14() {
+            ArrayConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+            
+            Object[] array = handler.convert(new ConversionContext(
+                converter,
+                String[].class,
+                "value1,,value3,,value5"
+            ));
+            
+            // Default: Should use ',' as delimiter and will not strip empty values.
+            // This will strip trailing empty values though.
+            assertNotNull(array);
+            assertEquals(5, array.length);
+            assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
+            assertArrayEquals(
+                new String[] { "value1", "", "value3", "", "value5" }, 
+                array
             );
         }
     }

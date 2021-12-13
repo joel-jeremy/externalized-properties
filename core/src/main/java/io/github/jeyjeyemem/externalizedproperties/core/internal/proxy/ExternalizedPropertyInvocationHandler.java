@@ -2,13 +2,12 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.ExternalizedPropertyMethod;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.MethodHandleFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
  * Invocation handler for Externalized Properties.
@@ -49,14 +48,14 @@ public class ExternalizedPropertyInvocationHandler implements InvocationHandler 
             return objectMethodResult;
         }
 
-        ExternalizedPropertyMethod propertyMethod = ExternalizedPropertyMethod.create(
+        ProxyMethod proxyMethod = new ProxyMethod(
             proxy, 
             method,
             externalizedProperties,
             methodHandleFactory
         );
 
-        return propertyMethod.resolveProperty(args);
+        return proxyMethod.resolveProperty(args);
     }
     
     // Avoid calling methods in proxy object to avoid recursion.

@@ -14,7 +14,9 @@ import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies
 import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.CachingInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.EagerLoadingInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.ExternalizedPropertyInvocationHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.InvocationHandlerFactory;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositePropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.DefaultPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.EnvironmentPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
 
@@ -24,7 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
  * The builder for {@link ExternalizedProperties}.
@@ -36,9 +38,13 @@ public class ExternalizedPropertiesBuilder {
     
     // Caching settings.
     private Duration cacheDuration = getDefaultCacheDuration();
-    private boolean isCachingEnabled = false;
-    private boolean isEagerLoadingEnabled = false;
-    private boolean isInvocationCachingEnabled = false;
+    private boolean withCaching = false;
+    private boolean withProxyEagerLoading = false;
+    private boolean withProxyInvocationCaching = false;
+
+    // Default settings.
+    private boolean withDefaultResolvers = false;
+    private boolean withDefaultConversionHandlers = false;
 
     private ExternalizedPropertiesBuilder(){}
 
@@ -64,10 +70,8 @@ public class ExternalizedPropertiesBuilder {
      * @return This builder.
      */
     public ExternalizedPropertiesBuilder withDefaultResolvers() {
-        return resolvers(
-            new SystemPropertyResolver(),
-            new EnvironmentPropertyResolver()
-        );
+        this.withDefaultResolvers = true;
+        return this;
     }
 
     /**
@@ -77,7 +81,8 @@ public class ExternalizedPropertiesBuilder {
      * @return This builder.
      */
     public ExternalizedPropertiesBuilder withDefaultConversionHandlers() {
-        return conversionHandlers(new DefaultConversionHandler());
+        this.withDefaultConversionHandlers = true;
+        return this;
     }
 
     /**
@@ -86,7 +91,7 @@ public class ExternalizedPropertiesBuilder {
      * @return This builder.
      */
     public ExternalizedPropertiesBuilder withCaching() {
-        this.isCachingEnabled = true;
+        this.withCaching = true;
         return this;
     }
 
@@ -96,7 +101,7 @@ public class ExternalizedPropertiesBuilder {
      * @return This builder.
      */
     public ExternalizedPropertiesBuilder withProxyInvocationCaching() {
-        this.isInvocationCachingEnabled = true;
+        this.withProxyInvocationCaching = true;
         return this;
     }
 
@@ -107,7 +112,7 @@ public class ExternalizedPropertiesBuilder {
      * @return This builder.
      */
     public ExternalizedPropertiesBuilder withProxyEagerLoading() {
-        this.isEagerLoadingEnabled = true;
+        this.withProxyEagerLoading = true;
         return this;
     }
 
@@ -189,21 +194,9 @@ public class ExternalizedPropertiesBuilder {
      */
     public ExternalizedProperties build() {
         ExternalizedPropertyResolver resolver = buildExternalizedPropertyResolver();
-
-        Converter converter = new InternalConverter(
-            conversionHandlers
-        );
-
-        VariableExpander variableExpander = new InternalVariableExpander(
-            resolver
-        );
-
-        InvocationHandlerFactory invocationHandlerFactory = 
-            buildInvocationHandlerFactory(
-                resolver,
-                converter,
-                variableExpander
-            );
+        Converter converter = buildConverter();
+        VariableExpander variableExpander = buildVariableExpander(resolver);
+        InvocationHandlerFactory invocationHandlerFactory = buildInvocationHandlerFactory();
 
         ExternalizedProperties externalizedProperties = new InternalExternalizedProperties(
             resolver, 
@@ -212,7 +205,7 @@ public class ExternalizedPropertiesBuilder {
             invocationHandlerFactory
         );
 
-        if (isCachingEnabled) {
+        if (withCaching) {
             return new CachingExternalizedProperties(
                 externalizedProperties,
                 new ExpiringCacheStrategy<>(
@@ -238,17 +231,14 @@ public class ExternalizedPropertiesBuilder {
         return new ExternalizedPropertiesBuilder();
     }
 
-    private InvocationHandlerFactory buildInvocationHandlerFactory(
-            ExternalizedPropertyResolver resolver,
-            Converter converter,
-            VariableExpander variableExpander
-    ) {
+    private InvocationHandlerFactory buildInvocationHandlerFactory() {
+        // Default invocation handler factory.
         InvocationHandlerFactory factory = (externalizedProperties, proxyInterface) -> 
             new ExternalizedPropertyInvocationHandler(
                 externalizedProperties
             );
 
-        if (isInvocationCachingEnabled) {
+        if (withProxyInvocationCaching) {
             // Decorate with CachingInvocationHandler.
             factory = factory.compose((baseHandler, externalizedProperties, proxyInterface) -> 
                 new CachingInvocationHandler(
@@ -260,7 +250,7 @@ public class ExternalizedPropertiesBuilder {
                 ));
         }
             
-        if (isEagerLoadingEnabled) {
+        if (withProxyEagerLoading) {
             // Decorate with EagerLoadingInvocationHandler.
             factory = factory.compose((baseHandler, externalizedProperties, proxyInterface) -> 
                 new EagerLoadingInvocationHandler(
@@ -278,6 +268,12 @@ public class ExternalizedPropertiesBuilder {
     }
 
     private ExternalizedPropertyResolver buildExternalizedPropertyResolver() {
+        // Add default resolvers last.
+        // Custom resolvers always take precedence.
+        if (withDefaultResolvers) {
+            resolvers(new DefaultPropertyResolver());
+        }
+
         if (resolvers.isEmpty()) {
             throw new IllegalStateException(
                 "At least one externalized property resolver is required."
@@ -285,6 +281,22 @@ public class ExternalizedPropertiesBuilder {
         }
 
         return CompositePropertyResolver.flatten(resolvers);
+    }
+
+    private InternalConverter buildConverter() {
+        // Add default conversion handlers last.
+        // Custom conversion handlers always take precedence.
+        if (withDefaultConversionHandlers) {
+            conversionHandlers(new DefaultConversionHandler());
+        }
+        
+        return new InternalConverter(conversionHandlers);
+    }
+
+    private InternalVariableExpander buildVariableExpander(
+            ExternalizedPropertyResolver resolver
+    ) {
+        return new InternalVariableExpander(resolver);
     }
 
     private Duration getDefaultCacheDuration() {

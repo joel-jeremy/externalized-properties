@@ -2,10 +2,12 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.InvocationHandlerFactory;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeReference;
 import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.InvocationHandlerFactory;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -15,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
  * The default {@link ExternalizedProperties} implementation.
@@ -81,6 +83,32 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
 
     /** {@inheritDoc} */
     @Override
+    public Optional<?> resolveProperty(ProxyMethodInfo proxyMethodInfo) {
+        requireNonNull(proxyMethodInfo, "proxyMethodInfo");
+        
+        String propertyName = proxyMethodInfo.externalizedPropertyName().orElseThrow(
+            () -> new IllegalArgumentException(
+                "Proxy method info externalized property name cannot be determined."
+            )
+        );
+
+        Optional<String> resolved = resolveProperty(propertyName);
+        
+        if (proxyMethodInfo.hasReturnType(String.class)) {
+            return resolved;
+        }
+
+        return resolved.map(resolvedValue -> converter.convert(
+            new ConversionContext(
+                converter, 
+                proxyMethodInfo, 
+                resolvedValue
+            )
+        ));
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Optional<String> resolveProperty(String propertyName) {
         return externalizedPropertyResolver.resolve(propertyName);
     }
@@ -90,9 +118,9 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
     @SuppressWarnings("unchecked")
     public <T> Optional<T> resolveProperty(
             String propertyName,
-            Class<T> expectedType
+            Class<T> targetType
     ) {
-        return (Optional<T>)resolveProperty(propertyName, (Type)expectedType);
+        return (Optional<T>)resolveProperty(propertyName, (Type)targetType);
     }
 
     /** {@inheritDoc} */
@@ -100,11 +128,11 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
     @SuppressWarnings("unchecked")
     public <T> Optional<T> resolveProperty(
             String propertyName,
-            TypeReference<T> expectedType
+            TypeReference<T> targetType
     ) {
         return (Optional<T>)resolveProperty(
             propertyName, 
-            requireNonNull(expectedType, "expectedType").type()
+            requireNonNull(targetType, "targetType").type()
         );
     }
 
@@ -112,20 +140,21 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
     @Override
     public Optional<?> resolveProperty(
             String propertyName,
-            Type expectedType
+            Type targetType
     ) {
         Optional<String> resolved = resolveProperty(propertyName);
 
-        if (String.class.equals(expectedType)) {
+        if (String.class.equals(targetType)) {
             return resolved;
         }
 
-        return resolved.map(r -> {
-            return converter.convert(
-                resolved.get(), 
-                expectedType
-            );
-        });
+        return resolved.map(resolvedValue -> converter.convert(
+            new ConversionContext(
+                converter,
+                targetType,
+                resolvedValue
+            )
+        ));
     }
 
     /** {@inheritDoc} */

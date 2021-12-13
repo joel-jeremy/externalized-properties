@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core.internal.utils;
+package io.github.jeyjeyemem.externalizedproperties.core;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -7,10 +7,12 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * Type-related utility methods.
+ * Type-related utility methods. 
+ * This provides useful utility methods to extract type information
+ * from Java's {@link Type} class.
  */
 public class TypeUtilities {
 
@@ -86,10 +88,10 @@ public class TypeUtilities {
     }
 
     /**
-     * Extract the list of generic type parameters if the given type has any.
+     * Extract the specified type's generic type parameters, if it has any.
      * 
      * @param type The type to extract type parameters from.
-     * @return The list of generic type parameters if the given type has any.
+     * @return The array of generic type parameters, if the specified type has any.
      */
     public static Type[] getTypeParameters(Type type) {
         ParameterizedType pt = asParameterizedType(type);
@@ -122,7 +124,7 @@ public class TypeUtilities {
      * Otherwise, {@code null}.
      */
     public static Class<?> asClass(Type type) {
-        if (isClass(type)) {
+        if (type instanceof Class<?>) {
             return (Class<?>)type;
         }
         return null;
@@ -147,7 +149,7 @@ public class TypeUtilities {
      * instance. Otherwise, {@code null}.
      */
     public static ParameterizedType asParameterizedType(Type type) {
-        if (isParameterizedType(type)) {
+        if (type instanceof ParameterizedType) {
             return (ParameterizedType)type;
         }
         return null;
@@ -172,7 +174,7 @@ public class TypeUtilities {
      * instance. Otherwise, {@code null}.
      */
     public static GenericArrayType asGenericArrayType(Type type) {
-        if (isGenericArrayType(type)) {
+        if (type instanceof GenericArrayType) {
             return (GenericArrayType)type;
         }
         return null;
@@ -197,7 +199,7 @@ public class TypeUtilities {
      * instance. Otherwise, {@code null}.
      */
     public static TypeVariable<?> asTypeVariable(Type type) {
-        if (isTypeVariable(type)) {
+        if (type instanceof TypeVariable<?>) {
             return (TypeVariable<?>)type;
         }
         return null;
@@ -222,7 +224,7 @@ public class TypeUtilities {
      * instance. Otherwise, {@code null}.
      */
     public static WildcardType asWildcardType(Type type) {
-        if (isWildcardType(type)) {
+        if (type instanceof WildcardType) {
             return (WildcardType)type;
         }
         return null;

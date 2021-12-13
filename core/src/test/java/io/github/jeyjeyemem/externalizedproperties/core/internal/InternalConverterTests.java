@@ -1,11 +1,10 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.PrimitiveConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.EnumProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.EnumProxyInterface.TestEnum;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
@@ -53,7 +52,7 @@ public class InternalConverterTests {
     class ConvertMethod {
         @Test
         @DisplayName(
-            "should throw when value argument is null."
+            "should throw when context argument is null."
         )
         public void test1() {
             InternalConverter converter = converter(
@@ -62,44 +61,31 @@ public class InternalConverterTests {
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> converter.convert(null, Integer.class)
+                () -> converter.convert(null)
             );
         }
 
         @Test
         @DisplayName(
-            "should throw when expected type argument is null."
+            "should correctly convert to target type."
         )
         public void test2() {
             InternalConverter converter = converter(
                 new PrimitiveConversionHandler()
             );
 
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> converter.convert("value", null)
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should correctly convert to expected type."
-        )
-        public void test3() {
-            InternalConverter converter = converter(
-                new PrimitiveConversionHandler()
-            );
-
-            StubExternalizedPropertyMethodInfo propertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     PrimitiveProxyInterface.class, 
                     "intPrimitiveProperty"
                 );
 
             Object convertedValue = converter.convert(
-                propertyMethod,
-                "1",
-                propertyMethod.genericReturnType()
+                new ConversionContext(
+                    converter,
+                    proxyMethodInfo,
+                    "1"
+                )
             );
 
             assertNotNull(convertedValue);
@@ -109,15 +95,15 @@ public class InternalConverterTests {
 
         @Test
         @DisplayName(
-            "should throw when there is no handler that can convert to expected type."
+            "should throw when there is no handler that can convert to target type."
         )
         public void test4() {
             InternalConverter converter = converter(
                 new PrimitiveConversionHandler()
             );
 
-            StubExternalizedPropertyMethodInfo propertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     EnumProxyInterface.class,
                     "enumProperty"
                 );
@@ -125,11 +111,11 @@ public class InternalConverterTests {
             // No handler registered to convert to TestEnum.
             assertThrows(
                 ConversionException.class, 
-                () -> converter.convert(
-                    propertyMethod, 
-                    TestEnum.ONE.name(), 
-                    propertyMethod.genericReturnType()
-                )
+                () -> converter.convert(new ConversionContext(
+                    converter,
+                    proxyMethodInfo, 
+                    TestEnum.ONE.name()
+                ))
             );
         }
 
@@ -143,13 +129,8 @@ public class InternalConverterTests {
                 new ConversionHandler<Object>() {
 
                     @Override
-                    public boolean canConvertTo(Class<?> expectedType) {
+                    public boolean canConvertTo(Class<?> targetType) {
                         return true;
-                    }
-
-                    @Override
-                    public Object convert(PropertyMethodConversionContext context) {
-                        throw new RuntimeException("Mr. Stark I don't feel so good...");
                     }
 
                     @Override
@@ -160,19 +141,19 @@ public class InternalConverterTests {
             
             InternalConverter converter = converter(throwingHandler);
 
-            StubExternalizedPropertyMethodInfo propertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     PrimitiveProxyInterface.class,
                     "intPrimitiveProperty"
                 );
 
             assertThrows(
                 ConversionException.class, 
-                () -> converter.convert(
-                    propertyMethod,
-                    "1",
-                    propertyMethod.genericReturnType()
-                )
+                () -> converter.convert(new ConversionContext(
+                    converter,
+                    proxyMethodInfo,
+                    "1"
+                ))
             );
         }
 

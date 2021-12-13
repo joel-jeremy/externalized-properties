@@ -5,7 +5,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBuilder;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubCacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
@@ -296,7 +296,7 @@ public class EagerLoadingInvocationHandlerTests {
         }
 
         private Method stubMethod() {
-            return StubExternalizedPropertyMethodInfo.getMethod(
+            return StubProxyMethodInfo.getMethod(
                 BasicProxyInterface.class, 
                 "property"
             );

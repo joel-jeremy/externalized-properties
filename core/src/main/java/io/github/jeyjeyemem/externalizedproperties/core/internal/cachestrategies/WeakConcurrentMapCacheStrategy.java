@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
  * Caching strategy which uses a {@link ConcurrentMap} as cache and whose keys are weakly held.
@@ -37,9 +37,8 @@ public class WeakConcurrentMapCacheStrategy<K, V> implements CacheStrategy<K, V>
 
     /** {@inheritDoc} */
     @Override
-    public void cache(K cacheKey, V value) {
-        purgeKeys();
-        cache.putIfAbsent(new WeakKey<>(cacheKey, referenceQueue), value);
+    public void cache(K cacheKey, V cacheValue) {
+        cache.putIfAbsent(new WeakKey<>(cacheKey, referenceQueue), cacheValue);
     }
 
     /** {@inheritDoc} */

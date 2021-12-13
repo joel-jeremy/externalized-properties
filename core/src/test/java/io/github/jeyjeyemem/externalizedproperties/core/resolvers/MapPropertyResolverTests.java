@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MapPropertyResolverTests {
+
     @Nested
     class Constructor {
         @Test
@@ -37,17 +38,18 @@ public class MapPropertyResolverTests {
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new MapPropertyResolver(Collections.emptyMap(), null)
+                () -> new MapPropertyResolver(new HashMap<>(), null)
             );
         }
     }
 
     @Nested
     class ResolveMethodSingleProperty {
+
         @Test
         @DisplayName("should throw when property name argument is null or empty")
         public void validationTest1() {
-            MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
+            MapPropertyResolver resolver = resolverToTest();
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -85,7 +87,7 @@ public class MapPropertyResolverTests {
             "when property is not found from the given map"
         )
         public void test2() {
-            MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
+            MapPropertyResolver resolver = resolverToTest();
             Optional<String> result = resolver.resolve(
                 "nonexisting.property"
             );
@@ -109,7 +111,7 @@ public class MapPropertyResolverTests {
                 };
 
             MapPropertyResolver resolver = resolverToTest(
-                Collections.emptyMap(),
+                new HashMap<>(),
                 unresolvedPropertyHandler
             );
 
@@ -130,7 +132,7 @@ public class MapPropertyResolverTests {
         @Test
         @DisplayName("should throw when property names varargs argument is null or empty")
         public void validationTest1() {
-            MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
+            MapPropertyResolver resolver = resolverToTest();
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -146,7 +148,7 @@ public class MapPropertyResolverTests {
         @Test
         @DisplayName("should throw when property names varargs contain any null or empty values")
         public void validationTest2() {
-            MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
+            MapPropertyResolver resolver = resolverToTest();
             
             assertThrows(
                 IllegalArgumentException.class, 
@@ -193,7 +195,7 @@ public class MapPropertyResolverTests {
             "when property is not found from the given map"
         )
         public void test2() {
-            MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
+            MapPropertyResolver resolver = resolverToTest();
 
             String[] propertiesToResolve = new String[] {
                 "nonexisting.property1",
@@ -229,7 +231,7 @@ public class MapPropertyResolverTests {
                 };
 
             MapPropertyResolver resolver = resolverToTest(
-                Collections.emptyMap(),
+                new HashMap<>(),
                 unresolvedPropertyHandler
             );
 
@@ -260,7 +262,7 @@ public class MapPropertyResolverTests {
         @Test
         @DisplayName("should throw when property names collection argument is null or empty")
         public void validationTest1() {
-        MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
+        MapPropertyResolver resolver = resolverToTest();
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -278,7 +280,7 @@ public class MapPropertyResolverTests {
             "should throw when property names collection contains any null or empty values"
         )
         public void validationTest2() {
-            MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
+            MapPropertyResolver resolver = resolverToTest();
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -325,7 +327,7 @@ public class MapPropertyResolverTests {
             "when property is not found from the given map"
         )
         public void test2() {
-            MapPropertyResolver resolver = resolverToTest(Collections.emptyMap());
+            MapPropertyResolver resolver = resolverToTest();
 
             List<String> propertiesToResolve = Arrays.asList(
                 "nonexisting.property1",
@@ -361,7 +363,7 @@ public class MapPropertyResolverTests {
                 };
 
             MapPropertyResolver resolver = resolverToTest(
-                Collections.emptyMap(),
+                new HashMap<>(),
                 unresolvedPropertyHandler
             );
 
@@ -385,6 +387,10 @@ public class MapPropertyResolverTests {
                 );
             }
         }
+    }
+
+    private MapPropertyResolver resolverToTest() {
+        return new MapPropertyResolver(new HashMap<>());
     }
 
     private MapPropertyResolver resolverToTest(

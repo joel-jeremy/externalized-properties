@@ -9,3 +9,8 @@ jar {
     )
   }
 }
+
+jmh {
+  resultsFile = project.file("${project.buildDir}/reports/jmh/results.json")
+  resultFormat = 'JSON'
+}

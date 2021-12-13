@@ -2,22 +2,22 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * Default property converter which delegates to the following conversion handlers:
- * <ul>
+ * Default property converter which delegates to the following conversion handlers 
+ * (in order):
+ * <ol>
  *  <li>{@link PrimitiveConversionHandler}</li>
- *  <li>{@link CollectionConversionHandler}</li>
+ *  <li>{@link ListConversionHandler}</li>
  *  <li>{@link ArrayConversionHandler}</li>
  *  <li>{@link OptionalConversionHandler}</li>
- * </ul>
+ * </ol>
  */
 public class DefaultConversionHandler implements ConversionHandler<Object> {
 
@@ -25,18 +25,18 @@ public class DefaultConversionHandler implements ConversionHandler<Object> {
 
     /**
      * Constructs a {@link DefaultConversionHandler} instance 
-     * which delegates to the following converters:
-     * <ul>
+     * which delegates to the following conversion handlers (in order):
+     * <ol>
      *  <li>{@link PrimitiveConversionHandler}</li>
-     *  <li>{@link CollectionConversionHandler}</li>
+     *  <li>{@link ListConversionHandler}</li>
      *  <li>{@link ArrayConversionHandler}</li>
      *  <li>{@link OptionalConversionHandler}</li>
-     * </ul>
+     * </ol>
      */
     public DefaultConversionHandler() {
         defaultConversionHandlers = Arrays.asList(
             new PrimitiveConversionHandler(),
-            new CollectionConversionHandler(),
+            new ListConversionHandler(),
             new ArrayConversionHandler(),
             new OptionalConversionHandler()
         );
@@ -44,8 +44,8 @@ public class DefaultConversionHandler implements ConversionHandler<Object> {
 
     /** {@inheritDoc} */
     @Override
-    public boolean canConvertTo(Class<?> expectedType) {
-        return defaultConversionHandlers.stream().anyMatch(c -> c.canConvertTo(expectedType));
+    public boolean canConvertTo(Class<?> targetType) {
+        return defaultConversionHandlers.stream().anyMatch(c -> c.canConvertTo(targetType));
     }
 
     /** {@inheritDoc} */
@@ -57,29 +57,17 @@ public class DefaultConversionHandler implements ConversionHandler<Object> {
         return converter.convert(context);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Object convert(PropertyMethodConversionContext context) {
-        requireNonNull(context, "context");
-
-        ConversionHandler<?> converter = getConversionHandler(context);
-        return converter.convert(context);
-    }
-
-    private ConversionHandler<?> getConversionHandler(
-            ConversionContext context
-    ) {
-        Class<?> rawExpectedType = context.rawExpectedType();
+    private ConversionHandler<?> getConversionHandler(ConversionContext context) {
+        Class<?> rawTargetType = context.rawTargetType();
         for (ConversionHandler<?> handler : defaultConversionHandlers) {
-            if (handler.canConvertTo(rawExpectedType)) {
+            if (handler.canConvertTo(rawTargetType)) {
                 return handler;
             }
         }
 
         throw new ConversionException(
             "No applicable conversion handler found to convert to " + 
-            context.expectedType() + "."
+            context.targetType() + "."
         );
     }
-    
 }

@@ -1,6 +1,6 @@
-package io.github.jeyjeyemem.externalizedproperties.core.internal.utils;
+package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,13 +43,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return raw type when type is a parameterized type.")
         public void parameterizedTest1() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "parameterizedTypeReturnType"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
             assertEquals(
@@ -64,13 +64,13 @@ public class TypeUtilitiesTests {
             "with type variable that has no extends declaration."
         )
         public void genericArrayTypeTest1() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "genericArrayTypeReturnTypeWithTypeVariable"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertTrue(genericReturnType instanceof GenericArrayType);
             assertEquals(
@@ -85,13 +85,13 @@ public class TypeUtilitiesTests {
             "with type variable that has an extends declaration."
         )
         public void genericArrayTypeTest2() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "genericArrayTypeReturnTypeWithTypeVariableExtends"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertTrue(genericReturnType instanceof GenericArrayType);
             assertEquals(
@@ -106,13 +106,13 @@ public class TypeUtilitiesTests {
             "that has no extends declaration."
         )
         public void typeVariableTest1() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "typeVariableReturnType"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertTrue(genericReturnType instanceof TypeVariable<?>);
             assertEquals(
@@ -127,13 +127,13 @@ public class TypeUtilitiesTests {
             "that has an extends declaration."
         )
         public void typeVariableTest2() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "typeVariableReturnTypeExtends"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertTrue(genericReturnType instanceof TypeVariable<?>);
             assertEquals(
@@ -148,15 +148,15 @@ public class TypeUtilitiesTests {
             "that has no extends declaration."
         )
         public void wildcardTypeTest1() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "wildcardTypeReturnType"
                 );
                 
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
 
@@ -176,15 +176,15 @@ public class TypeUtilitiesTests {
             "that has an extends declaration e.g. <? extends String>."
         )
         public void wildcardTypeTest2() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "wildcardTypeReturnTypeExtends"
                 );
                 
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
 
@@ -204,15 +204,15 @@ public class TypeUtilitiesTests {
             "that has a super declaration e.g. <? super String>."
         )
         public void wildcardTypeTest3() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "wildcardTypeReturnTypeSuper"
                 );
                 
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
 
@@ -261,13 +261,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return generic type parameter.")
         public void test1() {
-            StubExternalizedPropertyMethodInfo propertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "parameterizedTypeReturnType"
                 );
             
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertArrayEquals(
                 new Type[] { String.class },
@@ -278,13 +278,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return empty array when type is not a parameterized type.")
         public void test2() {
-            StubExternalizedPropertyMethodInfo propertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "nonParameterizedTypeReturnType"
                 );
             
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertTrue(TypeUtilities.getTypeParameters(genericReturnType).length == 0);
         }
@@ -303,13 +303,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return false when type is not a class.")
         public void test2() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "parameterizedTypeReturnType"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertFalse(genericReturnType instanceof Class<?>);
             assertFalse(TypeUtilities.isClass(genericReturnType));
@@ -321,13 +321,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return true when type is a parameterized type.")
         public void test1() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "parameterizedTypeReturnType"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
             assertTrue(genericReturnType instanceof ParameterizedType);
             assertTrue(TypeUtilities.isParameterizedType(genericReturnType));
         }
@@ -346,13 +346,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return true when type is a generic array type.")
         public void test1() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "genericArrayTypeReturnTypeWithTypeVariable"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
             assertTrue(genericReturnType instanceof GenericArrayType);
             assertTrue(TypeUtilities.isGenericArrayType(genericReturnType));
         }
@@ -371,13 +371,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return true when type is a type variable.")
         public void test1() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "typeVariableReturnType"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
             assertTrue(genericReturnType instanceof TypeVariable<?>);
             assertTrue(TypeUtilities.isTypeVariable(genericReturnType));
         }
@@ -396,15 +396,15 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return true when type is a wildcard type.")
         public void test1() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "wildcardTypeReturnType"
                 );
             
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
 
@@ -440,13 +440,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return null when type is not a class.")
         public void test2() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "parameterizedTypeReturnType"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
             assertTrue(genericReturnType instanceof ParameterizedType);
             assertNull(TypeUtilities.asClass(genericReturnType));
         }
@@ -457,13 +457,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return a parameterized type when type is a parameterized type.")
         public void test1() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "parameterizedTypeReturnType"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
             assertTrue(genericReturnType instanceof ParameterizedType);
             assertEquals(
                 genericReturnType,
@@ -485,13 +485,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return a generic array type when type is a generic array type.")
         public void test1() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "genericArrayTypeReturnTypeWithTypeVariable"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
             assertTrue(genericReturnType instanceof GenericArrayType);
             assertEquals(
                 genericReturnType,
@@ -513,13 +513,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return a type variable when type is a type variable.")
         public void test1() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "typeVariableReturnType"
                 );
                 
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
             assertTrue(genericReturnType instanceof TypeVariable<?>);
             assertEquals(
                 genericReturnType,
@@ -541,15 +541,15 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return a wildcard type when type is a wildcard type.")
         public void test1() {
-            StubExternalizedPropertyMethodInfo propertyMethod =
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            StubProxyMethodInfo proxyMethodInfo =
+                StubProxyMethodInfo.fromMethod(
                     TypesInterface.class,
                     "wildcardTypeReturnType"
                 );
             
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = propertyMethod.genericReturnType();
+            Type genericReturnType = proxyMethodInfo.genericReturnType();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
 

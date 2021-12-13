@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
@@ -13,10 +14,7 @@ public interface ExternalizedProperties {
      * Create a proxy that proxies invocation of methods annotated with {@link ExternalizedProperty}.
      * 
      * @implNote The names specified in the {@link ExternalizedProperty} supports variables
-     * e.g. "${MY_VARIABLE_NAME}-property". These variables will be expanded accordingly depending
-     * on the provided {@link VariableExpander} implementation. By default,
-     * the variable values will be resolved from system properties / environment variables if no
-     * custom implementation is provided.
+     * e.g. "${my.variable}.property". These variables will be expanded accordingly.
      * 
      * @param <T> The type of the proxy interface.
      * @param proxyInterface The interface whose methods are annotated with {@link ExternalizedProperty}. 
@@ -29,10 +27,7 @@ public interface ExternalizedProperties {
      * Create a proxy that proxies invocation of methods annotated with {@link ExternalizedProperty}.
      * 
      * @implNote The names specified in the {@link ExternalizedProperty} supports variables
-     * e.g. "${MY_VARIABLE_NAME}-property". These variables will be expanded accordingly depending
-     * on the provided {@link VariableExpander} implementation. By default,
-     * the variable values will be resolved from system properties / environment variables if no
-     * custom implementation is provided.
+     * e.g. "${my.variable}.property". These variables will be expanded accordingly.
      * 
      * @param <T> The type of the proxy interface.
      * @param proxyInterface The interface whose methods are annotated with {@link ExternalizedProperty}. 
@@ -43,6 +38,15 @@ public interface ExternalizedProperties {
     <T> T proxy(Class<T> proxyInterface, ClassLoader classLoader);
 
     /**
+     * Resolve property for the given the proxy method info.
+     * The property value will automatically be converted to be of the proxy method's return type.
+     * 
+     * @param proxyMethodInfo The externalized properties proxy method info.
+     * @return The resolved property value. Otherwise, an empty {@link Optional}.
+     */
+    Optional<?> resolveProperty(ProxyMethodInfo proxyMethodInfo);
+
+    /**
      * Resolve property from an external source.
      * 
      * @param propertyName The property name.
@@ -51,41 +55,41 @@ public interface ExternalizedProperties {
     Optional<String> resolveProperty(String propertyName);
 
     /**
-     * Resolve property from an external source and convert to expected type.
+     * Resolve property from an external source and convert to the target type.
      * 
-     * @param <T> The expected property type.
+     * @param <T> The target property type.
      * @param propertyName The property name.
-     * @param expectedType The expected property type.
+     * @param targetType The target property type.
      * @return The resolved property value. Otherwise, an empty {@link Optional}.
      */
     <T> Optional<T> resolveProperty(
         String propertyName,
-        Class<T> expectedType
+        Class<T> targetType
     );
 
     /**
-     * Resolve property from an external source and convert to expected type.
+     * Resolve property from an external source and convert to the target type.
      * 
-     * @param <T> The expected property type.
+     * @param <T> The target property type.
      * @param propertyName The property name.
-     * @param expectedType The expected property type.
+     * @param targetType The target property type.
      * @return The resolved property value. Otherwise, an empty {@link Optional}.
      */
     <T> Optional<T> resolveProperty(
         String propertyName,
-        TypeReference<T> expectedType
+        TypeReference<T> targetType
     );
 
     /**
-     * Resolve property from an external source and convert to expected type.
+     * Resolve property from an external source and convert to the target type.
      * 
      * @param propertyName The property name.
-     * @param expectedType The expected property type.
+     * @param targetType The target property type.
      * @return The resolved property value. Otherwise, an empty {@link Optional}.
      */
     Optional<?> resolveProperty(
         String propertyName,
-        Type expectedType
+        Type targetType
     );
 
     /**

@@ -1,4 +1,6 @@
-package io.github.jeyjeyemem.externalizedproperties.core;
+package io.github.jeyjeyemem.externalizedproperties.core.proxy;
+
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 
 import java.lang.reflect.InvocationHandler;
 

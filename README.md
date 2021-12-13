@@ -124,7 +124,7 @@ public static void main(String[] args) {
 
 ### Property Conversion
 
-Externalized Properties supports conversion of properties to various types. There are several build-in conversion handlers but anyone is free to create a custom conversion handler by implementing the `ConversionHandler` interface.
+Externalized Properties has powerful support for conversion of properties to various types. There are several build-in conversion handlers but anyone is free to create a custom conversion handler by implementing the `ConversionHandler` interface.
 
 To register conversion handlers to the library, it must be done through the builder:
 
@@ -180,3 +180,25 @@ public static void main(String[] args) {
     System.out.println("Valid numbers: " + validNumbers.get());
 }
 ```
+
+### Conversion to Generic Types
+
+Externalized Properties has good support for generic types. Given the proxy interface:
+
+```java
+public interface ApplicationProperties {
+    @ExternalizedProperty("list-of-numbers")
+    List<Integer> listOfNumbers();
+}
+```
+
+Externalized Properties provides enough information to conversion handlers for them to be able to convert each item from the `list-of-numbers` property to an integer (provided a conversion handler is registered to convert to an integer). 
+
+An arbitraty generic type parameter depth is supported. For example,
+
+```java
+@ExternalizedProperty("list-of-numbers")
+List<Optional<Integer>> listOfOptionalNumbers();
+````
+
+Conversion handlers should be able to extract the generic type information from the conversion context and convert each item to an `Optional<Integer>`.

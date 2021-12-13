@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
  * A {@link CacheStrategy} decorator that automatically expires cached
@@ -43,11 +43,11 @@ public class ExpiringCacheStrategy<K, V> implements CacheStrategy<K, V> {
      * based on the configured cache item lifetime.
      * 
      * @param cacheKey The cache key associated to the value.
-     * @param value The value to cache.
+     * @param cacheValue The value to cache.
      */
     @Override
-    public void cache(K cacheKey, V value) {
-        decorated.cache(cacheKey, value);
+    public void cache(K cacheKey, V cacheValue) {
+        decorated.cache(cacheKey, cacheValue);
         scheduleForExpiry(cacheKey);
     }
 

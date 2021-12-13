@@ -5,7 +5,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
  * Caching strategy which uses a {@link WeakHashMap} as cache.

@@ -6,8 +6,12 @@ import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.Defa
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.ExternalizedPropertyInvocationHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.VoidReturnTypeProxyInterface;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -91,7 +95,7 @@ public class InternalExternalizedPropertiesTests {
             );
         }
         @Test
-        @DisplayName("should throw when expected type argument is null")
+        @DisplayName("should throw when target type argument is null")
         public void test2() {
             // Always returns 1.
             StubExternalizedPropertyResolver resolver =
@@ -176,7 +180,7 @@ public class InternalExternalizedPropertiesTests {
             );
         }
         @Test
-        @DisplayName("should throw when expected type argument is null")
+        @DisplayName("should throw when target type argument is null")
         public void test2() {
             // Always returns 1.
             StubExternalizedPropertyResolver resolver =
@@ -266,7 +270,7 @@ public class InternalExternalizedPropertiesTests {
             );
         }
         @Test
-        @DisplayName("should throw when expected type argument is null")
+        @DisplayName("should throw when target type argument is null")
         public void test2() {
             // Always returns 1.
             StubExternalizedPropertyResolver resolver =
@@ -300,7 +304,7 @@ public class InternalExternalizedPropertiesTests {
             );
 
             assertTrue(property.isPresent());
-            assertEquals(1, property.get());
+            assertEquals(1, (int)property.get());
         }
 
         @Test
@@ -318,6 +322,110 @@ public class InternalExternalizedPropertiesTests {
                     "test.property",
                     (Type)Integer.class
                 )
+            );
+        }
+    }
+
+    @Nested
+    class ResolvePropertyMethodWithProxyMethodInfoOverload {
+        @Test
+        @DisplayName("should throw when proxy method info argument is null.")
+        public void test1() {
+            // Just return property name.
+            StubExternalizedPropertyResolver resolver =
+                new StubExternalizedPropertyResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty((ProxyMethodInfo)null)
+            );
+        }
+
+        @Test
+        @DisplayName("should return resolved property value.")
+        public void test2() {
+            // Just return property name.
+            StubExternalizedPropertyResolver resolver =
+                new StubExternalizedPropertyResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            StubProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(BasicProxyInterface.class, "property");
+
+            Optional<?> property = externalizedProperties.resolveProperty(proxyMethodInfo);
+
+            assertTrue(property.isPresent());
+            assertEquals("property-value", property.get());
+        }
+
+        @Test
+        @DisplayName("should return empty Optional when property cannot resolved.")
+        public void test3() {
+            // Properties not resolved.
+            StubExternalizedPropertyResolver resolver =
+                new StubExternalizedPropertyResolver(
+                    StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            StubProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(BasicProxyInterface.class, "property");
+
+            Optional<?> property = externalizedProperties.resolveProperty(proxyMethodInfo);
+
+            assertFalse(property.isPresent());
+        }
+
+        @Test
+        @DisplayName(
+            "should convert resolved property value according to proxy method's return type."
+        )
+        public void test4() {
+            // Always returns 1.
+            StubExternalizedPropertyResolver resolver =
+                new StubExternalizedPropertyResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            StubProxyMethodInfo proxyMethodInfo = StubProxyMethodInfo.fromMethod(
+                PrimitiveProxyInterface.class, 
+                "intPrimitiveProperty"
+            );
+
+            Optional<?> property = externalizedProperties.resolveProperty(proxyMethodInfo);
+
+            assertTrue(property.isPresent());
+            assertEquals(1, (int)property.get());
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when proxy method info does not have @ExternalizedProperty annotation."
+        )
+        public void test5() {
+            // Just return property name.
+            StubExternalizedPropertyResolver resolver =
+                new StubExternalizedPropertyResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            StubProxyMethodInfo proxyMethodInfo = StubProxyMethodInfo.fromMethod(
+                BasicProxyInterface.class, 
+                "propertyWithNoAnnotationAndNoDefaultValue"
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(proxyMethodInfo)
             );
         }
     }
@@ -409,11 +517,8 @@ public class InternalExternalizedPropertiesTests {
         @Test
         @DisplayName("should throw when proxy interface argument is null")
         public void test1() {
-            // Do not resolve any property.
             StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(
-                    StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
-                );
+                new StubExternalizedPropertyResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -427,11 +532,8 @@ public class InternalExternalizedPropertiesTests {
         @Test
         @DisplayName("should throw when class loader argument is null")
         public void test2() {
-            // Do not resolve any property.
             StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(
-                    StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
-                );
+                new StubExternalizedPropertyResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -443,8 +545,38 @@ public class InternalExternalizedPropertiesTests {
         }
 
         @Test
-        @DisplayName("should create a proxy")
+        @DisplayName("should throw when proxy interface argument is not an interface")
         public void test3() {
+            StubExternalizedPropertyResolver resolver =
+                new StubExternalizedPropertyResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.proxy(InternalExternalizedPropertiesTests.class)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when proxy interface contains void-returning methods")
+        public void test4() {
+            StubExternalizedPropertyResolver resolver =
+                new StubExternalizedPropertyResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.proxy(VoidReturnTypeProxyInterface.class)
+            );
+        }
+
+        @Test
+        @DisplayName("should create a proxy")
+        public void test5() {
             // Do not resolve any property.
             StubExternalizedPropertyResolver resolver =
                 new StubExternalizedPropertyResolver(

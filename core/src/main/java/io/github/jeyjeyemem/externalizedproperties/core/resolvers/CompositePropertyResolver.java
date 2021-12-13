@@ -13,8 +13,8 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNullOrEmptyCollection;
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNullOrEmptyString;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyCollection;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
 /**
  * An {@link ExternalizedPropertyResolver} decorator which resolves requested properties 
@@ -32,7 +32,7 @@ public class CompositePropertyResolver
      * 
      * @param resolvers The collection of {@link ExternalizedPropertyResolver}s to resolve properties from.
      */
-    private CompositePropertyResolver(
+    protected CompositePropertyResolver(
             Collection<ExternalizedPropertyResolver> resolvers
     ) {
         this.resolvers = requireNonNullOrEmptyCollection(resolvers, "resolvers");
@@ -131,6 +131,9 @@ public class CompositePropertyResolver
      * Factory method to create a {@link CompositePropertyResolver} instance with the
      * provided externalized property resolvers.
      * 
+     * @apiNote If ordering of resolvers is important, callers of this method must use a 
+     * {@link Collection} implementation that supports ordering such as {@link List}.
+     * 
      * @param resolvers The externalized property resolvers.
      * @return The {@link CompositePropertyResolver} instance which composes the provided resolvers. 
      */
@@ -161,6 +164,9 @@ public class CompositePropertyResolver
      * Factory method to create a {@link ExternalizedPropertyResolver} instance with the
      * provided externalized property resolvers. This will do some flattening to discard nested 
      * instances of {@link CompositePropertyResolver}.
+     * 
+     * @apiNote If ordering of resolvers is important, callers of this method must use a 
+     * {@link Collection} implementation that supports ordering such as {@link List}.
      * 
      * @implNote This may not necessarily return a {@link CompositePropertyResolver} instance. 
      * If the flattening operation resulted in a single resolver remaining, 

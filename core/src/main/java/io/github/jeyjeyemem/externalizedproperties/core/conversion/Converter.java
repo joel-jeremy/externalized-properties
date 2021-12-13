@@ -1,36 +1,14 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.TypeReference;
-
-import java.lang.reflect.Type;
-
 /**
- * This is an internal API to convert resolved properties to various types.
+ * API to convert values to various supported types.
  */
 public interface Converter {
     /**
-     * Convert value to the expected type.
+     * Convert value based on the provided conversion context.
      * 
-     * @param value The value to convert.
-     * @param expectedType The type to convert to. To specify generic types, the
-     * {@link TypeReference} class can be used to build the type and pass it here.
+     * @param context The conversion context.
      * @return The converted value.
      */
-    Object convert(String value, Type expectedType);
-
-    /**
-     * Convert value to the expected type.
-     * 
-     * @param externalizedPropertyMethodInfo The externalized property method info.
-     * @param value The value to convert.
-     * @param expectedType The type to convert to. To specify generic types, the
-     * {@link TypeReference} class can be used to build the type and pass it here.
-     * @return The converted value.
-     */
-    Object convert(
-        ExternalizedPropertyMethodInfo externalizedPropertyMethodInfo,
-        String value, 
-        Type expectedType
-    );
+    Object convert(ConversionContext context);
 }

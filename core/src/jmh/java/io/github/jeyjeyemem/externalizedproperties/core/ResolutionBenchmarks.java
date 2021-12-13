@@ -1,15 +1,16 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.PrimitiveConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapPropertyResolver;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 
 import java.time.Duration;
@@ -18,14 +19,17 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode(Mode.AverageTime)
+/**
+ * Benchmark property resolution via proxy or directly from
+ * {@link ExternalizedProperties}.
+ */
 @Warmup(iterations = 2, time = 5, timeUnit = TimeUnit.SECONDS)
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
-@Fork(2)
-public class ExternalizedPropertiesBenchmarks {
+@Measurement(time = 5, timeUnit = TimeUnit.SECONDS)
+@Fork(1)
+public abstract class ResolutionBenchmarks {
     @State(Scope.Benchmark)
     public static class BenchmarkState {
-        private Map<String, String> propertySource;
+        private Map<String, String> baselineMap;
         private ExternalizedProperties externalizedProperties;
         private ProxyInterface proxyInterface;
         private ProxyInterface proxyInterfaceWithCaching;
@@ -35,16 +39,19 @@ public class ExternalizedPropertiesBenchmarks {
 
         @Setup
         public void setup() {
-            propertySource = new ConcurrentHashMap<>();
+            baselineMap = new ConcurrentHashMap<>();
+            baselineMap.put("test", "test");
+
+            Map<String, String> propertySource = new ConcurrentHashMap<>();
             propertySource.put("test", "test");
-            propertySource.put("testInt", "1");
+
+            System.setProperty("test", "test");
     
             /**
              * Basic setup. No caching.
              */
             externalizedProperties = ExternalizedPropertiesBuilder.newBuilder()
                 .resolvers(new MapPropertyResolver(propertySource))
-                .conversionHandlers(new PrimitiveConversionHandler())
                 .build();
 
             proxyInterface = externalizedProperties.proxy(ProxyInterface.class);
@@ -56,7 +63,6 @@ public class ExternalizedPropertiesBenchmarks {
                 .resolvers(new MapPropertyResolver(propertySource))
                 .withCaching()
                 .withCacheDuration(Duration.ofHours(3))
-                .conversionHandlers(new PrimitiveConversionHandler())
                 .build();
 
             proxyInterfaceWithCaching = 
@@ -69,8 +75,7 @@ public class ExternalizedPropertiesBenchmarks {
                 ExternalizedPropertiesBuilder.newBuilder()
                     .resolvers(new MapPropertyResolver(propertySource))
                     .withProxyInvocationCaching()
-                    .withCacheDuration(Duration.ofHours(3))
-                    .conversionHandlers(new PrimitiveConversionHandler())
+                    .withCacheDuration(Duration.ofHours(24))
                     .build();
 
             proxyInterfaceWithInvocationCaching = 
@@ -83,8 +88,7 @@ public class ExternalizedPropertiesBenchmarks {
                 ExternalizedPropertiesBuilder.newBuilder()
                     .resolvers(new MapPropertyResolver(propertySource))
                     .withProxyEagerLoading()
-                    .withCacheDuration(Duration.ofHours(3))
-                    .conversionHandlers(new PrimitiveConversionHandler())
+                    .withCacheDuration(Duration.ofHours(24))
                     .build();
 
             proxyInterfaceWithEagerLoading = 
@@ -93,25 +97,66 @@ public class ExternalizedPropertiesBenchmarks {
     }
 
     /**
+     * Benchmarks that measure average time.
+     */
+    @BenchmarkMode(Mode.AverageTime)
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    public static class ResolutionBenchmarksAvgt extends ResolutionBenchmarks {}
+
+    /**
+     * Benchmarks that measure throughput.
+     */
+    @BenchmarkMode(Mode.Throughput)
+    @OutputTimeUnit(TimeUnit.MILLISECONDS)
+    public static class ResolutionBenchmarksThrpt extends ResolutionBenchmarks {}
+
+    /**
+     * Multi-threaded benchmarks that measure average time.
+     */
+    @BenchmarkMode(Mode.AverageTime)
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @Threads(Threads.MAX)
+    public static class ResolutionBenchmarksAvgtMultiThreaded extends ResolutionBenchmarks {}
+
+    /**
+     * Multi-threaded benchmarks that measure throughput.
+     */
+    @BenchmarkMode(Mode.Throughput)
+    @OutputTimeUnit(TimeUnit.MILLISECONDS)
+    @Threads(Threads.MAX)
+    public static class ResolutionBenchmarksThrptMultiThreaded extends ResolutionBenchmarks {}
+
+    /**
      * Benchmark retrieval of items from a map.
      * 
      * @param state The benchmark state.
      * @return For you, blackhole.
      */
     @Benchmark
-    public String baselineMap(BenchmarkState state) {
-        return state.propertySource.get("test");
+    public String baselineConcurrentMap(BenchmarkState state) {
+        return state.baselineMap.get("test");
     }
 
     /**
-     * Benchmark retrieval of items from a map and conversion to int.
+     * Benchmark retrieval of items from system properties.
      * 
      * @param state The benchmark state.
      * @return For you, blackhole.
      */
     @Benchmark
-    public int baselineMapConversion(BenchmarkState state) {
-        return Integer.parseInt(state.propertySource.get("testInt"));
+    public String baselineSystemProperty(BenchmarkState state) {
+        return System.getProperty("test");
+    }
+
+    /**
+     * Benchmark retrieval of items from environment variables.
+     * 
+     * @param state The benchmark state.
+     * @return For you, blackhole.
+     */
+    @Benchmark
+    public String baselineEnvVar(BenchmarkState state) {
+        return System.getenv("PATH");
     }
 
     /**
@@ -121,20 +166,8 @@ public class ExternalizedPropertiesBenchmarks {
      * @return For you, blackhole.
      */
     @Benchmark
-    public Optional<String> direct(BenchmarkState state) {
+    public Optional<String> resolveProperty(BenchmarkState state) {
         return state.externalizedProperties.resolveProperty("test");
-    }
-
-    /**
-     * Benchmark resolution of properties directly from ExternalizedProperties
-     * and conversion to integer.
-     * 
-     * @param state The benchmark state.
-     * @return For you, blackhole.
-     */
-    @Benchmark
-    public Optional<Integer> directConversion(BenchmarkState state) {
-        return state.externalizedProperties.resolveProperty("testInt", Integer.class);
     }
 
     /**
@@ -145,20 +178,8 @@ public class ExternalizedPropertiesBenchmarks {
      * @return For you, blackhole.
      */
     @Benchmark
-    public Optional<String> directWithCaching(BenchmarkState state) {
+    public Optional<String> resolvePropertyWithCaching(BenchmarkState state) {
         return state.externalizedPropertiesWithCaching.resolveProperty("test");
-    }
-
-    /**
-     * Benchmark resolution of properties directly from ExternalizedProperties
-     * and conversion to integer while caching enabled.
-     * 
-     * @param state The benchmark state.
-     * @return For you, blackhole.
-     */
-    @Benchmark
-    public Optional<Integer> directWithCachingConversion(BenchmarkState state) {
-        return state.externalizedPropertiesWithCaching.resolveProperty("testInt", Integer.class);
     }
 
     /**
@@ -173,17 +194,6 @@ public class ExternalizedPropertiesBenchmarks {
     }
 
     /**
-     * Benchmark resolution of properties from a proxy interface and conversion to int.
-     * 
-     * @param state The benchmark state.
-     * @return For you, blackhole.
-     */
-    @Benchmark
-    public int proxyInterfaceConversion(BenchmarkState state) {
-        return state.proxyInterface.testInt();
-    }
-
-    /**
      * Benchmark resolution of properties from a proxy interface while caching is enabled.
      * 
      * @param state The benchmark state.
@@ -192,18 +202,6 @@ public class ExternalizedPropertiesBenchmarks {
     @Benchmark
     public String proxyInterfaceWithCaching(BenchmarkState state) {
         return state.proxyInterfaceWithCaching.test();
-    }
-
-    /**
-     * Benchmark resolution of properties from a proxy interface and conversion to int 
-     * while caching is enabled.
-     * 
-     * @param state The benchmark state.
-     * @return For you, blackhole.
-     */
-    @Benchmark
-    public int proxyInterfaceWithCachingConversion(BenchmarkState state) {
-        return state.proxyInterfaceWithCaching.testInt();
     }
 
     /**
@@ -219,18 +217,6 @@ public class ExternalizedPropertiesBenchmarks {
     }
 
     /**
-     * Benchmark resolution of properties from a proxy interface and conversion to int 
-     * while proxy invocation caching is enabled.
-     * 
-     * @param state The benchmark state.
-     * @return For you, blackhole.
-     */
-    @Benchmark
-    public int proxyInterfaceWithInvocationCachingConversion(BenchmarkState state) {
-        return state.proxyInterfaceWithInvocationCaching.testInt();
-    }
-
-    /**
      * Benchmark resolution of properties from a proxy interface  with proxy
      * eager loading enabled.
      * 
@@ -240,39 +226,5 @@ public class ExternalizedPropertiesBenchmarks {
     @Benchmark
     public String proxyInterfaceWithEagerLoading(BenchmarkState state) {
         return state.proxyInterfaceWithEagerLoading.test();
-    }
-
-    /**
-     * Benchmark resolution of properties from a proxy interface and conversion to int 
-     * with proxy eager loading is enabled.
-     * 
-     * @param state The benchmark state.
-     * @return For you, blackhole.
-     */
-    @Benchmark
-    public int proxyInterfaceWithEagerLoadingConversion(BenchmarkState state) {
-        return state.proxyInterfaceWithEagerLoading.testInt();
-    }
-
-    /**
-     * Benchmark variable expansion.
-     * 
-     * @param state The benchmark state.
-     * @return For you, blackhole.
-     */
-    @Benchmark
-    public String variableExpansion(BenchmarkState state) {
-        return state.externalizedProperties.expandVariables("${test}");
-    }
-
-    /**
-     * Benchmark variable expansion while caching is enabled.
-     * 
-     * @param state The benchmark state.
-     * @return For you, blackhole.
-     */
-    @Benchmark
-    public String variableExpansionWithCaching(BenchmarkState state) {
-        return state.externalizedPropertiesWithCaching.expandVariables("${test}");
     }
 }

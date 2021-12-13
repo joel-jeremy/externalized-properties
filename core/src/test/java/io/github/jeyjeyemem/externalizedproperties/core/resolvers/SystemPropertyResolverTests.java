@@ -4,6 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -79,6 +81,58 @@ public class SystemPropertyResolverTests {
                 "nonexisting.property1", 
                 "nonexisting.property2"
             };
+
+            SystemPropertyResolver.Result result = resolver.resolve(
+                propertiesToResolve
+            );
+            
+            assertFalse(result.hasResolvedProperties());
+            assertTrue(result.hasUnresolvedProperties());
+            
+            for (String propertyName : propertiesToResolve) {
+                assertTrue(
+                    result.unresolvedPropertyNames().contains(propertyName)
+                );
+            }
+        }
+    }
+
+    @Nested
+    class ResolveMethodWithCollectionOverload {
+        @Test
+        @DisplayName("should resolve values from system properties")
+        public void test1() {
+            SystemPropertyResolver resolver = resolverToTest();
+
+            List<String> propertiesToResolve = Arrays.asList(
+                "java.version", 
+                "java.home"
+            );
+
+            SystemPropertyResolver.Result result = resolver.resolve(propertiesToResolve);
+
+            assertTrue(result.hasResolvedProperties());
+            assertFalse(result.hasUnresolvedProperties());
+
+            for (String propertyName : propertiesToResolve) {
+                assertEquals(
+                    System.getProperty(propertyName), 
+                    result.findRequiredProperty(propertyName)
+                );
+            }
+        }
+
+        @Test
+        @DisplayName(
+            "should return result with unresolved properties when system property is not found"
+        )
+        public void test2() {
+            SystemPropertyResolver resolver = resolverToTest();
+
+            List<String> propertiesToResolve = Arrays.asList(
+                "nonexisting.property1", 
+                "nonexisting.property2"
+            );
 
             SystemPropertyResolver.Result result = resolver.resolve(
                 propertiesToResolve

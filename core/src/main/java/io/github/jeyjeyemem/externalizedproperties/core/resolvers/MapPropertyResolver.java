@@ -3,14 +3,13 @@ package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNullOrEmptyCollection;
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNullOrEmptyString;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyCollection;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
 /**
  * {@link ExternalizedPropertyResolver} implementation which resolves requested properties 
@@ -27,6 +26,9 @@ public class MapPropertyResolver implements ExternalizedPropertyResolver {
      * Constructor.
      * 
      * @param propertySource The source map where requested properties will be derived from.
+     * 
+     * @apiNote The property source map must be a mutable map as this resolver will attempt 
+     * to add any unresolved properties to the map using the configured unresolved property handler.
      */
     public MapPropertyResolver(Map<String, String> propertySource) {
         this(
@@ -43,14 +45,15 @@ public class MapPropertyResolver implements ExternalizedPropertyResolver {
      * to be resolved via this handler. This should accept a property name and return the property value 
      * for the given property name. {@code null} return values are allowed but will be discarded when 
      * building the {@link Result}.
+     * 
+     * @apiNote The property source map must be a mutable map as this resolver will attempt 
+     * to add any unresolved properties to the map using the configured unresolved property handler.
      */
     public MapPropertyResolver(
             Map<String, String> propertySource,
             Function<String, String> unresolvedPropertyHandler
     ) {
-        this.propertySource = new HashMap<>(
-            requireNonNull(propertySource, "propertySource")
-        );
+        this.propertySource = requireNonNull(propertySource, "propertySource");
         this.unresolvedPropertyHandler = requireNonNull(
             unresolvedPropertyHandler,
             "unresolvedPropertyHandler"

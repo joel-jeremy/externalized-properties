@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core;
+package io.github.jeyjeyemem.externalizedproperties.core.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 
@@ -13,7 +13,7 @@ import java.util.Optional;
 /**
  * Information about methods that go through Externalized Properties proxying.
  */
-public interface ExternalizedPropertyMethodInfo {
+public interface ProxyMethodInfo {
     /**
      * The {@link ExternalizedProperty} annotation, if method is annotated.
      * 
@@ -31,6 +31,12 @@ public interface ExternalizedPropertyMethodInfo {
      * {@link ExternalizedProperty#value()}. Otherwise, an empty {@link Optional}.
      */
     Optional<String> externalizedPropertyName();
+
+    /**
+     * The array of annotations the method is annotated with.
+     * @return The array of annotations the method is annotated with.
+     */
+    Annotation[] annotations();
 
     /**
      * Find externalized property method annotation.

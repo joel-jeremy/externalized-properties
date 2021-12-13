@@ -4,8 +4,8 @@ import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyReso
 import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNull;
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.utils.Arguments.requireNonNullOrEmptyString;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
 /**
  * The default {@link VariableExpander} implementation.
@@ -92,14 +92,14 @@ public class InternalVariableExpander implements VariableExpander {
 
         String variableName = builder.substring(variableNameStartIndex, endIndex);
 
-        String variableValue = resolvePropertyValue(variableName);
+        String variableValue = resolvePropertyValueOrThrow(variableName);
 
         builder.replace(startIndex, endIndex + 1, variableValue);
 
         return expandVariables(builder);
     }
 
-    private String resolvePropertyValue(String variableName) {
+    private String resolvePropertyValueOrThrow(String variableName) {
         return externalizedPropertyResolver.resolve(variableName)
             .orElseThrow(() -> new VariableExpansionException(
                 "Failed to expand \"" + variableName + "\" variable. " +

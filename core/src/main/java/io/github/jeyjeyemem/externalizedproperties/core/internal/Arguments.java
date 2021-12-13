@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core.internal.utils;
+package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
 import java.util.Collection;
 

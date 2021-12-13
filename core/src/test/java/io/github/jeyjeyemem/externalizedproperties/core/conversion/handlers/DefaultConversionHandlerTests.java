@@ -1,12 +1,11 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.PropertyMethodConversionContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalConverter;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ArrayProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.EnumProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.EnumProxyInterface.TestEnum;
@@ -34,7 +33,7 @@ public class DefaultConversionHandlerTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return false when expected type is null.")
+        @DisplayName("should return false when target type is null.")
         public void test1() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(null);
@@ -42,7 +41,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is an Integer.")
+        @DisplayName("should return true when target type is an Integer.")
         public void test2() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(Integer.class);
@@ -50,7 +49,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is a primitive int.")
+        @DisplayName("should return true when target type is a primitive int.")
         public void test3() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(Integer.TYPE);
@@ -58,7 +57,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is a Long.")
+        @DisplayName("should return true when target type is a Long.")
         public void test4() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(Long.class);
@@ -66,7 +65,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is a primitive long.")
+        @DisplayName("should return true when target type is a primitive long.")
         public void test5() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(Long.TYPE);
@@ -74,7 +73,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is a Float.")
+        @DisplayName("should return true when target type is a Float.")
         public void test6() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(Float.class);
@@ -82,7 +81,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is a primitive float.")
+        @DisplayName("should return true when target type is a primitive float.")
         public void test7() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(Float.TYPE);
@@ -90,7 +89,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is a Double.")
+        @DisplayName("should return true when target type is a Double.")
         public void test8() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(Double.class);
@@ -98,7 +97,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is a primitive double.")
+        @DisplayName("should return true when target type is a primitive double.")
         public void test9() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(Double.TYPE);
@@ -106,7 +105,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is a List.")
+        @DisplayName("should return true when target type is a List.")
         public void test10() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(List.class);
@@ -114,7 +113,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is a Collection.")
+        @DisplayName("should return true when target type is a Collection.")
         public void test11() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(Collection.class);
@@ -122,7 +121,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is an Array.")
+        @DisplayName("should return true when target type is an Array.")
         public void test12() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(String[].class);
@@ -130,7 +129,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return true when expected type is an Optional.")
+        @DisplayName("should return true when target type is an Optional.")
         public void test13() {
             DefaultConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(Optional.class);
@@ -138,7 +137,7 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return false when expected type is not supported.")
+        @DisplayName("should return false when target type is not supported.")
         public void test14() {
             DefaultConversionHandler handler = handlerToTest();
             // Not primitive, List/Collection, array or Optional.
@@ -146,7 +145,7 @@ public class DefaultConversionHandlerTests {
             assertFalse(canConvert);
         }
     }
-    
+
     @Nested
     class ConvertMethod {
         @Test
@@ -157,16 +156,23 @@ public class DefaultConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should throw when expected type is not supported.")
+        @DisplayName("should throw when target type is not supported.")
         public void test2() {
             DefaultConversionHandler handler = handlerToTest();
+
+            // Not primitive, List/Collection, array or Optional.
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
+                    EnumProxyInterface.class,
+                    "enumProperty" // This method returns a TestEnum.
+                );
             
             Converter converter = new InternalConverter(handler);
 
             ConversionContext context = new ConversionContext(
                 converter,
-                TestEnum.ONE.name(),
-                TestEnum.class // Expected type is a TestEnum.
+                proxyMethodInfo,
+                TestEnum.ONE.name()
             );
             
             assertThrows(
@@ -179,20 +185,31 @@ public class DefaultConversionHandlerTests {
         @DisplayName("should convert resolved property to an Integer or primitive int.")
         public void test3() {
             DefaultConversionHandler handler = handlerToTest();
+
+            ProxyMethodInfo wrapperProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "integerWrapperProperty" // This method returns a Integer wrapper class
+                );
+
+            ProxyMethodInfo primitiveProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "intPrimitiveProperty" // This method returns an int primitive
+                );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             ConversionContext wrapperContext = new ConversionContext(
                 converter,
-                "1",
-                Integer.class
+                wrapperProxyMethod,
+                "1"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
                 converter,
-                "2",
-                int.class
+                primitiveProxyMethod,
+                "2"
             );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -212,19 +229,31 @@ public class DefaultConversionHandlerTests {
         @DisplayName("should convert resolved property to a Long or primitive long.")
         public void test4() {
             DefaultConversionHandler handler = handlerToTest();
+
+            ProxyMethodInfo wrapperProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "longWrapperProperty" // This method returns a Long wrapper class
+                );
+
+            ProxyMethodInfo primitiveProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "longPrimitiveProperty" // This method returns an long primitive
+                );
             
             Converter converter = new InternalConverter(handler);
 
             ConversionContext wrapperContext = new ConversionContext(
                 converter,
-                "1",
-                Long.class
+                wrapperProxyMethod,
+                "1"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
                 converter,
-                "2",
-                long.class
+                primitiveProxyMethod,
+                "2"
             );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -244,20 +273,31 @@ public class DefaultConversionHandlerTests {
         @DisplayName("should convert resolved property to a Float or primitive float.")
         public void test5() {
             DefaultConversionHandler handler = handlerToTest();
+
+            ProxyMethodInfo wrapperProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "floatWrapperProperty" // This method returns a Float wrapper class
+                );
+
+            ProxyMethodInfo primitiveProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "floatPrimitiveProperty" // This method returns an float primitive
+                );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
             ConversionContext wrapperContext = new ConversionContext(
                 converter,
-                "1.0",
-                Float.class
+                wrapperProxyMethod,
+                "1.0"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
                 converter,
-                "2.0",
-                float.class
+                primitiveProxyMethod,
+                "2.0"
             );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -277,19 +317,31 @@ public class DefaultConversionHandlerTests {
         @DisplayName("should convert resolved property to a Double or primitive double.")
         public void test6() {
             DefaultConversionHandler handler = handlerToTest();
+
+            ProxyMethodInfo wrapperProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "doubleWrapperProperty" // This method returns a Double wrapper class
+                );
+
+            ProxyMethodInfo primitiveProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "doublePrimitiveProperty" // This method returns an double primitive
+                );
             
             Converter converter = new InternalConverter(handler);
 
             ConversionContext wrapperContext = new ConversionContext(
                 converter,
-                "1.0",
-                Double.class
+                wrapperProxyMethod,
+                "1.0"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
                 converter,
-                "2.0",
-                double.class
+                primitiveProxyMethod,
+                "2.0"
             );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -309,19 +361,31 @@ public class DefaultConversionHandlerTests {
         @DisplayName("should convert resolved property to a Short or primitive short.")
         public void test7() {
             DefaultConversionHandler handler = handlerToTest();
+
+            ProxyMethodInfo wrapperProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "shortWrapperProperty" // This method returns a Short wrapper class
+                );
+
+            ProxyMethodInfo primitiveProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "shortPrimitiveProperty" // This method returns a short primitive
+                );
             
             Converter converter = new InternalConverter(handler);
 
             ConversionContext wrapperContext = new ConversionContext(
                 converter,
-                "1",
-                Short.class
+                wrapperProxyMethod,
+                "1"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
                 converter,
-                "2",
-                short.class
+                primitiveProxyMethod,
+                "2"
             );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -341,19 +405,31 @@ public class DefaultConversionHandlerTests {
         @DisplayName("should convert resolved property to a Boolean or primitive boolean.")
         public void test8() {
             DefaultConversionHandler handler = handlerToTest();
+
+            ProxyMethodInfo wrapperProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "booleanWrapperProperty" // This method returns a Boolean wrapper class
+                );
+
+            ProxyMethodInfo primitiveProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "booleanPrimitiveProperty" // This method returns a boolean primitive
+                );
             
             Converter converter = new InternalConverter(handler);
 
             ConversionContext wrapperContext = new ConversionContext(
                 converter,
-                "true",
-                Boolean.class
+                wrapperProxyMethod,
+                "true"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
                 converter,
-                "false",
-                boolean.class
+                primitiveProxyMethod,
+                "false"
             );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -373,19 +449,31 @@ public class DefaultConversionHandlerTests {
         @DisplayName("should convert resolved property to a Byte or primitive byte.")
         public void test9() {
             DefaultConversionHandler handler = handlerToTest();
+
+            ProxyMethodInfo wrapperProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "byteWrapperProperty" // This method returns a Byte wrapper class
+                );
+
+            ProxyMethodInfo primitiveProxyMethod = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "bytePrimitiveProperty" // This method returns a byte primitive
+                );
             
             Converter converter = new InternalConverter(handler);
 
             ConversionContext wrapperContext = new ConversionContext(
                 converter,
-                "1",
-                Byte.class
+                wrapperProxyMethod,
+                "1"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
                 converter,
-                "2",
-                byte.class
+                primitiveProxyMethod,
+                "2"
             );
 
             Object wrapperValue = handler.convert(wrapperContext);
@@ -405,19 +493,31 @@ public class DefaultConversionHandlerTests {
         @DisplayName("should convert resolved property to a List or Collection.")
         public void test10() {
             DefaultConversionHandler handler = handlerToTest();
+
+            ProxyMethodInfo listProxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
+                    ListProxyInterface.class,
+                    "listProperty" // This method returns a List.
+                );
+
+            ProxyMethodInfo collectionProxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
+                    ListProxyInterface.class,
+                    "collectionProperty" // This method returns a Collection.
+                );
             
             Converter converter = new InternalConverter(handler);
 
             ConversionContext listContext = new ConversionContext(
                 converter,
-                "a,b,c",
-                List.class
+                listProxyMethodInfo,
+                "a,b,c"
             );
 
             ConversionContext collectionContext = new ConversionContext(
                 converter,
-                "c,b,a",
-                Collection.class
+                collectionProxyMethodInfo,
+                "c,b,a"
             );
 
             Object listValue = handler.convert(listContext);
@@ -443,491 +543,20 @@ public class DefaultConversionHandlerTests {
         @DisplayName("should convert resolved property to an array.")
         public void test11() {
             DefaultConversionHandler handler = handlerToTest();
-            
-            Converter converter = new InternalConverter(handler);
 
-            ConversionContext context = new ConversionContext(
-                converter,
-                "a,b,c",
-                String[].class
-            );
-            
-            Object arrayValue = handler.convert(context);
-            
-            assertNotNull(arrayValue);
-
-            assertTrue(arrayValue.getClass().isArray());
-            assertArrayEquals(
-                new String[] { "a", "b", "c" }, 
-                (String[])arrayValue
-            );
-        }
-
-        @Test
-        @DisplayName("should convert resolved property to an Optional.")
-        public void test12() {
-            DefaultConversionHandler handler = handlerToTest();
-            
-            Converter converter = new InternalConverter(handler);
-
-            ConversionContext context = new ConversionContext(
-                converter,
-                "optional-value",
-                Optional.class
-            );
-            
-            Object optionalValue = handler.convert(context);
-            
-            assertNotNull(optionalValue);
-
-            assertTrue(optionalValue instanceof Optional<?>);
-
-            Optional<?> opt = (Optional<?>)optionalValue;
-            assertTrue(opt.isPresent());
-            assertEquals("optional-value", opt.get());
-        }
-    }
-
-    @Nested
-    class ConvertMethodWithPropertyMethodConversionContextOverload {
-        @Test
-        @DisplayName("should throw when context is null.")
-        public void test1() {
-            DefaultConversionHandler handler = handlerToTest();
-            assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
-        }
-
-        @Test
-        @DisplayName("should throw when expected type is not supported.")
-        public void test2() {
-            DefaultConversionHandler handler = handlerToTest();
-
-            // Not primitive, List/Collection, array or Optional.
-            ExternalizedPropertyMethodInfo propertyMethodInfo = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    EnumProxyInterface.class,
-                    "enumProperty" // This method returns a TestEnum.
-                );
-            
-            Converter converter = 
-                new InternalConverter(handler);
-
-            PropertyMethodConversionContext context = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    propertyMethodInfo,
-                    TestEnum.ONE.name(),
-                    TestEnum.class // Expected type is a List.
-                );
-            
-            assertThrows(
-                ConversionException.class, 
-                () -> handler.convert(context)
-            );
-        }
-
-        @Test
-        @DisplayName("should convert resolved property to an Integer or primitive int.")
-        public void test3() {
-            DefaultConversionHandler handler = handlerToTest();
-
-            ExternalizedPropertyMethodInfo wrapperPropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "integerWrapperProperty" // This method returns a Integer wrapper class
-                );
-
-            ExternalizedPropertyMethodInfo primitivePropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "intPrimitiveProperty" // This method returns an int primitive
-                );
-            
-            Converter converter = 
-                new InternalConverter(handler);
-
-            PropertyMethodConversionContext wrapperContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    wrapperPropertyMethod,
-                    "1"
-                );
-
-            PropertyMethodConversionContext primitiveContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    primitivePropertyMethod,
-                    "2"
-                );
-
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
-            
-            assertNotNull(wrapperValue);
-            assertNotNull(primitiveValue);
-
-            assertTrue(wrapperValue instanceof Integer);
-            assertTrue(primitiveValue instanceof Integer);
-
-            assertEquals(1, wrapperValue);
-            assertEquals(2, primitiveValue);
-        }
-
-        @Test
-        @DisplayName("should convert resolved property to a Long or primitive long.")
-        public void test4() {
-            DefaultConversionHandler handler = handlerToTest();
-
-            ExternalizedPropertyMethodInfo wrapperPropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "longWrapperProperty" // This method returns a Long wrapper class
-                );
-
-            ExternalizedPropertyMethodInfo primitivePropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "longPrimitiveProperty" // This method returns an long primitive
-                );
-            
-            Converter converter = 
-                new InternalConverter(handler);
-
-            PropertyMethodConversionContext wrapperContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    wrapperPropertyMethod,
-                    "1"
-                );
-
-            PropertyMethodConversionContext primitiveContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    primitivePropertyMethod,
-                    "2"
-                );
-
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
-            
-            assertNotNull(wrapperValue);
-            assertNotNull(primitiveValue);
-
-            assertTrue(wrapperValue instanceof Long);
-            assertTrue(primitiveValue instanceof Long);
-
-            assertEquals(1L, wrapperValue);
-            assertEquals(2L, primitiveValue);
-        }
-
-        @Test
-        @DisplayName("should convert resolved property to a Float or primitive float.")
-        public void test5() {
-            DefaultConversionHandler handler = handlerToTest();
-
-            ExternalizedPropertyMethodInfo wrapperPropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "floatWrapperProperty" // This method returns a Float wrapper class
-                );
-
-            ExternalizedPropertyMethodInfo primitivePropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "floatPrimitiveProperty" // This method returns an float primitive
-                );
-            
-            Converter converter = 
-                new InternalConverter(handler);
-
-            PropertyMethodConversionContext wrapperContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    wrapperPropertyMethod,
-                    "1.0"
-                );
-
-            PropertyMethodConversionContext primitiveContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    primitivePropertyMethod,
-                    "2.0"
-                );
-
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
-            
-            assertNotNull(wrapperValue);
-            assertNotNull(primitiveValue);
-
-            assertTrue(wrapperValue instanceof Float);
-            assertTrue(primitiveValue instanceof Float);
-
-            assertEquals(1.0F, wrapperValue);
-            assertEquals(2.0F, primitiveValue);
-        }
-
-        @Test
-        @DisplayName("should convert resolved property to a Double or primitive double.")
-        public void test6() {
-            DefaultConversionHandler handler = handlerToTest();
-
-            ExternalizedPropertyMethodInfo wrapperPropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "doubleWrapperProperty" // This method returns a Double wrapper class
-                );
-
-            ExternalizedPropertyMethodInfo primitivePropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "doublePrimitiveProperty" // This method returns an double primitive
-                );
-            
-            Converter converter = 
-                new InternalConverter(handler);
-
-            PropertyMethodConversionContext wrapperContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    wrapperPropertyMethod,
-                    "1.0"
-                );
-
-            PropertyMethodConversionContext primitiveContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    primitivePropertyMethod,
-                    "2.0"
-                );
-
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
-            
-            assertNotNull(wrapperValue);
-            assertNotNull(primitiveValue);
-
-            assertTrue(wrapperValue instanceof Double);
-            assertTrue(primitiveValue instanceof Double);
-
-            assertEquals(1.0D, wrapperValue);
-            assertEquals(2.0D, primitiveValue);
-        }
-
-        @Test
-        @DisplayName("should convert resolved property to a Short or primitive short.")
-        public void test7() {
-            DefaultConversionHandler handler = handlerToTest();
-
-            ExternalizedPropertyMethodInfo wrapperPropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "shortWrapperProperty" // This method returns a Short wrapper class
-                );
-
-            ExternalizedPropertyMethodInfo primitivePropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "shortPrimitiveProperty" // This method returns a short primitive
-                );
-            
-            Converter converter = 
-                new InternalConverter(handler);
-
-            PropertyMethodConversionContext wrapperContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    wrapperPropertyMethod,
-                    "1"
-                );
-
-            PropertyMethodConversionContext primitiveContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    primitivePropertyMethod,
-                    "2"
-                );
-
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
-            
-            assertNotNull(wrapperValue);
-            assertNotNull(primitiveValue);
-
-            assertTrue(wrapperValue instanceof Short);
-            assertTrue(primitiveValue instanceof Short);
-
-            assertEquals((short)1, wrapperValue);
-            assertEquals((short)2, primitiveValue);
-        }
-
-        @Test
-        @DisplayName("should convert resolved property to a Boolean or primitive boolean.")
-        public void test8() {
-            DefaultConversionHandler handler = handlerToTest();
-
-            ExternalizedPropertyMethodInfo wrapperPropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "booleanWrapperProperty" // This method returns a Boolean wrapper class
-                );
-
-            ExternalizedPropertyMethodInfo primitivePropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "booleanPrimitiveProperty" // This method returns a boolean primitive
-                );
-            
-            Converter converter = 
-                new InternalConverter(handler);
-
-            PropertyMethodConversionContext wrapperContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    wrapperPropertyMethod,
-                    "true"
-                );
-
-            PropertyMethodConversionContext primitiveContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    primitivePropertyMethod,
-                    "false"
-                );
-
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
-            
-            assertNotNull(wrapperValue);
-            assertNotNull(primitiveValue);
-
-            assertTrue(wrapperValue instanceof Boolean);
-            assertTrue(primitiveValue instanceof Boolean);
-
-            assertEquals(true, (Boolean)wrapperValue);
-            assertEquals(false, (boolean)primitiveValue);
-        }
-
-        @Test
-        @DisplayName("should convert resolved property to a Byte or primitive byte.")
-        public void test9() {
-            DefaultConversionHandler handler = handlerToTest();
-
-            ExternalizedPropertyMethodInfo wrapperPropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "byteWrapperProperty" // This method returns a Byte wrapper class
-                );
-
-            ExternalizedPropertyMethodInfo primitivePropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "bytePrimitiveProperty" // This method returns a byte primitive
-                );
-            
-            Converter converter = 
-                new InternalConverter(handler);
-
-            PropertyMethodConversionContext wrapperContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    wrapperPropertyMethod,
-                    "1"
-                );
-
-            PropertyMethodConversionContext primitiveContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    primitivePropertyMethod,
-                    "2"
-                );
-
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
-            
-            assertNotNull(wrapperValue);
-            assertNotNull(primitiveValue);
-
-            assertTrue(wrapperValue instanceof Byte);
-            assertTrue(primitiveValue instanceof Byte);
-
-            assertEquals((byte)1, (Byte)wrapperValue);
-            assertEquals((byte)2, (byte)primitiveValue);
-        }
-
-        @Test
-        @DisplayName("should convert resolved property to a List or Collection.")
-        public void test10() {
-            DefaultConversionHandler handler = handlerToTest();
-
-            ExternalizedPropertyMethodInfo listPropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    ListProxyInterface.class,
-                    "listProperty" // This method returns a List.
-                );
-
-            ExternalizedPropertyMethodInfo collectionPropertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
-                    ListProxyInterface.class,
-                    "collectionProperty" // This method returns a Collection.
-                );
-            
-            Converter converter = 
-                new InternalConverter(handler);
-
-            PropertyMethodConversionContext listContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    listPropertyMethod,
-                    "a,b,c"
-                );
-
-            PropertyMethodConversionContext collectionContext = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    collectionPropertyMethod,
-                    "c,b,a"
-                );
-
-            Object listValue = handler.convert(listContext);
-            Object collectionValue = handler.convert(collectionContext);
-            
-            assertNotNull(listValue);
-            assertNotNull(collectionValue);
-
-            assertTrue(listValue instanceof List<?>);
-            assertTrue(collectionValue instanceof Collection<?>);
-
-            assertIterableEquals(
-                Arrays.asList("a", "b", "c"), 
-                (List<?>)listValue
-            );
-            assertIterableEquals(
-                Arrays.asList("c", "b", "a"), 
-                (Collection<?>)collectionValue
-            );
-        }
-
-        @Test
-        @DisplayName("should convert resolved property to an array.")
-        public void test11() {
-            DefaultConversionHandler handler = handlerToTest();
-
-            ExternalizedPropertyMethodInfo propertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     ArrayProxyInterface.class,
                     "arrayProperty" // This method returns a String[].
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
-            PropertyMethodConversionContext context = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    propertyMethod,
-                    "a,b,c"
-                );
+            ConversionContext context = new ConversionContext(
+                converter,
+                proxyMethodInfo,
+                "a,b,c"
+            );
             
             Object arrayValue = handler.convert(context);
             
@@ -945,21 +574,19 @@ public class DefaultConversionHandlerTests {
         public void test12() {
             DefaultConversionHandler handler = handlerToTest();
 
-            ExternalizedPropertyMethodInfo propertyMethod = 
-                StubExternalizedPropertyMethodInfo.fromMethod(
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
                     OptionalProxyInterface.class,
                     "optionalProperty" // This method returns an Optional.
                 );
             
-            Converter converter = 
-                new InternalConverter(handler);
+            Converter converter = new InternalConverter(handler);
 
-            PropertyMethodConversionContext context = 
-                new PropertyMethodConversionContext(
-                    converter,
-                    propertyMethod,
-                    "optional-value"
-                );
+            ConversionContext context = new ConversionContext(
+                converter,
+                proxyMethodInfo,
+                "optional-value"
+            );
             
             Object optionalValue = handler.convert(context);
             

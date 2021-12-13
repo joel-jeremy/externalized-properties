@@ -2,7 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubCacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubInvocationHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -160,7 +160,7 @@ public class CachingInvocationHandlerTests {
         }
 
         private Method stubMethod() {
-            return StubExternalizedPropertyMethodInfo.getMethod(
+            return StubProxyMethodInfo.getMethod(
                 StubProxyInterface.class, 
                 "methodName"
             );

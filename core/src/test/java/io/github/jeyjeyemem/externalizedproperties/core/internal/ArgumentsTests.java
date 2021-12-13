@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core.internal.utils;
+package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

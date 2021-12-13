@@ -1,10 +1,10 @@
 package io.github.jeyjeyemem.externalizedproperties.core.testentities;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.TypeUtilities;
 import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalVariableExpander;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
 
 import java.lang.annotation.Annotation;
@@ -13,19 +13,18 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 
 /**
- * A stub {@link ExternalizedPropertyMethodInfo} implementation.
+ * A stub {@link ProxyMethodInfo} implementation.
  */
-public class StubExternalizedPropertyMethodInfo
-        implements ExternalizedPropertyMethodInfo {
+public class StubProxyMethodInfo implements ProxyMethodInfo {
 
     private final Method method;
     private final VariableExpander variableExpander;
 
-    private StubExternalizedPropertyMethodInfo(Method method) {
+    private StubProxyMethodInfo(Method method) {
         this(method, new InternalVariableExpander(new SystemPropertyResolver()));
     }
 
-    private StubExternalizedPropertyMethodInfo(Method method, VariableExpander variableExpander) {
+    private StubProxyMethodInfo(Method method, VariableExpander variableExpander) {
         if (method == null) {
             throw new IllegalArgumentException("method must not be null.");
         }
@@ -46,6 +45,18 @@ public class StubExternalizedPropertyMethodInfo
     }
 
     @Override
+    public Optional<String> externalizedPropertyName() {
+        return externalizedPropertyAnnotation().map(
+            ep -> variableExpander.expandVariables(ep.value())
+        );
+    }
+
+    @Override
+    public Annotation[] annotations() {
+        return method.getAnnotations();
+    }
+
+    @Override
     public <T extends Annotation> Optional<T> findAnnotation(Class<T> annotation) {
         return Optional.ofNullable(method.getAnnotation(annotation));
     }
@@ -53,13 +64,6 @@ public class StubExternalizedPropertyMethodInfo
     @Override
     public <T extends Annotation> boolean hasAnnotation(Class<T> annotationClass) {
         return findAnnotation(annotationClass).isPresent();
-    }
-
-    @Override
-    public Optional<String> externalizedPropertyName() {
-        return externalizedPropertyAnnotation().map(
-            ep -> variableExpander.expandVariables(ep.value())
-        );
     }
 
     @Override
@@ -123,7 +127,7 @@ public class StubExternalizedPropertyMethodInfo
         return method.getGenericParameterTypes();
     }
 
-    public static StubExternalizedPropertyMethodInfo fromMethod(
+    public static StubProxyMethodInfo fromMethod(
             Class<?> proxyInterface,
             String methodName,
             Class<?>... methodParameterTypes
@@ -133,20 +137,20 @@ public class StubExternalizedPropertyMethodInfo
             methodName, 
             methodParameterTypes
         );
-        return new StubExternalizedPropertyMethodInfo(method);
+        return new StubProxyMethodInfo(method);
     }
 
-    public static StubExternalizedPropertyMethodInfo fromMethod(
-            Method propertyMethod
+    public static StubProxyMethodInfo fromMethod(
+            Method proxyInterfaceMethod
     ) {
-        return new StubExternalizedPropertyMethodInfo(propertyMethod);
+        return new StubProxyMethodInfo(proxyInterfaceMethod);
     }
 
-    public static StubExternalizedPropertyMethodInfo fromMethod(
-        Method propertyMethod,
+    public static StubProxyMethodInfo fromMethod(
+        Method proxyInterfaceMethod,
         VariableExpander variableExpander
     ) {
-        return new StubExternalizedPropertyMethodInfo(propertyMethod, variableExpander);
+        return new StubProxyMethodInfo(proxyInterfaceMethod, variableExpander);
     }
     
     public static Method getMethod(

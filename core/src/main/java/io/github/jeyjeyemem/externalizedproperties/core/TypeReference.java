@@ -1,18 +1,13 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.internal.utils.TypeUtilities;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
- * This class can be used to specify a type (possibly a generic type) when resolving
- * properties via the {@link ExternalizedProperties#resolveProperty(String, TypeReference)}
- * method.
+ * This class is used to reference a type (possibly a generic type).
  * 
  * @apiNote This needs to be instantiated as an anonymous class in order for the 
  * type parameter to be detected e.g. {@code new TypeReference<List<Integer>>()&#123;&#125;}.
- * 
  */
 public abstract class TypeReference<T> {
     private final Type type;

@@ -82,6 +82,6 @@ public class StubExternalizedPropertyResolver implements ExternalizedPropertyRes
     }
 
     public Set<String> resolvedPropertyNames() {
-        return java.util.Collections.unmodifiableSet(trackedResolvedProperties.keySet());
+        return Collections.unmodifiableSet(trackedResolvedProperties.keySet());
     }
 }
