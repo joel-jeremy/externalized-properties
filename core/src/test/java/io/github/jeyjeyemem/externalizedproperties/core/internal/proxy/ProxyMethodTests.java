@@ -100,6 +100,27 @@ public class ProxyMethodTests {
     }
 
     @Nested
+    class DeclaringClassMethod {
+        @Test
+        @DisplayName("should return method's declaring class.")
+        public void test1() {
+            String methodName = "property";
+
+            ProxyMethod proxyMethod = proxyMethod(
+                BasicProxyInterface.class, 
+                methodName
+            );
+
+            Method method = getProxyInterfaceMethod(
+                BasicProxyInterface.class, 
+                methodName
+            );
+            
+            assertEquals(method.getDeclaringClass(), proxyMethod.declaringClass());
+        }
+    }
+
+    @Nested
     class NameMethod {
         @Test
         @DisplayName("should return method name.")
@@ -746,7 +767,7 @@ public class ProxyMethodTests {
     @Nested
     class ResolvePropertyMethod {
         @Test
-        @DisplayName("should return value from externalized property resolver.")
+        @DisplayName("should return value from resolver.")
         public void test1() {
             ProxyMethod proxyMethod = proxyMethod(
                 JavaPropertiesProxyInterface.class, 
@@ -782,7 +803,7 @@ public class ProxyMethodTests {
         @DisplayName(
             "should return default value " + 
             "when method is annotated with @ExternalizedProperty " + 
-            "but property cannot be resolved via the externalized property resolver."
+            "but property cannot be resolved via the resolver."
         )
         public void test3() {
             ProxyMethod proxyMethod = proxyMethod(

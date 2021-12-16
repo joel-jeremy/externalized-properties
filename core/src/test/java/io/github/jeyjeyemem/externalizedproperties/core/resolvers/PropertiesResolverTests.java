@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PropertiesPropertyResolverTests {
+public class PropertiesResolverTests {
     private static final Properties EMPTY_PROPERTIES = new Properties();
 
     @Nested
@@ -27,7 +27,7 @@ public class PropertiesPropertyResolverTests {
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new PropertiesPropertyResolver((Properties)null)
+                () -> new PropertiesResolver((Properties)null)
             );
         }
 
@@ -36,7 +36,7 @@ public class PropertiesPropertyResolverTests {
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new PropertiesPropertyResolver(EMPTY_PROPERTIES, null)
+                () -> new PropertiesResolver(EMPTY_PROPERTIES, null)
             );
         }
 
@@ -48,8 +48,8 @@ public class PropertiesPropertyResolverTests {
             props.put(123, "property.nonstring.key");
             props.put("property.name", "property.value");
 
-            PropertiesPropertyResolver resolver = resolverToTest(props);
-            PropertiesPropertyResolver.Result result = 
+            PropertiesResolver resolver = resolverToTest(props);
+            PropertiesResolver.Result result = 
                 resolver.resolve("property.nonstring", "property.name");
 
             assertTrue(result.hasResolvedProperties());
@@ -71,7 +71,7 @@ public class PropertiesPropertyResolverTests {
             Properties props = new Properties();
             props.setProperty("property.name", "property.value");
             
-            PropertiesPropertyResolver resolver = resolverToTest(props);
+            PropertiesResolver resolver = resolverToTest(props);
             Optional<String> result = resolver.resolve(
                 "property.name"
             );
@@ -90,7 +90,7 @@ public class PropertiesPropertyResolverTests {
             "when property is not found from the given properties"
         )
         public void test2() {
-            PropertiesPropertyResolver resolver = resolverToTest(EMPTY_PROPERTIES);
+            PropertiesResolver resolver = resolverToTest(EMPTY_PROPERTIES);
             Optional<String> result = resolver.resolve(
                 "nonexisting.property"
             );
@@ -113,7 +113,7 @@ public class PropertiesPropertyResolverTests {
                     return propertyName + "-default-value";
                 };
 
-            PropertiesPropertyResolver resolver = resolverToTest(
+            PropertiesResolver resolver = resolverToTest(
                 EMPTY_PROPERTIES,
                 unresolvedPropertyHandler
             );
@@ -144,8 +144,8 @@ public class PropertiesPropertyResolverTests {
                 "property.name2"
             };
             
-            PropertiesPropertyResolver resolver = resolverToTest(props);
-            PropertiesPropertyResolver.Result result = resolver.resolve(
+            PropertiesResolver resolver = resolverToTest(props);
+            PropertiesResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
 
@@ -166,14 +166,14 @@ public class PropertiesPropertyResolverTests {
             "when property is not found from the given properties"
         )
         public void test2() {
-            PropertiesPropertyResolver resolver = resolverToTest(EMPTY_PROPERTIES);
+            PropertiesResolver resolver = resolverToTest(EMPTY_PROPERTIES);
 
             String[] propertiesToResolve = new String[] {
                 "nonexisting.property1",
                 "nonexisting.property2"
             };
 
-            PropertiesPropertyResolver.Result result = resolver.resolve(
+            PropertiesResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -201,7 +201,7 @@ public class PropertiesPropertyResolverTests {
                     return propertyName + "-default-value";
                 };
 
-            PropertiesPropertyResolver resolver = resolverToTest(
+            PropertiesResolver resolver = resolverToTest(
                 EMPTY_PROPERTIES,
                 unresolvedPropertyHandler
             );
@@ -211,7 +211,7 @@ public class PropertiesPropertyResolverTests {
                 "property.unresolvedhandler2"
             };
 
-            PropertiesPropertyResolver.Result result = resolver.resolve(
+            PropertiesResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -242,8 +242,8 @@ public class PropertiesPropertyResolverTests {
                 "property.name2"
             );
             
-            PropertiesPropertyResolver resolver = resolverToTest(props);
-            PropertiesPropertyResolver.Result result = resolver.resolve(
+            PropertiesResolver resolver = resolverToTest(props);
+            PropertiesResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
 
@@ -264,14 +264,14 @@ public class PropertiesPropertyResolverTests {
             "when property is not found from the given properties"
         )
         public void test2() {
-            PropertiesPropertyResolver resolver = resolverToTest(EMPTY_PROPERTIES);
+            PropertiesResolver resolver = resolverToTest(EMPTY_PROPERTIES);
 
             List<String> propertiesToResolve = Arrays.asList(
                 "nonexisting.property1",
                 "nonexisting.property2"
             );
 
-            PropertiesPropertyResolver.Result result = resolver.resolve(
+            PropertiesResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -299,7 +299,7 @@ public class PropertiesPropertyResolverTests {
                     return propertyName + "-default-value";
                 };
 
-            PropertiesPropertyResolver resolver = resolverToTest(
+            PropertiesResolver resolver = resolverToTest(
                 EMPTY_PROPERTIES,
                 unresolvedPropertyHandler
             );
@@ -309,7 +309,7 @@ public class PropertiesPropertyResolverTests {
                 "property.unresolvedhandler2"
             );
 
-            PropertiesPropertyResolver.Result result = resolver.resolve(
+            PropertiesResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -326,16 +326,16 @@ public class PropertiesPropertyResolverTests {
         }
     }
 
-    private PropertiesPropertyResolver resolverToTest(
+    private PropertiesResolver resolverToTest(
             Properties properties
     ) {
-        return new PropertiesPropertyResolver(properties);
+        return new PropertiesResolver(properties);
     }
 
-    private PropertiesPropertyResolver resolverToTest(
+    private PropertiesResolver resolverToTest(
             Properties properties,
             Function<String, String> unresolverPropertyHandler
     ) {
-        return new PropertiesPropertyResolver(properties, unresolverPropertyHandler);
+        return new PropertiesResolver(properties, unresolverPropertyHandler);
     }
 }

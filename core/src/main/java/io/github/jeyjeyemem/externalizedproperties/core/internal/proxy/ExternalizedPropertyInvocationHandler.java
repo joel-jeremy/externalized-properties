@@ -32,7 +32,7 @@ public class ExternalizedPropertyInvocationHandler implements InvocationHandler 
     }
 
     /**
-     * Handles the externalized property method invocation.
+     * Handles the externalized properties proxy method invocation.
      * 
      * @param proxy The proxy object.
      * @param method The invoked method.

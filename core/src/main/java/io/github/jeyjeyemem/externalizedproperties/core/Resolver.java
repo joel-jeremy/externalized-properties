@@ -18,7 +18,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 /**
  * The mechanism to resolve properties from various external sources.
  */
-public interface ExternalizedPropertyResolver {
+public interface Resolver {
     /**
      * Resolve property from an external source.
      * 
@@ -66,8 +66,7 @@ public interface ExternalizedPropertyResolver {
             requireNonNull(requestedPropertyNames, "requestedPropertyNames");
             requireNonNull(resolvedPropertiesByName, "resolvedPropertiesByName");
 
-            this.resolvedPropertiesByName = Collections.unmodifiableMap(resolvedPropertiesByName);
-
+            this.resolvedPropertiesByName = resolvedPropertiesByName;
             this.unresolvedPropertyNames = getUnresolvedPropertyNames(
                 requestedPropertyNames, 
                 resolvedPropertiesByName.keySet()
@@ -87,7 +86,7 @@ public interface ExternalizedPropertyResolver {
          * @return The unmodifiable map of resolved properties.
          */
         public Map<String, String> resolvedProperties() {
-            return resolvedPropertiesByName;
+            return Collections.unmodifiableMap(resolvedPropertiesByName);
         }
 
         /**
@@ -97,7 +96,7 @@ public interface ExternalizedPropertyResolver {
          * @return The unmodifiable set of resolved property names.
          */
         public Set<String> resolvedPropertyNames() {
-            return resolvedPropertiesByName.keySet();
+            return Collections.unmodifiableSet(resolvedPropertiesByName.keySet());
         }
 
         /**
@@ -107,7 +106,7 @@ public interface ExternalizedPropertyResolver {
          * @return The unmodifiable set of unresolved property names.
          */
         public Set<String> unresolvedPropertyNames() {
-            return unresolvedPropertyNames;
+            return Collections.unmodifiableSet(unresolvedPropertyNames);
         }
 
         /**
@@ -186,8 +185,8 @@ public interface ExternalizedPropertyResolver {
 
         private static Set<String> getUnresolvedPropertyNames(
                 Collection<String> propertiesToResolve,
-                Set<String> resolvedPropertyNames) 
-        {
+                Set<String> resolvedPropertyNames
+        ) {
             Set<String> unresolvedPropertyNames = new HashSet<>(
                 // Prevent internal hashmap resizing.
                 (int) ((float) propertiesToResolve.size() / 0.75F + 1.0F)
@@ -199,7 +198,7 @@ public interface ExternalizedPropertyResolver {
                 }
             }
 
-            return Collections.unmodifiableSet(unresolvedPropertyNames);
+            return unresolvedPropertyNames;
         }
 
         /**
@@ -217,7 +216,8 @@ public interface ExternalizedPropertyResolver {
 
                 this.resolvedPropertiesByName = new HashMap<>(
                     // Prevent hashmap resizing.
-                    (int) ((float) requestedPropertyNames.size() / 0.75F + 1.0F)
+                    // 0.75 is HashMap's default load factor.
+                    (int)(requestedPropertyNames.size() / 0.75f) + 1
                 );
             }
 

@@ -52,7 +52,8 @@ public class OptionalConversionHandler implements ConversionHandler<Optional<?>>
             );
         } catch (Exception ex) {
             throw new ConversionException(String.format(
-                    "Failed to convert value to an Optional: %s",
+                    "Failed to convert value to %s type: %s",
+                    context.rawTargetType(),
                     context.value()
                 ),  
                 ex

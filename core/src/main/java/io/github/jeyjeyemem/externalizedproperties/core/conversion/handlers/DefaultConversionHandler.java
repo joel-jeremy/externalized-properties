@@ -21,7 +21,8 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  */
 public class DefaultConversionHandler implements ConversionHandler<Object> {
 
-    private final List<ConversionHandler<?>> defaultConversionHandlers;
+    // private final List<ConversionHandler<?>> defaultConversionHandlers;
+    private final ClassValue<ConversionHandler<?>> conversionHandlersByTargetType;
 
     /**
      * Constructs a {@link DefaultConversionHandler} instance 
@@ -34,18 +35,32 @@ public class DefaultConversionHandler implements ConversionHandler<Object> {
      * </ol>
      */
     public DefaultConversionHandler() {
-        defaultConversionHandlers = Arrays.asList(
+        // In order.
+        final List<ConversionHandler<?>> defaultConversionHandlers = Arrays.asList(
             new PrimitiveConversionHandler(),
             new ListConversionHandler(),
             new ArrayConversionHandler(),
             new OptionalConversionHandler()
         );
+
+        conversionHandlersByTargetType = new ClassValue<ConversionHandler<?>>() {
+            @Override
+            protected ConversionHandler<?> computeValue(Class<?> targetType) {
+                for (ConversionHandler<?> conversionHandler : defaultConversionHandlers) {
+                    if (conversionHandler.canConvertTo(targetType)) {
+                        return conversionHandler;
+                    }
+                }
+                return null;
+            }
+        };
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean canConvertTo(Class<?> targetType) {
-        return defaultConversionHandlers.stream().anyMatch(c -> c.canConvertTo(targetType));
+        if (targetType == null) return false;
+        return conversionHandlersByTargetType.get(targetType) != null;
     }
 
     /** {@inheritDoc} */
@@ -53,21 +68,15 @@ public class DefaultConversionHandler implements ConversionHandler<Object> {
     public Object convert(ConversionContext context) {
         requireNonNull(context, "context");
 
-        ConversionHandler<?> converter = getConversionHandler(context);
-        return converter.convert(context);
-    }
-
-    private ConversionHandler<?> getConversionHandler(ConversionContext context) {
         Class<?> rawTargetType = context.rawTargetType();
-        for (ConversionHandler<?> handler : defaultConversionHandlers) {
-            if (handler.canConvertTo(rawTargetType)) {
-                return handler;
-            }
+        ConversionHandler<?> conversionHandler = conversionHandlersByTargetType.get(rawTargetType);
+        if (conversionHandler == null) {
+            throw new ConversionException(String.format(
+                "No applicable conversion handler found to convert to %s type.", 
+                context.targetType()
+            ));
         }
 
-        throw new ConversionException(
-            "No applicable conversion handler found to convert to " + 
-            context.targetType() + "."
-        );
+        return conversionHandler.convert(context);
     }
 }

@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ExternalizedPropertyResolverTests {
+public class ResolverTests {
     @Nested
     class ResolveMethodWithVarArgsOverload {
         @Test
@@ -30,7 +30,7 @@ public class ExternalizedPropertyResolverTests {
             AtomicReference<Collection<String>> propertyNamesCollectionRef = 
                 new AtomicReference<>();
             
-            ExternalizedPropertyResolver resolver = new ExternalizedPropertyResolver() {
+            Resolver resolver = new Resolver() {
                 @Override
                 public Optional<String> resolve(String propertyName) {
                     return Optional.empty();
@@ -46,7 +46,7 @@ public class ExternalizedPropertyResolverTests {
             };
 
             // This shall be converted to a empty collection
-            // and delegate to ExternalizedPropertyResolver.resolve(Collection<String>).
+            // and delegate to Resolver.resolve(Collection<String>).
             resolver.resolve((String[])null);
 
             assertNotNull(propertyNamesCollectionRef.get());
@@ -61,8 +61,8 @@ public class ExternalizedPropertyResolverTests {
             @Test
             @DisplayName("should not return null")
             public void test1() {
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder("test.property");
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder("test.property");
 
                 assertNotNull(resultBuilder);
             }
@@ -74,14 +74,14 @@ public class ExternalizedPropertyResolverTests {
             public void test2() {
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> ExternalizedPropertyResolver.Result.builder(
+                    () -> Resolver.Result.builder(
                         (String[])null
                     )
                 );
                 
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> ExternalizedPropertyResolver.Result.builder(
+                    () -> Resolver.Result.builder(
                         new String[0]
                     )
                 );
@@ -93,8 +93,8 @@ public class ExternalizedPropertyResolverTests {
             @Test
             @DisplayName("should not return null")
             public void test1() {
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         Arrays.asList("test.property")
                     );
 
@@ -108,14 +108,14 @@ public class ExternalizedPropertyResolverTests {
             public void test2() {
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> ExternalizedPropertyResolver.Result.builder(
+                    () -> Resolver.Result.builder(
                         (Collection<String>)null
                     )
                 );
 
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> ExternalizedPropertyResolver.Result.builder(
+                    () -> Resolver.Result.builder(
                         Collections.emptyList()
                     )
                 );
@@ -131,14 +131,14 @@ public class ExternalizedPropertyResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 assertNotNull(result.resolvedProperties());
             }
@@ -150,14 +150,14 @@ public class ExternalizedPropertyResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 assertEquals(requestedProperties, result.resolvedProperties());
             }
@@ -169,14 +169,14 @@ public class ExternalizedPropertyResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 Map<String, String> resolvedProperties = result.resolvedProperties();
 
@@ -285,14 +285,14 @@ public class ExternalizedPropertyResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 String resolved = result.findRequiredProperty("test.property.1");
 
@@ -306,14 +306,14 @@ public class ExternalizedPropertyResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 assertThrows(
                     UnresolvedPropertiesException.class,
@@ -330,14 +330,14 @@ public class ExternalizedPropertyResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 Optional<String> resolved = result.findResolvedProperty("test.property.1");
 
@@ -352,14 +352,14 @@ public class ExternalizedPropertyResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 Optional<String> property = result.findResolvedProperty("unresolved");
 
@@ -376,14 +376,14 @@ public class ExternalizedPropertyResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 assertTrue(result.hasResolvedProperties());
             }
@@ -394,14 +394,14 @@ public class ExternalizedPropertyResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 // No resolved properties added to result.
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 assertFalse(result.hasResolvedProperties());
             }
@@ -415,14 +415,14 @@ public class ExternalizedPropertyResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 // No resolved properties added to result.
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 assertTrue(result.hasUnresolvedProperties());
             }
@@ -433,14 +433,14 @@ public class ExternalizedPropertyResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 assertFalse(result.hasUnresolvedProperties());
             }
@@ -455,14 +455,14 @@ public class ExternalizedPropertyResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 assertTrue(result.resolvedPropertyNames().contains("test.property.1"));
                 assertTrue(result.resolvedPropertyNames().contains("test.property.2"));
@@ -475,14 +475,14 @@ public class ExternalizedPropertyResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 // No resolved properties added to result.
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 assertFalse(result.resolvedPropertyNames().contains("test.property.1"));
                 assertFalse(result.resolvedPropertyNames().contains("test.property.2"));
@@ -495,14 +495,14 @@ public class ExternalizedPropertyResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 Set<String> resolvedPropertyNames = result.resolvedPropertyNames();
 
@@ -522,14 +522,14 @@ public class ExternalizedPropertyResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 // No resolved properties added to result.
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 assertTrue(result.unresolvedPropertyNames().contains("test.property.1"));
                 assertTrue(result.unresolvedPropertyNames().contains("test.property.2"));
@@ -542,14 +542,14 @@ public class ExternalizedPropertyResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 assertFalse(result.unresolvedPropertyNames().contains("test.property.1"));
                 assertFalse(result.unresolvedPropertyNames().contains("test.property.2"));
@@ -562,14 +562,14 @@ public class ExternalizedPropertyResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
 
                 Set<String> resolvedPropertyNames = result.unresolvedPropertyNames();
 
@@ -588,8 +588,8 @@ public class ExternalizedPropertyResolverTests {
             @Test
             @DisplayName("should throw when property name argument is null or empty")
             public void test1() {
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         Arrays.asList("test.property")
                     );
 
@@ -609,8 +609,8 @@ public class ExternalizedPropertyResolverTests {
             @Test
             @DisplayName("should throw when resolved property value argument is null")
             public void test2() {
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         Arrays.asList("test.property")
                     );
 
@@ -623,14 +623,14 @@ public class ExternalizedPropertyResolverTests {
             @Test
             @DisplayName("should add property to result's resolved properties")
             public void test3() {
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         Arrays.asList("test.property")
                     );
                 
                 resultBuilder.add("test.property", "test.property.value");
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
                 
                 assertTrue(result.resolvedPropertyNames().contains("test.property"));
             }
@@ -642,14 +642,14 @@ public class ExternalizedPropertyResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
                 
-                ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                    ExternalizedPropertyResolver.Result.builder(
+                Resolver.Result.Builder resultBuilder = 
+                    Resolver.Result.builder(
                         requestedProperties.keySet()
                     );
                 
                 resultBuilder.add("test.property.1", "test.property.value.1");
 
-                ExternalizedPropertyResolver.Result result = resultBuilder.build();
+                Resolver.Result result = resultBuilder.build();
                 
                 assertTrue(result.resolvedPropertyNames().contains("test.property.1"));
                 // test.property.2 was not resolved.
@@ -664,8 +664,8 @@ public class ExternalizedPropertyResolverTests {
         @Test
         @DisplayName("should throw when resolved proeprties by name map argument is null")
         public void test1() {
-            ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                ExternalizedPropertyResolver.Result.builder(
+            Resolver.Result.Builder resultBuilder = 
+                Resolver.Result.builder(
                     Arrays.asList("test.property")
                 );
 
@@ -690,8 +690,8 @@ public class ExternalizedPropertyResolverTests {
             requestedProperties.put("test.property.2", "test.property.value.2");
             requestedProperties.put("test.property.3", "test.property.value.3");
             
-            ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                ExternalizedPropertyResolver.Result.builder(
+            Resolver.Result.Builder resultBuilder = 
+                Resolver.Result.builder(
                     requestedProperties.keySet()
                 );
 
@@ -702,7 +702,7 @@ public class ExternalizedPropertyResolverTests {
             
             resultBuilder.addAll(resolved);
 
-            ExternalizedPropertyResolver.Result result = resultBuilder.build();
+            Resolver.Result result = resultBuilder.build();
             
             assertTrue(result.resolvedPropertyNames().contains("test.property.1"));
             assertTrue(result.resolvedPropertyNames().contains("test.property.2"));
@@ -717,8 +717,8 @@ public class ExternalizedPropertyResolverTests {
             requestedProperties.put("test.property.2", "test.property.value.2");
             requestedProperties.put("test.property.3", "test.property.value.3");
 
-            ExternalizedPropertyResolver.Result.Builder resultBuilder = 
-                ExternalizedPropertyResolver.Result.builder(
+            Resolver.Result.Builder resultBuilder = 
+                Resolver.Result.builder(
                     requestedProperties.keySet()
                 );
 
@@ -729,7 +729,7 @@ public class ExternalizedPropertyResolverTests {
             
             resultBuilder.addAll(resolved);
 
-            ExternalizedPropertyResolver.Result result = resultBuilder.build();
+            Resolver.Result result = resultBuilder.build();
             
             assertTrue(result.resolvedPropertyNames().contains("test.property.1"));
             assertTrue(result.resolvedPropertyNames().contains("test.property.2"));
@@ -740,53 +740,53 @@ public class ExternalizedPropertyResolverTests {
     }
 
     private <T> void verifyUnmodifiableCollection(
-            Collection<T> setToVerify, 
+            Collection<T> collectionToVerify, 
             Supplier<T> itemSupplier
     ) {
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.add(itemSupplier.get())
+            () -> collectionToVerify.add(itemSupplier.get())
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.remove(itemSupplier.get())
+            () -> collectionToVerify.remove(itemSupplier.get())
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.addAll(
+            () -> collectionToVerify.addAll(
                 Collections.singletonList(itemSupplier.get())
             )
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.clear()
+            () -> collectionToVerify.clear()
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.removeAll(
+            () -> collectionToVerify.removeAll(
                 Collections.singletonList(itemSupplier.get())
             )
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.removeIf(r -> true)
+            () -> collectionToVerify.removeIf(r -> true)
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.retainAll(
+            () -> collectionToVerify.retainAll(
                 Collections.singletonList(itemSupplier.get())
             )
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.iterator().remove()
+            () -> collectionToVerify.iterator().remove()
         );
     }
 }

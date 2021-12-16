@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion;
 
-import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalConverter;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;

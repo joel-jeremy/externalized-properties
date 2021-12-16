@@ -44,7 +44,7 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
      * Constructor.
      * 
      * @param listFactory The list factory. This must return a list instance
-     * given a length. This must not return null.
+     * (optionally with given the length). This must not return null.
      */
     public ListConversionHandler(IntFunction<List<?>> listFactory) {
         this.listFactory = requireNonNull(listFactory, "listFactory");
@@ -95,7 +95,8 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
         } catch (Exception ex) {
             throw new ConversionException(
                 String.format(
-                    "Failed to convert value to a List/Collection: %s",
+                    "Failed to convert value to %s type: %s",
+                    context.rawTargetType(),
                     context.value()
                 ),  
                 ex
@@ -165,7 +166,6 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
                 "Type variables e.g. List<T> are not supported."
             );
         }
-
         return listGenericTypeParameter;
     }
 }

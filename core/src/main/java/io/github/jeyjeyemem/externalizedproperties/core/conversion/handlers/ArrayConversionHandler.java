@@ -20,7 +20,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  * Supports conversion of values to an array.
  * 
  * @implNote By default, this uses ',' as default delimiter when splitting resolved property values.
- * This can overriden by annotating the externalized property method with {@link Delimiter} annotation
+ * This can overriden by annotating the proxy method with {@link Delimiter} annotation
  * in which case the {@link Delimiter#value()} attribute will be used as the delimiter.
  * 
  * @implNote If stripping of empty values from the array is desired, 
@@ -63,7 +63,10 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
             }
 
             // Generic array component type handling e.g. Optional<String>[]
-            GenericArrayType genericArrayType = TypeUtilities.asGenericArrayType(context.targetType());
+            GenericArrayType genericArrayType = TypeUtilities.asGenericArrayType(
+                context.targetType()
+            );
+            
             if (genericArrayType != null) {
                 Type genericArrayComponentType = genericArrayType.getGenericComponentType();
             

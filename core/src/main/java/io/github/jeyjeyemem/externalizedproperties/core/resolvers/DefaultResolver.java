@@ -6,22 +6,22 @@ import java.util.Arrays;
  * Default property converter which delegates to the following resolvers (in order):
  * <ol>
  *  <li>{@link SystemPropertyResolver}</li>
- *  <li>{@link EnvironmentPropertyResolver}</li>
+ *  <li>{@link EnvironmentVariableResolver}</li>
  * </ol>
  */
-public class DefaultPropertyResolver extends CompositePropertyResolver {
+public class DefaultResolver extends CompositeResolver {
     /**
      * Construct a property converter which delegates to the following resolvers 
      * (in order):
      * <ol>
      *  <li>{@link SystemPropertyResolver}</li>
-     *  <li>{@link EnvironmentPropertyResolver}</li>
+     *  <li>{@link EnvironmentVariableResolver}</li>
      * </ol>
      */
-    public DefaultPropertyResolver() {
+    public DefaultResolver() {
         super(Arrays.asList(
             new SystemPropertyResolver(),
-            new EnvironmentPropertyResolver()
+            new EnvironmentVariableResolver()
         ));
     }
 }

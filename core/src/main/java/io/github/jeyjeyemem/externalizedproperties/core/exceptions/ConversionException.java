@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.exceptions;
 
 /**
- * Resolve property conversion related exception. 
+ * Conversion related exception. 
  */
 public class ConversionException extends ExternalizedPropertiesException {
     /**

@@ -1,8 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.EnumConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * Benchmark property conversion via proxy or directly from 
@@ -32,8 +33,10 @@ public abstract class ConversionBenchmarks {
     public static class BenchmarkState {
         private ExternalizedProperties externalizedProperties;
         private ExternalizedProperties externalizedPropertiesWithCaching;
+        private ExternalizedProperties externalizedPropertiesWithMultipleConversionHandlers;
         private ProxyInterface proxyInterface;
         private ProxyInterface proxyInterfaceWithCaching;
+        private ProxyInterface proxyInterfaceWithMultipleConversionHandler;
 
         @Setup
         public void setup() {
@@ -41,10 +44,10 @@ public abstract class ConversionBenchmarks {
              * Basic setup. No caching.
              */
             externalizedProperties = ExternalizedPropertiesBuilder.newBuilder()
-                .resolvers(new MapPropertyResolver(
+                .resolvers(new MapResolver(
                     Collections.singletonMap("testInt", "1")
                 ))
-                .conversionHandlers(new IntegerConversionHandler())
+                .withDefaultConversionHandlers()
                 .build();
 
             proxyInterface = externalizedProperties.proxy(ProxyInterface.class);
@@ -53,15 +56,38 @@ public abstract class ConversionBenchmarks {
              * Setup with caching.
              */
             externalizedPropertiesWithCaching = ExternalizedPropertiesBuilder.newBuilder()
-                .resolvers(new MapPropertyResolver(
+                .resolvers(new MapResolver(
                     Collections.singletonMap("testInt", "1")
                 ))
                 .withCaching()
                 .withCacheDuration(Duration.ofHours(24))
+                .withDefaultConversionHandlers()
                 .build();
 
             proxyInterfaceWithCaching = 
                 externalizedPropertiesWithCaching.proxy(ProxyInterface.class);
+
+            /**
+             * Basic setup. No caching.
+             */
+            externalizedPropertiesWithMultipleConversionHandlers = 
+                ExternalizedPropertiesBuilder.newBuilder()
+                    .resolvers(new MapResolver(
+                        Collections.singletonMap("testInt", "1")
+                    ))
+                    // Add a bunch more conversion handlers.
+                    .conversionHandlers(
+                        Stream.generate(() -> new EnumConversionHandler())
+                            .limit(50)
+                            .toArray(ConversionHandler<?>[]::new)
+                    )
+                    .withDefaultConversionHandlers()
+                    .build();
+
+            proxyInterfaceWithMultipleConversionHandler = 
+                externalizedPropertiesWithMultipleConversionHandlers.proxy(
+                    ProxyInterface.class
+                );
         }
     }
 
@@ -103,7 +129,7 @@ public abstract class ConversionBenchmarks {
      * @return For you, blackhole.
      */
     @Benchmark
-    public Optional<Integer> conversionInResolveProperty(BenchmarkState state) {
+    public Optional<Integer> resolveProperty(BenchmarkState state) {
         return state.externalizedProperties.resolveProperty("testInt", Integer.class);
     }
 
@@ -115,8 +141,25 @@ public abstract class ConversionBenchmarks {
      * @return For you, blackhole.
      */
     @Benchmark
-    public Optional<Integer> conversionInResolvePropertyWithCaching(BenchmarkState state) {
+    public Optional<Integer> resolvePropertyWithCaching(BenchmarkState state) {
         return state.externalizedPropertiesWithCaching.resolveProperty("testInt", Integer.class);
+    }
+
+    /**
+     * Benchmark resolution of properties directly from ExternalizedProperties
+     * and conversion to integer.
+     * 
+     * @param state The benchmark state.
+     * @return For you, blackhole.
+     */
+    @Benchmark
+    public Optional<Integer> resolvePropertyWithMultipleConversionHandlers(
+            BenchmarkState state
+    ) {
+        return state.externalizedPropertiesWithMultipleConversionHandlers.resolveProperty(
+            "testInt", 
+            Integer.class
+        );
     }
 
     /**
@@ -126,7 +169,18 @@ public abstract class ConversionBenchmarks {
      * @return For you, blackhole.
      */
     @Benchmark
-    public int conversionInProxyInterfaceWithCaching(BenchmarkState state) {
+    public int proxyInterface(BenchmarkState state) {
+        return state.proxyInterface.testInt();
+    }
+
+    /**
+     * Benchmark resolution of properties from a proxy interface and conversion to int.
+     * 
+     * @param state The benchmark state.
+     * @return For you, blackhole.
+     */
+    @Benchmark
+    public int proxyInterfaceWithCaching(BenchmarkState state) {
         return state.proxyInterfaceWithCaching.testInt();
     }
 
@@ -137,19 +191,19 @@ public abstract class ConversionBenchmarks {
      * @return For you, blackhole.
      */
     @Benchmark
-    public int conversionInProxyInterface(BenchmarkState state) {
-        return state.proxyInterface.testInt();
+    public int proxyInterfaceWithMultipleConversionHandler(BenchmarkState state) {
+        return state.proxyInterfaceWithMultipleConversionHandler.testInt();
     }
 
-    private static class IntegerConversionHandler implements ConversionHandler<Integer> {
-        @Override
-        public boolean canConvertTo(Class<?> targetType) {
-            return Integer.TYPE.equals(targetType) || Integer.class.equals(targetType);
-        }
+    // private static class IntegerConversionHandler implements ConversionHandler<Integer> {
+    //     @Override
+    //     public boolean canConvertTo(Class<?> targetType) {
+    //         return Integer.TYPE.equals(targetType) || Integer.class.equals(targetType);
+    //     }
 
-        @Override
-        public Integer convert(ConversionContext context) {
-            return Integer.valueOf(context.value());
-        }
-    }
+    //     @Override
+    //     public Integer convert(ConversionContext context) {
+    //         return Integer.valueOf(context.value());
+    //     }
+    // }
 }

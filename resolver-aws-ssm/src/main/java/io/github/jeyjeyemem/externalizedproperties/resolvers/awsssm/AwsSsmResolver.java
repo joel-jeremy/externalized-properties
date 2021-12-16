@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.awsssm;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
 import software.amazon.awssdk.services.ssm.model.GetParametersResponse;
@@ -10,10 +10,10 @@ import java.util.Collection;
 import java.util.Optional;
 
 /**
- * {@link ExternalizedPropertyResolver} implementation which resolves requested properties 
+ * {@link Resolver} implementation which resolves requested properties 
  * from AWS SSM.
  */
-public class AwsSsmPropertyResolver implements ExternalizedPropertyResolver {
+public class AwsSsmResolver implements Resolver {
     private final SsmClient awsSsmClient;
 
     /**
@@ -21,13 +21,14 @@ public class AwsSsmPropertyResolver implements ExternalizedPropertyResolver {
      * 
      * @param awsSsmClient The AWS SSM client.
      */
-    public AwsSsmPropertyResolver(SsmClient awsSsmClient) {
+    public AwsSsmResolver(SsmClient awsSsmClient) {
         if (awsSsmClient == null) {
             throw new IllegalArgumentException("awsSsmClient must not be null.");
         }
 
         this.awsSsmClient = awsSsmClient;
     }
+    
     /**
      * Resolve properties from AWS SSM.
      * 

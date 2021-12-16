@@ -13,30 +13,17 @@ public class PrimitiveConversionHandler implements ConversionHandler<Object> {
     /** {@inheritDoc} */
     @Override
     public boolean canConvertTo(Class<?> targetType) {
-        if (targetType == null) {
-            return false;
-        }
-
-        if (targetType.isPrimitive()) {
-            return true;
-        }
+        if (targetType == null) return false;
+        if (targetType.isPrimitive()) return true;
 
         // Primitive wrappers.
-        if (Boolean.class.equals(targetType)) {
-            return true;
-        } else if (Integer.class.equals(targetType)) {
-            return true;
-        } else if (Long.class.equals(targetType)) {
-            return true;
-        } else if (Short.class.equals(targetType)) {
-            return true;
-        } else if (Float.class.equals(targetType)) {
-            return true;
-        } else if (Double.class.equals(targetType)) {
-            return true;
-        } else if (Byte.class.equals(targetType)) {
-            return true;
-        }
+        if (Boolean.class.equals(targetType)) return true;
+        else if (Integer.class.equals(targetType)) return true;
+        else if (Long.class.equals(targetType)) return true;
+        else if (Short.class.equals(targetType)) return true;
+        else if (Float.class.equals(targetType)) return true;
+        else if (Double.class.equals(targetType)) return true;
+        else if (Byte.class.equals(targetType)) return true;
 
         return false;
     }
@@ -68,7 +55,7 @@ public class PrimitiveConversionHandler implements ConversionHandler<Object> {
             throw new ConversionException(
                 String.format(
                     "Failed to convert value to %s type: %s",
-                    context.targetType(),
+                    targetType.getName(),
                     context.value()
                 ),  
                 ex
@@ -77,7 +64,7 @@ public class PrimitiveConversionHandler implements ConversionHandler<Object> {
     
         throw new ConversionException(
             "Type is not a primitive/primitive wrapper type: " + 
-            targetType
+            targetType.getName()
         );
     }
 }

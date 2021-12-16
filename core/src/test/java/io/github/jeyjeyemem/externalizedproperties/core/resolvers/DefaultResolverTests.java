@@ -13,13 +13,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DefaultPropertyResolverTests {
+public class DefaultResolverTests {
     @Nested
     class ResolveMethod {
         @Test
         @DisplayName("should resolve property value from system properties")
         public void systemPropertyTest1() {
-            DefaultPropertyResolver resolver = resolverToTest();
+            DefaultResolver resolver = resolverToTest();
             Optional<String> result = resolver.resolve("java.version");
 
             assertNotNull(result);
@@ -35,7 +35,7 @@ public class DefaultPropertyResolverTests {
             "should return empty Optional when system property is not found"
         )
         public void systemPropertyTest2() {
-            DefaultPropertyResolver resolver = resolverToTest();
+            DefaultResolver resolver = resolverToTest();
             Optional<String> result = resolver.resolve(
                 "nonexisting.property"
             );
@@ -47,7 +47,7 @@ public class DefaultPropertyResolverTests {
         @Test
         @DisplayName("should resolve property value from environment variables")
         public void environmentVariableTest1() {
-            DefaultPropertyResolver resolver = resolverToTest();
+            DefaultResolver resolver = resolverToTest();
             Optional<String> result = resolver.resolve(
                 "PATH"
             );
@@ -65,7 +65,7 @@ public class DefaultPropertyResolverTests {
             "should return empty Optional when environment variable is not found"
         )
         public void environmentVariableTest2() {
-            DefaultPropertyResolver resolver = resolverToTest();
+            DefaultResolver resolver = resolverToTest();
             Optional<String> result = resolver.resolve(
                 "NON_EXISTING_ENVVAR"
             );
@@ -80,14 +80,14 @@ public class DefaultPropertyResolverTests {
         @Test
         @DisplayName("should resolve values from system properties")
         public void systemPropertyTest1() {
-            DefaultPropertyResolver resolver = resolverToTest();
+            DefaultResolver resolver = resolverToTest();
 
             String[] propertiesToResolve = new String[] {
                 "java.version", 
                 "java.home"
             };
 
-            DefaultPropertyResolver.Result result = resolver.resolve(propertiesToResolve);
+            DefaultResolver.Result result = resolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -105,14 +105,14 @@ public class DefaultPropertyResolverTests {
             "should return result with unresolved properties when system property is not found"
         )
         public void systemPropertyTest2() {
-            DefaultPropertyResolver resolver = resolverToTest();
+            DefaultResolver resolver = resolverToTest();
 
             String[] propertiesToResolve = new String[] {
                 "nonexisting.property1", 
                 "nonexisting.property2"
             };
 
-            DefaultPropertyResolver.Result result = resolver.resolve(
+            DefaultResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -129,8 +129,8 @@ public class DefaultPropertyResolverTests {
         @Test
         @DisplayName("should resolve property values from environment variables")
         public void environmentVariableTest1() {
-            DefaultPropertyResolver resolver = resolverToTest();
-            DefaultPropertyResolver.Result result = resolver.resolve(
+            DefaultResolver resolver = resolverToTest();
+            DefaultResolver.Result result = resolver.resolve(
                 "PATH",
                 "HOME"
             );
@@ -154,8 +154,8 @@ public class DefaultPropertyResolverTests {
             "should return result with unresolved properties when environment variable is not found"
         )
         public void environmentVariableTest2() {
-            DefaultPropertyResolver resolver = resolverToTest();
-            DefaultPropertyResolver.Result result = resolver.resolve(
+            DefaultResolver resolver = resolverToTest();
+            DefaultResolver.Result result = resolver.resolve(
                 "NON_EXISTING_ENVVAR1",
                 "NON_EXISTING_ENVVAR2"
             );
@@ -171,14 +171,14 @@ public class DefaultPropertyResolverTests {
         @Test
         @DisplayName("should resolve values from system properties")
         public void systemPropertyTest1() {
-            DefaultPropertyResolver resolver = resolverToTest();
+            DefaultResolver resolver = resolverToTest();
 
             List<String> propertiesToResolve = Arrays.asList(
                 "java.version", 
                 "java.home"
             );
 
-            DefaultPropertyResolver.Result result = resolver.resolve(propertiesToResolve);
+            DefaultResolver.Result result = resolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -196,14 +196,14 @@ public class DefaultPropertyResolverTests {
             "should return result with unresolved properties when system property is not found"
         )
         public void systemPropertyTest2() {
-            DefaultPropertyResolver resolver = resolverToTest();
+            DefaultResolver resolver = resolverToTest();
 
             List<String> propertiesToResolve = Arrays.asList(
                 "nonexisting.property1", 
                 "nonexisting.property2"
             );
 
-            DefaultPropertyResolver.Result result = resolver.resolve(
+            DefaultResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -220,8 +220,8 @@ public class DefaultPropertyResolverTests {
         @Test
         @DisplayName("should resolve property values from environment variables")
         public void environmentVariableTest1() {
-            DefaultPropertyResolver resolver = resolverToTest();
-            DefaultPropertyResolver.Result result = resolver.resolve(
+            DefaultResolver resolver = resolverToTest();
+            DefaultResolver.Result result = resolver.resolve(
                 Arrays.asList(
                     "PATH",
                     "HOME"
@@ -247,8 +247,8 @@ public class DefaultPropertyResolverTests {
             "should return result with unresolved properties when environment variable is not found"
         )
         public void environmentVariableTest2() {
-            DefaultPropertyResolver resolver = resolverToTest();
-            DefaultPropertyResolver.Result result = resolver.resolve(
+            DefaultResolver resolver = resolverToTest();
+            DefaultResolver.Result result = resolver.resolve(
                 Arrays.asList(
                     "NON_EXISTING_ENVVAR1",
                     "NON_EXISTING_ENVVAR2"
@@ -262,7 +262,7 @@ public class DefaultPropertyResolverTests {
         }
     }
 
-    private DefaultPropertyResolver resolverToTest() {
-        return new DefaultPropertyResolver();
+    private DefaultResolver resolverToTest() {
+        return new DefaultResolver();
     }
 }

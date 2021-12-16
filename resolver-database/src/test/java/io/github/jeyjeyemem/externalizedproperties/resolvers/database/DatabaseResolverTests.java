@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DatabasePropertyResolverTests {
+public class DatabaseResolverTests {
 
     private static final int NUMBER_OF_TEST_ENTRIES = 2;
     // Use DB_CLOSE_DELAY=-1 so that h2 in-memory database contents are not lost when closing. 
@@ -46,7 +46,7 @@ public class DatabasePropertyResolverTests {
         @DisplayName("should throw when connection provider argument is null")
         public void test1() {
             assertThrows(IllegalArgumentException.class, () -> {
-                new DatabasePropertyResolver(null, new SimpleNameValueQueryExecutor());
+                new DatabaseResolver(null, new SimpleNameValueQueryExecutor());
             });
         }
 
@@ -54,7 +54,7 @@ public class DatabasePropertyResolverTests {
         @DisplayName("should throw when query runner is null")
         public void test2() {
             assertThrows(IllegalArgumentException.class, () -> {
-                new DatabasePropertyResolver(CONNECTION_PROVIDER, null);
+                new DatabaseResolver(CONNECTION_PROVIDER, null);
             });
         }
     }
@@ -64,8 +64,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyName argument is null")
         public void test1() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 databasePropertyResolver.resolve((String)null);
@@ -75,8 +75,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyName argument is blank")
         public void test2() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
                 
             assertThrows(IllegalArgumentException.class, () -> {
                 databasePropertyResolver.resolve("");
@@ -90,8 +90,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should resolve all properties from database")
         public void test3() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
             
             String propertyName = "test.property.1";
 
@@ -104,8 +104,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should return empty Optional when property is not found in database")
         public void test4() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
 
             String propertyName = "non.existent.property";
 
@@ -117,8 +117,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should use provided custom query executor")
         public void test5() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(
                     CONNECTION_PROVIDER,
                     new AbstractNameValueQueryExecutor() {
                         @Override
@@ -157,8 +157,8 @@ public class DatabasePropertyResolverTests {
                     "invalid_password"
                 );
             
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(invalidConnectionProvider);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(invalidConnectionProvider);
 
             String propertyName = "test.property";
 
@@ -176,8 +176,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyNames argument is null")
         public void test1() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 databasePropertyResolver.resolve((Collection<String>)null);
@@ -187,8 +187,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyNames argument is empty")
         public void test2() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
                 
             assertThrows(IllegalArgumentException.class, () -> {
                 databasePropertyResolver.resolve(Collections.emptyList());
@@ -198,8 +198,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyNames argument contains null or blank values")
         public void test3() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
 
             List<String> propertiesToResolve = Arrays.asList(
                 null, 
@@ -216,15 +216,15 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should resolve all properties from database")
         public void test4() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
 
             List<String> propertiesToResolve = Arrays.asList(
                 "test.property.1", 
                 "test.property.2"
             );
             
-            DatabasePropertyResolver.Result result = 
+            DatabaseResolver.Result result = 
                 databasePropertyResolver.resolve(propertiesToResolve);
             
             assertTrue(result.hasResolvedProperties());
@@ -250,8 +250,8 @@ public class DatabasePropertyResolverTests {
             "should return result with resolved and unresolved properties from database"
         )
         public void test5() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
 
             List<String> propertiesToResolve = Arrays.asList(
                 "test.property.1", 
@@ -259,7 +259,7 @@ public class DatabasePropertyResolverTests {
                 "non.existent.property"
             );
 
-            DatabasePropertyResolver.Result result = 
+            DatabaseResolver.Result result = 
                 databasePropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -281,8 +281,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should use provided custom query executor")
         public void test6() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(
                     CONNECTION_PROVIDER,
                     new AbstractNameValueQueryExecutor() {
                         @Override
@@ -307,7 +307,7 @@ public class DatabasePropertyResolverTests {
                 "custom.table.test.property.2"
             );
 
-            DatabasePropertyResolver.Result result =
+            DatabaseResolver.Result result =
                 databasePropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -328,8 +328,8 @@ public class DatabasePropertyResolverTests {
                     "invalid_password"
                 );
             
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(invalidConnectionProvider);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(invalidConnectionProvider);
 
 
             List<String> propertiesToResolve = Arrays.asList(
@@ -352,8 +352,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyNames varargs argument is null")
         public void test1() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 databasePropertyResolver.resolve((String[])null);
@@ -363,8 +363,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyNames varargs argument is empty")
         public void test2() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
                 
             assertThrows(IllegalArgumentException.class, () -> {
                 databasePropertyResolver.resolve(new String[0]);
@@ -374,8 +374,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyNames argument contains null or blank values")
         public void test3() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
             
             String[] propertiesToResolve = new String[] {
                 "",
@@ -392,15 +392,15 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should resolve all properties from database")
         public void test4() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
 
             String[] propertiesToResolve = new String[] {
                 "test.property.1", 
                 "test.property.2"
             };
             
-            DatabasePropertyResolver.Result result = 
+            DatabaseResolver.Result result = 
                 databasePropertyResolver.resolve(propertiesToResolve);
             
             assertTrue(result.hasResolvedProperties());
@@ -413,8 +413,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should return result with resolved and unresolved properties from database")
         public void test5() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(CONNECTION_PROVIDER);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(CONNECTION_PROVIDER);
 
             String[] propertiesToResolve = new String[] {
                 "test.property.1", 
@@ -422,7 +422,7 @@ public class DatabasePropertyResolverTests {
                 "non.existent.property"
             };
 
-            DatabasePropertyResolver.Result result = 
+            DatabaseResolver.Result result = 
                 databasePropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -433,8 +433,8 @@ public class DatabasePropertyResolverTests {
         @Test
         @DisplayName("should use provided custom query executor")
         public void test6() {
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(
                     CONNECTION_PROVIDER,
                     new AbstractNameValueQueryExecutor() {
                         @Override
@@ -459,7 +459,7 @@ public class DatabasePropertyResolverTests {
                 "custom.table.test.property.2"
             };
 
-            DatabasePropertyResolver.Result result =
+            DatabaseResolver.Result result =
                 databasePropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -480,8 +480,8 @@ public class DatabasePropertyResolverTests {
                     "invalid_password"
                 );
             
-            DatabasePropertyResolver databasePropertyResolver = 
-                new DatabasePropertyResolver(invalidConnectionProvider);
+            DatabaseResolver databasePropertyResolver = 
+                new DatabaseResolver(invalidConnectionProvider);
 
 
             String[] propertiesToResolve = new String[] {

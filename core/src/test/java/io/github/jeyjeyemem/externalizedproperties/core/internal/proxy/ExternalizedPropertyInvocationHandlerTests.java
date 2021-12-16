@@ -2,12 +2,12 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBuilder;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositePropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositeResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
@@ -738,7 +738,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
         @Test
         @DisplayName(
-            "should treat equals method with different signature as a externalized property method"
+            "should treat equals method with different signature as a proxy method"
         )
         public void proxyEqualsMethod3() throws Throwable {
             ExternalizedProperties externalizedProperties = 
@@ -756,7 +756,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedPropertyInvocationHandler handler = 
                 new ExternalizedPropertyInvocationHandler(externalizedProperties);
 
-            // equals method treated as externalized property method
+            // equals method treated as proxy method
             // instead of an Object method due to different signature.
             assertThrows(
                 UnresolvedPropertiesException.class,
@@ -838,16 +838,16 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ConversionHandler<?>... conversionHandlers
     ) {
         return externalizedProperties(
-            Arrays.asList(new MapPropertyResolver(propertySource)),
+            Arrays.asList(new MapResolver(propertySource)),
             Arrays.asList(conversionHandlers)
         );
     }
 
     private ExternalizedProperties externalizedProperties(
-            Collection<ExternalizedPropertyResolver> resolvers,
+            Collection<Resolver> resolvers,
             Collection<ConversionHandler<?>> conversionHandlers
     ) {
-        ExternalizedPropertyResolver resolver = CompositePropertyResolver.flatten(resolvers);
+        Resolver resolver = CompositeResolver.flatten(resolvers);
         
         ExternalizedPropertiesBuilder builder = 
             ExternalizedPropertiesBuilder.newBuilder()

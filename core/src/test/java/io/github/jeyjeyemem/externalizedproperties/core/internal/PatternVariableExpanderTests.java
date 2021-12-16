@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
 import org.junit.jupiter.api.DisplayName;
@@ -95,9 +95,7 @@ public class PatternVariableExpanderTests {
         }
     }
 
-    private PatternVariableExpander variableExpander(
-            ExternalizedPropertyResolver externalizedPropertyResolver
-    ) {
-        return new PatternVariableExpander(externalizedPropertyResolver);
+    private PatternVariableExpander variableExpander(Resolver resolver) {
+        return new PatternVariableExpander(resolver);
     }
 }

@@ -1,16 +1,23 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Processor;
+import io.github.jeyjeyemem.externalizedproperties.core.Processors;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeReference;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.DefaultConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
+import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ProcessingException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.processing.ProcessorRegistry;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.ExternalizedPropertyInvocationHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.processing.Base64Decode;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ProcessorProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.VoidReturnTypeProxyInterface;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +26,9 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,11 +43,32 @@ public class InternalExternalizedPropertiesTests {
     @Nested
     class ResolvePropertyMethod {
         @Test
-        @DisplayName("should return resolved property value")
+        @DisplayName("should throw when property name argument is null or empty.")
         public void test1() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty((String)null)
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty("")
+            );
+        }
+        
+        @Test
+        @DisplayName("should return resolved property value.")
+        public void test2() {
             // Just return property name.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver();
+            StubResolver resolver =
+                new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -49,12 +80,12 @@ public class InternalExternalizedPropertiesTests {
         }
 
         @Test
-        @DisplayName("should return empty Optional when property cannot resolved")
-        public void test2() {
+        @DisplayName("should return empty Optional when property cannot resolved.")
+        public void test3() {
             // Properties not resolved.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(
-                    StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver =
+                new StubResolver(
+                    StubResolver.NULL_VALUE_RESOLVER
                 );
             
             InternalExternalizedProperties externalizedProperties = 
@@ -67,13 +98,147 @@ public class InternalExternalizedPropertiesTests {
     }
 
     @Nested
-    class ResolvePropertyMethodWithClassOverload {
+    class ResolvePropertyMethodWithProcessorsOverload {
         @Test
-        @DisplayName("should throw when property name argument is null or empty")
+        @DisplayName("should throw when property name argument is null or empty.")
         public void test1() {
             // Always returns 1.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "1");
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    null,
+                    Processors.NONE
+                )
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "",
+                    Processors.NONE
+                )
+            );
+        }
+        
+        @Test
+        @DisplayName("should throw when target type argument is null.")
+        public void test2() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    (Processors)null
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should return resolved property value.")
+        public void test3() {
+            // Just return property name appended with "-value".
+            StubResolver resolver =
+                new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            Optional<String> property = externalizedProperties.resolveProperty(
+                "test.property",
+                Processors.NONE
+            );
+
+            assertTrue(property.isPresent());
+            assertEquals("test.property-value", property.get());
+        }
+
+        @Test
+        @DisplayName("should return empty Optional when property cannot resolved.")
+        public void test4() {
+            // Properties not resolved.
+            StubResolver resolver =
+                new StubResolver(
+                    StubResolver.NULL_VALUE_RESOLVER
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            Optional<String> property = externalizedProperties.resolveProperty(
+                "test.property",
+                Processors.NONE
+            );
+
+            assertFalse(property.isPresent());
+        }
+        
+        @Test
+        @DisplayName(
+            "should apply processors defined in @ProcessorClasses annotation to the property value."
+        )
+        public void test5() {
+            // Always returns base64 encoded property name.
+            StubResolver resolver =
+                new StubResolver(propertyName -> 
+                    base64Encode(propertyName)
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(
+                    resolver,
+                    Arrays.asList(new Base64Decode()) // Register base64 processor.
+                );
+            Optional<?> property = externalizedProperties.resolveProperty(
+                "test.property",
+                Processors.of(Base64Decode.class)
+            );
+
+            assertTrue(property.isPresent());
+            assertEquals("test.property", property.get());
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when processors defined in @ProcessorClasses annotation was not registered."
+        )
+        public void test6() {
+            StubResolver resolver =
+                new StubResolver();
+            
+            // Base64Decode processor not registered.
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                ProcessingException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    Processors.of(Base64Decode.class)
+                )
+            );
+        }
+    }
+
+    @Nested
+    class ResolvePropertyMethodWithClassOverload {
+        @Test
+        @DisplayName("should throw when property name argument is null or empty.")
+        public void test1() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -94,12 +259,13 @@ public class InternalExternalizedPropertiesTests {
                 )
             );
         }
+
         @Test
-        @DisplayName("should throw when target type argument is null")
+        @DisplayName("should throw when target type argument is null.")
         public void test2() {
             // Always returns 1.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "1");
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -114,11 +280,30 @@ public class InternalExternalizedPropertiesTests {
         }
 
         @Test
-        @DisplayName("should convert property to the target class")
+        @DisplayName("should skip conversion when target class is String.")
         public void test3() {
             // Always returns 1.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "1");
+            StubResolver resolver =
+                new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            Optional<String> property = externalizedProperties.resolveProperty(
+                "test.property",
+                String.class
+            );
+
+            assertTrue(property.isPresent());
+            assertEquals("test.property-value", property.get());
+        }
+
+        @Test
+        @DisplayName("should convert property to the target class.")
+        public void test4() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -133,10 +318,10 @@ public class InternalExternalizedPropertiesTests {
         }
 
         @Test
-        @DisplayName("should throw when property cannot be converted to the target class")
-        public void test4() {
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "invalid_integer");
+        @DisplayName("should throw when property cannot be converted to the target class.")
+        public void test5() {
+            StubResolver resolver =
+                new StubResolver(propertyName -> "invalid_integer");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -152,13 +337,187 @@ public class InternalExternalizedPropertiesTests {
     }
 
     @Nested
-    class ResolvePropertyMethodWithTypeReferenceOverload {
+    class ResolvePropertyMethodWithProcessorsAndClassOverload {
         @Test
-        @DisplayName("should throw when property name argument is null or empty")
+        @DisplayName("should throw when property name argument is null or empty.")
         public void test1() {
             // Always returns 1.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "1");
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    null,
+                    Processors.NONE,
+                    Integer.class
+                )
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "",
+                    Processors.NONE,
+                    Integer.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when target type argument is null.")
+        public void test2() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    null,
+                    Integer.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when target type argument is null.")
+        public void test3() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    Processors.NONE,
+                    (Class<?>)null
+                )
+            );
+        }
+        
+        @Test
+        @DisplayName(
+            "should apply processors defined in Processors and skip conversion " + 
+            "when target type is String."
+        )
+        public void test4() {
+            // Always returns base64 encoded property name.
+            StubResolver resolver =
+                new StubResolver(propertyName -> 
+                    base64Encode(propertyName)
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(
+                    resolver,
+                    Arrays.asList(new Base64Decode()) // Register base64 processor.
+                );
+            
+            Optional<?> property = externalizedProperties.resolveProperty(
+                "test.property",
+                Processors.of(Base64Decode.class),
+                String.class
+            );
+
+            assertTrue(property.isPresent());
+            assertEquals("test.property", property.get());
+        }
+        
+        @Test
+        @DisplayName(
+            "should apply processors defined in Processors and convert to target type."
+        )
+        public void test5() {
+            // Always returns base64 encoded "1".
+            StubResolver resolver =
+                new StubResolver(propertyName -> 
+                    base64Encode("1")
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(
+                    resolver,
+                    Arrays.asList(new Base64Decode()) // Register base64 processor.
+                );
+            
+            Optional<?> property = externalizedProperties.resolveProperty(
+                "test.property",
+                Processors.of(Base64Decode.class),
+                Integer.class
+            );
+
+            assertTrue(property.isPresent());
+            assertEquals(1, (int)property.get());
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when processors defined in Processors was not registered."
+        )
+        public void test6() {
+            StubResolver resolver =
+                new StubResolver();
+            
+            // Base64Decode processor not registered.
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                ProcessingException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    Processors.of(Base64Decode.class),
+                    Integer.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when property cannot be converted to the target class")
+        public void test7() {
+            // Always returns base64 encoded "1".
+            StubResolver resolver =
+                new StubResolver(propertyName -> 
+                    base64Encode("invalid_integer")
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(
+                    resolver,
+                    Arrays.asList(new Base64Decode()) // Register base64 processor.
+                );
+            
+            assertThrows(
+                ConversionException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    Processors.of(Base64Decode.class),
+                    Integer.class
+                )
+            );
+        }
+    }
+
+    @Nested
+    class ResolvePropertyMethodWithTypeReferenceOverload {
+        @Test
+        @DisplayName("should throw when property name argument is null or empty.")
+        public void test1() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -179,12 +538,13 @@ public class InternalExternalizedPropertiesTests {
                 )
             );
         }
+
         @Test
-        @DisplayName("should throw when target type argument is null")
+        @DisplayName("should throw when target type argument is null.")
         public void test2() {
             // Always returns 1.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "1");
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -199,11 +559,30 @@ public class InternalExternalizedPropertiesTests {
         }
 
         @Test
-        @DisplayName("should convert property to the target type reference")
+        @DisplayName("should skip conversion when target type is String.")
         public void test3() {
+            // Just return property name appended with "-value".
+            StubResolver resolver =
+                new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            Optional<String> property = externalizedProperties.resolveProperty(
+                "test.property",
+                new TypeReference<String>(){}
+            );
+
+            assertTrue(property.isPresent());
+            assertEquals("test.property-value", property.get());
+        }
+
+        @Test
+        @DisplayName("should convert property to the target type reference")
+        public void test4() {
             // Always returns 1,2,3.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "1,2,3");
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1,2,3");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -224,9 +603,9 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should throw when property cannot be converted to the target type reference")
-        public void test4() {
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "invalid_integer");
+        public void test5() {
+            StubResolver resolver =
+                new StubResolver(propertyName -> "invalid_integer");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -242,13 +621,187 @@ public class InternalExternalizedPropertiesTests {
     }
 
     @Nested
+    class ResolvePropertyMethodWithProcessorsAndTypeReferenceOverload {
+        @Test
+        @DisplayName("should throw when property name argument is null or empty.")
+        public void test1() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    null,
+                    Processors.NONE,
+                    new TypeReference<List<Integer>>(){}
+                )
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "",
+                    Processors.NONE,
+                    new TypeReference<List<Integer>>(){}
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when processors argument is null.")
+        public void test2() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    (Processors)null,
+                    new TypeReference<List<Integer>>(){}
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when target type argument is null.")
+        public void test3() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    Processors.NONE,
+                    (TypeReference<?>)null
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should apply processors defined in Processors and skip conversion " + 
+            "when target type is String."
+        )
+        public void test4() {
+            // Always returns base64 encoded property name.
+            StubResolver resolver =
+                new StubResolver(propertyName -> 
+                    base64Encode(propertyName)
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(
+                    resolver,
+                    Arrays.asList(new Base64Decode()) // Register base64 processor.
+                );
+
+            Optional<?> property = externalizedProperties.resolveProperty(
+                "test.property",
+                Processors.of(Base64Decode.class),
+                (Type)String.class
+            );
+
+            assertTrue(property.isPresent());
+            assertEquals("test.property", property.get());
+        }
+        
+        @Test
+        @DisplayName(
+            "should apply processors defined in Processors and convert to target type."
+        )
+        public void test5() {
+            // Always returns base64 encoded "1".
+            StubResolver resolver =
+                new StubResolver(propertyName -> 
+                    base64Encode("1")
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(
+                    resolver,
+                    Arrays.asList(new Base64Decode()) // Register base64 processor.
+                );
+            
+            Optional<?> property = externalizedProperties.resolveProperty(
+                "test.property",
+                Processors.of(Base64Decode.class),
+                new TypeReference<Integer>(){}
+            );
+
+            assertTrue(property.isPresent());
+            assertEquals(1, (int)property.get());
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when processors defined in Processors was not registered."
+        )
+        public void test6() {
+            StubResolver resolver =
+                new StubResolver();
+            
+            // Base64Decode processor not registered.
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                ProcessingException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    Processors.of(Base64Decode.class),
+                    new TypeReference<Integer>(){}
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when property cannot be converted to the target type reference")
+        public void test7() {
+            // Always returns base64 encoded "1".
+            StubResolver resolver =
+                new StubResolver(propertyName -> 
+                    base64Encode("invalid_integer")
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(
+                    resolver,
+                    Arrays.asList(new Base64Decode()) // Register base64 processor.
+                );
+            
+            assertThrows(
+                ConversionException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    Processors.of(Base64Decode.class),
+                    new TypeReference<Integer>(){}
+                )
+            );
+        }
+    }
+
+    @Nested
     class ResolvePropertyMethodWithTypeOverload {
         @Test
         @DisplayName("should throw when property name argument is null or empty")
         public void test1() {
             // Always returns 1.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "1");
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -269,12 +822,13 @@ public class InternalExternalizedPropertiesTests {
                 )
             );
         }
+
         @Test
         @DisplayName("should throw when target type argument is null")
         public void test2() {
             // Always returns 1.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "1");
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -289,11 +843,30 @@ public class InternalExternalizedPropertiesTests {
         }
 
         @Test
-        @DisplayName("should convert property to the target type")
+        @DisplayName("should skip conversion when target class is String.")
         public void test3() {
+            // Just return property name appended with "-value".
+            StubResolver resolver =
+                new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            Optional<?> property = externalizedProperties.resolveProperty(
+                "test.property",
+                (Type)String.class
+            );
+
+            assertTrue(property.isPresent());
+            assertEquals("test.property-value", property.get());
+        }
+
+        @Test
+        @DisplayName("should convert property to the target type")
+        public void test4() {
             // Always returns 1.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "1");
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -309,9 +882,9 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should throw when property cannot be converted to the target type")
-        public void test4() {
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "invalid_integer");
+        public void test5() {
+            StubResolver resolver =
+                new StubResolver(propertyName -> "invalid_integer");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -327,13 +900,187 @@ public class InternalExternalizedPropertiesTests {
     }
 
     @Nested
+    class ResolvePropertyMethodWithProcessorsAndTypeOverload {
+        @Test
+        @DisplayName("should throw when property name argument is null or empty")
+        public void test1() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    null,
+                    Processors.NONE,
+                    (Type)Integer.class
+                )
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "",
+                    Processors.NONE,
+                    (Type)Integer.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when processors argument is null")
+        public void test2() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    (Processors)null,
+                    (Type)Integer.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when target type argument is null")
+        public void test3() {
+            // Always returns 1.
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    Processors.NONE,
+                    (Type)null
+                )
+            );
+        }
+        
+        @Test
+        @DisplayName(
+            "should apply processors defined in Processors and skip conversion " + 
+            "when target type is String."
+        )
+        public void test4() {
+            // Always returns base64 encoded property name.
+            StubResolver resolver =
+                new StubResolver(propertyName -> 
+                    base64Encode(propertyName)
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(
+                    resolver,
+                    Arrays.asList(new Base64Decode()) // Register base64 processor.
+                );
+            
+            Optional<?> property = externalizedProperties.resolveProperty(
+                "test.property",
+                Processors.of(Base64Decode.class),
+                (Type)String.class
+            );
+
+            assertTrue(property.isPresent());
+            assertEquals("test.property", property.get());
+        }
+        
+        @Test
+        @DisplayName(
+            "should apply processors defined in Processors and convert to target type."
+        )
+        public void test5() {
+            // Always returns base64 encoded "1".
+            StubResolver resolver =
+                new StubResolver(propertyName -> 
+                    base64Encode("1")
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(
+                    resolver,
+                    Arrays.asList(new Base64Decode()) // Register base64 processor.
+                );
+            
+            Optional<?> property = externalizedProperties.resolveProperty(
+                "test.property",
+                Processors.of(Base64Decode.class),
+                (Type)Integer.class
+            );
+
+            assertTrue(property.isPresent());
+            assertEquals(1, (int)property.get());
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when processors defined in Processors was not registered."
+        )
+        public void test6() {
+            StubResolver resolver =
+                new StubResolver();
+            
+            // Base64Decode processor not registered.
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            assertThrows(
+                ProcessingException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    Processors.of(Base64Decode.class),
+                    (Type)Integer.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when property cannot be converted to the target type reference")
+        public void test7() {
+            // Always returns base64 encoded "1".
+            StubResolver resolver =
+                new StubResolver(propertyName -> 
+                    base64Encode("invalid_integer")
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(
+                    resolver,
+                    Arrays.asList(new Base64Decode()) // Register base64 processor.
+                );
+            
+            assertThrows(
+                ConversionException.class, 
+                () -> externalizedProperties.resolveProperty(
+                    "test.property",
+                    Processors.of(Base64Decode.class),
+                    (Type)Integer.class
+                )
+            );
+        }
+    }
+
+    @Nested
     class ResolvePropertyMethodWithProxyMethodInfoOverload {
         @Test
         @DisplayName("should throw when proxy method info argument is null.")
         public void test1() {
             // Just return property name.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver();
+            StubResolver resolver =
+                new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -348,8 +1095,8 @@ public class InternalExternalizedPropertiesTests {
         @DisplayName("should return resolved property value.")
         public void test2() {
             // Just return property name.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver();
+            StubResolver resolver =
+                new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -367,9 +1114,9 @@ public class InternalExternalizedPropertiesTests {
         @DisplayName("should return empty Optional when property cannot resolved.")
         public void test3() {
             // Properties not resolved.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(
-                    StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver =
+                new StubResolver(
+                    StubResolver.NULL_VALUE_RESOLVER
                 );
             
             InternalExternalizedProperties externalizedProperties = 
@@ -389,8 +1136,8 @@ public class InternalExternalizedPropertiesTests {
         )
         public void test4() {
             // Always returns 1.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(propertyName -> "1");
+            StubResolver resolver =
+                new StubResolver(propertyName -> "1");
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -408,12 +1155,69 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when proxy method info does not have @ExternalizedProperty annotation."
+            "should apply processors defined in @ProcessorClasses annotation " +
+            "to the property value and convert according to proxy method's return type."
         )
         public void test5() {
+            // Always base64 encoded "1".
+            StubResolver resolver =
+                new StubResolver(propertyName -> 
+                    base64Encode("1")
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(
+                    resolver,
+                    Arrays.asList(new Base64Decode()) // Register base64 processor.
+                );
+
+            StubProxyMethodInfo proxyMethodInfo = StubProxyMethodInfo.fromMethod(
+                ProcessorProxyInterface.class, 
+                "base64DecodeInt"
+            );
+
+            Optional<?> property = externalizedProperties.resolveProperty(proxyMethodInfo);
+
+            assertTrue(property.isPresent());
+            assertEquals(1, (int)property.get());
+        }
+
+        @Test
+        @DisplayName(
+            "should apply processors defined in @ProcessorClasses annotation to the property value."
+        )
+        public void test6() {
+            // Always base64 encoded property name.
+            StubResolver resolver =
+                new StubResolver(propertyName -> 
+                    base64Encode(propertyName)
+                );
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(
+                    resolver,
+                    Arrays.asList(new Base64Decode()) // Register base64 processor.
+                );
+
+            StubProxyMethodInfo proxyMethodInfo = StubProxyMethodInfo.fromMethod(
+                ProcessorProxyInterface.class, 
+                "base64Decode"
+            );
+
+            Optional<?> property = externalizedProperties.resolveProperty(proxyMethodInfo);
+
+            assertTrue(property.isPresent());
+            assertEquals("test.base64Decode", property.get());
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when proxy method info does not have @ExternalizedProperty annotation."
+        )
+        public void test7() {
             // Just return property name.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver();
+            StubResolver resolver =
+                new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -428,6 +1232,30 @@ public class InternalExternalizedPropertiesTests {
                 () -> externalizedProperties.resolveProperty(proxyMethodInfo)
             );
         }
+
+        @Test
+        @DisplayName(
+            "should throw when processors defined in @ProcessorClasses annotation was not registered."
+        )
+        public void test8() {
+            StubResolver resolver =
+                new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            // Method is annotation with @ProcessorClasses(Base64Decode.class)
+            // Base64Decode is not registered to InternalExternalizedProperties.
+            StubProxyMethodInfo proxyMethodInfo = StubProxyMethodInfo.fromMethod(
+                ProcessorProxyInterface.class, 
+                "base64Decode"
+            );
+
+            assertThrows(
+                ProcessingException.class, 
+                () -> externalizedProperties.resolveProperty(proxyMethodInfo)
+            );
+        }
     }
 
     @Nested
@@ -436,8 +1264,8 @@ public class InternalExternalizedPropertiesTests {
         @DisplayName("should expand variables in source string")
         public void test1() {
             // Always returns propertyName + .variable.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(
+            StubResolver resolver =
+                new StubResolver(
                     propertyName -> propertyName + ".variable"
                 );
             
@@ -456,9 +1284,9 @@ public class InternalExternalizedPropertiesTests {
         )
         public void test2() {
             // Do not resolve any property.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(
-                    StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver =
+                new StubResolver(
+                    StubResolver.NULL_VALUE_RESOLVER
                 );
             
             InternalExternalizedProperties externalizedProperties = 
@@ -479,9 +1307,9 @@ public class InternalExternalizedPropertiesTests {
         @DisplayName("should throw when proxy interface argument is null")
         public void test1() {
             // Do not resolve any property.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(
-                    StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver =
+                new StubResolver(
+                    StubResolver.NULL_VALUE_RESOLVER
                 );
             
             InternalExternalizedProperties externalizedProperties = 
@@ -497,9 +1325,9 @@ public class InternalExternalizedPropertiesTests {
         @DisplayName("should create a proxy")
         public void test2() {
             // Do not resolve any property.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(
-                    StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver =
+                new StubResolver(
+                    StubResolver.NULL_VALUE_RESOLVER
                 );
             
             InternalExternalizedProperties externalizedProperties = 
@@ -517,8 +1345,8 @@ public class InternalExternalizedPropertiesTests {
         @Test
         @DisplayName("should throw when proxy interface argument is null")
         public void test1() {
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver();
+            StubResolver resolver =
+                new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -532,8 +1360,8 @@ public class InternalExternalizedPropertiesTests {
         @Test
         @DisplayName("should throw when class loader argument is null")
         public void test2() {
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver();
+            StubResolver resolver =
+                new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -547,8 +1375,8 @@ public class InternalExternalizedPropertiesTests {
         @Test
         @DisplayName("should throw when proxy interface argument is not an interface")
         public void test3() {
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver();
+            StubResolver resolver =
+                new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -562,8 +1390,8 @@ public class InternalExternalizedPropertiesTests {
         @Test
         @DisplayName("should throw when proxy interface contains void-returning methods")
         public void test4() {
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver();
+            StubResolver resolver =
+                new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
@@ -578,9 +1406,9 @@ public class InternalExternalizedPropertiesTests {
         @DisplayName("should create a proxy")
         public void test5() {
             // Do not resolve any property.
-            StubExternalizedPropertyResolver resolver =
-                new StubExternalizedPropertyResolver(
-                    StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver =
+                new StubResolver(
+                    StubResolver.NULL_VALUE_RESOLVER
                 );
             
             InternalExternalizedProperties externalizedProperties = 
@@ -597,16 +1425,30 @@ public class InternalExternalizedPropertiesTests {
     }
 
     private InternalExternalizedProperties internalExternalizedProperties(
-            ExternalizedPropertyResolver resolver
+            Resolver resolver
+    ) {
+        return internalExternalizedProperties(resolver, Collections.emptyList());
+    }
+
+    private InternalExternalizedProperties internalExternalizedProperties(
+            Resolver resolver,
+            Collection<Processor> processors
     ) {
         return new InternalExternalizedProperties(
             resolver, 
+            new ProcessorRegistry(
+                processors
+            ),
             new InternalConverter(
                 new DefaultConversionHandler()
-            ), 
+            ),
             new InternalVariableExpander(resolver),
             (ep, proxyInterface) -> 
                 new ExternalizedPropertyInvocationHandler(ep)
         );
+    }
+
+    private String base64Encode(String property) {
+        return new String(Base64.getEncoder().encode(property.getBytes()));
     }
 }

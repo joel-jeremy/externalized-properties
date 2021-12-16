@@ -1,49 +1,54 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * Supports conversion of values to an enum.
+ * Supports conversion of values to enums.
  */
-public class EnumConversionHandler<T extends Enum<T>> implements ConversionHandler<T> {
-
-    private final Class<T> enumClass;
-
-    /**
-     * Constructor.
-     * 
-     * @param enumClass The enum class to convert resolved properties to.
-     */
-    public EnumConversionHandler(Class<T> enumClass) {
-        this.enumClass = Arguments.requireNonNull(enumClass, "enumClass");
-    }
-
+public class EnumConversionHandler implements ConversionHandler<Enum<?>> {
     /** {@inheritDoc} */
     @Override
     public boolean canConvertTo(Class<?> targetType) {
-        return enumClass.equals(targetType);
+        return targetType != null && targetType.isEnum();
     }
 
     /** {@inheritDoc} */
     @Override
-    public T convert(ConversionContext context) {
+    public Enum<?> convert(ConversionContext context) {
         requireNonNull(context, "context");
+        
+        Class<?> enumClass = context.rawTargetType();
+        
+        Object[] enumConstants = enumClass.getEnumConstants();
+        if (enumConstants == null) {
+            throw new ConversionException("Type is not an enum: " + enumClass.getName());
+        }
 
         try {
-            return Enum.valueOf(enumClass, context.value());
+            for (Object enumConstant : enumConstants) {
+                Enum<?> enumValue = (Enum<?>)enumConstant;
+                if (enumValue.name().equals(context.value())) {
+                    return enumValue;
+                }
+            }
         } catch (Exception ex) {
             throw new ConversionException(String.format(
                     "Failed to convert value to an enum of type %s: %s",
-                    enumClass,
+                    enumClass.getName(),
                     context.value()
                 ),
                 ex
             );
         }
+        
+        throw new ConversionException(String.format(
+            "Invalid (%s) value: %s",
+            enumClass.getName(),
+            context.value()
+        ));
     }
 }

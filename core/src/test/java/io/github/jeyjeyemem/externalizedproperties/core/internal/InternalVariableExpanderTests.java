@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
 import org.junit.jupiter.api.DisplayName;
@@ -212,19 +212,17 @@ public class InternalVariableExpanderTests {
         }
     }
 
-    private InternalVariableExpander variableExpander(
-            ExternalizedPropertyResolver externalizedPropertyResolver
-    ) {
-        return new InternalVariableExpander(externalizedPropertyResolver);
+    private InternalVariableExpander variableExpander(Resolver resolver) {
+        return new InternalVariableExpander(resolver);
     }
 
     private InternalVariableExpander variableExpander(
-            ExternalizedPropertyResolver externalizedPropertyResolver,
+            Resolver resolver,
             String variablePrefix,
             String variableSuffix
     ) {
         return new InternalVariableExpander(
-            externalizedPropertyResolver,
+            resolver,
             variablePrefix,
             variableSuffix
         );

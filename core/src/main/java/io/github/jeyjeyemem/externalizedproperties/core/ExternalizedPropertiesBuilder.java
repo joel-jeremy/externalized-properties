@@ -5,19 +5,20 @@ import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHan
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.DefaultConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.CachingExternalizedProperties;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ConcurrentMapCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ExpiringCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.WeakConcurrentMapCacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.processing.ProcessorRegistry;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.CachingInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.EagerLoadingInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.ExternalizedPropertyInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.InvocationHandlerFactory;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositePropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.DefaultPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.EnvironmentPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositeResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.DefaultResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.EnvironmentVariableResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
 
 import java.time.Duration;
@@ -32,9 +33,9 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  * The builder for {@link ExternalizedProperties}.
  */
 public class ExternalizedPropertiesBuilder {
-    private List<ExternalizedPropertyResolver> resolvers = new ArrayList<>();
-    private List<ConversionHandler<?>> conversionHandlers = 
-        new ArrayList<>();
+    private List<Resolver> resolvers = new ArrayList<>();
+    private List<ConversionHandler<?>> conversionHandlers = new ArrayList<>();
+    private List<Processor> processors = new ArrayList<>();
     
     // Caching settings.
     private Duration cacheDuration = getDefaultCacheDuration();
@@ -49,7 +50,7 @@ public class ExternalizedPropertiesBuilder {
     private ExternalizedPropertiesBuilder(){}
 
     /**
-     * Enable default configurations. This will enable default {@link ExternalizedPropertyResolver}s 
+     * Enable default configurations. This will enable default {@link Resolver}s 
      * and {@link ConversionHandler}s via the {@link #withDefaultResolvers()} and 
      * {@link #withDefaultConversionHandlers()} methods and enable caching via 
      * {@link #withCaching()} and {@link #withProxyInvocationCaching()} methods.
@@ -64,8 +65,8 @@ public class ExternalizedPropertiesBuilder {
     }
 
     /**
-     * Adds the {@link SystemPropertyResolver} and {@link EnvironmentPropertyResolver} 
-     * to the registered {@link ExternalizedPropertyResolver}s.
+     * Adds the {@link SystemPropertyResolver} and {@link EnvironmentVariableResolver} 
+     * to the registered {@link Resolver}s.
      * 
      * @return This builder.
      */
@@ -128,36 +129,32 @@ public class ExternalizedPropertiesBuilder {
     }
 
     /**
-     * The array of {@link ExternalizedPropertyResolver}s to resolve properties from.
+     * The array of {@link Resolver}s to resolve properties from.
      * 
-     * @param externalizedPropertyResolvers The externalized property resolver.
+     * @param resolvers The resolvers.
      * @return This builder.
      */
-    public ExternalizedPropertiesBuilder resolvers(
-            ExternalizedPropertyResolver... externalizedPropertyResolvers
-    ) {
-        requireNonNull(externalizedPropertyResolvers, "externalizedPropertyResolvers");
+    public ExternalizedPropertiesBuilder resolvers(Resolver... resolvers) {
+        requireNonNull(resolvers, "resolvers");
 
-        return resolvers(Arrays.asList(externalizedPropertyResolvers));
+        return resolvers(Arrays.asList(resolvers));
     }
 
     /**
-     * The collection of {@link ExternalizedPropertyResolver}s to resolve properties from.
+     * The collection of {@link Resolver}s to resolve properties from.
      * 
-     * @param externalizedPropertyResolvers The externalized property resolver.
+     * @param resolvers The resolvers.
      * @return This builder.
      */
-    public ExternalizedPropertiesBuilder resolvers(
-            Collection<ExternalizedPropertyResolver> externalizedPropertyResolvers
-    ) {
-        requireNonNull(externalizedPropertyResolvers, "externalizedPropertyResolvers");
+    public ExternalizedPropertiesBuilder resolvers(Collection<Resolver> resolvers) {
+        requireNonNull(resolvers, "resolvers");
 
-        this.resolvers.addAll(externalizedPropertyResolvers);
+        this.resolvers.addAll(resolvers);
         return this;
     }
 
     /**
-     * The array of {@link ConversionHandler}s to convert resolved properties
+     * The array of {@link ConversionHandler}s to convert properties
      * to various types.
      * 
      * @param conversionHandlers The conversion handlers.
@@ -172,7 +169,7 @@ public class ExternalizedPropertiesBuilder {
     }
 
     /**
-     * The collection of {@link ConversionHandler}s to convert resolved properties
+     * The collection of {@link ConversionHandler}s to convert properties
      * to various types.
      * 
      * @param conversionHandlers The conversion handlers.
@@ -188,18 +185,45 @@ public class ExternalizedPropertiesBuilder {
     }
 
     /**
+     * The array of {@link Processor}s to register.
+     * 
+     * @param processors The processors to register.
+     * @return This builder.
+     */
+    public ExternalizedPropertiesBuilder processors(Processor... processors) {
+        requireNonNull(processors, "processors");
+
+        return processors(Arrays.asList(processors));
+    }
+
+    /**
+     * The collection of {@link Processor}s to register.
+     * 
+     * @param processors The processors to register.
+     * @return This builder.
+     */
+    public ExternalizedPropertiesBuilder processors(Collection<Processor> processors) {
+        requireNonNull(processors, "processors");
+
+        this.processors.addAll(processors);
+        return this;
+    }
+
+    /**
      * Build the {@link InternalExternalizedProperties} instance.
      * 
      * @return The built {@link InternalExternalizedProperties} instance.
      */
     public ExternalizedProperties build() {
-        ExternalizedPropertyResolver resolver = buildExternalizedPropertyResolver();
+        Resolver resolver = buildResolver();
         Converter converter = buildConverter();
+        ProcessorRegistry processorRegistry = buildProcessorRegistry();
         VariableExpander variableExpander = buildVariableExpander(resolver);
         InvocationHandlerFactory invocationHandlerFactory = buildInvocationHandlerFactory();
 
         ExternalizedProperties externalizedProperties = new InternalExternalizedProperties(
             resolver, 
+            processorRegistry,
             converter,
             variableExpander,
             invocationHandlerFactory
@@ -267,20 +291,20 @@ public class ExternalizedPropertiesBuilder {
         return factory;
     }
 
-    private ExternalizedPropertyResolver buildExternalizedPropertyResolver() {
+    private Resolver buildResolver() {
         // Add default resolvers last.
         // Custom resolvers always take precedence.
         if (withDefaultResolvers) {
-            resolvers(new DefaultPropertyResolver());
+            resolvers(new DefaultResolver());
         }
 
         if (resolvers.isEmpty()) {
             throw new IllegalStateException(
-                "At least one externalized property resolver is required."
+                "At least one resolver is required."
             );
         }
 
-        return CompositePropertyResolver.flatten(resolvers);
+        return CompositeResolver.flatten(resolvers);
     }
 
     private InternalConverter buildConverter() {
@@ -293,8 +317,12 @@ public class ExternalizedPropertiesBuilder {
         return new InternalConverter(conversionHandlers);
     }
 
+    private ProcessorRegistry buildProcessorRegistry() {
+        return new ProcessorRegistry(processors);
+    }
+
     private InternalVariableExpander buildVariableExpander(
-            ExternalizedPropertyResolver resolver
+            Resolver resolver
     ) {
         return new InternalVariableExpander(resolver);
     }

@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testcontainers(disabledWithoutDocker = true)
-public class AwsSsmPropertyResolverTests {
+public class AwsSsmResolverTests {
 
     private static DockerImageName LOCALSTACK_IMAGE = DockerImageName.parse(
         "localstack/localstack:0.13.0"
@@ -49,7 +49,7 @@ public class AwsSsmPropertyResolverTests {
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new AwsSsmPropertyResolver(null)
+                () -> new AwsSsmResolver(null)
             );
         }
     }
@@ -71,8 +71,8 @@ public class AwsSsmPropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyName argument is null")
         public void test1() {
-            AwsSsmPropertyResolver awsSsmPropertyResolver = 
-                new AwsSsmPropertyResolver(ssmClient);
+            AwsSsmResolver awsSsmPropertyResolver = 
+                new AwsSsmResolver(ssmClient);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 awsSsmPropertyResolver.resolve((String)null);
@@ -82,8 +82,8 @@ public class AwsSsmPropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyName argument is empty")
         public void test2() {
-            AwsSsmPropertyResolver awsSsmPropertyResolver = 
-                new AwsSsmPropertyResolver(ssmClient);
+            AwsSsmResolver awsSsmPropertyResolver = 
+                new AwsSsmResolver(ssmClient);
                 
             assertThrows(IllegalArgumentException.class, () -> {
                 awsSsmPropertyResolver.resolve("");
@@ -93,8 +93,8 @@ public class AwsSsmPropertyResolverTests {
         @Test
         @DisplayName("should resolve property from AWS SSM")
         public void test3() {
-            AwsSsmPropertyResolver awsSsmPropertyResolver = 
-                new AwsSsmPropertyResolver(ssmClient);
+            AwsSsmResolver awsSsmPropertyResolver = 
+                new AwsSsmResolver(ssmClient);
 
             Optional<String> resolved = awsSsmPropertyResolver.resolve("/test/property");
 
@@ -105,8 +105,8 @@ public class AwsSsmPropertyResolverTests {
         @Test
         @DisplayName("should return empty Optional when property is not found in AWS SSM")
         public void tes4() {
-            AwsSsmPropertyResolver awsSsmPropertyResolver = 
-                new AwsSsmPropertyResolver(ssmClient);
+            AwsSsmResolver awsSsmPropertyResolver = 
+                new AwsSsmResolver(ssmClient);
 
             Optional<String> resolved = awsSsmPropertyResolver.resolve(
                 "non/existing/property"
@@ -133,8 +133,8 @@ public class AwsSsmPropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyNames argument is null")
         public void test1() {
-            AwsSsmPropertyResolver awsSsmPropertyResolver = 
-                new AwsSsmPropertyResolver(ssmClient);
+            AwsSsmResolver awsSsmPropertyResolver = 
+                new AwsSsmResolver(ssmClient);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 awsSsmPropertyResolver.resolve((Collection<String>)null);
@@ -144,8 +144,8 @@ public class AwsSsmPropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyNames argument is empty")
         public void test2() {
-            AwsSsmPropertyResolver awsSsmPropertyResolver = 
-                new AwsSsmPropertyResolver(ssmClient);
+            AwsSsmResolver awsSsmPropertyResolver = 
+                new AwsSsmResolver(ssmClient);
                 
             assertThrows(IllegalArgumentException.class, () -> {
                 awsSsmPropertyResolver.resolve(Collections.emptyList());
@@ -155,15 +155,15 @@ public class AwsSsmPropertyResolverTests {
         @Test
         @DisplayName("should resolve all properties from AWS SSM")
         public void test3() {
-            AwsSsmPropertyResolver awsSsmPropertyResolver = 
-                new AwsSsmPropertyResolver(ssmClient);
+            AwsSsmResolver awsSsmPropertyResolver = 
+                new AwsSsmResolver(ssmClient);
 
             List<String> propertiesToResolve = Arrays.asList(
                 "/test/property",
                 "/test/property/2"
             );
 
-            AwsSsmPropertyResolver.Result result = 
+            AwsSsmResolver.Result result = 
                 awsSsmPropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -189,8 +189,8 @@ public class AwsSsmPropertyResolverTests {
             "should return result with resolved and unresolved properties from AWS SSM"
         )
         public void test4() {
-            AwsSsmPropertyResolver awsSsmPropertyResolver = 
-                new AwsSsmPropertyResolver(ssmClient);
+            AwsSsmResolver awsSsmPropertyResolver = 
+                new AwsSsmResolver(ssmClient);
 
             List<String> propertiesToResolve = Arrays.asList(
                 "test/property", 
@@ -198,7 +198,7 @@ public class AwsSsmPropertyResolverTests {
                 "non/existent/property"
             );
 
-            AwsSsmPropertyResolver.Result result = 
+            AwsSsmResolver.Result result = 
                 awsSsmPropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -235,8 +235,8 @@ public class AwsSsmPropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyNames argument is null")
         public void test1() {
-            AwsSsmPropertyResolver awsSsmPropertyResolver = 
-                new AwsSsmPropertyResolver(ssmClient);
+            AwsSsmResolver awsSsmPropertyResolver = 
+                new AwsSsmResolver(ssmClient);
 
             assertThrows(IllegalArgumentException.class, () -> {
                 awsSsmPropertyResolver.resolve((String[])null);
@@ -246,8 +246,8 @@ public class AwsSsmPropertyResolverTests {
         @Test
         @DisplayName("should throw when propertyNames argument is empty")
         public void test2() {
-            AwsSsmPropertyResolver awsSsmPropertyResolver = 
-                new AwsSsmPropertyResolver(ssmClient);
+            AwsSsmResolver awsSsmPropertyResolver = 
+                new AwsSsmResolver(ssmClient);
                 
             assertThrows(IllegalArgumentException.class, () -> {
                 awsSsmPropertyResolver.resolve(new String[0]);
@@ -257,15 +257,15 @@ public class AwsSsmPropertyResolverTests {
         @Test
         @DisplayName("should resolve all properties from AWS SSM")
         public void test3() {
-            AwsSsmPropertyResolver awsSsmPropertyResolver = 
-                new AwsSsmPropertyResolver(ssmClient);
+            AwsSsmResolver awsSsmPropertyResolver = 
+                new AwsSsmResolver(ssmClient);
 
             String[] propertiesToResolve = new String[] {
                 "/test/property",
                 "/test/property/2"
             };
 
-            AwsSsmPropertyResolver.Result result = 
+            AwsSsmResolver.Result result = 
                 awsSsmPropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -291,8 +291,8 @@ public class AwsSsmPropertyResolverTests {
             "should return result with resolved and unresolved properties from AWS SSM"
         )
         public void test4() {
-            AwsSsmPropertyResolver awsSsmPropertyResolver = 
-                new AwsSsmPropertyResolver(ssmClient);
+            AwsSsmResolver awsSsmPropertyResolver = 
+                new AwsSsmResolver(ssmClient);
 
             String[] propertiesToResolve = new String[] {
                 "test/property", 
@@ -300,7 +300,7 @@ public class AwsSsmPropertyResolverTests {
                 "non/existent/property"
             };
 
-            AwsSsmPropertyResolver.Result result = 
+            AwsSsmResolver.Result result = 
                 awsSsmPropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());

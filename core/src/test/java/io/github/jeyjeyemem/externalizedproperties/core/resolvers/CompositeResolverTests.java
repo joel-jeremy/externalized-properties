@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CompositePropertyResolverTests {
+public class CompositeResolverTests {
     @Nested
     class FromMethod {
         @Test
@@ -26,14 +26,14 @@ public class CompositePropertyResolverTests {
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> CompositePropertyResolver.from(
-                    (Collection<ExternalizedPropertyResolver>)null
+                () -> CompositeResolver.from(
+                    (Collection<Resolver>)null
                 )
             );
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> CompositePropertyResolver.from(Collections.emptyList())
+                () -> CompositeResolver.from(Collections.emptyList())
             );
         }
 
@@ -42,14 +42,14 @@ public class CompositePropertyResolverTests {
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> CompositePropertyResolver.from(
-                    (ExternalizedPropertyResolver[])null
+                () -> CompositeResolver.from(
+                    (Resolver[])null
                 )
             );
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> CompositePropertyResolver.from(new ExternalizedPropertyResolver[0])
+                () -> CompositeResolver.from(new Resolver[0])
             );
         }
     }
@@ -61,14 +61,14 @@ public class CompositePropertyResolverTests {
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> CompositePropertyResolver.flatten(
-                    (Collection<ExternalizedPropertyResolver>)null
+                () -> CompositeResolver.flatten(
+                    (Collection<Resolver>)null
                 )
             );
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> CompositePropertyResolver.flatten(Collections.emptyList())
+                () -> CompositeResolver.flatten(Collections.emptyList())
             );
         }
 
@@ -77,45 +77,45 @@ public class CompositePropertyResolverTests {
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> CompositePropertyResolver.flatten(
-                    (ExternalizedPropertyResolver[])null
+                () -> CompositeResolver.flatten(
+                    (Resolver[])null
                 )
             );
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> CompositePropertyResolver.flatten(new ExternalizedPropertyResolver[0])
+                () -> CompositeResolver.flatten(new Resolver[0])
             );
         }
 
         @Test
         @DisplayName("should discard any nested composite property resolvers")
         public void test3() {
-            CompositePropertyResolver resolver1 = 
-                CompositePropertyResolver.from(new SystemPropertyResolver());
-            CompositePropertyResolver resolver2 =
-                CompositePropertyResolver.from(resolver1);
-            CompositePropertyResolver resolver3 =
-                CompositePropertyResolver.from(new EnvironmentPropertyResolver());
-            CompositePropertyResolver resolver4 =
-                CompositePropertyResolver.from(resolver3);
+            CompositeResolver resolver1 = 
+                CompositeResolver.from(new SystemPropertyResolver());
+            CompositeResolver resolver2 =
+                CompositeResolver.from(resolver1);
+            CompositeResolver resolver3 =
+                CompositeResolver.from(new EnvironmentVariableResolver());
+            CompositeResolver resolver4 =
+                CompositeResolver.from(resolver3);
 
-            ExternalizedPropertyResolver flattenedResolver =   
-                CompositePropertyResolver.flatten(resolver2, resolver4);
+            Resolver flattenedResolver =   
+                CompositeResolver.flatten(resolver2, resolver4);
             
-            assertTrue(flattenedResolver instanceof CompositePropertyResolver);
+            assertTrue(flattenedResolver instanceof CompositeResolver);
             
-            CompositePropertyResolver compositeResolver = 
-                (CompositePropertyResolver)flattenedResolver;
+            CompositeResolver compositeResolver = 
+                (CompositeResolver)flattenedResolver;
 
             // Should discard other composite property resolvers but
             // maintain original resolver order.
             int resolverCount = 0;
-            for (ExternalizedPropertyResolver resolver : compositeResolver) {
+            for (Resolver resolver : compositeResolver) {
                 if (resolverCount == 0) {
                     assertTrue(resolver instanceof SystemPropertyResolver);
                 } else if (resolverCount == 1) {
-                    assertTrue(resolver instanceof EnvironmentPropertyResolver);
+                    assertTrue(resolver instanceof EnvironmentVariableResolver);
                 }
                 resolverCount++;
             }
@@ -130,11 +130,11 @@ public class CompositePropertyResolverTests {
             "when only one resolver remained after the flattening operation"
         )
         public void test4() {
-            CompositePropertyResolver resolver = 
-                CompositePropertyResolver.from(new SystemPropertyResolver());
+            CompositeResolver resolver = 
+                CompositeResolver.from(new SystemPropertyResolver());
 
-            ExternalizedPropertyResolver flattenedResolver =   
-                CompositePropertyResolver.flatten(resolver);
+            Resolver flattenedResolver =   
+                CompositeResolver.flatten(resolver);
             
             assertTrue(flattenedResolver instanceof SystemPropertyResolver);
         }
@@ -145,8 +145,8 @@ public class CompositePropertyResolverTests {
         @Test
         @DisplayName("should throw when property name argument is null or empty")
         public void validationTest1() {
-            CompositePropertyResolver compositeResolver = resolverToTest(
-                new StubExternalizedPropertyResolver()
+            CompositeResolver compositeResolver = resolverToTest(
+                new StubResolver()
             );
 
             assertThrows(
@@ -163,9 +163,9 @@ public class CompositePropertyResolverTests {
         @Test
         @DisplayName("should resolve property value from the child resolver")
         public void test1() {
-            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver();
+            StubResolver resolver = new StubResolver();
             
-            CompositePropertyResolver compositeResolver = resolverToTest(resolver);
+            CompositeResolver compositeResolver = resolverToTest(resolver);
 
             Optional<String> result = compositeResolver.resolve("property.name");
 
@@ -184,15 +184,15 @@ public class CompositePropertyResolverTests {
             "when property is not found from any of the child resolvers"
         )
         public void test2() {
-            StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
-                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver1 = new StubResolver(
+                StubResolver.NULL_VALUE_RESOLVER
             );
 
-            StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
-                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver2 = new StubResolver(
+                StubResolver.NULL_VALUE_RESOLVER
             );
             
-            CompositePropertyResolver compositeResolver = resolverToTest(
+            CompositeResolver compositeResolver = resolverToTest(
                 resolver1,
                 resolver2
             );
@@ -209,25 +209,25 @@ public class CompositePropertyResolverTests {
         @Test
         @DisplayName("should be able to resolve property value from one or more child resolvers")
         public void test3() {
-            StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
+            StubResolver resolver1 = new StubResolver(
                 propertyName -> propertyName.endsWith("1") ? 
                     "resolver-1-result" :
                     null
             );
 
-            StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
+            StubResolver resolver2 = new StubResolver(
                 propertyName -> propertyName.endsWith("2") ? 
                     "resolver-2-result" :
                     null
             );
 
-            StubExternalizedPropertyResolver resolver3 = new StubExternalizedPropertyResolver(
+            StubResolver resolver3 = new StubResolver(
                 propertyName -> propertyName.endsWith("3") ?
                     "resolver-3-result" :
                     null
             );
             
-            CompositePropertyResolver compositeResolver = resolverToTest(
+            CompositeResolver compositeResolver = resolverToTest(
                 resolver1,
                 resolver2,
                 resolver3
@@ -255,25 +255,25 @@ public class CompositePropertyResolverTests {
             "when the property has already been resolved"
         )
         public void test4() {
-            StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
+            StubResolver resolver1 = new StubResolver(
                 propertyName -> propertyName.endsWith("1") ? 
                     "resolver-1-result" :
                     null
             );
 
-            StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
+            StubResolver resolver2 = new StubResolver(
                 propertyName -> propertyName.endsWith("2") ? 
                     "resolver-2-result" :
                     null
             );
 
-            StubExternalizedPropertyResolver resolver3 = new StubExternalizedPropertyResolver(
+            StubResolver resolver3 = new StubResolver(
                 propertyName -> propertyName.endsWith("3") ?
                     "resolver-3-result" :
                     null
             );
             
-            CompositePropertyResolver compositeResolver = resolverToTest(
+            CompositeResolver compositeResolver = resolverToTest(
                 resolver1,
                 resolver2,
                 resolver3
@@ -300,8 +300,8 @@ public class CompositePropertyResolverTests {
         @Test
         @DisplayName("should throw when property names varargs argument is null or empty")
         public void validationTest1() {
-            CompositePropertyResolver compositeResolver = resolverToTest(
-                new StubExternalizedPropertyResolver()
+            CompositeResolver compositeResolver = resolverToTest(
+                new StubResolver()
             );
 
             assertThrows(
@@ -320,11 +320,11 @@ public class CompositePropertyResolverTests {
         public void test1() {
             String[] propertiesToResolve = new String[] { "property.name1", "property.name2" };
 
-            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver();
+            StubResolver resolver = new StubResolver();
             
-            CompositePropertyResolver compositeResolver = resolverToTest(resolver);
+            CompositeResolver compositeResolver = resolverToTest(resolver);
 
-            CompositePropertyResolver.Result result = compositeResolver.resolve(propertiesToResolve);
+            CompositeResolver.Result result = compositeResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -350,20 +350,20 @@ public class CompositePropertyResolverTests {
                 "property.nonexistent2"
             };
 
-            StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
-                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver1 = new StubResolver(
+                StubResolver.NULL_VALUE_RESOLVER
             );
 
-            StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
-                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver2 = new StubResolver(
+                StubResolver.NULL_VALUE_RESOLVER
             );
             
-            CompositePropertyResolver compositeResolver = resolverToTest(
+            CompositeResolver compositeResolver = resolverToTest(
                 resolver1,
                 resolver2
             );
 
-            CompositePropertyResolver.Result result = compositeResolver.resolve(
+            CompositeResolver.Result result = compositeResolver.resolve(
                 propertiesToResolve
             );
 
@@ -379,31 +379,31 @@ public class CompositePropertyResolverTests {
         @Test
         @DisplayName("should be able to resolve property values from one or more child resolvers")
         public void test3() {
-            StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
+            StubResolver resolver1 = new StubResolver(
                 propertyName -> propertyName.endsWith("1") ? 
                     "resolver-1-result" :
                     null
             );
 
-            StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
+            StubResolver resolver2 = new StubResolver(
                 propertyName -> propertyName.endsWith("2") ? 
                     "resolver-2-result" :
                     null
             );
 
-            StubExternalizedPropertyResolver resolver3 = new StubExternalizedPropertyResolver(
+            StubResolver resolver3 = new StubResolver(
                 propertyName -> propertyName.endsWith("3") ?
                     "resolver-3-result" :
                     null
             );
             
-            CompositePropertyResolver compositeResolver = resolverToTest(
+            CompositeResolver compositeResolver = resolverToTest(
                 resolver1,
                 resolver2,
                 resolver3
             );
 
-            CompositePropertyResolver.Result result = compositeResolver.resolve(
+            CompositeResolver.Result result = compositeResolver.resolve(
                 "property.name.1",
                 "property.name.2",
                 "property.name.3"
@@ -450,31 +450,31 @@ public class CompositePropertyResolverTests {
             "when the property has already been resolved"
         )
         public void test4() {
-            StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
+            StubResolver resolver1 = new StubResolver(
                 propertyName -> propertyName.endsWith("1") || propertyName.endsWith("2") ? 
                     "resolver-1-result" :
                     null
             );
 
-            StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
+            StubResolver resolver2 = new StubResolver(
                 propertyName -> propertyName.endsWith("2") ? 
                     "resolver-2-result" :
                     null
             );
 
-            StubExternalizedPropertyResolver resolver3 = new StubExternalizedPropertyResolver(
+            StubResolver resolver3 = new StubResolver(
                 propertyName -> propertyName.endsWith("2") || propertyName.endsWith("3") ?
                     "resolver-3-result" :
                     null
             );
             
-            CompositePropertyResolver compositeResolver = resolverToTest(
+            CompositeResolver compositeResolver = resolverToTest(
                 resolver1,
                 resolver2,
                 resolver3
             );
 
-            CompositePropertyResolver.Result result = compositeResolver.resolve(
+            CompositeResolver.Result result = compositeResolver.resolve(
                 "property.name.1",
                 "property.name.2",
                 "property.name.3"
@@ -524,8 +524,8 @@ public class CompositePropertyResolverTests {
         @Test
         @DisplayName("should throw when property names collection argument is null or empty")
         public void validationTest1() {
-            CompositePropertyResolver compositeResolver = resolverToTest(
-                new StubExternalizedPropertyResolver()
+            CompositeResolver compositeResolver = resolverToTest(
+                new StubResolver()
             );
 
             assertThrows(
@@ -547,11 +547,11 @@ public class CompositePropertyResolverTests {
                 "property.name2"
             );
 
-            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver();
+            StubResolver resolver = new StubResolver();
             
-            CompositePropertyResolver compositeResolver = resolverToTest(resolver);
+            CompositeResolver compositeResolver = resolverToTest(resolver);
 
-            CompositePropertyResolver.Result result = compositeResolver.resolve(
+            CompositeResolver.Result result = compositeResolver.resolve(
                 propertiesToResolve
             );
 
@@ -579,20 +579,20 @@ public class CompositePropertyResolverTests {
                 "property.nonexistent2"
             );
 
-            StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
-                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver1 = new StubResolver(
+                StubResolver.NULL_VALUE_RESOLVER
             );
 
-            StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
-                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver2 = new StubResolver(
+                StubResolver.NULL_VALUE_RESOLVER
             );
             
-            CompositePropertyResolver compositeResolver = resolverToTest(
+            CompositeResolver compositeResolver = resolverToTest(
                 resolver1,
                 resolver2
             );
 
-            CompositePropertyResolver.Result result = compositeResolver.resolve(
+            CompositeResolver.Result result = compositeResolver.resolve(
                 propertiesToResolve
             );
 
@@ -614,31 +614,31 @@ public class CompositePropertyResolverTests {
                 "property.name.3"
             );
 
-            StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
+            StubResolver resolver1 = new StubResolver(
                 propertyName -> propertyName.endsWith("1") ? 
                     "resolver-1-result" :
                     null
             );
 
-            StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
+            StubResolver resolver2 = new StubResolver(
                 propertyName -> propertyName.endsWith("2") ? 
                     "resolver-2-result" :
                     null
             );
 
-            StubExternalizedPropertyResolver resolver3 = new StubExternalizedPropertyResolver(
+            StubResolver resolver3 = new StubResolver(
                 propertyName -> propertyName.endsWith("3") ?
                     "resolver-3-result" :
                     null
             );
             
-            CompositePropertyResolver compositeResolver = resolverToTest(
+            CompositeResolver compositeResolver = resolverToTest(
                 resolver1,
                 resolver2,
                 resolver3
             );
 
-            CompositePropertyResolver.Result result = compositeResolver.resolve(
+            CompositeResolver.Result result = compositeResolver.resolve(
                 propertiesToResolve
             );
 
@@ -689,31 +689,31 @@ public class CompositePropertyResolverTests {
                 "property.name.3"
             );
             
-            StubExternalizedPropertyResolver resolver1 = new StubExternalizedPropertyResolver(
+            StubResolver resolver1 = new StubResolver(
                 propertyName -> propertyName.endsWith("1") || propertyName.endsWith("2") ? 
                     "resolver-1-result" :
                     null
             );
 
-            StubExternalizedPropertyResolver resolver2 = new StubExternalizedPropertyResolver(
+            StubResolver resolver2 = new StubResolver(
                 propertyName -> propertyName.endsWith("2") ? 
                     "resolver-2-result" :
                     null
             );
 
-            StubExternalizedPropertyResolver resolver3 = new StubExternalizedPropertyResolver(
+            StubResolver resolver3 = new StubResolver(
                 propertyName -> propertyName.endsWith("2") || propertyName.endsWith("3") ?
                     "resolver-3-result" :
                     null
             );
             
-            CompositePropertyResolver compositeResolver = resolverToTest(
+            CompositeResolver compositeResolver = resolverToTest(
                 resolver1,
                 resolver2,
                 resolver3
             );
 
-            CompositePropertyResolver.Result result = compositeResolver.resolve(
+            CompositeResolver.Result result = compositeResolver.resolve(
                 propertiesToResolve
             );
 
@@ -761,23 +761,23 @@ public class CompositePropertyResolverTests {
         @Test
         @DisplayName("should return resolver collection string")
         public void test1() {
-            List<ExternalizedPropertyResolver> resolvers = Arrays.asList(
+            List<Resolver> resolvers = Arrays.asList(
                 new SystemPropertyResolver(),
-                new EnvironmentPropertyResolver(),
-                CompositePropertyResolver.from(new MapPropertyResolver(Collections.emptyMap()))
+                new EnvironmentVariableResolver(),
+                CompositeResolver.from(new MapResolver(Collections.emptyMap()))
             );
 
-            CompositePropertyResolver resolver = resolverToTest(
-                resolvers.toArray(new ExternalizedPropertyResolver[resolvers.size()])
+            CompositeResolver resolver = resolverToTest(
+                resolvers.toArray(new Resolver[resolvers.size()])
             );
 
             assertEquals(resolvers.toString(), resolver.toString());
         }
     }
 
-    private CompositePropertyResolver resolverToTest(
-            ExternalizedPropertyResolver... externalizedPropertyResolvers
+    private CompositeResolver resolverToTest(
+            Resolver... resolvers
     ) {
-        return CompositePropertyResolver.from(externalizedPropertyResolvers);
+        return CompositeResolver.from(resolvers);
     }
 }

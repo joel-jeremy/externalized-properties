@@ -1,7 +1,7 @@
-package io.github.jeyjeyemem.externalizedproperties.core.internal;
+package io.github.jeyjeyemem.externalizedproperties.core.internal.conversion;
 
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.PrimitiveConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;

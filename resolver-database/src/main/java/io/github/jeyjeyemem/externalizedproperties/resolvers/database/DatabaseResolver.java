@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
 
@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * {@link ExternalizedPropertyResolver} implementation which resolves requested properties 
+ * {@link Resolver} implementation which resolves requested properties 
  * from a database.
  */
-public class DatabasePropertyResolver implements ExternalizedPropertyResolver {
+public class DatabaseResolver implements Resolver {
     private final ConnectionProvider connectionProvider;
     private final QueryExecutor queryExecutor;
 
@@ -25,7 +25,7 @@ public class DatabasePropertyResolver implements ExternalizedPropertyResolver {
      * 
      * @param connectionProvider The connection provider.
      */
-    public DatabasePropertyResolver(ConnectionProvider connectionProvider) {
+    public DatabaseResolver(ConnectionProvider connectionProvider) {
         this(connectionProvider, new SimpleNameValueQueryExecutor());
     }
 
@@ -35,7 +35,7 @@ public class DatabasePropertyResolver implements ExternalizedPropertyResolver {
      * @param connectionProvider The connection provider.
      * @param queryExecutor The query executor to resolve properties from the database.
      */
-    public DatabasePropertyResolver(
+    public DatabaseResolver(
             ConnectionProvider connectionProvider,
             QueryExecutor queryExecutor
     ) {

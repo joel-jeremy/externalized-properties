@@ -2,6 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
+import io.github.jeyjeyemem.externalizedproperties.core.Processors;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeReference;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
 
@@ -60,11 +61,13 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
     @Override
     public Optional<?> resolveProperty(ProxyMethodInfo proxyMethodInfo) {
         requireNonNull(proxyMethodInfo, "proxyMethodInfo");
+
         String propertyName = proxyMethodInfo.externalizedPropertyName().orElseThrow(
             () -> new IllegalArgumentException(
                 "Proxy method info externalized property name cannot be determined."
             )
         );
+
         Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.get(propertyName);
         if (cached.isPresent()) {
             return cached.get();
@@ -90,9 +93,64 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
 
     /** {@inheritDoc} */
     @Override
+    public Optional<String> resolveProperty(
+            String propertyName,
+            Processors processors
+    ) {
+        Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.get(propertyName);
+        if (cached.isPresent()) {
+            @SuppressWarnings("unchecked")
+            Optional<String> cachedValue = (Optional<String>)cached.get();
+            return cachedValue;
+        }
+
+        Optional<String> resolved = decorated.resolveProperty(
+            propertyName,
+            processors
+        );
+        return cacheResolvedValue(propertyName, resolved);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     @SuppressWarnings("unchecked")
     public <T> Optional<T> resolveProperty(String propertyName, Class<T> targetType) {
-        return (Optional<T>)resolveProperty(propertyName, (Type)targetType);
+        Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.get(propertyName);
+        if (cached.isPresent()) {
+            return (Optional<T>)cached.get();
+        }
+
+        // Property name variable already expanded.
+        Optional<T> resolved = decorated.resolveProperty(
+            propertyName, 
+            targetType
+        );
+
+        return cacheResolvedValue(propertyName, resolved);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T> Optional<T> resolveProperty(
+            String propertyName,
+            Processors processors, 
+            Class<T> targetType
+    ) {
+        Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.get(propertyName);
+        if (cached.isPresent()) {
+            @SuppressWarnings("unchecked")
+            Optional<T> cachedValue = (Optional<T>)cached.get();
+            return cachedValue;
+        }
+
+        // Property name variable already expanded.
+        Optional<T> resolved = decorated.resolveProperty(
+            propertyName,
+            processors,
+            targetType
+        );
+
+        return cacheResolvedValue(propertyName, resolved);
     }
 
     /** {@inheritDoc} */
@@ -102,10 +160,42 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
             String propertyName, 
             TypeReference<T> targetType
     ) {
-        return (Optional<T>)resolveProperty(
+        Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.get(propertyName);
+        if (cached.isPresent()) {
+            return (Optional<T>)cached.get();
+        }
+
+        // Property name variable already expanded.
+        Optional<T> resolved = decorated.resolveProperty(
             propertyName, 
-            requireNonNull(targetType, "targetType").type()
+            targetType
         );
+
+        return cacheResolvedValue(propertyName, resolved);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T> Optional<T> resolveProperty(
+            String propertyName,
+            Processors processors, 
+            TypeReference<T> targetType
+    ) {
+        Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.get(propertyName);
+        if (cached.isPresent()) {
+            @SuppressWarnings("unchecked")
+            Optional<T> cachedValue = (Optional<T>)cached.get();
+            return cachedValue;
+        }
+
+        // Property name variable already expanded.
+        Optional<T> resolved = decorated.resolveProperty(
+            propertyName,
+            processors,
+            targetType
+        );
+
+        return cacheResolvedValue(propertyName, resolved);
     }
 
     /** {@inheritDoc} */
@@ -122,6 +212,28 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
         // Property name variable already expanded.
         Optional<?> resolved = decorated.resolveProperty(
             propertyName, 
+            targetType
+        );
+
+        return cacheResolvedValue(propertyName, resolved);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Optional<?> resolveProperty(
+            String propertyName,
+            Processors processors, 
+            Type targetType
+    ) {
+        Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.get(propertyName);
+        if (cached.isPresent()) {
+            return cached.get();
+        }
+
+        // Property name variable already expanded.
+        Optional<?> resolved = decorated.resolveProperty(
+            propertyName,
+            processors,
             targetType
         );
 

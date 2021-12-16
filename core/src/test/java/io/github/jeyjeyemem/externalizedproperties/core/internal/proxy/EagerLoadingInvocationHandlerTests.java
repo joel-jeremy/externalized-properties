@@ -6,7 +6,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBu
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import org.junit.jupiter.api.DisplayName;
@@ -111,7 +111,7 @@ public class EagerLoadingInvocationHandlerTests {
         @Test
         @DisplayName("should throw when cache strategy argument is null")
         public void test5() {
-            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver();
+            StubResolver resolver = new StubResolver();
 
             ExternalizedProperties externalizedProperties = 
                 ExternalizedPropertiesBuilder.newBuilder()
@@ -156,7 +156,7 @@ public class EagerLoadingInvocationHandlerTests {
             // Add to cache.
             cacheStrategy.cache(stubMethod, "cached-value");
 
-            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver();
+            StubResolver resolver = new StubResolver();
 
             ExternalizedProperties externalizedProperties = 
                 ExternalizedPropertiesBuilder.newBuilder()
@@ -203,8 +203,8 @@ public class EagerLoadingInvocationHandlerTests {
             // No cached results.
             CacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
 
-            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver(
-                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver = new StubResolver(
+                StubResolver.NULL_VALUE_RESOLVER
             );
 
             ExternalizedProperties externalizedProperties = 
@@ -256,8 +256,8 @@ public class EagerLoadingInvocationHandlerTests {
             // No cached results.
             CacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
 
-            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver(
-                StubExternalizedPropertyResolver.NULL_VALUE_RESOLVER
+            StubResolver resolver = new StubResolver(
+                StubResolver.NULL_VALUE_RESOLVER
             );
 
             ExternalizedProperties externalizedProperties = 

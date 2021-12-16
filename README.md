@@ -95,7 +95,7 @@ private ExternalizedProperties buildExternalizedProperties() {
     ExternalizedProperties externalizedProperties = ExternalizedPropertiesBuilder.newBuilder()
         .withDefaultResolvers() 
         .resolvers( 
-            new AwsSsmPropertyResolver(ssmClient),
+            new AwsSsmResolver(ssmClient),
             new DatabaseResolver(entityManagerFactory)
         ) 
         .build();
@@ -192,7 +192,7 @@ public interface ApplicationProperties {
 }
 ```
 
-Externalized Properties provides enough information to conversion handlers for them to be able to convert each item from the `list-of-numbers` property to an integer (provided a conversion handler is registered to convert to an integer). 
+Externalized Properties provides enough information to conversion handlers for them to be able to convert each item from the `list-of-numbers` property to an integer (provided a conversion handler is registered to convert to an integer).
 
 An arbitraty generic type parameter depth is supported. For example,
 

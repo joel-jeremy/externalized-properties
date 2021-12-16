@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MapPropertyResolverTests {
+public class MapResolverTests {
 
     @Nested
     class Constructor {
@@ -29,7 +29,7 @@ public class MapPropertyResolverTests {
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new MapPropertyResolver((Map<String, String>)null)
+                () -> new MapResolver((Map<String, String>)null)
             );
         }
 
@@ -38,7 +38,7 @@ public class MapPropertyResolverTests {
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new MapPropertyResolver(new HashMap<>(), null)
+                () -> new MapResolver(new HashMap<>(), null)
             );
         }
     }
@@ -49,7 +49,7 @@ public class MapPropertyResolverTests {
         @Test
         @DisplayName("should throw when property name argument is null or empty")
         public void validationTest1() {
-            MapPropertyResolver resolver = resolverToTest();
+            MapResolver resolver = resolverToTest();
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -68,7 +68,7 @@ public class MapPropertyResolverTests {
             Map<String, String> map = new HashMap<>();
             map.put("property.name", "property.value");
             
-            MapPropertyResolver resolver = resolverToTest(map);
+            MapResolver resolver = resolverToTest(map);
             Optional<String> result = resolver.resolve(
                 "property.name"
             );
@@ -87,7 +87,7 @@ public class MapPropertyResolverTests {
             "when property is not found from the given map"
         )
         public void test2() {
-            MapPropertyResolver resolver = resolverToTest();
+            MapResolver resolver = resolverToTest();
             Optional<String> result = resolver.resolve(
                 "nonexisting.property"
             );
@@ -110,7 +110,7 @@ public class MapPropertyResolverTests {
                     return propertyName + "-default-value";
                 };
 
-            MapPropertyResolver resolver = resolverToTest(
+            MapResolver resolver = resolverToTest(
                 new HashMap<>(),
                 unresolvedPropertyHandler
             );
@@ -132,7 +132,7 @@ public class MapPropertyResolverTests {
         @Test
         @DisplayName("should throw when property names varargs argument is null or empty")
         public void validationTest1() {
-            MapPropertyResolver resolver = resolverToTest();
+            MapResolver resolver = resolverToTest();
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -148,7 +148,7 @@ public class MapPropertyResolverTests {
         @Test
         @DisplayName("should throw when property names varargs contain any null or empty values")
         public void validationTest2() {
-            MapPropertyResolver resolver = resolverToTest();
+            MapResolver resolver = resolverToTest();
             
             assertThrows(
                 IllegalArgumentException.class, 
@@ -173,8 +173,8 @@ public class MapPropertyResolverTests {
                 "property.name2"
             };
             
-            MapPropertyResolver resolver = resolverToTest(map);
-            MapPropertyResolver.Result result = resolver.resolve(
+            MapResolver resolver = resolverToTest(map);
+            MapResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
 
@@ -195,14 +195,14 @@ public class MapPropertyResolverTests {
             "when property is not found from the given map"
         )
         public void test2() {
-            MapPropertyResolver resolver = resolverToTest();
+            MapResolver resolver = resolverToTest();
 
             String[] propertiesToResolve = new String[] {
                 "nonexisting.property1",
                 "nonexisting.property2"
             };
 
-            MapPropertyResolver.Result result = resolver.resolve(
+            MapResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -230,7 +230,7 @@ public class MapPropertyResolverTests {
                     return propertyName + "-default-value";
                 };
 
-            MapPropertyResolver resolver = resolverToTest(
+            MapResolver resolver = resolverToTest(
                 new HashMap<>(),
                 unresolvedPropertyHandler
             );
@@ -240,7 +240,7 @@ public class MapPropertyResolverTests {
                 "property.unresolvedhandler2"
             };
 
-            MapPropertyResolver.Result result = resolver.resolve(
+            MapResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -262,7 +262,7 @@ public class MapPropertyResolverTests {
         @Test
         @DisplayName("should throw when property names collection argument is null or empty")
         public void validationTest1() {
-        MapPropertyResolver resolver = resolverToTest();
+        MapResolver resolver = resolverToTest();
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -280,7 +280,7 @@ public class MapPropertyResolverTests {
             "should throw when property names collection contains any null or empty values"
         )
         public void validationTest2() {
-            MapPropertyResolver resolver = resolverToTest();
+            MapResolver resolver = resolverToTest();
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -305,8 +305,8 @@ public class MapPropertyResolverTests {
                 "property.name2"
             );
             
-            MapPropertyResolver resolver = resolverToTest(map);
-            MapPropertyResolver.Result result = resolver.resolve(
+            MapResolver resolver = resolverToTest(map);
+            MapResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
 
@@ -327,14 +327,14 @@ public class MapPropertyResolverTests {
             "when property is not found from the given map"
         )
         public void test2() {
-            MapPropertyResolver resolver = resolverToTest();
+            MapResolver resolver = resolverToTest();
 
             List<String> propertiesToResolve = Arrays.asList(
                 "nonexisting.property1",
                 "nonexisting.property2"
             );
 
-            MapPropertyResolver.Result result = resolver.resolve(
+            MapResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -362,7 +362,7 @@ public class MapPropertyResolverTests {
                     return propertyName + "-default-value";
                 };
 
-            MapPropertyResolver resolver = resolverToTest(
+            MapResolver resolver = resolverToTest(
                 new HashMap<>(),
                 unresolvedPropertyHandler
             );
@@ -372,7 +372,7 @@ public class MapPropertyResolverTests {
                 "property.unresolvedhandler2"
             );
 
-            MapPropertyResolver.Result result = resolver.resolve(
+            MapResolver.Result result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -389,20 +389,20 @@ public class MapPropertyResolverTests {
         }
     }
 
-    private MapPropertyResolver resolverToTest() {
-        return new MapPropertyResolver(new HashMap<>());
+    private MapResolver resolverToTest() {
+        return new MapResolver(new HashMap<>());
     }
 
-    private MapPropertyResolver resolverToTest(
+    private MapResolver resolverToTest(
             Map<String, String> map
     ) {
-        return new MapPropertyResolver(map);
+        return new MapResolver(map);
     }
 
-    private MapPropertyResolver resolverToTest(
+    private MapResolver resolverToTest(
             Map<String, String> map,
             Function<String, String> unresolverPropertyHandler
     ) {
-        return new MapPropertyResolver(map, unresolverPropertyHandler);
+        return new MapResolver(map, unresolverPropertyHandler);
     }
 }

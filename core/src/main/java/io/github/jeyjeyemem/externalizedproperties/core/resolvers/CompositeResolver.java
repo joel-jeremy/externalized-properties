@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,29 +17,29 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
 /**
- * An {@link ExternalizedPropertyResolver} decorator which resolves requested properties 
- * from a collection of {@link ExternalizedPropertyResolver}s.
+ * An {@link Resolver} decorator which resolves requested properties 
+ * from a collection of {@link Resolver}s.
  */
-public class CompositePropertyResolver 
-        implements ExternalizedPropertyResolver, Iterable<ExternalizedPropertyResolver> {
+public class CompositeResolver implements Resolver, Iterable<Resolver> {
     
-    private static final Logger LOGGER = Logger.getLogger(CompositePropertyResolver.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CompositeResolver.class.getName());
 
-    private final Collection<ExternalizedPropertyResolver> resolvers;
+    private final Collection<Resolver> resolvers;
 
     /**
      * Constructor.
      * 
-     * @param resolvers The collection of {@link ExternalizedPropertyResolver}s to resolve properties from.
+     * @apiNote If ordering of resolvers is important, callers of this constructor must use a 
+     * {@link Collection} implementation that supports ordering such as {@link List}.
+     * 
+     * @param resolvers The collection of {@link Resolver}s to resolve properties from.
      */
-    protected CompositePropertyResolver(
-            Collection<ExternalizedPropertyResolver> resolvers
-    ) {
+    protected CompositeResolver(Collection<Resolver> resolvers) {
         this.resolvers = requireNonNullOrEmptyCollection(resolvers, "resolvers");
     }
 
     /**
-     * Resolve property from a collection of {@link ExternalizedPropertyResolver}s.
+     * Resolve property from a collection of {@link Resolver}s.
      * 
      * @param propertyName The property name.
      * @return The resolved property value. Otherwise, an empty {@link Optional}.
@@ -48,7 +48,7 @@ public class CompositePropertyResolver
     public Optional<String> resolve(String propertyName) {
         requireNonNullOrEmptyString(propertyName, "propertyName");
 
-        for (ExternalizedPropertyResolver resolver : resolvers) {
+        for (Resolver resolver : resolvers) {
             Optional<String> resolved = resolver.resolve(propertyName);
             if (resolved.isPresent()) {
                 return resolved;
@@ -59,7 +59,7 @@ public class CompositePropertyResolver
     }
 
     /**
-     * Resolve properties from a collection of {@link ExternalizedPropertyResolver}s.
+     * Resolve properties from a collection of {@link Resolver}s.
      * 
      * @param propertyNames The property names.
      * @return The {@link Result} which contains the resolved properties
@@ -72,7 +72,7 @@ public class CompositePropertyResolver
         Result.Builder resultBuilder = Result.builder(propertyNames);
         List<String> unresolvedPropertyNames = new ArrayList<>(propertyNames);
 
-        for (ExternalizedPropertyResolver resolver : resolvers) {
+        for (Resolver resolver : resolvers) {
             Result result = resolver.resolve(unresolvedPropertyNames);
             for (Map.Entry<String, String> newResolvedProperty : result.resolvedProperties().entrySet()) {
                 LOGGER.log(
@@ -115,73 +115,70 @@ public class CompositePropertyResolver
     }
 
     /**
-     * Factory method to create a {@link CompositePropertyResolver} instance with the
-     * provided externalized property resolvers.
+     * Factory method to create a {@link CompositeResolver} instance with the provided 
+     * resolvers.
      * 
-     * @param resolvers The externalized property resolvers.
-     * @return The {@link CompositePropertyResolver} instance which composes the provided resolvers. 
+     * @param resolvers The resolvers.
+     * @return The {@link CompositeResolver} instance which composes the provided resolvers. 
      */
-    public static CompositePropertyResolver from(ExternalizedPropertyResolver... resolvers) {
+    public static CompositeResolver from(Resolver... resolvers) {
         return from(
             resolvers == null ? Collections.emptyList() : Arrays.asList(resolvers)
         );
     }
 
     /**
-     * Factory method to create a {@link CompositePropertyResolver} instance with the
-     * provided externalized property resolvers.
+     * Factory method to create a {@link CompositeResolver} instance with the provided 
+     * resolvers.
      * 
      * @apiNote If ordering of resolvers is important, callers of this method must use a 
      * {@link Collection} implementation that supports ordering such as {@link List}.
      * 
-     * @param resolvers The externalized property resolvers.
-     * @return The {@link CompositePropertyResolver} instance which composes the provided resolvers. 
+     * @param resolvers The resolvers.
+     * @return The {@link CompositeResolver} instance which composes the provided resolvers. 
      */
-    public static CompositePropertyResolver from(Collection<ExternalizedPropertyResolver> resolvers) {
-        return new CompositePropertyResolver(resolvers);
+    public static CompositeResolver from(Collection<Resolver> resolvers) {
+        return new CompositeResolver(resolvers);
     }
 
     /**
-     * Factory method to create a {@link CompositePropertyResolver} instance with the
-     * provided externalized property resolvers. This will do some flattening to discard nested 
-     * instances of {@link CompositePropertyResolver}.
+     * Factory method to create a {@link CompositeResolver} instance with the
+     * provided resolvers. This will do some flattening to discard nested 
+     * instances of {@link CompositeResolver}.
      * 
-     * @implNote This may not necessarily return a {@link CompositePropertyResolver} instance. 
+     * @implNote This may not necessarily return a {@link CompositeResolver} instance. 
      * If the flattening operation resulted in a single resolver remaining, 
-     * that resolver instance will be returned. Otherwise, a {@link CompositePropertyResolver} 
+     * that resolver instance will be returned. Otherwise, a {@link CompositeResolver} 
      * instance will be returned which is composed of all the remaining resolvers.
      * 
-     * @param resolvers The externalized property resolvers.
-     * @return The {@link ExternalizedPropertyResolver} instance. 
+     * @param resolvers The resolvers.
+     * @return The flattened {@link Resolver} instance. 
      */
-    public static ExternalizedPropertyResolver flatten(ExternalizedPropertyResolver... resolvers) {
+    public static Resolver flatten(Resolver... resolvers) {
         return flatten(
             resolvers == null ? Collections.emptyList() : Arrays.asList(resolvers)
         );
     }
 
     /**
-     * Factory method to create a {@link ExternalizedPropertyResolver} instance with the
-     * provided externalized property resolvers. This will do some flattening to discard nested 
-     * instances of {@link CompositePropertyResolver}.
+     * Factory method to create a {@link Resolver} instance with the provided resolvers. 
+     * This will do some flattening to discard nested instances of {@link CompositeResolver}.
      * 
      * @apiNote If ordering of resolvers is important, callers of this method must use a 
      * {@link Collection} implementation that supports ordering such as {@link List}.
      * 
-     * @implNote This may not necessarily return a {@link CompositePropertyResolver} instance. 
+     * @implNote This may not necessarily return a {@link CompositeResolver} instance. 
      * If the flattening operation resulted in a single resolver remaining, 
-     * that resolver instance will be returned. Otherwise, a {@link CompositePropertyResolver} 
+     * that resolver instance will be returned. Otherwise, a {@link CompositeResolver} 
      * instance will be returned which is composed of all the flattened resolvers.
      * 
-     * @param resolvers The externalized property resolvers.
-     * @return The {@link ExternalizedPropertyResolver} instance.
+     * @param resolvers The resolvers.
+     * @return The flattened {@link Resolver} instance.
      */
-    public static ExternalizedPropertyResolver flatten(
-            Collection<ExternalizedPropertyResolver> resolvers
-    ) {
+    public static Resolver flatten(Collection<Resolver> resolvers) {
         requireNonNullOrEmptyCollection(resolvers, "resolvers");
        
-        List<ExternalizedPropertyResolver> flattened = flattenResolvers(resolvers);
+        List<Resolver> flattened = flattenResolvers(resolvers);
         if (flattened.size() == 1) {
             return flattened.get(0);
         }
@@ -191,19 +188,19 @@ public class CompositePropertyResolver
 
     /** {@inheritDoc} */
     @Override
-    public Iterator<ExternalizedPropertyResolver> iterator() {
+    public Iterator<Resolver> iterator() {
         return resolvers.iterator();
     }
 
-    private static List<ExternalizedPropertyResolver> flattenResolvers(
-            Collection<ExternalizedPropertyResolver> registeredResolvers
+    private static List<Resolver> flattenResolvers(
+            Collection<Resolver> registeredResolvers
     ) {
         // Resolver order is maintained.
-        List<ExternalizedPropertyResolver> flattened = new ArrayList<>();
-        for (ExternalizedPropertyResolver registered : registeredResolvers) {
-            if (registered instanceof CompositePropertyResolver) {
+        List<Resolver> flattened = new ArrayList<>();
+        for (Resolver registered : registeredResolvers) {
+            if (registered instanceof CompositeResolver) {
                 flattened.addAll(
-                    flattenResolvers(((CompositePropertyResolver)registered).resolvers)
+                    flattenResolvers(((CompositeResolver)registered).resolvers)
                 );
             } else {
                 flattened.add(registered);

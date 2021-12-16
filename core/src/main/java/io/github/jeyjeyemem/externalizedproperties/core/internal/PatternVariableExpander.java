@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
 
@@ -11,26 +11,23 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 
 /**
  * A regex/pattern-based {@link VariableExpander} implementation.
- * This resolves the variables from the externalized property resolver.
+ * This resolves the variables from the resolver.
  * 
  * @implNote By default, this will match the basic pattern: ${variable}
  */
 public class PatternVariableExpander implements VariableExpander {
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{(.+?)\\}");
     
-    private final ExternalizedPropertyResolver externalizedPropertyResolver;
+    private final Resolver resolver;
 
     /**
      * Construct a string variable expander which looks up variable values
-     * from the externalized property resolver.
+     * from the resolver.
      * 
-     * @param externalizedPropertyResolver The externalized property resolver to lookup variable values from.
+     * @param resolver The resolver to lookup variable values from.
      */
-    public PatternVariableExpander(ExternalizedPropertyResolver externalizedPropertyResolver) {
-        this.externalizedPropertyResolver = requireNonNull(
-            externalizedPropertyResolver, 
-            "externalizedPropertyResolver"
-        );
+    public PatternVariableExpander(Resolver resolver) {
+        this.resolver = requireNonNull(resolver, "resolver");
     }
 
     /** {@inheritDoc} */
@@ -68,10 +65,10 @@ public class PatternVariableExpander implements VariableExpander {
     }
 
     private String resolvePropertyValueOrThrow(String propertyName) {
-        return externalizedPropertyResolver.resolve(propertyName)
+        return resolver.resolve(propertyName)
             .orElseThrow(() -> new VariableExpansionException(
                 "Failed to expand \"" + propertyName + "\" variable. " +
-                "Variable value cannot be resolved from any of the externalized property resolvers."
+                "Variable value cannot be resolved from the resolver."
             ));
     }
 }

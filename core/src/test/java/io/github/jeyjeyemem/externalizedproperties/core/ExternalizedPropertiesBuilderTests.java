@@ -1,8 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ArrayProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.JavaPropertiesProxyInterface;
@@ -41,22 +41,22 @@ public class ExternalizedPropertiesBuilderTests {
     @Nested
     class ResolversMethod {
         @Test
-        @DisplayName("should throw when externalized property resolvers collection argument is null")
+        @DisplayName("should throw when resolvers collection argument is null")
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> ExternalizedPropertiesBuilder.newBuilder()
-                    .resolvers((Collection<ExternalizedPropertyResolver>)null)
+                    .resolvers((Collection<Resolver>)null)
             );
         }
 
         @Test
-        @DisplayName("should throw when externalized property resolvers varargs argument is null")
+        @DisplayName("should throw when resolvers varargs argument is null")
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> ExternalizedPropertiesBuilder.newBuilder()
-                    .resolvers((ExternalizedPropertyResolver[])null)
+                    .resolvers((Resolver[])null)
             );
         }
     }
@@ -85,6 +85,29 @@ public class ExternalizedPropertiesBuilderTests {
     }
 
     @Nested
+    class ProcessorsMethod {
+        @Test
+        @DisplayName("should throw when processors collection argument is null")
+        public void test1() {
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> ExternalizedPropertiesBuilder.newBuilder()
+                    .processors((Collection<Processor>)null)
+            );
+        }
+    
+        @Test
+        @DisplayName("should throw when processors varargs argument is null")
+        public void test2() {
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> ExternalizedPropertiesBuilder.newBuilder()
+                    .processors((Processor[])null)
+            );
+        }
+    }
+
+    @Nested
     class BuildMethod {
         @Test
         @DisplayName("should throw when on build when there are no resolvers")
@@ -94,42 +117,6 @@ public class ExternalizedPropertiesBuilderTests {
                 () -> ExternalizedPropertiesBuilder.newBuilder().build()
             );
         }
-
-        // @Test
-        // @DisplayName("should allow multiple resolvers")
-        // public void test2() {
-        //     Map<String, String> map = new HashMap<>();
-        //     map.put("property", "value");
-    
-        //     ExternalizedProperties ep = ExternalizedPropertiesBuilder.newBuilder()
-        //         .resolvers(
-        //             new SystemPropertyResolver(),
-        //             new EnvironmentPropertyResolver(),
-        //             new MapPropertyResolver(map)
-        //         )
-        //         .build();
-    
-        //     JavaPropertiesProxyInterface javaProxyInterface = 
-        //         ep.proxy(JavaPropertiesProxyInterface.class);
-    
-        //     // Resolved from system properties.
-        //     assertEquals(
-        //         System.getProperty("java.version"), 
-        //         javaProxyInterface.javaVersion()
-        //     );
-    
-        //     // Resolved from environment variables.
-        //     assertEquals(
-        //         System.getenv("PATH"), 
-        //         javaProxyInterface.pathEnv()
-        //     );
-    
-        //     BasicProxyInterface basicProxyInterface = 
-        //         ep.proxy(BasicProxyInterface.class);
-    
-        //     // Resolved from map resolver.
-        //     assertEquals("value", basicProxyInterface.property());
-        // }
     }
 
     @Nested
@@ -173,7 +160,7 @@ public class ExternalizedPropertiesBuilderTests {
             // - Arrays
             // - Optionals
             ExternalizedProperties ep = ExternalizedPropertiesBuilder.newBuilder()
-                .resolvers(new MapPropertyResolver(map))
+                .resolvers(new MapResolver(map))
                 .withDefaultConversionHandlers()
                 .build();
     
@@ -240,7 +227,7 @@ public class ExternalizedPropertiesBuilderTests {
         @Test
         @DisplayName("should enable proxy eager loading")
         public void test1() {
-            StubExternalizedPropertyResolver resolver = new StubExternalizedPropertyResolver();
+            StubResolver resolver = new StubResolver();
 
             ExternalizedProperties externalizedProperties = 
                 ExternalizedPropertiesBuilder.newBuilder()

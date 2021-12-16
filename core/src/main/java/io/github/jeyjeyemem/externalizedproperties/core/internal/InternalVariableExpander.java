@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
 
@@ -9,7 +9,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 
 /**
  * The default {@link VariableExpander} implementation.
- * This resolves the variables from the externalized property resolver.
+ * This resolves the variables using the resolver.
  * 
  * @implNote By default, this will match the basic pattern: ${variable}
  */
@@ -18,22 +18,19 @@ public class InternalVariableExpander implements VariableExpander {
     private static final String DEFAULT_VARIABLE_PREFIX = "${";
     private static final String DEFAULT_VARIABLE_END_SUFFIX = "}";
 
-    private final ExternalizedPropertyResolver externalizedPropertyResolver;
+    private final Resolver resolver;
     private final String variablePrefix;
     private final String variableSuffix;
 
     /**
      * Construct a string variable expander which looks up variable values
-     * from the externalized property resolver.
+     * from the resolver.
      * 
-     * @param externalizedPropertyResolver The externalized property resolver to 
-     * lookup variable values from.
+     * @param resolver The resolver to lookup variable values from.
      */
-    public InternalVariableExpander(
-            ExternalizedPropertyResolver externalizedPropertyResolver
-    ) {
+    public InternalVariableExpander(Resolver resolver) {
         this(
-            externalizedPropertyResolver, 
+            resolver, 
             DEFAULT_VARIABLE_PREFIX, 
             DEFAULT_VARIABLE_END_SUFFIX
         );
@@ -41,22 +38,18 @@ public class InternalVariableExpander implements VariableExpander {
 
     /**
      * Construct a string variable expander which uses a custom variable prefix and suffix 
-     * and looks up variable values from the externalized property resolver.
+     * and looks up variable values from the resolver.
      * 
-     * @param externalizedPropertyResolver The externalized property resolver to 
-     * lookup variable values from.
+     * @param resolver The resolver to lookup variable values from.
      * @param variablePrefix The variable prefix to look for when expanding variables.
      * @param variableSuffix The variable suffix to look for when expanding variables.
      */
     public InternalVariableExpander(
-            ExternalizedPropertyResolver externalizedPropertyResolver,
+            Resolver resolver,
             String variablePrefix,
             String variableSuffix
     ) {
-        this.externalizedPropertyResolver = requireNonNull(
-            externalizedPropertyResolver,
-            "externalizedPropertyResolver"
-        );
+        this.resolver = requireNonNull(resolver, "resolver");
         this.variablePrefix = requireNonNullOrEmptyString(variablePrefix, "variablePrefix");
         this.variableSuffix = requireNonNullOrEmptyString(variableSuffix, "variableSuffix");
     }
@@ -100,10 +93,10 @@ public class InternalVariableExpander implements VariableExpander {
     }
 
     private String resolvePropertyValueOrThrow(String variableName) {
-        return externalizedPropertyResolver.resolve(variableName)
+        return resolver.resolve(variableName)
             .orElseThrow(() -> new VariableExpansionException(
                 "Failed to expand \"" + variableName + "\" variable. " +
-                "Variable value cannot be resolved from any of the externalized property resolvers."
+                "Variable value cannot be resolved from the resolver."
             ));
     }
 }

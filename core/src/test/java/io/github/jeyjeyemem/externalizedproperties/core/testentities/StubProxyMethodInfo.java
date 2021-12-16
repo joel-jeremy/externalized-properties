@@ -67,6 +67,11 @@ public class StubProxyMethodInfo implements ProxyMethodInfo {
     }
 
     @Override
+    public Class<?> declaringClass() {
+        return method.getDeclaringClass();
+    }
+
+    @Override
     public String name() {
         return method.getName();
     }

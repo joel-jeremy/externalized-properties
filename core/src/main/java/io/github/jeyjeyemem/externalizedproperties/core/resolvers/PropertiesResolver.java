@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 
 import java.util.Hashtable;
 import java.util.Properties;
@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * {@link ExternalizedPropertyResolver} implementation which resolves requested properties 
+ * {@link Resolver} implementation which resolves requested properties 
  * from a given properties instance.
  */
-public class PropertiesPropertyResolver extends MapPropertyResolver {
+public class PropertiesResolver extends MapResolver {
     /**
      * Constructor which builds from a {@link Properties} instance.
      * 
@@ -28,7 +28,7 @@ public class PropertiesPropertyResolver extends MapPropertyResolver {
      * 
      * @param properties The properties instance to build from.
      */
-    public PropertiesPropertyResolver(Properties properties) {
+    public PropertiesResolver(Properties properties) {
         super(
             ignoreNonStringProperties(requireNonNull(properties, "properties"))
         );
@@ -50,7 +50,7 @@ public class PropertiesPropertyResolver extends MapPropertyResolver {
      * for the given property name. {@code null} return values are allowed but will be discarded when 
      * building the {@link Result}.
      */
-    public PropertiesPropertyResolver(
+    public PropertiesResolver(
             Properties properties, 
             Function<String, String> unresolvedPropertyHandler
     ) {

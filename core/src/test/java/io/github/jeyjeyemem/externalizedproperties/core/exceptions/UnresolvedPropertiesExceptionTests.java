@@ -135,53 +135,53 @@ public class UnresolvedPropertiesExceptionTests {
     }
 
     private <T> void verifyUnmodifiableCollection(
-            Collection<T> setToVerify, 
+            Collection<T> collectionToVerify, 
             Supplier<T> itemSupplier
     ) {
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.add(itemSupplier.get())
+            () -> collectionToVerify.add(itemSupplier.get())
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.remove(itemSupplier.get())
+            () -> collectionToVerify.remove(itemSupplier.get())
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.addAll(
+            () -> collectionToVerify.addAll(
                 Collections.singletonList(itemSupplier.get())
             )
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.clear()
+            () -> collectionToVerify.clear()
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.removeAll(
+            () -> collectionToVerify.removeAll(
                 Collections.singletonList(itemSupplier.get())
             )
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.removeIf(r -> true)
+            () -> collectionToVerify.removeIf(r -> true)
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.retainAll(
+            () -> collectionToVerify.retainAll(
                 Collections.singletonList(itemSupplier.get())
             )
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> setToVerify.iterator().remove()
+            () -> collectionToVerify.iterator().remove()
         );
     }
 }

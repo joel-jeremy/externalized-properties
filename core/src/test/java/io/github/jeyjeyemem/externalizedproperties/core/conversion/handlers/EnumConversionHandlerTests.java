@@ -3,10 +3,11 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalConverter;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.EnumProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ListProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.EnumProxyInterface.TestEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,27 +25,27 @@ public class EnumConversionHandlerTests {
         @Test
         @DisplayName("should return false when target type is null.")
         public void test1() {
-            EnumConversionHandler<TestEnum> handler = handlerToTest(TestEnum.class);
+            EnumConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(null);
             assertFalse(canConvert);
         }
 
         @Test
         @DisplayName(
-            "should return true when target type matches the conversion handler's enum class."
+            "should return true when target type is an enum."
         )
         public void test2() {
-            EnumConversionHandler<TestEnum> handler = handlerToTest(TestEnum.class);
+            EnumConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(TestEnum.class);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName(
-            "should return false when target type does not match the conversion handler's enum class."
+            "should return false when target type is not an enum."
         )
         public void test3() {
-            EnumConversionHandler<TestEnum> handler = handlerToTest(TestEnum.class);
+            EnumConversionHandler handler = handlerToTest();
             boolean canConvert = handler.canConvertTo(String.class);
             assertFalse(canConvert);
         }
@@ -55,14 +56,14 @@ public class EnumConversionHandlerTests {
         @Test
         @DisplayName("should throw when context is null.")
         public void test1() {
-            EnumConversionHandler<TestEnum> handler = handlerToTest(TestEnum.class);
+            EnumConversionHandler handler = handlerToTest();
             assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
         }
 
         @Test
-        @DisplayName("should convert resolved property to the conversion handler's enum class.")
+        @DisplayName("should convert resolved property to enum.")
         public void test2() {
-            EnumConversionHandler<TestEnum> handler = handlerToTest(TestEnum.class);
+            EnumConversionHandler handler = handlerToTest();
 
             ProxyMethodInfo proxyMethodInfo = 
                 StubProxyMethodInfo.fromMethod(
@@ -78,7 +79,7 @@ public class EnumConversionHandlerTests {
                 TestEnum.ONE.name()
             );
 
-            TestEnum testEnum = handler.convert(context);
+            Enum<?> testEnum = handler.convert(context);
             
             assertNotNull(testEnum);
             assertEquals(TestEnum.ONE, testEnum);
@@ -87,7 +88,7 @@ public class EnumConversionHandlerTests {
         @Test
         @DisplayName("should throw when property value is not a valid enum value.")
         public void test3() {
-            EnumConversionHandler<TestEnum> handler = handlerToTest(TestEnum.class);
+            EnumConversionHandler handler = handlerToTest();
 
             ProxyMethodInfo proxyMethodInfo = 
                 StubProxyMethodInfo.fromMethod(
@@ -107,9 +108,33 @@ public class EnumConversionHandlerTests {
                 handler.convert(context);
             });
         }
+
+        @Test
+        @DisplayName("should throw when target type is not an enum.")
+        public void test4() {
+            EnumConversionHandler handler = handlerToTest();
+
+            ProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
+                    ListProxyInterface.class,
+                    "listProperty"
+                );
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                proxyMethodInfo,
+                "1,2,3"
+            );
+
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(context);
+            });
+        }
     }
 
-    private <T extends Enum<T>> EnumConversionHandler<T> handlerToTest(Class<T> enumClass) {
-        return new EnumConversionHandler<>(enumClass);
+    private EnumConversionHandler handlerToTest() {
+        return new EnumConversionHandler();
     }
 }

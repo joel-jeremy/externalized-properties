@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 
 import java.util.Collection;
 import java.util.Map;
@@ -12,10 +12,10 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
 /**
- * {@link ExternalizedPropertyResolver} implementation which resolves requested properties 
+ * {@link Resolver} implementation which resolves requested properties 
  * from a given properties map.
  */
-public class MapPropertyResolver implements ExternalizedPropertyResolver {
+public class MapResolver implements Resolver {
     private static final Function<String, String> NULL_UNRESOLVED_PROPERTY_HANDLER = 
         propertyName -> null;
 
@@ -30,7 +30,7 @@ public class MapPropertyResolver implements ExternalizedPropertyResolver {
      * @apiNote The property source map must be a mutable map as this resolver will attempt 
      * to add any unresolved properties to the map using the configured unresolved property handler.
      */
-    public MapPropertyResolver(Map<String, String> propertySource) {
+    public MapResolver(Map<String, String> propertySource) {
         this(
             propertySource, 
             NULL_UNRESOLVED_PROPERTY_HANDLER
@@ -49,7 +49,7 @@ public class MapPropertyResolver implements ExternalizedPropertyResolver {
      * @apiNote The property source map must be a mutable map as this resolver will attempt 
      * to add any unresolved properties to the map using the configured unresolved property handler.
      */
-    public MapPropertyResolver(
+    public MapResolver(
             Map<String, String> propertySource,
             Function<String, String> unresolvedPropertyHandler
     ) {

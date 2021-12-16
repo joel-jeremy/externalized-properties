@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,11 +14,11 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
 /**
- * An {@link ExternalizedPropertyResolver} decorator which caches resolved properties
+ * An {@link Resolver} decorator which caches resolved properties
  * for a specified duration.
  */
-public class CachingPropertyResolver implements ExternalizedPropertyResolver {
-    private final ExternalizedPropertyResolver decorated;
+public class CachingResolver implements Resolver {
+    private final Resolver decorated;
     private final CacheStrategy<String, String> cacheStrategy;
 
     /**
@@ -27,8 +27,8 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
      * @param decorated The decorated resolver where properties will actually be resolved from.
      * @param cacheStrategy The cache strategy.
      */
-    public CachingPropertyResolver(
-            ExternalizedPropertyResolver decorated,
+    public CachingResolver(
+            Resolver decorated,
             CacheStrategy<String, String> cacheStrategy
     ) {
         this.decorated = requireNonNull(decorated, "decorated");
@@ -36,7 +36,7 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
     }
 
     /**
-     * Resolve property from the decorated {@link ExternalizedPropertyResolver} 
+     * Resolve property from the decorated {@link Resolver} 
      * and caches the resolved property. If requested property is already in the cache,
      * the cached property will be returned.
      * 
@@ -63,10 +63,10 @@ public class CachingPropertyResolver implements ExternalizedPropertyResolver {
     }
 
     /**
-     * Resolve properties from the decorated {@link ExternalizedPropertyResolver} 
+     * Resolve properties from the decorated {@link Resolver} 
      * and caches the resolved properties. If requested properties are already in the cache,
      * the cached properties will be returned. Any uncached properties will be resolved from 
-     * the decorated {@link ExternalizedPropertyResolver}.
+     * the decorated {@link Resolver}.
      * 
      * @param propertyNames The property names.
      * @return The {@link Result} which contains the resolved properties

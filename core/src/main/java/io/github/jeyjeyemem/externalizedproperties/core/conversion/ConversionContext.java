@@ -52,7 +52,7 @@ public class ConversionContext {
      * @param converter The converter. 
      * This is here to allow for recursive conversion in {@link ConversionHandler}
      * implementations.
-     * @param proxyMethodInfo The externalized property proxy method info.
+     * @param proxyMethodInfo The proxy method info.
      * @param value The value to convert.
      */
     public ConversionContext(
@@ -92,11 +92,10 @@ public class ConversionContext {
     }
 
     /**
-     * The externalized property proxy method info.
-     * This may be empty if the conversion did not originate from a proxy
-     * method invocation.
+     * The proxy method info. This may be empty {@code Optional} 
+     * if the conversion did not originate from a proxy method invocation.
      * 
-     * @return The externalized property proxy method info. 
+     * @return The proxy method info. 
      * Otherwise, an empty {@link Optional}.
      */
     public Optional<ProxyMethodInfo> proxyMethodInfo() {

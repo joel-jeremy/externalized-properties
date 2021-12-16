@@ -1,9 +1,9 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubCacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CachingPropertyResolverTests {
+public class CachingResolverTests {
     @Nested
     class Constructor {
         @Test
@@ -28,7 +28,7 @@ public class CachingPropertyResolverTests {
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new CachingPropertyResolver(null, new StubCacheStrategy<>())
+                () -> new CachingResolver(null, new StubCacheStrategy<>())
             );
         }
 
@@ -37,8 +37,8 @@ public class CachingPropertyResolverTests {
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new CachingPropertyResolver(
-                    new StubExternalizedPropertyResolver(),
+                () -> new CachingResolver(
+                    new StubResolver(),
                     null
                 )
             );
@@ -50,8 +50,8 @@ public class CachingPropertyResolverTests {
         @Test
         @DisplayName("should throw when property name argument is null or empty")
         public void validationTest1() {
-            CachingPropertyResolver resolver = resolverToTest(
-                new StubExternalizedPropertyResolver()
+            CachingResolver resolver = resolverToTest(
+                new StubResolver()
             );
 
             assertThrows(
@@ -69,9 +69,9 @@ public class CachingPropertyResolverTests {
         @DisplayName("should resolve property value from the decorated resolver")
         public void test1() {
             String propertyName = "property";
-            StubExternalizedPropertyResolver decorated = new StubExternalizedPropertyResolver();
+            StubResolver decorated = new StubResolver();
 
-            CachingPropertyResolver resolver = resolverToTest(decorated);
+            CachingResolver resolver = resolverToTest(decorated);
 
             Optional<String> result = resolver.resolve(propertyName);
             
@@ -89,7 +89,7 @@ public class CachingPropertyResolverTests {
             "when property is not found from the decorated resolver"
         )
         public void test2() {
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver()
             );
 
@@ -104,10 +104,10 @@ public class CachingPropertyResolverTests {
         @DisplayName("should cache resolved property")
         public void cacheTest1() {
             String propertyName = "property";
-            StubExternalizedPropertyResolver decorated = new StubExternalizedPropertyResolver();
+            StubResolver decorated = new StubResolver();
             StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
 
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 decorated,
                 cacheStrategy
             );
@@ -129,7 +129,7 @@ public class CachingPropertyResolverTests {
         public void cacheTest2() {
             StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
 
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver(),
                 cacheStrategy
             );
@@ -150,13 +150,13 @@ public class CachingPropertyResolverTests {
         @DisplayName("should return cached property")
         public void cacheTest3() {
             String propertyName = "property.cached";
-            StubExternalizedPropertyResolver decorated = new StubExternalizedPropertyResolver();
+            StubResolver decorated = new StubResolver();
 
             StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
             // Cache values.
             cacheStrategy.cache(propertyName, "cached.value");
 
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 decorated,
                 cacheStrategy
             );
@@ -183,7 +183,7 @@ public class CachingPropertyResolverTests {
         @Test
         @DisplayName("should throw when property names varargs argument is null or empty")
         public void validationTest1() {
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver()
             );
 
@@ -201,7 +201,7 @@ public class CachingPropertyResolverTests {
         @Test
         @DisplayName("should throw when property names varargs contain any null or empty values")
         public void validationTest2() {
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver()
             );
 
@@ -220,10 +220,10 @@ public class CachingPropertyResolverTests {
         @DisplayName("should resolve property values from the decorated resolver")
         public void test1() {
             String[] propertyNames = new String[] { "property1", "property2" };
-            StubExternalizedPropertyResolver decorated = new StubExternalizedPropertyResolver();
-            CachingPropertyResolver resolver = resolverToTest(decorated);
+            StubResolver decorated = new StubResolver();
+            CachingResolver resolver = resolverToTest(decorated);
 
-            CachingPropertyResolver.Result result = resolver.resolve(propertyNames);
+            CachingResolver.Result result = resolver.resolve(propertyNames);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -247,12 +247,12 @@ public class CachingPropertyResolverTests {
                 "nonexistent.property1", 
                 "nonexistent.property2"
             };
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver()
             );
 
             // Properties are not in system properties.
-            CachingPropertyResolver.Result result = resolver.resolve(
+            CachingResolver.Result result = resolver.resolve(
                 nonExistentProperties
             );
             
@@ -268,15 +268,15 @@ public class CachingPropertyResolverTests {
         @DisplayName("should cache resolved properties")
         public void cacheTest1() {
             String[] propertyNames = new String[] { "property1", "property2" };
-            StubExternalizedPropertyResolver decorated = new StubExternalizedPropertyResolver();
+            StubResolver decorated = new StubResolver();
             StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
 
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 decorated,
                 cacheStrategy
             );
 
-            CachingPropertyResolver.Result result = resolver.resolve(propertyNames);
+            CachingResolver.Result result = resolver.resolve(propertyNames);
             
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -299,12 +299,12 @@ public class CachingPropertyResolverTests {
             };
             StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
 
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver(),
                 cacheStrategy
             );
 
-            CachingPropertyResolver.Result result = resolver.resolve(
+            CachingResolver.Result result = resolver.resolve(
                 nonExistentProperties
             );
             
@@ -321,7 +321,7 @@ public class CachingPropertyResolverTests {
         @DisplayName("should return cached properties")
         public void cacheTest3() {
             String[] propertyNames = new String[] { "property.cached1", "property.cached2" };
-            StubExternalizedPropertyResolver decorated = new StubExternalizedPropertyResolver();
+            StubResolver decorated = new StubResolver();
 
             StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
             for (String propertyName : propertyNames) {
@@ -331,13 +331,13 @@ public class CachingPropertyResolverTests {
                 );
             }
 
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 decorated,
                 cacheStrategy
             );
 
             // property.cache is not in decorated resolver but is in the cache strategy.
-            CachingPropertyResolver.Result result = resolver.resolve(propertyNames);
+            CachingResolver.Result result = resolver.resolve(propertyNames);
             
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -358,7 +358,7 @@ public class CachingPropertyResolverTests {
         @Test
         @DisplayName("should throw when property names collection argument is null or empty")
         public void validationTest1() {
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver()
             );
 
@@ -378,7 +378,7 @@ public class CachingPropertyResolverTests {
             "should throw when property names collection contains any null or empty values"
         )
         public void validationTest2() {
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver()
             );
 
@@ -397,10 +397,10 @@ public class CachingPropertyResolverTests {
         @DisplayName("should resolve property values from the decorated resolver")
         public void test1() {
             List<String> propertyNames = Arrays.asList("property1", "property2");
-            StubExternalizedPropertyResolver decorated = new StubExternalizedPropertyResolver();
-            CachingPropertyResolver resolver = resolverToTest(decorated);
+            StubResolver decorated = new StubResolver();
+            CachingResolver resolver = resolverToTest(decorated);
 
-            CachingPropertyResolver.Result result = resolver.resolve(propertyNames);
+            CachingResolver.Result result = resolver.resolve(propertyNames);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -424,12 +424,12 @@ public class CachingPropertyResolverTests {
                 "nonexistent.property1", 
                 "nonexistent.property2"
             );
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver()
             );
 
             // Properties are not in system properties.
-            CachingPropertyResolver.Result result = resolver.resolve(
+            CachingResolver.Result result = resolver.resolve(
                 nonExistentProperties
             );
             
@@ -445,15 +445,15 @@ public class CachingPropertyResolverTests {
         @DisplayName("should cache resolved properties")
         public void cacheTest1() {
             List<String> propertyNames = Arrays.asList("property1", "property2");
-            StubExternalizedPropertyResolver decorated = new StubExternalizedPropertyResolver();
+            StubResolver decorated = new StubResolver();
             StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
 
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 decorated,
                 cacheStrategy
             );
 
-            CachingPropertyResolver.Result result = resolver.resolve(propertyNames);
+            CachingResolver.Result result = resolver.resolve(propertyNames);
             
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -476,12 +476,12 @@ public class CachingPropertyResolverTests {
             );
             StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
 
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver(),
                 cacheStrategy
             );
 
-            CachingPropertyResolver.Result result = resolver.resolve(
+            CachingResolver.Result result = resolver.resolve(
                 nonExistentProperties
             );
             
@@ -498,7 +498,7 @@ public class CachingPropertyResolverTests {
         @DisplayName("should return cached properties")
         public void cacheTest3() {
             List<String> propertyNames = Arrays.asList("property.cached1", "property.cached2");
-            StubExternalizedPropertyResolver decorated = new StubExternalizedPropertyResolver();
+            StubResolver decorated = new StubResolver();
 
             StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
             for (String propertyName : propertyNames) {
@@ -508,13 +508,13 @@ public class CachingPropertyResolverTests {
                 );
             }
 
-            CachingPropertyResolver resolver = resolverToTest(
+            CachingResolver resolver = resolverToTest(
                 decorated,
                 cacheStrategy
             );
 
             // property.cache is not in decorated resolver but is in the cache strategy.
-            CachingPropertyResolver.Result result = resolver.resolve(propertyNames);
+            CachingResolver.Result result = resolver.resolve(propertyNames);
             
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -530,8 +530,8 @@ public class CachingPropertyResolverTests {
         }
     }
 
-    private CachingPropertyResolver resolverToTest(
-            ExternalizedPropertyResolver decorated
+    private CachingResolver resolverToTest(
+            Resolver decorated
     ) {
         return resolverToTest(
             decorated,
@@ -539,11 +539,11 @@ public class CachingPropertyResolverTests {
         );
     }
 
-    private CachingPropertyResolver resolverToTest(
-            ExternalizedPropertyResolver decorated,
+    private CachingResolver resolverToTest(
+            Resolver decorated,
             CacheStrategy<String, String> cacheStrategy
     ) {
-        return new CachingPropertyResolver(
+        return new CachingResolver(
             decorated, 
             cacheStrategy
         );

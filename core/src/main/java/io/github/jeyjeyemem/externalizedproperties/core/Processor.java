@@ -1,8 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 /**
- * API for processing of resolved properties.
+ * API for processing of properties.
  */
-public interface ExternalizedPropertyProcessor {
+public interface Processor {
     /**
      * Process property value.
      * 

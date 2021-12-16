@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core.internal;
+package io.github.jeyjeyemem.externalizedproperties.core.internal.conversion;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
@@ -16,7 +16,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  */
 public class InternalConverter implements Converter {
 
-    private final Collection<ConversionHandler<?>> conversionHandlers;
+    private final ClassValue<ConversionHandler<?>> conversionHandlerByTargetType;
 
     /**
      * Constructor.
@@ -40,10 +40,22 @@ public class InternalConverter implements Converter {
      * to handle the actual conversion.
      */
     public InternalConverter(Collection<ConversionHandler<?>> conversionHandlers) {
-        this.conversionHandlers = requireNonNull(
-            conversionHandlers, 
-            "conversionHandlers"
-        );
+        requireNonNull(conversionHandlers, "conversionHandlers");
+
+        this.conversionHandlerByTargetType = new ClassValue<ConversionHandler<?>>() {
+            @Override
+            protected ConversionHandler<?> computeValue(Class<?> rawTargetType) {
+                for (ConversionHandler<?> handler : conversionHandlers) {
+                    if (handler.canConvertTo(rawTargetType)) {
+                        return handler;
+                    }
+                }
+                throw new ConversionException(String.format(
+                    "No converter found to convert value to target type: %s.",
+                    rawTargetType.getName()
+                ));
+            }
+        };
     }
 
     /** {@inheritDoc} */
@@ -52,13 +64,15 @@ public class InternalConverter implements Converter {
         requireNonNull(context, "context");
 
         Class<?> rawTargetType = context.rawTargetType();
+        if (String.class.equals(rawTargetType)) {
+            return context.value();
+        }
+        
+        // This should throw when no handler is found, so no need to null check below.
+        ConversionHandler<?> conversionHandler = conversionHandlerByTargetType.get(rawTargetType);
 
         try {
-            for (ConversionHandler<?> handler : conversionHandlers) {
-                if (handler.canConvertTo(rawTargetType)) {
-                    return handler.convert(context);
-                }
-            }
+            return conversionHandler.convert(context);
         } catch (Exception ex) {
             throw new ConversionException(
                 String.format(
@@ -70,11 +84,5 @@ public class InternalConverter implements Converter {
                 ex
             );
         }
-
-        throw new ConversionException(String.format(
-            "No converter found to convert value to target type: %s. Value: %s",
-            rawTargetType.getName(),
-            context.value()
-        ));
     }
 }

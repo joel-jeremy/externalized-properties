@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Fields marked with this annotation will allow {@link ExternalizedProperties} 
+ * Methods marked with this annotation will allow {@link ExternalizedProperties} 
  * to load their values from external sources.
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -32,8 +32,8 @@ public class ProxyMethod implements ProxyMethodInfo {
     /**
      * Constructor.
      * 
-     * @param proxy The proxy instance.
-     * @param method The externalized property method.
+     * @param proxy The proxy.
+     * @param method The method.
      * @param externalizedProperties The externalized properties.
      * @param methodHandleFactory The method handle factory.
      */
@@ -69,6 +69,12 @@ public class ProxyMethod implements ProxyMethodInfo {
     @Override
     public Optional<String> externalizedPropertyName() {
         return Optional.ofNullable(expandedPropertyName);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Class<?> declaringClass() {
+        return method.getDeclaringClass();
     }
 
     /** {@inheritDoc} */
@@ -197,21 +203,18 @@ public class ProxyMethod implements ProxyMethodInfo {
      * This will attempt to do the following:
      * <ol>
      *  <li>
-     *      Invoke the externalized property method if it's a default interface method
-     *      and return the value.
+     *      Invoke the method if it's a default interface method and return the value.
      *  </li>
      *  <li>
-     *      Return {@link Optional#empty()} if the externalized property method 
-     *      return type is an {@link Optional}.
+     *      Return {@link Optional#empty()} if the method return type is an {@link Optional}.
      *  </li>
      *  <li>
-     *      Throw an exception if the externalized property method return type 
-     *      is not an {@link Optional}.
+     *      Throw an exception if the method return type is not an {@link Optional}.
      *  </li>
      * </ol> 
      * 
-     * @param args The arguments passed to the externalized property method.
-     * @return The default value that shall be returned by the externalized property method.
+     * @param args The arguments passed to the method.
+     * @return The default value that shall be returned by the method.
      * @throws UnresolvedPropertiesException if a default value cannot be determined.
      */
     public Object determineDefaultValueOrThrow(Object[] args) {
@@ -228,7 +231,7 @@ public class ProxyMethod implements ProxyMethodInfo {
         throw new UnresolvedPropertiesException(
             propertyName,
             String.format(
-                "Failed to resolve property '(%s)' for externalized property proxy method (%s). " + 
+                "Failed to resolve property '(%s)' for proxy method (%s). " + 
                 "To prevent exceptions when a property cannot be resolved, " +
                 "consider changing method's return type to an Optional.",
                 propertyName,
@@ -259,7 +262,7 @@ public class ProxyMethod implements ProxyMethodInfo {
             throw new ExternalizedPropertiesException(
                 String.format(
                     "Error occurred while invoking default interface method. " +
-                    "Externalized property method: %s.",
+                    "Proxy method: %s.",
                     methodSignatureString()
                 ), 
                 ex
@@ -283,7 +286,7 @@ public class ProxyMethod implements ProxyMethodInfo {
         return args -> {
             throw new IllegalStateException(String.format(
                 "Tried to invoke a non-default interface method. " +
-                "Externalized property method: %s.",
+                "Proxy method: %s.",
                 methodSignatureString()
             ));
         };

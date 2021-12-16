@@ -21,7 +21,6 @@ public class Arguments {
         if (arg == null) {
             throw new IllegalArgumentException("Argument " + argName + " must not be null.");
         }
-
         return arg;
     }
 
@@ -37,7 +36,6 @@ public class Arguments {
         if (isNullOrEmpty(arg)) {
             throw new IllegalArgumentException("Argument " + argName + " must not be null or empty.");
         }
-
         return arg;
     }
 
@@ -57,7 +55,6 @@ public class Arguments {
         if (arg == null || arg.isEmpty()) {
             throw new IllegalArgumentException("Argument " + argName + " must not be null or empty.");
         }
-
         return arg;
     }
 

@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.testentities;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -11,11 +11,11 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * A stub {@link ExternalizedPropertyResolver} implemenation that resolves properties based on 
+ * A stub {@link Resolver} implemenation that resolves properties based on 
  * a provider value resolver function. By default, it will defaul any property by returning the 
  * property name suffixed with "-value".
  */
-public class StubExternalizedPropertyResolver implements ExternalizedPropertyResolver {
+public class StubResolver implements Resolver {
 
     public static final String DEFAULT_PROPERTY_NAME_SUFFIX = "-value";
 
@@ -29,11 +29,11 @@ public class StubExternalizedPropertyResolver implements ExternalizedPropertyRes
     private final Map<String, String> trackedResolvedProperties = new HashMap<>();
     private final Function<String, String> valueResolver;
 
-    public StubExternalizedPropertyResolver() {
+    public StubResolver() {
         this(DEFAULT_VALUE_RESOLVER);
     }
 
-    public StubExternalizedPropertyResolver(
+    public StubResolver(
             Function<String, String> valueResolver
     ) {
         this.valueResolver = valueResolver;
