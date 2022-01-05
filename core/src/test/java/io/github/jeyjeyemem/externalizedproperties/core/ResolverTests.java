@@ -37,11 +37,11 @@ public class ResolverTests {
                 }
 
                 @Override
-                public Result resolve(Collection<String> propertyNames) {
+                public ResolverResult resolve(Collection<String> propertyNames) {
                     // Track propertyName collection for assertion.
                     propertyNamesCollectionRef.set(propertyNames);
                     // Empty result.
-                    return Result.EMPTY;
+                    return ResolverResult.EMPTY;
                 }
             };
 
@@ -61,8 +61,8 @@ public class ResolverTests {
             @Test
             @DisplayName("should not return null")
             public void test1() {
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder("test.property");
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder("test.property");
 
                 assertNotNull(resultBuilder);
             }
@@ -74,14 +74,14 @@ public class ResolverTests {
             public void test2() {
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> Resolver.Result.builder(
+                    () -> ResolverResult.builder(
                         (String[])null
                     )
                 );
                 
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> Resolver.Result.builder(
+                    () -> ResolverResult.builder(
                         new String[0]
                     )
                 );
@@ -93,8 +93,8 @@ public class ResolverTests {
             @Test
             @DisplayName("should not return null")
             public void test1() {
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         Arrays.asList("test.property")
                     );
 
@@ -108,14 +108,14 @@ public class ResolverTests {
             public void test2() {
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> Resolver.Result.builder(
+                    () -> ResolverResult.builder(
                         (Collection<String>)null
                     )
                 );
 
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> Resolver.Result.builder(
+                    () -> ResolverResult.builder(
                         Collections.emptyList()
                     )
                 );
@@ -131,14 +131,14 @@ public class ResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 assertNotNull(result.resolvedProperties());
             }
@@ -150,14 +150,14 @@ public class ResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 assertEquals(requestedProperties, result.resolvedProperties());
             }
@@ -169,14 +169,14 @@ public class ResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 Map<String, String> resolvedProperties = result.resolvedProperties();
 
@@ -264,7 +264,7 @@ public class ResolverTests {
                     resolvedProperties.entrySet(), 
                     () -> resolvedProperties.entrySet().stream()
                         .findFirst()
-                        .orElseThrow()
+                        .get()
                 );
                 verifyUnmodifiableCollection(
                     resolvedProperties.keySet(), 
@@ -285,14 +285,14 @@ public class ResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 String resolved = result.findRequiredProperty("test.property.1");
 
@@ -306,14 +306,14 @@ public class ResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 assertThrows(
                     UnresolvedPropertiesException.class,
@@ -330,14 +330,14 @@ public class ResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 Optional<String> resolved = result.findResolvedProperty("test.property.1");
 
@@ -352,14 +352,14 @@ public class ResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 Optional<String> property = result.findResolvedProperty("unresolved");
 
@@ -376,14 +376,14 @@ public class ResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 assertTrue(result.hasResolvedProperties());
             }
@@ -394,14 +394,14 @@ public class ResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 // No resolved properties added to result.
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 assertFalse(result.hasResolvedProperties());
             }
@@ -415,14 +415,14 @@ public class ResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 // No resolved properties added to result.
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 assertTrue(result.hasUnresolvedProperties());
             }
@@ -433,14 +433,14 @@ public class ResolverTests {
                 Map<String, String> requestedProperties = new HashMap<>();
                 requestedProperties.put("test.property.1", "test.property.value.1");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 assertFalse(result.hasUnresolvedProperties());
             }
@@ -455,14 +455,14 @@ public class ResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 assertTrue(result.resolvedPropertyNames().contains("test.property.1"));
                 assertTrue(result.resolvedPropertyNames().contains("test.property.2"));
@@ -475,14 +475,14 @@ public class ResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 // No resolved properties added to result.
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 assertFalse(result.resolvedPropertyNames().contains("test.property.1"));
                 assertFalse(result.resolvedPropertyNames().contains("test.property.2"));
@@ -495,14 +495,14 @@ public class ResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 Set<String> resolvedPropertyNames = result.resolvedPropertyNames();
 
@@ -522,14 +522,14 @@ public class ResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 // No resolved properties added to result.
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 assertTrue(result.unresolvedPropertyNames().contains("test.property.1"));
                 assertTrue(result.unresolvedPropertyNames().contains("test.property.2"));
@@ -542,14 +542,14 @@ public class ResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 assertFalse(result.unresolvedPropertyNames().contains("test.property.1"));
                 assertFalse(result.unresolvedPropertyNames().contains("test.property.2"));
@@ -562,14 +562,14 @@ public class ResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
 
                 resultBuilder.addAll(requestedProperties);
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
 
                 Set<String> resolvedPropertyNames = result.unresolvedPropertyNames();
 
@@ -588,8 +588,8 @@ public class ResolverTests {
             @Test
             @DisplayName("should throw when property name argument is null or empty")
             public void test1() {
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         Arrays.asList("test.property")
                     );
 
@@ -609,8 +609,8 @@ public class ResolverTests {
             @Test
             @DisplayName("should throw when resolved property value argument is null")
             public void test2() {
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         Arrays.asList("test.property")
                     );
 
@@ -623,14 +623,14 @@ public class ResolverTests {
             @Test
             @DisplayName("should add property to result's resolved properties")
             public void test3() {
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         Arrays.asList("test.property")
                     );
                 
                 resultBuilder.add("test.property", "test.property.value");
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
                 
                 assertTrue(result.resolvedPropertyNames().contains("test.property"));
             }
@@ -642,14 +642,14 @@ public class ResolverTests {
                 requestedProperties.put("test.property.1", "test.property.value.1");
                 requestedProperties.put("test.property.2", "test.property.value.2");
                 
-                Resolver.Result.Builder resultBuilder = 
-                    Resolver.Result.builder(
+                ResolverResult.Builder resultBuilder = 
+                    ResolverResult.builder(
                         requestedProperties.keySet()
                     );
                 
                 resultBuilder.add("test.property.1", "test.property.value.1");
 
-                Resolver.Result result = resultBuilder.build();
+                ResolverResult result = resultBuilder.build();
                 
                 assertTrue(result.resolvedPropertyNames().contains("test.property.1"));
                 // test.property.2 was not resolved.
@@ -664,8 +664,8 @@ public class ResolverTests {
         @Test
         @DisplayName("should throw when resolved proeprties by name map argument is null")
         public void test1() {
-            Resolver.Result.Builder resultBuilder = 
-                Resolver.Result.builder(
+            ResolverResult.Builder resultBuilder = 
+                ResolverResult.builder(
                     Arrays.asList("test.property")
                 );
 
@@ -690,8 +690,8 @@ public class ResolverTests {
             requestedProperties.put("test.property.2", "test.property.value.2");
             requestedProperties.put("test.property.3", "test.property.value.3");
             
-            Resolver.Result.Builder resultBuilder = 
-                Resolver.Result.builder(
+            ResolverResult.Builder resultBuilder = 
+                ResolverResult.builder(
                     requestedProperties.keySet()
                 );
 
@@ -702,7 +702,7 @@ public class ResolverTests {
             
             resultBuilder.addAll(resolved);
 
-            Resolver.Result result = resultBuilder.build();
+            ResolverResult result = resultBuilder.build();
             
             assertTrue(result.resolvedPropertyNames().contains("test.property.1"));
             assertTrue(result.resolvedPropertyNames().contains("test.property.2"));
@@ -717,8 +717,8 @@ public class ResolverTests {
             requestedProperties.put("test.property.2", "test.property.value.2");
             requestedProperties.put("test.property.3", "test.property.value.3");
 
-            Resolver.Result.Builder resultBuilder = 
-                Resolver.Result.builder(
+            ResolverResult.Builder resultBuilder = 
+                ResolverResult.builder(
                     requestedProperties.keySet()
                 );
 
@@ -729,7 +729,7 @@ public class ResolverTests {
             
             resultBuilder.addAll(resolved);
 
-            Resolver.Result result = resultBuilder.build();
+            ResolverResult result = resultBuilder.build();
             
             assertTrue(result.resolvedPropertyNames().contains("test.property.1"));
             assertTrue(result.resolvedPropertyNames().contains("test.property.2"));

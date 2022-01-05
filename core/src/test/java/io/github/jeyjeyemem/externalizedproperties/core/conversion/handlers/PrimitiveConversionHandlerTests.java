@@ -2,6 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
@@ -114,7 +115,7 @@ public class PrimitiveConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should throw when target type is not a primitive type.")
+        @DisplayName("should return skipped result when target type is not a primitive type.")
         public void test2() {
             PrimitiveConversionHandler handler = handlerToTest();
 
@@ -132,10 +133,8 @@ public class PrimitiveConversionHandlerTests {
                 "a,b,c"
             );
             
-            assertThrows(
-                ConversionException.class, 
-                () -> handler.convert(context)
-            );
+            ConversionResult<?> result =  handler.convert(context);
+            assertEquals(ConversionResult.skip(), result);
         }
 
         @Test
@@ -169,9 +168,14 @@ public class PrimitiveConversionHandlerTests {
                 "2"
             );
 
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
+            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
             
+            assertNotNull(wrapperResult);
+            assertNotNull(primitiveResult);
+            Object wrapperValue = wrapperResult.value();
+            Object primitiveValue = primitiveResult.value();
+
             assertNotNull(wrapperValue);
             assertNotNull(primitiveValue);
 
@@ -213,8 +217,13 @@ public class PrimitiveConversionHandlerTests {
                 "2"
             );
 
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
+            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperResult);
+            assertNotNull(primitiveResult);
+            Object wrapperValue = wrapperResult.value();
+            Object primitiveValue = primitiveResult.value();
             
             assertNotNull(wrapperValue);
             assertNotNull(primitiveValue);
@@ -257,8 +266,13 @@ public class PrimitiveConversionHandlerTests {
                 "2.0"
             );
 
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
+            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperResult);
+            assertNotNull(primitiveResult);
+            Object wrapperValue = wrapperResult.value();
+            Object primitiveValue = primitiveResult.value();
             
             assertNotNull(wrapperValue);
             assertNotNull(primitiveValue);
@@ -301,8 +315,13 @@ public class PrimitiveConversionHandlerTests {
                 "2.0"
             );
 
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
+            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperResult);
+            assertNotNull(primitiveResult);
+            Object wrapperValue = wrapperResult.value();
+            Object primitiveValue = primitiveResult.value();
             
             assertNotNull(wrapperValue);
             assertNotNull(primitiveValue);
@@ -345,8 +364,13 @@ public class PrimitiveConversionHandlerTests {
                 "2"
             );
 
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
+            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperResult);
+            assertNotNull(primitiveResult);
+            Object wrapperValue = wrapperResult.value();
+            Object primitiveValue = primitiveResult.value();
             
             assertNotNull(wrapperValue);
             assertNotNull(primitiveValue);
@@ -389,8 +413,13 @@ public class PrimitiveConversionHandlerTests {
                 "false"
             );
 
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
+            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperResult);
+            assertNotNull(primitiveResult);
+            Object wrapperValue = wrapperResult.value();
+            Object primitiveValue = primitiveResult.value();
             
             assertNotNull(wrapperValue);
             assertNotNull(primitiveValue);
@@ -433,8 +462,13 @@ public class PrimitiveConversionHandlerTests {
                 "invalid_boolean"
             );
 
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
+            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperResult);
+            assertNotNull(primitiveResult);
+            Object wrapperValue = wrapperResult.value();
+            Object primitiveValue = primitiveResult.value();
             
             assertNotNull(wrapperValue);
             assertNotNull(primitiveValue);
@@ -477,8 +511,13 @@ public class PrimitiveConversionHandlerTests {
                 "2"
             );
 
-            Object wrapperValue = handler.convert(wrapperContext);
-            Object primitiveValue = handler.convert(primitiveContext);
+            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            
+            assertNotNull(wrapperResult);
+            assertNotNull(primitiveResult);
+            Object wrapperValue = wrapperResult.value();
+            Object primitiveValue = primitiveResult.value();
             
             assertNotNull(wrapperValue);
             assertNotNull(primitiveValue);

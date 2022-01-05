@@ -2,6 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
@@ -105,7 +106,10 @@ public class ListConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            List<?> list = handler.convert(context);
+            ConversionResult<List<?>> result = handler.convert(context);
+            
+            assertNotNull(result);
+            List<?> list = result.value();
             
             assertNotNull(list);
             assertEquals(3, list.size());
@@ -135,7 +139,10 @@ public class ListConversionHandlerTests {
                 "value1#value2#value3"
             );
 
-            List<?> list = handler.convert(context);
+            ConversionResult<List<?>> result = handler.convert(context);
+
+            assertNotNull(result);
+            List<?> list = result.value();
             
             assertNotNull(list);
             assertEquals(3, list.size());
@@ -169,7 +176,10 @@ public class ListConversionHandlerTests {
                 "1,2,3"
             );
             
-            List<?> list = handler.convert(context);
+            ConversionResult<List<?>> result = handler.convert(context);
+            
+            assertNotNull(result);
+            List<?> list = result.value();
             
             assertNotNull(list);
             assertEquals(3, list.size());
@@ -200,7 +210,10 @@ public class ListConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            List<?> list = handler.convert(context);
+            ConversionResult<List<?>> result = handler.convert(context);
+            
+            assertNotNull(result);
+            List<?> list = result.value();
             
             assertNotNull(list);
             assertEquals(3, list.size());
@@ -232,7 +245,10 @@ public class ListConversionHandlerTests {
                     "value1,value2,value3"
                 );
 
-            List<?> list = handler.convert(context);
+            ConversionResult<List<?>> result = handler.convert(context);
+        
+            assertNotNull(result);
+            List<?> list = result.value();
             
             assertNotNull(list);
             assertEquals(3, list.size());
@@ -263,7 +279,10 @@ public class ListConversionHandlerTests {
                 "" // Empty value.
             );
 
-            List<?> list = handler.convert(context);
+            ConversionResult<List<?>> result = handler.convert(context);
+            
+            assertNotNull(result);
+            List<?> list = result.value();
             
             assertNotNull(list);
             assertTrue(list.isEmpty());
@@ -289,7 +308,10 @@ public class ListConversionHandlerTests {
                     "value1,,value3,,value5" // Has empty values.
                 );
 
-            List<?> list = handler.convert(context);
+            ConversionResult<List<?>> result = handler.convert(context);
+        
+            assertNotNull(result);
+            List<?> list = result.value();
             
             assertNotNull(list);
             assertEquals(5, list.size());
@@ -320,7 +342,10 @@ public class ListConversionHandlerTests {
                 "value1,,value3,,value5" // Has empty values.
             );
 
-            List<?> list = handler.convert(context);
+            ConversionResult<List<?>> result = handler.convert(context);
+            
+            assertNotNull(result);
+            List<?> list = result.value();
             
             assertNotNull(list);
             assertEquals(3, list.size());
@@ -384,7 +409,10 @@ public class ListConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            List<?> list = handler.convert(context);
+            ConversionResult<List<?>> result = handler.convert(context);
+            
+            assertNotNull(result);
+            List<?> list = result.value();
             
             assertNotNull(list);
             assertEquals(3, list.size());
@@ -425,7 +453,10 @@ public class ListConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            List<?> list = handler.convert(context);
+            ConversionResult<List<?>> result = handler.convert(context);
+            
+            assertNotNull(result);
+            List<?> list = result.value();
             
             assertNotNull(list);
             assertEquals(3, list.size());
@@ -493,7 +524,10 @@ public class ListConversionHandlerTests {
                 "value1,,value3,,value5"
             );
 
-            List<?> list = handler.convert(context);
+            ConversionResult<List<?>> result = handler.convert(context);
+            
+            assertNotNull(result);
+            List<?> list = result.value();
             
             // Default: Should use ',' as delimiter and will not strip empty values.
             // This will strip trailing empty values though.
@@ -524,7 +558,10 @@ public class ListConversionHandlerTests {
                 "value1,,value3,,value5"
             );
 
-            List<?> list = handler.convert(context);
+            ConversionResult<List<?>> result = handler.convert(context);
+            
+            assertNotNull(result);
+            List<?> list = result.value();
             
             // Default: Should use ',' as delimiter and will not strip empty values.
             // This will strip trailing empty values though.

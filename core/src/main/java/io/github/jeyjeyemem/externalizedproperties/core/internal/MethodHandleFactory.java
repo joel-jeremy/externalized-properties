@@ -6,6 +6,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -49,49 +50,43 @@ public class MethodHandleFactory {
     }
 
     private static MethodHandle buildMethodHandleInternal(Method method) {
-        if (IS_RUNNING_ON_JAVA_9_OR_LATER) {
-            return java9BuildMethodHandle(method);
-        }
-
-        return java8BuildMethodHandle(method);
-    }
-
-    private static MethodHandle java8BuildMethodHandle(Method method) {
         try {
-            // This will only work on Java 8.
-            // For Java9+, the new private lookup API should be used.
-            final Constructor<Lookup> constructor = Lookup.class
-                .getDeclaredConstructor(Class.class);
-            
-            constructor.setAccessible(true);
-            final Lookup lookup = constructor.newInstance(method.getDeclaringClass());
-            constructor.setAccessible(false);
-            
-            return lookup.in(method.getDeclaringClass())
-                .unreflectSpecial(method, method.getDeclaringClass());
-        } catch (Throwable ex) {
-            throw new ExternalizedPropertiesException(
-                "Error occurred while trying to build method handle.", 
-                ex
-            );
-        }
-    }
+            if (IS_RUNNING_ON_JAVA_9_OR_LATER) {
+                return java9BuildMethodHandle(method);
+            }
 
-    private static MethodHandle java9BuildMethodHandle(Method method) {
-        Lookup privateLookup = java9PrivateLookup(method.getDeclaringClass());
-        try {
-            return privateLookup.in(method.getDeclaringClass())
-                .unreflectSpecial(method, method.getDeclaringClass());
+            return java8BuildMethodHandle(method);
         } catch (Exception ex) {
             throw new ExternalizedPropertiesException(
-                String.format(
-                    "Error occurred while trying to build method handle. " +
-                    "Method: %s.",
-                    method.toGenericString()
-                ), 
+                "Error occurred while trying to build method handle for method: " +
+                method.toGenericString(), 
                 ex
             );
         }
+    }
+
+    private static MethodHandle java8BuildMethodHandle(Method method) 
+            throws NoSuchMethodException, SecurityException, 
+                InstantiationException, IllegalAccessException, 
+                IllegalArgumentException, InvocationTargetException {
+        // This will only work on Java 8.
+        // For Java9+, the new private lookup API should be used.
+        final Constructor<Lookup> constructor = Lookup.class
+            .getDeclaredConstructor(Class.class);
+        
+        constructor.setAccessible(true);
+        final Lookup lookup = constructor.newInstance(method.getDeclaringClass());
+        constructor.setAccessible(false);
+        
+        return lookup.in(method.getDeclaringClass())
+            .unreflectSpecial(method, method.getDeclaringClass());
+    }
+
+    private static MethodHandle java9BuildMethodHandle(Method method) 
+            throws IllegalAccessException {
+        Lookup privateLookup = java9PrivateLookup(method.getDeclaringClass());
+        return privateLookup.in(method.getDeclaringClass())
+            .unreflectSpecial(method, method.getDeclaringClass());
     }
 
     private static Lookup java9PrivateLookup(Class<?> classToLookup) {

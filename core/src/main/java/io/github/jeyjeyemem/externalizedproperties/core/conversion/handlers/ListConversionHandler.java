@@ -3,6 +3,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeUtilities;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.StripEmptyValues;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
@@ -59,7 +60,7 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public List<?> convert(ConversionContext context) {
+    public ConversionResult<List<?>> convert(ConversionContext context) {
         requireNonNull(context, "context");
         
         try {
@@ -74,7 +75,7 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
 
             String propertyValue = context.value();
             if (propertyValue.isEmpty()) {
-                return newList(0);
+                return ConversionResult.of(newList(0));
             }
 
             final String[] values = getValues(context);
@@ -84,13 +85,15 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
             // If List<String> or List<Object>, return String values.
             if (String.class.equals(rawTargetListType) || 
                     Object.class.equals(rawTargetListType)) {
-                return newList(values);
+                return ConversionResult.of(newList(values));
             }
 
-            return convertValuesToListType(
-                context,
-                values,
-                targetListType
+            return ConversionResult.of(
+                convertValuesToListType(
+                    context,
+                    values,
+                    targetListType
+                )
             );
         } catch (Exception ex) {
             throw new ConversionException(

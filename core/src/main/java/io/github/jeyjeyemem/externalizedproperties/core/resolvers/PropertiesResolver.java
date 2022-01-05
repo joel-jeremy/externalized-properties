@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 
 import java.util.Hashtable;
 import java.util.Properties;
@@ -48,7 +49,7 @@ public class PropertiesResolver extends MapResolver {
      * @param unresolvedPropertyHandler Any properties not found in the source properties will tried 
      * to be resolved via this handler. This should accept a property name and return the property value 
      * for the given property name. {@code null} return values are allowed but will be discarded when 
-     * building the {@link Result}.
+     * building the {@link ResolverResult}.
      */
     public PropertiesResolver(
             Properties properties, 

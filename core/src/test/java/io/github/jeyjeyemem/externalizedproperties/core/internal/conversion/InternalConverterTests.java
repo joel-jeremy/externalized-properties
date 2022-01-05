@@ -2,6 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal.conversion;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.PrimitiveConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
@@ -134,7 +135,7 @@ public class InternalConverterTests {
                     }
 
                     @Override
-                    public Object convert(ConversionContext context) {
+                    public ConversionResult<Object> convert(ConversionContext context) {
                         throw new RuntimeException("Mr. Stark I don't feel so good...");
                     }
                 };

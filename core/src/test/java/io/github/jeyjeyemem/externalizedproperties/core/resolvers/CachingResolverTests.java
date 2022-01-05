@@ -2,6 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubResolver;
 import org.junit.jupiter.api.DisplayName;
@@ -223,7 +224,7 @@ public class CachingResolverTests {
             StubResolver decorated = new StubResolver();
             CachingResolver resolver = resolverToTest(decorated);
 
-            CachingResolver.Result result = resolver.resolve(propertyNames);
+            ResolverResult result = resolver.resolve(propertyNames);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -252,7 +253,7 @@ public class CachingResolverTests {
             );
 
             // Properties are not in system properties.
-            CachingResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 nonExistentProperties
             );
             
@@ -276,7 +277,7 @@ public class CachingResolverTests {
                 cacheStrategy
             );
 
-            CachingResolver.Result result = resolver.resolve(propertyNames);
+            ResolverResult result = resolver.resolve(propertyNames);
             
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -304,7 +305,7 @@ public class CachingResolverTests {
                 cacheStrategy
             );
 
-            CachingResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 nonExistentProperties
             );
             
@@ -337,7 +338,7 @@ public class CachingResolverTests {
             );
 
             // property.cache is not in decorated resolver but is in the cache strategy.
-            CachingResolver.Result result = resolver.resolve(propertyNames);
+            ResolverResult result = resolver.resolve(propertyNames);
             
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -400,7 +401,7 @@ public class CachingResolverTests {
             StubResolver decorated = new StubResolver();
             CachingResolver resolver = resolverToTest(decorated);
 
-            CachingResolver.Result result = resolver.resolve(propertyNames);
+            ResolverResult result = resolver.resolve(propertyNames);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -429,7 +430,7 @@ public class CachingResolverTests {
             );
 
             // Properties are not in system properties.
-            CachingResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 nonExistentProperties
             );
             
@@ -453,7 +454,7 @@ public class CachingResolverTests {
                 cacheStrategy
             );
 
-            CachingResolver.Result result = resolver.resolve(propertyNames);
+            ResolverResult result = resolver.resolve(propertyNames);
             
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -481,7 +482,7 @@ public class CachingResolverTests {
                 cacheStrategy
             );
 
-            CachingResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 nonExistentProperties
             );
             
@@ -514,7 +515,7 @@ public class CachingResolverTests {
             );
 
             // property.cache is not in decorated resolver but is in the cache strategy.
-            CachingResolver.Result result = resolver.resolve(propertyNames);
+            ResolverResult result = resolver.resolve(propertyNames);
             
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());

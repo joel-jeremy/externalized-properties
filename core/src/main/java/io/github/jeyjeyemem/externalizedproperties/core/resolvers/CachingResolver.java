@@ -2,6 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -69,15 +70,15 @@ public class CachingResolver implements Resolver {
      * the decorated {@link Resolver}.
      * 
      * @param propertyNames The property names.
-     * @return The {@link Result} which contains the resolved properties
+     * @return The {@link ResolverResult} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
-    public Result resolve(Collection<String> propertyNames) {
+    public ResolverResult resolve(Collection<String> propertyNames) {
         requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
 
         List<String> nonCachedProperties = new ArrayList<>(propertyNames.size());
-        Result.Builder resultBuilder = Result.builder(propertyNames);
+        ResolverResult.Builder resultBuilder = ResolverResult.builder(propertyNames);
 
         for (String propertyName : propertyNames) {
             throwIfNullOrEmptyValue(propertyName);
@@ -91,7 +92,7 @@ public class CachingResolver implements Resolver {
 
         // Need to resolve remaining non-cached properties.
         if (!nonCachedProperties.isEmpty()) {
-            Result result = decorated.resolve(nonCachedProperties);
+            ResolverResult result = decorated.resolve(nonCachedProperties);
             for (Map.Entry<String, String> resolvedProperty : result.resolvedProperties().entrySet()) {
                 // Cache.
                 cacheStrategy.cache(resolvedProperty.getKey(), resolvedProperty.getValue());

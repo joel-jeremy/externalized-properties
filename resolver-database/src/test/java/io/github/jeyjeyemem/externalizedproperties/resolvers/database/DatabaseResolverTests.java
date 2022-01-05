@@ -1,5 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.AbstractNameValueQueryExecutor;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
@@ -224,7 +225,7 @@ public class DatabaseResolverTests {
                 "test.property.2"
             );
             
-            DatabaseResolver.Result result = 
+            ResolverResult result = 
                 databasePropertyResolver.resolve(propertiesToResolve);
             
             assertTrue(result.hasResolvedProperties());
@@ -259,7 +260,7 @@ public class DatabaseResolverTests {
                 "non.existent.property"
             );
 
-            DatabaseResolver.Result result = 
+            ResolverResult result = 
                 databasePropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -307,7 +308,7 @@ public class DatabaseResolverTests {
                 "custom.table.test.property.2"
             );
 
-            DatabaseResolver.Result result =
+            ResolverResult result =
                 databasePropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -400,7 +401,7 @@ public class DatabaseResolverTests {
                 "test.property.2"
             };
             
-            DatabaseResolver.Result result = 
+            ResolverResult result = 
                 databasePropertyResolver.resolve(propertiesToResolve);
             
             assertTrue(result.hasResolvedProperties());
@@ -422,7 +423,7 @@ public class DatabaseResolverTests {
                 "non.existent.property"
             };
 
-            DatabaseResolver.Result result = 
+            ResolverResult result = 
                 databasePropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -459,7 +460,7 @@ public class DatabaseResolverTests {
                 "custom.table.test.property.2"
             };
 
-            DatabaseResolver.Result result =
+            ResolverResult result =
                 databasePropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());

@@ -1,5 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,7 @@ public class PropertiesResolverTests {
             props.put("property.name", "property.value");
 
             PropertiesResolver resolver = resolverToTest(props);
-            PropertiesResolver.Result result = 
+            ResolverResult result = 
                 resolver.resolve("property.nonstring", "property.name");
 
             assertTrue(result.hasResolvedProperties());
@@ -145,7 +146,7 @@ public class PropertiesResolverTests {
             };
             
             PropertiesResolver resolver = resolverToTest(props);
-            PropertiesResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
 
@@ -173,7 +174,7 @@ public class PropertiesResolverTests {
                 "nonexisting.property2"
             };
 
-            PropertiesResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -211,7 +212,7 @@ public class PropertiesResolverTests {
                 "property.unresolvedhandler2"
             };
 
-            PropertiesResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -243,7 +244,7 @@ public class PropertiesResolverTests {
             );
             
             PropertiesResolver resolver = resolverToTest(props);
-            PropertiesResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
 
@@ -271,7 +272,7 @@ public class PropertiesResolverTests {
                 "nonexisting.property2"
             );
 
-            PropertiesResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -309,7 +310,7 @@ public class PropertiesResolverTests {
                 "property.unresolvedhandler2"
             );
 
-            PropertiesResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
             

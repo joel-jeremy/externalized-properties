@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,18 +63,18 @@ public class CompositeResolver implements Resolver, Iterable<Resolver> {
      * Resolve properties from a collection of {@link Resolver}s.
      * 
      * @param propertyNames The property names.
-     * @return The {@link Result} which contains the resolved properties
+     * @return The {@link ResolverResult} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
-    public Result resolve(Collection<String> propertyNames) {
+    public ResolverResult resolve(Collection<String> propertyNames) {
         requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
 
-        Result.Builder resultBuilder = Result.builder(propertyNames);
+        ResolverResult.Builder resultBuilder = ResolverResult.builder(propertyNames);
         List<String> unresolvedPropertyNames = new ArrayList<>(propertyNames);
 
         for (Resolver resolver : resolvers) {
-            Result result = resolver.resolve(unresolvedPropertyNames);
+            ResolverResult result = resolver.resolve(unresolvedPropertyNames);
             for (Map.Entry<String, String> newResolvedProperty : result.resolvedProperties().entrySet()) {
                 LOGGER.log(
                     Level.FINE,

@@ -1,5 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.awsssm;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -163,7 +164,7 @@ public class AwsSsmResolverTests {
                 "/test/property/2"
             );
 
-            AwsSsmResolver.Result result = 
+            ResolverResult result = 
                 awsSsmPropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -198,7 +199,7 @@ public class AwsSsmResolverTests {
                 "non/existent/property"
             );
 
-            AwsSsmResolver.Result result = 
+            ResolverResult result = 
                 awsSsmPropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -265,7 +266,7 @@ public class AwsSsmResolverTests {
                 "/test/property/2"
             };
 
-            AwsSsmResolver.Result result = 
+            ResolverResult result = 
                 awsSsmPropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
@@ -300,7 +301,7 @@ public class AwsSsmResolverTests {
                 "non/existent/property"
             };
 
-            AwsSsmResolver.Result result = 
+            ResolverResult result = 
                 awsSsmPropertyResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());

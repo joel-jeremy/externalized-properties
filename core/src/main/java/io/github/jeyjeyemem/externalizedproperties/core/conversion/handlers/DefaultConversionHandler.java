@@ -1,8 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +22,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 public class DefaultConversionHandler implements ConversionHandler<Object> {
 
     // private final List<ConversionHandler<?>> defaultConversionHandlers;
-    private final ClassValue<ConversionHandler<?>> conversionHandlersByTargetType;
+    private final ClassValue<ConversionHandler<Object>> conversionHandlersByTargetType;
 
     /**
      * Constructs a {@link DefaultConversionHandler} instance 
@@ -36,19 +36,23 @@ public class DefaultConversionHandler implements ConversionHandler<Object> {
      */
     public DefaultConversionHandler() {
         // In order.
-        final List<ConversionHandler<?>> defaultConversionHandlers = Arrays.asList(
-            new PrimitiveConversionHandler(),
-            new ListConversionHandler(),
-            new ArrayConversionHandler(),
-            new OptionalConversionHandler()
-        );
+        final List<ConversionHandler<?>> defaultHandlers = 
+            Arrays.asList(
+                new PrimitiveConversionHandler(),
+                new ListConversionHandler(),
+                new ArrayConversionHandler(),
+                new OptionalConversionHandler()
+            );
 
-        conversionHandlersByTargetType = new ClassValue<ConversionHandler<?>>() {
+        conversionHandlersByTargetType = new ClassValue<ConversionHandler<Object>>() {
             @Override
-            protected ConversionHandler<?> computeValue(Class<?> targetType) {
-                for (ConversionHandler<?> conversionHandler : defaultConversionHandlers) {
+            protected ConversionHandler<Object> computeValue(Class<?> targetType) {
+                for (ConversionHandler<?> conversionHandler : defaultHandlers) {
                     if (conversionHandler.canConvertTo(targetType)) {
-                        return conversionHandler;
+                        @SuppressWarnings("unchecked")
+                        ConversionHandler<Object> casted = 
+                            (ConversionHandler<Object>)conversionHandler;
+                        return casted;
                     }
                 }
                 return null;
@@ -65,16 +69,14 @@ public class DefaultConversionHandler implements ConversionHandler<Object> {
 
     /** {@inheritDoc} */
     @Override
-    public Object convert(ConversionContext context) {
+    public ConversionResult<Object> convert(ConversionContext context) {
         requireNonNull(context, "context");
 
         Class<?> rawTargetType = context.rawTargetType();
-        ConversionHandler<?> conversionHandler = conversionHandlersByTargetType.get(rawTargetType);
+        ConversionHandler<Object> conversionHandler = 
+            conversionHandlersByTargetType.get(rawTargetType);
         if (conversionHandler == null) {
-            throw new ConversionException(String.format(
-                "No applicable conversion handler found to convert to %s type.", 
-                context.targetType()
-            ));
+            return ConversionResult.skip();
         }
 
         return conversionHandler.convert(context);

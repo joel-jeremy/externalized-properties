@@ -3,6 +3,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeUtilities;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.StripEmptyValues;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
@@ -37,7 +38,7 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
 
     /** {@inheritDoc} */
     @Override
-    public Object[] convert(ConversionContext context) {
+    public ConversionResult<Object[]> convert(ConversionContext context) {
         requireNonNull(context, "context");
 
         try {    
@@ -46,20 +47,21 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
 
             String propertyValue = context.value();
             if (propertyValue.isEmpty()) {
-                return new String[0];
+                return ConversionResult.of(new String[0]);
             }
 
             final String[] values = getValues(context);
 
             Class<?> rawArrayComponentType = context.rawTargetType().getComponentType();
             if (rawArrayComponentType == null) {
-                throw new ConversionException("Target type is not an array.");
+                // Not an array.
+                return ConversionResult.skip();
             }
             
             // If array is String[] or Object[], return the string values.
             if (String.class.equals(rawArrayComponentType) || 
                     Object.class.equals(rawArrayComponentType)) {
-                return values;
+                return ConversionResult.of(values);
             }
 
             // Generic array component type handling e.g. Optional<String>[]
@@ -70,18 +72,22 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
             if (genericArrayType != null) {
                 Type genericArrayComponentType = genericArrayType.getGenericComponentType();
             
-                return convertValuesToArrayComponentType(
-                    context,
-                    values,
-                    genericArrayComponentType
+                return ConversionResult.of(
+                    convertValuesToArrayComponentType(
+                        context,
+                        values,
+                        genericArrayComponentType
+                    )
                 );
             }
 
             // Just convert to raw type.
-            return convertValuesToArrayComponentType(
-                context,
-                values,
-                rawArrayComponentType
+            return ConversionResult.of(
+                convertValuesToArrayComponentType(
+                    context,
+                    values,
+                    rawArrayComponentType
+                )
             );
         } catch (Exception ex) {
             throw new ConversionException(

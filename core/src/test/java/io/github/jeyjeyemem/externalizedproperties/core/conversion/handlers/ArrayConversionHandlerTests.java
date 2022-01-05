@@ -2,6 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
@@ -61,7 +62,7 @@ public class ArrayConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should throw when method does not return an array.")
+        @DisplayName("should return skipped result when target type is not an array.")
         public void test2() {
             ArrayConversionHandler handler = handlerToTest();
 
@@ -74,14 +75,14 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
 
+            ConversionResult<?> result = handler.convert(new ConversionContext(
+                converter,
+                proxyMethodInfo,
+                "value1,value2,value3"
+            ));
+
             // Method return type is a List and not an array
-            assertThrows(ConversionException.class, () -> {
-                handler.convert(new ConversionContext(
-                    converter,
-                    proxyMethodInfo,
-                    "value1,value2,value3"
-                ));
-            });
+            assertEquals(ConversionResult.skip(), result);
         }
 
         @Test
@@ -97,12 +98,15 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
 
-            Object[] array = handler.convert(new ConversionContext(
+            ConversionResult<Object[]> result = handler.convert(new ConversionContext(
                 converter,
                 proxyMethodInfo,
                 "value1,value2,value3"
             ));
-            
+
+            assertNotNull(result);
+            Object[] array = result.value();
+
             assertNotNull(array);
             assertEquals(3, array.length);
             assertTrue(Arrays.stream(array).allMatch(v -> v instanceof String));
@@ -128,13 +132,16 @@ public class ArrayConversionHandlerTests {
                 new PrimitiveConversionHandler()
             );
             
-            Object[] array = handler.convert(
+            ConversionResult<Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
                     "1,2,3"
                 )
             );
+
+            assertNotNull(result);
+            Object[] array = result.value();
             
             assertNotNull(array);
             assertEquals(3, array.length);
@@ -158,13 +165,15 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            Object[] array = handler.convert(
+            ConversionResult<Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
                     "" // Empty value.
                 )
             );
+            assertNotNull(result);
+            Object[] array = result.value();
             
             assertNotNull(array);
             assertEquals(0, array.length);
@@ -183,13 +192,16 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            Object[] array = handler.convert(
+            ConversionResult<Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
                     "value1,,value3,,value5" // Has empty values.
                 )
             );
+
+            assertNotNull(result);
+            Object[] array = result.value();
             
             assertNotNull(array);
             assertEquals(5, array.length);
@@ -213,13 +225,16 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            Object[] array = handler.convert(
+            ConversionResult<Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
                     "value1,,value3,,value5" // Has empty values.
                 )
             );
+
+            assertNotNull(result);
+            Object[] array = result.value();
             
             assertNotNull(array);
             assertEquals(3, array.length);
@@ -243,13 +258,16 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            Object[] array = handler.convert(
+            ConversionResult<Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
                     "value1,value2,value3"
                 )
             );
+
+            assertNotNull(result);
+            Object[] array = result.value();
             
             assertNotNull(array);
             assertEquals(3, array.length);
@@ -301,13 +319,16 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            Object[] array = handler.convert(
+            ConversionResult<Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
                     "value1|value2|value3" // Custom delimiter
                 )
             );
+
+            assertNotNull(result);
+            Object[] array = result.value();
             
             assertNotNull(array);
             assertEquals(3, array.length);
@@ -336,13 +357,16 @@ public class ArrayConversionHandlerTests {
                 new OptionalConversionHandler() // Register additional Optional handler.
             );
             
-            Object[] array = handler.convert(
+            ConversionResult<Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
                     "value1,value2,value3"
                 )
             );
+
+            assertNotNull(result);
+            Object[] array = result.value();
             
             assertNotNull(array);
             assertEquals(3, array.length);
@@ -375,13 +399,16 @@ public class ArrayConversionHandlerTests {
                 new OptionalConversionHandler() // Register additional Optional handler.
             );
             
-            Object[] array = handler.convert(
+            ConversionResult<Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
                     "value1,value2,value3"
                 )
             );
+
+            assertNotNull(result);
+            Object[] array = result.value();
             
             assertNotNull(array);
             assertEquals(3, array.length);
@@ -431,11 +458,14 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            Object[] array = handler.convert(new ConversionContext(
+            ConversionResult<Object[]> result = handler.convert(new ConversionContext(
                 converter,
                 String[].class,
                 "value1,,value3,,value5"
             ));
+
+            assertNotNull(result);
+            Object[] array = result.value();
             
             // Default: Should use ',' as delimiter and will not strip empty values.
             // This will strip trailing empty values though.

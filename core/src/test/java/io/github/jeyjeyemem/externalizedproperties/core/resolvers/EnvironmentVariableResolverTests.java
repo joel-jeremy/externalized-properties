@@ -1,5 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -52,7 +53,7 @@ public class EnvironmentVariableResolverTests {
         @DisplayName("should resolve property values from environment variables")
         public void test1() {
             EnvironmentVariableResolver resolver = resolverToTest();
-            EnvironmentVariableResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 "PATH",
                 "HOME"
             );
@@ -77,7 +78,7 @@ public class EnvironmentVariableResolverTests {
         )
         public void test2() {
             EnvironmentVariableResolver resolver = resolverToTest();
-            EnvironmentVariableResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 "NON_EXISTING_ENVVAR1",
                 "NON_EXISTING_ENVVAR2"
             );
@@ -94,7 +95,7 @@ public class EnvironmentVariableResolverTests {
         @DisplayName("should resolve property values from environment variables")
         public void test1() {
             EnvironmentVariableResolver resolver = resolverToTest();
-            EnvironmentVariableResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 Arrays.asList(
                     "PATH",
                     "HOME"
@@ -121,7 +122,7 @@ public class EnvironmentVariableResolverTests {
         )
         public void test2() {
             EnvironmentVariableResolver resolver = resolverToTest();
-            EnvironmentVariableResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 Arrays.asList(
                     "NON_EXISTING_ENVVAR1",
                     "NON_EXISTING_ENVVAR2"

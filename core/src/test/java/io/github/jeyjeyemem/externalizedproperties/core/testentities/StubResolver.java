@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.testentities;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -56,11 +57,11 @@ public class StubResolver implements Resolver {
     }
 
     @Override
-    public Result resolve(Collection<String> propertyNames) {
+    public ResolverResult resolve(Collection<String> propertyNames) {
         if (propertyNames == null || propertyNames.isEmpty()) {
             throw new IllegalArgumentException("propertyNames must not be null or empty.");
         }
-        Result.Builder resultBuilder = Result.builder(propertyNames);
+        ResolverResult.Builder resultBuilder = ResolverResult.builder(propertyNames);
 
         for (String propertyName : propertyNames) {
             String resolvedValue = valueResolver.apply(propertyName);
@@ -69,7 +70,7 @@ public class StubResolver implements Resolver {
             }
         }
 
-        Result result = resultBuilder.build();
+        ResolverResult result = resultBuilder.build();
 
         // Add for tracking.
         trackedResolvedProperties.putAll(result.resolvedProperties());

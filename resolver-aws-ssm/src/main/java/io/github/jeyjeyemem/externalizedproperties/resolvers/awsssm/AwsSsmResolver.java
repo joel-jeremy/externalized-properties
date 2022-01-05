@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.awsssm;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
 import software.amazon.awssdk.services.ssm.model.GetParametersResponse;
@@ -32,7 +33,7 @@ public class AwsSsmResolver implements Resolver {
     /**
      * Resolve properties from AWS SSM.
      * 
-     * @return The {@link Result} which contains the resolved properties
+     * @return The {@link ResolverResult} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
@@ -54,11 +55,11 @@ public class AwsSsmResolver implements Resolver {
     /**
      * Resolve properties from AWS SSM.
      * 
-     * @return The {@link Result} which contains the resolved properties
+     * @return The {@link ResolverResult} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
-    public Result resolve(Collection<String> propertyNames) {
+    public ResolverResult resolve(Collection<String> propertyNames) {
         if (propertyNames == null || propertyNames.isEmpty()) {
             throw new IllegalArgumentException("propertyNames must not be null or empty.");
         }
@@ -75,7 +76,7 @@ public class AwsSsmResolver implements Resolver {
         //     throw new AwsSsmInvalidPropertyException(exceptionMessage);
         // }
 
-        Result.Builder resultBuilder = Result.builder(propertyNames);
+        ResolverResult.Builder resultBuilder = ResolverResult.builder(propertyNames);
 
         response.parameters().forEach(p -> 
             resultBuilder.add(p.name(), p.value())

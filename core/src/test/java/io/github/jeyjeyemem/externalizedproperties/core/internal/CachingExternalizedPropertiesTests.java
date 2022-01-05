@@ -1474,7 +1474,7 @@ public class CachingExternalizedPropertiesTests {
                 cachingExternalizedProperties.resolveProperty(proxyMethodInfo);
 
             assertTrue(resolved.isPresent());
-            assertEquals(1, (int)resolved.get());
+            assertEquals(1, (Integer)resolved.get());
         }
 
         @Test
@@ -1510,7 +1510,7 @@ public class CachingExternalizedPropertiesTests {
                 cachingExternalizedProperties.resolveProperty(proxyMethodInfo);
 
             assertTrue(resolved.isPresent());
-            assertEquals(1, (int)resolved.get());
+            assertEquals(1, (Integer)resolved.get());
 
             String propertyName = "property.integer.primitive";
             assertTrue(resolver.resolvedPropertyNames().contains(propertyName));
@@ -1551,7 +1551,7 @@ public class CachingExternalizedPropertiesTests {
                 cachingExternalizedProperties.resolveProperty(proxyMethodInfo);
 
             assertTrue(resolved.isPresent());
-            assertEquals(1, (int)resolved.get());
+            assertEquals(1, (Integer)resolved.get());
 
             String propertyName = "property.integer.primitive";
             Optional<Optional<?>> cached = resolvedPropertiesCacheStrategy.get(propertyName);

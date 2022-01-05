@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 
@@ -30,27 +31,29 @@ public class PrimitiveConversionHandler implements ConversionHandler<Object> {
 
     /** {@inheritDoc} */
     @Override
-    public Object convert(ConversionContext context) {
+    public ConversionResult<Object> convert(ConversionContext context) {
         requireNonNull(context, "context");
 
         Class<?> targetType = context.rawTargetType();
 
         try {
             if (Boolean.class.equals(targetType) || Boolean.TYPE.equals(targetType)) {
-                return Boolean.parseBoolean(context.value());
+                return ConversionResult.of(Boolean.parseBoolean(context.value()));
             } else if (Integer.class.equals(targetType) || Integer.TYPE.equals(targetType)) {
-                return Integer.parseInt(context.value());
+                return ConversionResult.of(Integer.parseInt(context.value()));
             } else if (Long.class.equals(targetType) || Long.TYPE.equals(targetType)) {
-                return Long.parseLong(context.value());
+                return ConversionResult.of(Long.parseLong(context.value()));
             } else if (Short.class.equals(targetType) || Short.TYPE.equals(targetType)) {
-                return Short.parseShort(context.value());
+                return ConversionResult.of(Short.parseShort(context.value()));
             } else if (Float.class.equals(targetType) || Float.TYPE.equals(targetType)) {
-                return Float.parseFloat(context.value());
+                return ConversionResult.of(Float.parseFloat(context.value()));
             } else if (Double.class.equals(targetType) || Double.TYPE.equals(targetType)) {
-                return Double.parseDouble(context.value());
+                return ConversionResult.of(Double.parseDouble(context.value()));
             } else if (Byte.class.equals(targetType) || Byte.TYPE.equals(targetType)) {
-                return Byte.parseByte(context.value());
+                return ConversionResult.of(Byte.parseByte(context.value()));
             }
+            // Not a primitive.
+            return ConversionResult.skip();
         } catch (Exception ex) {
             throw new ConversionException(
                 String.format(
@@ -61,10 +64,5 @@ public class PrimitiveConversionHandler implements ConversionHandler<Object> {
                 ex
             );
         }
-    
-        throw new ConversionException(
-            "Type is not a primitive/primitive wrapper type: " + 
-            targetType.getName()
-        );
     }
 }

@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 
 import java.util.Collection;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class MapResolver implements Resolver {
      * @param unresolvedPropertyHandler Any properties not found in the source properties will tried 
      * to be resolved via this handler. This should accept a property name and return the property value 
      * for the given property name. {@code null} return values are allowed but will be discarded when 
-     * building the {@link Result}.
+     * building the {@link ResolverResult}.
      * 
      * @apiNote The property source map must be a mutable map as this resolver will attempt 
      * to add any unresolved properties to the map using the configured unresolved property handler.
@@ -76,14 +77,14 @@ public class MapResolver implements Resolver {
     /**
      * Resolve properties from a given properties map.
      * 
-     * @return The {@link Result} which contains the resolved properties
+     * @return The {@link ResolverResult} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
-    public Result resolve(Collection<String> propertyNames) {
+    public ResolverResult resolve(Collection<String> propertyNames) {
         requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
 
-        Result.Builder resultBuilder = Result.builder(propertyNames);
+        ResolverResult.Builder resultBuilder = ResolverResult.builder(propertyNames);
 
         for (String propertyName : propertyNames) {
             throwIfNullOrEmptyValue(propertyName);

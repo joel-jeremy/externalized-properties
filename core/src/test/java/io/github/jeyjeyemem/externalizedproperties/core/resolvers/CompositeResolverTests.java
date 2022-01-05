@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -324,7 +325,7 @@ public class CompositeResolverTests {
             
             CompositeResolver compositeResolver = resolverToTest(resolver);
 
-            CompositeResolver.Result result = compositeResolver.resolve(propertiesToResolve);
+            ResolverResult result = compositeResolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -363,7 +364,7 @@ public class CompositeResolverTests {
                 resolver2
             );
 
-            CompositeResolver.Result result = compositeResolver.resolve(
+            ResolverResult result = compositeResolver.resolve(
                 propertiesToResolve
             );
 
@@ -403,7 +404,7 @@ public class CompositeResolverTests {
                 resolver3
             );
 
-            CompositeResolver.Result result = compositeResolver.resolve(
+            ResolverResult result = compositeResolver.resolve(
                 "property.name.1",
                 "property.name.2",
                 "property.name.3"
@@ -474,7 +475,7 @@ public class CompositeResolverTests {
                 resolver3
             );
 
-            CompositeResolver.Result result = compositeResolver.resolve(
+            ResolverResult result = compositeResolver.resolve(
                 "property.name.1",
                 "property.name.2",
                 "property.name.3"
@@ -551,7 +552,7 @@ public class CompositeResolverTests {
             
             CompositeResolver compositeResolver = resolverToTest(resolver);
 
-            CompositeResolver.Result result = compositeResolver.resolve(
+            ResolverResult result = compositeResolver.resolve(
                 propertiesToResolve
             );
 
@@ -592,7 +593,7 @@ public class CompositeResolverTests {
                 resolver2
             );
 
-            CompositeResolver.Result result = compositeResolver.resolve(
+            ResolverResult result = compositeResolver.resolve(
                 propertiesToResolve
             );
 
@@ -638,7 +639,7 @@ public class CompositeResolverTests {
                 resolver3
             );
 
-            CompositeResolver.Result result = compositeResolver.resolve(
+            ResolverResult result = compositeResolver.resolve(
                 propertiesToResolve
             );
 
@@ -713,7 +714,7 @@ public class CompositeResolverTests {
                 resolver3
             );
 
-            CompositeResolver.Result result = compositeResolver.resolve(
+            ResolverResult result = compositeResolver.resolve(
                 propertiesToResolve
             );
 

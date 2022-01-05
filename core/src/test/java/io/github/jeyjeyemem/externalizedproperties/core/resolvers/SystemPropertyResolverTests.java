@@ -1,5 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,7 @@ public class SystemPropertyResolverTests {
                 "java.home"
             };
 
-            SystemPropertyResolver.Result result = resolver.resolve(propertiesToResolve);
+            ResolverResult result = resolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -82,7 +83,7 @@ public class SystemPropertyResolverTests {
                 "nonexisting.property2"
             };
 
-            SystemPropertyResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -109,7 +110,7 @@ public class SystemPropertyResolverTests {
                 "java.home"
             );
 
-            SystemPropertyResolver.Result result = resolver.resolve(propertiesToResolve);
+            ResolverResult result = resolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -134,7 +135,7 @@ public class SystemPropertyResolverTests {
                 "nonexisting.property2"
             );
 
-            SystemPropertyResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
             

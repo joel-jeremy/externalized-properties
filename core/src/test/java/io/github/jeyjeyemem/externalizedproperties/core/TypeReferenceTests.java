@@ -25,7 +25,7 @@ public class TypeReferenceTests {
         @Test
         @DisplayName("should return non-generic type")
         public void test1() {
-            TypeReference<Integer> listType = new TypeReference<>(){};
+            TypeReference<Integer> listType = new TypeReference<Integer>(){};
 
             // Detects Integer.
             assertTrue(listType.type() instanceof Class<?>);
@@ -35,7 +35,7 @@ public class TypeReferenceTests {
         @Test
         @DisplayName("should return generic parameterized type")
         public void test2() {
-            TypeReference<List<String>> listType = new TypeReference<>(){};
+            TypeReference<List<String>> listType = new TypeReference<List<String>>(){};
 
             // Method returns a List<String>.
             // Used for comparison of generic type.
@@ -53,7 +53,7 @@ public class TypeReferenceTests {
         @Test
         @DisplayName("should detect non-generic array type")
         public void test4() {
-            TypeReference<Integer[]> listType = new TypeReference<>(){};
+            TypeReference<Integer[]> listType = new TypeReference<Integer[]>(){};
 
             assertTrue(listType.type() instanceof Class<?>);
             assertEquals(Integer[].class, listType.type());
@@ -62,7 +62,8 @@ public class TypeReferenceTests {
         @Test
         @DisplayName("should return generic array type")
         public void test5() {
-            TypeReference<Optional<Optional<String>>[]> listType = new TypeReference<>(){};
+            TypeReference<Optional<Optional<String>>[]> listType = 
+                new TypeReference<Optional<Optional<String>>[]>(){};
 
             // Method returns a Optional<Optional<String>>[].
             // Used for comparison of generic type.
@@ -82,7 +83,7 @@ public class TypeReferenceTests {
         @Test
         @DisplayName("should return upper bound of type variable")
         public <T extends Number> void test6() {
-            TypeReference<T> listType = new TypeReference<>(){};
+            TypeReference<T> listType = new TypeReference<T>(){};
 
             assertTrue(listType.type() instanceof TypeVariable);
             // Type variable has correct bounds as <T>.
@@ -96,7 +97,7 @@ public class TypeReferenceTests {
         @Test
         @DisplayName("should return non-generic class when referenced type is non-generic")
         public void test1() {
-            TypeReference<Integer> listType = new TypeReference<>(){};
+            TypeReference<Integer> listType = new TypeReference<Integer>(){};
 
             // Detects Integer.
             assertEquals(Integer.class, listType.rawType());
@@ -105,7 +106,7 @@ public class TypeReferenceTests {
         @Test
         @DisplayName("should return raw class of generic parameterized type")
         public void test2() {
-            TypeReference<List<String>> listType = new TypeReference<>(){};
+            TypeReference<List<String>> listType = new TypeReference<List<String>>(){};
 
             // Detects List<String>.
             assertEquals(List.class, listType.rawType());
@@ -114,7 +115,7 @@ public class TypeReferenceTests {
         @Test
         @DisplayName("should return raw class of non-generic array type")
         public void test4() {
-            TypeReference<Integer[]> listType = new TypeReference<>(){};
+            TypeReference<Integer[]> listType = new TypeReference<Integer[]>(){};
 
             assertEquals(listType.rawType(), Integer[].class);
         }
@@ -122,7 +123,8 @@ public class TypeReferenceTests {
         @Test
         @DisplayName("should return raw class of generic array type")
         public void test5() {
-            TypeReference<Optional<Integer>[]> listType = new TypeReference<>(){};
+            TypeReference<Optional<Integer>[]> listType = 
+                new TypeReference<Optional<Integer>[]>(){};
 
             assertEquals(listType.rawType(), Optional[].class);
         }
@@ -130,7 +132,7 @@ public class TypeReferenceTests {
         @Test
         @DisplayName("should return upper bound of type variable")
         public <T extends Number> void test6() {
-            TypeReference<T> listType = new TypeReference<>(){};
+            TypeReference<T> listType = new TypeReference<T>(){};
 
             // Should return the type variable bound.
             assertEquals(listType.rawType(), Number.class);
@@ -142,7 +144,7 @@ public class TypeReferenceTests {
         @Test
         @DisplayName("should return empty array when referenced type is non-generic")
         public void test1() {
-            TypeReference<Integer> listType = new TypeReference<>(){};
+            TypeReference<Integer> listType = new TypeReference<Integer>(){};
 
             assertTrue(listType.genericTypeParameters().length == 0);
         }
@@ -152,7 +154,7 @@ public class TypeReferenceTests {
             "should return type parameter array when referenced type is a parameterized type"
         )
         public void test2() {
-            TypeReference<List<String>> listType = new TypeReference<>(){};
+            TypeReference<List<String>> listType = new TypeReference<List<String>>(){};
 
             // Return String from List<String>.
             assertArrayEquals(
@@ -166,7 +168,7 @@ public class TypeReferenceTests {
             "should return empty array when referenced type is a non-generic array type"
         )
         public void test4() {
-            TypeReference<Integer[]> listType = new TypeReference<>(){};
+            TypeReference<Integer[]> listType = new TypeReference<Integer[]>(){};
 
             assertTrue(listType.genericTypeParameters().length == 0);
         }
@@ -176,7 +178,8 @@ public class TypeReferenceTests {
             "should return empty array when referenced type is a generic array type"
         )
         public void test5() {
-            TypeReference<Optional<Integer>[]> listType = new TypeReference<>(){};
+            TypeReference<Optional<Integer>[]> listType = 
+                new TypeReference<Optional<Integer>[]>(){};
 
             assertTrue(listType.genericTypeParameters().length == 0);
         }
@@ -186,7 +189,7 @@ public class TypeReferenceTests {
             "should return empty array when referenced type is a type variable"
         )
         public <T> void test6() {
-            TypeReference<T> listType = new TypeReference<>(){};
+            TypeReference<T> listType = new TypeReference<T>(){};
 
             assertTrue(listType.genericTypeParameters().length == 0);
         }

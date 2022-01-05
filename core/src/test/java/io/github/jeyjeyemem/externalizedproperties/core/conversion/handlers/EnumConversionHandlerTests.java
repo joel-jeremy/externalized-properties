@@ -2,6 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
@@ -79,9 +80,10 @@ public class EnumConversionHandlerTests {
                 TestEnum.ONE.name()
             );
 
-            Enum<?> testEnum = handler.convert(context);
-            
-            assertNotNull(testEnum);
+            ConversionResult<Enum<?>> result = handler.convert(context);
+            assertNotNull(result);
+
+            Enum<?> testEnum = result.value();
             assertEquals(TestEnum.ONE, testEnum);
         }
 
@@ -110,7 +112,7 @@ public class EnumConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should throw when target type is not an enum.")
+        @DisplayName("should return skipped result when target type is not an enum.")
         public void test4() {
             EnumConversionHandler handler = handlerToTest();
 
@@ -127,10 +129,9 @@ public class EnumConversionHandlerTests {
                 proxyMethodInfo,
                 "1,2,3"
             );
-
-            assertThrows(ConversionException.class, () -> {
-                handler.convert(context);
-            });
+            
+            ConversionResult<?> result = handler.convert(context);
+            assertEquals(ConversionResult.skip(), result);
         }
     }
 

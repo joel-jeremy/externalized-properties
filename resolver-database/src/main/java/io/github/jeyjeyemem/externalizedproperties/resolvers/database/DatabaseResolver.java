@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
 
@@ -52,7 +53,7 @@ public class DatabaseResolver implements Resolver {
     /**
      * Resolve property from database.
      * 
-     * @return The {@link Result} which contains the resolved properties
+     * @return The {@link ResolverResult} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
@@ -62,7 +63,7 @@ public class DatabaseResolver implements Resolver {
         }
         
         try {
-            Result result = getFromDatabase(Arrays.asList(propertyName));
+            ResolverResult result = getFromDatabase(Arrays.asList(propertyName));
             return result.findResolvedProperty(propertyName);
         } catch (SQLException e) {
             throw new ExternalizedPropertiesException(
@@ -75,11 +76,11 @@ public class DatabaseResolver implements Resolver {
     /**
      * Resolve properties from database.
      * 
-     * @return The {@link Result} which contains the resolved properties
+     * @return The {@link ResolverResult} which contains the resolved properties
      * and unresolved properties, if there are any.
      */
     @Override
-    public Result resolve(Collection<String> propertyNames) {
+    public ResolverResult resolve(Collection<String> propertyNames) {
         if (propertyNames == null || propertyNames.isEmpty()) {
             throw new IllegalArgumentException("propertyNames must not be null or empty.");
         }
@@ -96,12 +97,12 @@ public class DatabaseResolver implements Resolver {
         }
     }
 
-    private Result getFromDatabase(Collection<String> propertyNames) throws SQLException {
+    private ResolverResult getFromDatabase(Collection<String> propertyNames) throws SQLException {
         try (Connection connection = connectionProvider.getConnection()) {
             List<DatabaseProperty> resolvedProperties = 
                 queryExecutor.queryProperties(connection, propertyNames);
 
-            Result.Builder resultBuilder = Result.builder(propertyNames);
+            ResolverResult.Builder resultBuilder = ResolverResult.builder(propertyNames);
             
             resolvedProperties.forEach(resolved -> 
                 resultBuilder.add(resolved.name(), resolved.value())

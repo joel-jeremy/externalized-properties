@@ -3,6 +3,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeUtilities;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 
 import java.lang.reflect.Type;
@@ -23,7 +24,7 @@ public class OptionalConversionHandler implements ConversionHandler<Optional<?>>
 
     /** {@inheritDoc} */
     @Override
-    public Optional<?> convert(ConversionContext context) {
+    public ConversionResult<Optional<?>> convert(ConversionContext context) {
         requireNonNull(context, "context");
 
         try {
@@ -42,13 +43,15 @@ public class OptionalConversionHandler implements ConversionHandler<Optional<?>>
             // If Optional<String> or Optional<Object>, return String value.
             if (String.class.equals(rawTargetOptionalType) || 
                     Object.class.equals(rawTargetOptionalType)) {
-                return Optional.of(value);
+                return ConversionResult.of(Optional.of(value));
             }
 
-            return convertToOptionalType(
-                context,
-                value,
-                targetOptionalType
+            return ConversionResult.of(
+                convertToOptionalType(
+                    context,
+                    value,
+                    targetOptionalType
+                )
             );
         } catch (Exception ex) {
             throw new ConversionException(String.format(

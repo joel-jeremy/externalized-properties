@@ -2,6 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
@@ -79,7 +80,10 @@ public class OptionalConversionHandlerTests {
                 "value"
             );
 
-            Optional<?> optional = handler.convert(context);
+            ConversionResult<Optional<?>> result = handler.convert(context);
+
+            assertNotNull(result);
+            Optional<?> optional = result.value();
             
             assertNotNull(optional);
             assertTrue(optional.isPresent());
@@ -111,7 +115,10 @@ public class OptionalConversionHandlerTests {
                 "1"
             );
 
-            Optional<?> optional = handler.convert(context);
+            ConversionResult<Optional<?>> result = handler.convert(context);
+
+            assertNotNull(result);
+            Optional<?> optional = result.value();
             
             assertNotNull(optional);
             assertTrue(optional.isPresent());
@@ -138,8 +145,11 @@ public class OptionalConversionHandlerTests {
                 "value"
             );
 
-            Optional<?> optional = handler.convert(context);
+            ConversionResult<Optional<?>> result = handler.convert(context);
             
+            assertNotNull(result);
+            Optional<?> optional = result.value();
+
             assertNotNull(optional);
             assertTrue(optional.isPresent());
             assertTrue(optional.get() instanceof String);
@@ -167,8 +177,11 @@ public class OptionalConversionHandlerTests {
                 "value"
             );
 
-            Optional<?> optional = handler.convert(context);
+            ConversionResult<Optional<?>> result = handler.convert(context);
             
+            assertNotNull(result);
+            Optional<?> optional = result.value();
+
             assertNotNull(optional);
             assertTrue(optional.isPresent());
             assertTrue(optional.get() instanceof String);
@@ -225,8 +238,11 @@ public class OptionalConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            Optional<?> optional = handler.convert(context);
+            ConversionResult<Optional<?>> result = handler.convert(context);
             
+            assertNotNull(result);
+            Optional<?> optional = result.value();
+
             assertNotNull(optional);
             assertTrue(optional.isPresent());
             assertTrue(optional.get() instanceof List<?>);
@@ -261,8 +277,11 @@ public class OptionalConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            Optional<?> optional = handler.convert(context);
+            ConversionResult<Optional<?>> result = handler.convert(context);
             
+            assertNotNull(result);
+            Optional<?> optional = result.value();
+
             assertNotNull(optional);
             assertTrue(optional.isPresent());
             assertTrue(optional.get() instanceof Optional<?>[]);
@@ -292,7 +311,10 @@ public class OptionalConversionHandlerTests {
                 "value"
             );
 
-            Optional<?> optional = handler.convert(context);
+            ConversionResult<Optional<?>> result = handler.convert(context);
+            
+            assertNotNull(result);
+            Optional<?> optional = result.value();
             
             assertNotNull(optional);
             assertTrue(optional.isPresent());

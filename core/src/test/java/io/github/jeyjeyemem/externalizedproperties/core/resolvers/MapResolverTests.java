@@ -1,5 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -174,7 +175,7 @@ public class MapResolverTests {
             };
             
             MapResolver resolver = resolverToTest(map);
-            MapResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
 
@@ -202,7 +203,7 @@ public class MapResolverTests {
                 "nonexisting.property2"
             };
 
-            MapResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -240,7 +241,7 @@ public class MapResolverTests {
                 "property.unresolvedhandler2"
             };
 
-            MapResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -306,7 +307,7 @@ public class MapResolverTests {
             );
             
             MapResolver resolver = resolverToTest(map);
-            MapResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
 
@@ -334,7 +335,7 @@ public class MapResolverTests {
                 "nonexisting.property2"
             );
 
-            MapResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -372,7 +373,7 @@ public class MapResolverTests {
                 "property.unresolvedhandler2"
             );
 
-            MapResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
             

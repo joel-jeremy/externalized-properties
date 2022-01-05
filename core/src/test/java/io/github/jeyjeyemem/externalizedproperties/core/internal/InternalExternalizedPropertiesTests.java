@@ -459,7 +459,7 @@ public class InternalExternalizedPropertiesTests {
             );
 
             assertTrue(property.isPresent());
-            assertEquals(1, (int)property.get());
+            assertEquals(1, (Integer)property.get());
         }
 
         @Test
@@ -743,7 +743,7 @@ public class InternalExternalizedPropertiesTests {
             );
 
             assertTrue(property.isPresent());
-            assertEquals(1, (int)property.get());
+            assertEquals(1, (Integer)property.get());
         }
 
         @Test
@@ -877,7 +877,7 @@ public class InternalExternalizedPropertiesTests {
             );
 
             assertTrue(property.isPresent());
-            assertEquals(1, (int)property.get());
+            assertEquals(1, (Integer)property.get());
         }
 
         @Test
@@ -1022,7 +1022,7 @@ public class InternalExternalizedPropertiesTests {
             );
 
             assertTrue(property.isPresent());
-            assertEquals(1, (int)property.get());
+            assertEquals(1, (Integer)property.get());
         }
 
         @Test
@@ -1150,7 +1150,7 @@ public class InternalExternalizedPropertiesTests {
             Optional<?> property = externalizedProperties.resolveProperty(proxyMethodInfo);
 
             assertTrue(property.isPresent());
-            assertEquals(1, (int)property.get());
+            assertEquals(1, (Integer)property.get());
         }
 
         @Test
@@ -1179,7 +1179,7 @@ public class InternalExternalizedPropertiesTests {
             Optional<?> property = externalizedProperties.resolveProperty(proxyMethodInfo);
 
             assertTrue(property.isPresent());
-            assertEquals(1, (int)property.get());
+            assertEquals(1, (Integer)property.get());
         }
 
         @Test

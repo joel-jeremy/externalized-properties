@@ -1,5 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -87,7 +88,7 @@ public class DefaultResolverTests {
                 "java.home"
             };
 
-            DefaultResolver.Result result = resolver.resolve(propertiesToResolve);
+            ResolverResult result = resolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -112,7 +113,7 @@ public class DefaultResolverTests {
                 "nonexisting.property2"
             };
 
-            DefaultResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -130,7 +131,7 @@ public class DefaultResolverTests {
         @DisplayName("should resolve property values from environment variables")
         public void environmentVariableTest1() {
             DefaultResolver resolver = resolverToTest();
-            DefaultResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 "PATH",
                 "HOME"
             );
@@ -155,7 +156,7 @@ public class DefaultResolverTests {
         )
         public void environmentVariableTest2() {
             DefaultResolver resolver = resolverToTest();
-            DefaultResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 "NON_EXISTING_ENVVAR1",
                 "NON_EXISTING_ENVVAR2"
             );
@@ -178,7 +179,7 @@ public class DefaultResolverTests {
                 "java.home"
             );
 
-            DefaultResolver.Result result = resolver.resolve(propertiesToResolve);
+            ResolverResult result = resolver.resolve(propertiesToResolve);
 
             assertTrue(result.hasResolvedProperties());
             assertFalse(result.hasUnresolvedProperties());
@@ -203,7 +204,7 @@ public class DefaultResolverTests {
                 "nonexisting.property2"
             );
 
-            DefaultResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 propertiesToResolve
             );
             
@@ -221,7 +222,7 @@ public class DefaultResolverTests {
         @DisplayName("should resolve property values from environment variables")
         public void environmentVariableTest1() {
             DefaultResolver resolver = resolverToTest();
-            DefaultResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 Arrays.asList(
                     "PATH",
                     "HOME"
@@ -248,7 +249,7 @@ public class DefaultResolverTests {
         )
         public void environmentVariableTest2() {
             DefaultResolver resolver = resolverToTest();
-            DefaultResolver.Result result = resolver.resolve(
+            ResolverResult result = resolver.resolve(
                 Arrays.asList(
                     "NON_EXISTING_ENVVAR1",
                     "NON_EXISTING_ENVVAR2"
