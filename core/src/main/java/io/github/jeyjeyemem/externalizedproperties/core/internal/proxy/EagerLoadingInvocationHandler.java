@@ -22,13 +22,18 @@ public class EagerLoadingInvocationHandler implements InvocationHandler {
     /**
      * Constructor.
      * 
+     * @apiNote It is recommended that the {@link CacheStrategy} implementation only holds
+     * weak references to the {@link Method} key in order to avoid leaks and class 
+     * unloading issues.
+     * 
      * @param decorated The decorated {@link InvocationHandler} instance.
      * @param externalizedProperties The externalized properties instance.
      * @param proxyInterface The proxy interface whose methods are annotated with
      * {@link ExternalizedProperty} annotations.
      * @param cacheStrategy The cache strategy keyed by a {@link Method} and whose values
-     * are the eagerly resolved properties. This cache strategy should weakly hold on to the 
-     * {@link Method} key in order to avoid leaks and class unloading issues. 
+     * are the eagerly resolved properties. It is recommended that the {@link CacheStrategy} 
+     * implementation only holds weak references to the {@link Method} key in order to avoid
+     * leaks and class unloading issues.
      */
     public EagerLoadingInvocationHandler(
             InvocationHandler decorated,

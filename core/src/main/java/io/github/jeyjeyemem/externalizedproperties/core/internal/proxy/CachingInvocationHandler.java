@@ -19,10 +19,15 @@ public class CachingInvocationHandler implements InvocationHandler {
     /**
      * Constructor.
      * 
+     * @apiNote It is recommended that the {@link CacheStrategy} implementation only holds
+     * weak references to the {@link Method} key in order to avoid leaks and class 
+     * unloading issues.
+     * 
      * @param decorated The decorated {@link InvocationHandler} instance.
      * @param cacheStrategy The cache strategy keyed by a {@link Method} and whose values
-     * are the resolved properties. This cache strategy should weakly hold on to the 
-     * {@link Method} key in order to avoid leaks and class unloading issues. 
+     * are the resolved properties. It is recommended that the {@link CacheStrategy} 
+     * implementation only holds weak references to the {@link Method} key in order to avoid
+     * leaks and class unloading issues.
      */
     public CachingInvocationHandler(
             InvocationHandler decorated,

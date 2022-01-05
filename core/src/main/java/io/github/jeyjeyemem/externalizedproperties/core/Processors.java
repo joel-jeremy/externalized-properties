@@ -19,6 +19,11 @@ public class Processors {
 
     private final List<Class<? extends Processor>> processorClasses;
 
+    /**
+     * Constructor.
+     * 
+     * @param processorClasses The processor classes.
+     */
     private Processors(
             List<Class<? extends Processor>> processorClasses
     ) {

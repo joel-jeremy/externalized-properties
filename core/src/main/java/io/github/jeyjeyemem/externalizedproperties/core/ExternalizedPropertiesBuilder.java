@@ -264,9 +264,9 @@ public class ExternalizedPropertiesBuilder {
 
         if (withProxyInvocationCaching) {
             // Decorate with CachingInvocationHandler.
-            factory = factory.compose((baseHandler, externalizedProperties, proxyInterface) -> 
+            factory = factory.compose((baseFactory, externalizedProperties, proxyInterface) -> 
                 new CachingInvocationHandler(
-                    baseHandler,
+                    baseFactory.createInvocationHandler(externalizedProperties, proxyInterface),
                     new ExpiringCacheStrategy<>(
                         new WeakConcurrentMapCacheStrategy<>(),
                         cacheDuration
@@ -276,9 +276,9 @@ public class ExternalizedPropertiesBuilder {
             
         if (withProxyEagerLoading) {
             // Decorate with EagerLoadingInvocationHandler.
-            factory = factory.compose((baseHandler, externalizedProperties, proxyInterface) -> 
+            factory = factory.compose((baseFactory, externalizedProperties, proxyInterface) -> 
                 new EagerLoadingInvocationHandler(
-                    baseHandler,
+                    baseFactory.createInvocationHandler(externalizedProperties, proxyInterface),
                     externalizedProperties,
                     proxyInterface,
                     new ExpiringCacheStrategy<>(

@@ -27,6 +27,13 @@ public class ResolverResult {
     private final Map<String, String> resolvedPropertiesByName;
     private final Set<String> unresolvedPropertyNames;
     
+    /**
+     * Constructor.
+     * 
+     * @param requestedPropertyNames The requested property names.
+     * @param resolvedPropertiesByName The map of resolved properties keyed by 
+     * property names.
+     */
     private ResolverResult(
             Collection<String> requestedPropertyNames,
             Map<String, String> resolvedPropertiesByName
@@ -41,7 +48,7 @@ public class ResolverResult {
         );
     }
 
-    /** For {@link #EMPTY} */
+    /** For {@link ResolverResult#EMPTY} */
     private ResolverResult() {
         this.resolvedPropertiesByName = Collections.emptyMap();
         this.unresolvedPropertyNames = Collections.emptySet();
@@ -170,12 +177,17 @@ public class ResolverResult {
     }
 
     /**
-     * {@link ResolverResult} builder.
+     * The {@link ResolverResult} builder.
      */
     public static class Builder {
         private final Collection<String> requestedPropertyNames;
         private final Map<String, String> resolvedPropertiesByName;
 
+        /**
+         * Constructor.
+         * 
+         * @param requestedPropertyNames The requested property names.
+         */
         private Builder(Collection<String> requestedPropertyNames) {
             this.requestedPropertyNames = requireNonNullOrEmptyCollection(
                 requestedPropertyNames, 

@@ -21,15 +21,16 @@ public interface InvocationHandlerFactory {
     );
 
     /**
-     * Compose an {@link InvocationHandler} based from the result of this factory.
+     * Compose an {@link InvocationHandler} based from this factory.
      * 
-     * @param compose The compose function.
-     * @return The composed invocation handler factory.
+     * @param composeFunction The compose function.
+     * @return A new invocation handler factory that creates an invocation handler 
+     * instance based from this invocation handler factory.
      */
-    default InvocationHandlerFactory compose(ComposeFunction compose) {
+    default InvocationHandlerFactory compose(ComposeFunction composeFunction) {
         return (externalizedProperties, proxyInterface) -> 
-            compose.compose(
-                createInvocationHandler(externalizedProperties, proxyInterface), 
+            composeFunction.compose(
+                this, 
                 externalizedProperties, 
                 proxyInterface
             );
@@ -43,13 +44,13 @@ public interface InvocationHandlerFactory {
          * Create an {@link InvocationHandler} based from the result of another 
          * invocation handler factory. 
          * 
-         * @param toDecorate The invocation handler to build from.
+         * @param before The invocation handler factory to build from.
          * @param externalizedProperties The externalized properties.
          * @param proxyInterface The proxy interface.
          * @return The {@link InvocationHandler} for the specified proxy interface.
          */
         InvocationHandler compose(
-            InvocationHandler toDecorate, 
+            InvocationHandlerFactory before, 
             ExternalizedProperties externalizedProperties,
             Class<?> proxyInterface
         );
