@@ -14,10 +14,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InternalConverterTests {
     @Nested
@@ -90,7 +93,7 @@ public class InternalConverterTests {
             );
 
             assertNotNull(convertedValue);
-            assertEquals(Integer.class, convertedValue.getClass());
+            assertTrue(convertedValue instanceof Integer);
             assertEquals(1, convertedValue);
         }
 
@@ -156,6 +159,62 @@ public class InternalConverterTests {
                     "1"
                 ))
             );
+        }
+
+        @Test
+        @DisplayName(
+            "should skip to next conversion handler when skip result is returned."
+        )
+        public void test6() throws InterruptedException {
+            ConversionHandler<?> handler1 = new ConversionHandler<Object>() {
+                @Override
+                public boolean canConvertTo(Class<?> targetType) {
+                    return true;
+                }
+
+                @Override
+                public ConversionResult<Object> convert(ConversionContext context) {
+                    // Skipped.
+                    return ConversionResult.skip();
+                }
+            };
+
+            CountDownLatch handler2Latch = new CountDownLatch(1);
+
+            ConversionHandler<?> handler2 = new ConversionHandler<Object>() {
+                @Override
+                public boolean canConvertTo(Class<?> targetType) {
+                    return true;
+                }
+
+                @Override
+                public ConversionResult<Object> convert(ConversionContext context) {
+                    handler2Latch.countDown();
+                    return ConversionResult.of(Integer.parseInt(context.value()));
+                }
+            };
+            
+            InternalConverter converter = converter(
+                handler1,
+                handler2
+            );
+
+            StubProxyMethodInfo proxyMethodInfo = 
+                StubProxyMethodInfo.fromMethod(
+                    PrimitiveProxyInterface.class,
+                    "intPrimitiveProperty"
+                );
+
+            Object convertedValue = converter.convert(new ConversionContext(
+                converter,
+                proxyMethodInfo,
+                "1"
+            ));
+
+            assertTrue(handler2Latch.await(1, TimeUnit.MINUTES));
+            assertNotNull(convertedValue);
+            assertTrue(convertedValue instanceof Integer);
+            assertEquals(1, convertedValue);
         }
 
         private InternalConverter converter(
