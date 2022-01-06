@@ -95,8 +95,8 @@ private ExternalizedProperties buildExternalizedProperties() {
     ExternalizedProperties externalizedProperties = ExternalizedPropertiesBuilder.newBuilder()
         .withDefaultResolvers() 
         .resolvers( 
-            new AwsSsmResolver(ssmClient),
-            new DatabaseResolver(entityManagerFactory)
+            new AwsSsmResolver(getAwsSsmClient()),
+            new DatabaseResolver(getEntityManagerFactory())
         ) 
         .build();
     
@@ -113,8 +113,8 @@ public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = buildExternalizedProperties();
 
     // Direct resolution via ExternalizedProperties API.
-    Optional<String> databaseUrl = externalizedProperties.resolveProperty("database.url");
-    Optional<String> databaseDriver = externalizedProperties.resolveProperty("database.url");
+    Optional<String> databaseUrl = externalizedProperties.resolveProperty("DATABASE_URL");
+    Optional<String> databaseDriver = externalizedProperties.resolveProperty("DATABASE_DRIVER");
 
     // Use property:
     System.out.println("Database URL: " + databaseUrl.get());
@@ -124,7 +124,7 @@ public static void main(String[] args) {
 
 ### Property Conversion
 
-Externalized Properties has powerful support for conversion of properties to various types. There are several build-in conversion handlers but anyone is free to create a custom conversion handler by implementing the `ConversionHandler` interface.
+Externalized Properties has powerful support for conversion of properties to various types. There are several build-in conversion handlers but developers are free to create a custom conversion handler by implementing the `ConversionHandler` interface.
 
 To register conversion handlers to the library, it must be done through the builder:
 
@@ -170,7 +170,8 @@ public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = buildExternalizedProperties();
 
     // Use properties.
-    Optional<Integer> numberOfThreads = externalizedProperties.resolveProperty("number-of-threads", int.class);
+    Optional<Integer> numberOfThreads = externalizedProperties.resolveProperty("number-of-threads", Integer.class);
+    // TypeReference class can be used to specify generic target types.
     Optional<List<Integer>> validNumbers = externalizedProperties.resolveProperty(
         "valid-numbers", 
         new TypeReference<List<Integer>>(){}
@@ -197,8 +198,10 @@ Externalized Properties provides enough information to conversion handlers for t
 An arbitraty generic type parameter depth is supported. For example,
 
 ```java
-@ExternalizedProperty("list-of-numbers")
-List<Optional<Integer>> listOfOptionalNumbers();
+public interface ApplicationProperties {
+    @ExternalizedProperty("list-of-numbers")
+    List<Optional<Integer>> listOfOptionalNumbers();
+}
 ````
 
 Conversion handlers should be able to extract the generic type information from the conversion context and convert each item to an `Optional<Integer>`.
