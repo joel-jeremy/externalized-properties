@@ -35,8 +35,8 @@ public class ProcessorRegistry {
                 }
                 throw new IllegalArgumentException(
                     "No processor registered for processor class: " + 
-                    processorClass + ". Please make sure processor is registered " + 
-                    "while building ExternalizedProperties." 
+                    processorClass.getName() + ". Please make sure processor is " + 
+                    "registered while building ExternalizedProperties." 
                 );
             }
         };
@@ -67,9 +67,7 @@ public class ProcessorRegistry {
         );
 
         for (Class<?> processorClass : processorClasses) {
-            Processor processor = 
-                processorClassValue.get(processorClass);
-            found.add(processor);
+            found.add(processorClassValue.get(processorClass));
         }
 
         return found;
