@@ -15,7 +15,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 /**
  * Caching strategy which uses a {@link ConcurrentMap} as cache and whose keys are weakly held.
  */
-public class WeakConcurrentMapCacheStrategy<K, V> implements CacheStrategy<K, V> {
+public class WeakConcurrentHashMapCacheStrategy<K, V> implements CacheStrategy<K, V> {
 
     private final ReferenceQueue<K> referenceQueue = new ReferenceQueue<>();
     private final ConcurrentMap<WeakKey<K>, V> cache;
@@ -24,14 +24,14 @@ public class WeakConcurrentMapCacheStrategy<K, V> implements CacheStrategy<K, V>
      * Default constructor for building a cache strategy that uses an 
      * internal {@link ConcurrentHashMap} cache.
      */
-    public WeakConcurrentMapCacheStrategy() {
+    public WeakConcurrentHashMapCacheStrategy() {
         this(new ConcurrentHashMap<>());
     }
 
     /**
      * Package-private constructor.
      */
-    WeakConcurrentMapCacheStrategy(ConcurrentMap<WeakKey<K>, V> cache) {
+    WeakConcurrentHashMapCacheStrategy(ConcurrentMap<WeakKey<K>, V> cache) {
         this.cache = requireNonNull(cache, "cache");
     }
 

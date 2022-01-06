@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,14 +15,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Nested
-public class ConcurrentMapCacheStrategyTests {
+public class ConcurrentHashMapCacheStrategyTests {
     @Nested
     class Constructor {
         @Test
         @DisplayName("should not throw when invoking default constructor")
         public void test1() {
             assertDoesNotThrow(
-                () -> new ConcurrentMapCacheStrategy<>()
+                () -> new ConcurrentHashMapCacheStrategy<>()
             );
         }
 
@@ -33,7 +31,7 @@ public class ConcurrentMapCacheStrategyTests {
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new ConcurrentMapCacheStrategy<>(null)
+                () -> new ConcurrentHashMapCacheStrategy<>(null)
             );
         }
     }
@@ -46,15 +44,14 @@ public class ConcurrentMapCacheStrategyTests {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
-            ConcurrentMap<String, String> cache = new ConcurrentHashMap<>();
             CacheStrategy<String, String> cacheStrategy = 
-                new ConcurrentMapCacheStrategy<>(cache);
+                new ConcurrentHashMapCacheStrategy<>();
     
             cacheStrategy.cache(cacheKey, cacheValue);
     
             assertEquals(
                 cacheValue, 
-                cache.get(cacheKey)
+                cacheStrategy.get(cacheKey).get()
             );
         }
     }
@@ -66,12 +63,11 @@ public class ConcurrentMapCacheStrategyTests {
         public void test1() {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
-    
-            ConcurrentMap<String, String> cache = new ConcurrentHashMap<>();
-            cache.put(cacheKey, cacheValue);
-    
+            
             CacheStrategy<String, String> cacheStrategy = 
-                new ConcurrentMapCacheStrategy<>(cache);
+                new ConcurrentHashMapCacheStrategy<>();
+            
+            cacheStrategy.cache(cacheKey, cacheValue);
     
             Optional<String> cachedPropertyValue = 
                 cacheStrategy.get(cacheKey);
@@ -88,10 +84,9 @@ public class ConcurrentMapCacheStrategyTests {
         public void test2() {
             String cacheKey = "cache.key";
     
-            ConcurrentMap<String, String> empty = new ConcurrentHashMap<>();
-    
+            // Empty cache.
             CacheStrategy<String, String> cacheStrategy = 
-                new ConcurrentMapCacheStrategy<>(empty);
+                new ConcurrentHashMapCacheStrategy<>();
     
             Optional<String> cachedPropertyValue = 
                 cacheStrategy.get(cacheKey);
@@ -108,16 +103,18 @@ public class ConcurrentMapCacheStrategyTests {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
-            ConcurrentMap<String, String> cache = new ConcurrentHashMap<>();
-            cache.put(cacheKey, cacheValue);
-    
             CacheStrategy<String, String> cacheStrategy = 
-                new ConcurrentMapCacheStrategy<>(cache);
+                new ConcurrentHashMapCacheStrategy<>();
+
+            // Cache and assert.
+            cacheStrategy.cache(cacheKey, cacheValue);
+            assertTrue(cacheStrategy.get(cacheKey).isPresent());
     
+            // Expire all cached items.
             cacheStrategy.expire(cacheKey);
     
             // Deleted from cache map.
-            assertFalse(cache.containsKey(cacheKey));
+            assertFalse(cacheStrategy.get(cacheKey).isPresent());
         }
     }
 
@@ -126,19 +123,30 @@ public class ConcurrentMapCacheStrategyTests {
         @Test
         @DisplayName("should expire all cached values from the cache map")
         public void test1() {
-            String cacheKey = "cache.key";
-            String cacheValue = "property.value";
-    
-            ConcurrentMap<String, String> cache = new ConcurrentHashMap<>();
-            cache.put(cacheKey, cacheValue);
-    
+            String cacheKey1 = "cache.key.1";
+            String cacheValue1 = "property.value.1";
+            String cacheKey2 = "cache.key.2";
+            String cacheValue2 = "property.value.2";
+            String cacheKey3 = "cache.key.3";
+            String cacheValue3 = "property.value.3";
+            
             CacheStrategy<String, String> cacheStrategy = 
-                new ConcurrentMapCacheStrategy<>(cache);
+                new ConcurrentHashMapCacheStrategy<>();
+            
+            // Cache and assert.
+            cacheStrategy.cache(cacheKey1, cacheValue1);
+            cacheStrategy.cache(cacheKey2, cacheValue2);
+            cacheStrategy.cache(cacheKey3, cacheValue3);
+            assertTrue(cacheStrategy.get(cacheKey1).isPresent());
+            assertTrue(cacheStrategy.get(cacheKey2).isPresent());
+            assertTrue(cacheStrategy.get(cacheKey3).isPresent());
     
+            // Expire all cached items.
             cacheStrategy.expireAll();
     
-            // All items deleted from cache map.
-            assertTrue(cache.isEmpty());
+            assertFalse(cacheStrategy.get(cacheKey1).isPresent());
+            assertFalse(cacheStrategy.get(cacheKey2).isPresent());
+            assertFalse(cacheStrategy.get(cacheKey3).isPresent());
         }
     }
 }

@@ -11,7 +11,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 /**
  * Caching strategy which uses a {@link ConcurrentHashMap} as cache.
  */
-public class ConcurrentMapCacheStrategy<K, V> implements CacheStrategy<K, V> {
+public class ConcurrentHashMapCacheStrategy<K, V> implements CacheStrategy<K, V> {
 
     private final ConcurrentMap<K, V> cache;
 
@@ -19,7 +19,7 @@ public class ConcurrentMapCacheStrategy<K, V> implements CacheStrategy<K, V> {
      * Default constructor for building a cache strategy that uses an 
      * internal {@link ConcurrentHashMap} cache.
      */
-    public ConcurrentMapCacheStrategy() {
+    public ConcurrentHashMapCacheStrategy() {
         this(new ConcurrentHashMap<>());
     }
 
@@ -29,7 +29,7 @@ public class ConcurrentMapCacheStrategy<K, V> implements CacheStrategy<K, V> {
      * 
      * @param cache The cache map.
      */
-    ConcurrentMapCacheStrategy(ConcurrentMap<K, V> cache) {
+    ConcurrentHashMapCacheStrategy(ConcurrentMap<K, V> cache) {
         this.cache = requireNonNull(cache, "cache");
     }
 

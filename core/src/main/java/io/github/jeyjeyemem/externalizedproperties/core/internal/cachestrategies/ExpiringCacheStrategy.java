@@ -13,7 +13,9 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 
 /**
  * A {@link CacheStrategy} decorator that automatically expires cached
- * items after the given cache item lifetime duration.
+ * items after the given cache item lifetime duration. This expires individual
+ * cache items instead of the whole cache and the expiry timer for a cache item
+ * starts on {@link ExpiringCacheStrategy#cache(Object, Object)} method invocation.
  */
 public class ExpiringCacheStrategy<K, V> implements CacheStrategy<K, V> {
 

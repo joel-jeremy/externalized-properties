@@ -7,9 +7,9 @@ import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.Defa
 import io.github.jeyjeyemem.externalizedproperties.core.internal.CachingExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalVariableExpander;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ConcurrentMapCacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ConcurrentHashMapCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ExpiringCacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.WeakConcurrentMapCacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.processing.ProcessorRegistry;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.CachingInvocationHandler;
@@ -233,11 +233,11 @@ public class ExternalizedPropertiesBuilder {
             return new CachingExternalizedProperties(
                 externalizedProperties,
                 new ExpiringCacheStrategy<>(
-                    new ConcurrentMapCacheStrategy<>(),
+                    new ConcurrentHashMapCacheStrategy<>(),
                     cacheDuration
                 ),
                 new ExpiringCacheStrategy<>(
-                    new ConcurrentMapCacheStrategy<>(),
+                    new ConcurrentHashMapCacheStrategy<>(),
                     cacheDuration
                 )
             );
@@ -268,7 +268,7 @@ public class ExternalizedPropertiesBuilder {
                 new CachingInvocationHandler(
                     baseFactory.createInvocationHandler(externalizedProperties, proxyInterface),
                     new ExpiringCacheStrategy<>(
-                        new WeakConcurrentMapCacheStrategy<>(),
+                        new WeakConcurrentHashMapCacheStrategy<>(),
                         cacheDuration
                     )
                 ));
@@ -282,7 +282,7 @@ public class ExternalizedPropertiesBuilder {
                     externalizedProperties,
                     proxyInterface,
                     new ExpiringCacheStrategy<>(
-                        new WeakConcurrentMapCacheStrategy<>(),
+                        new WeakConcurrentHashMapCacheStrategy<>(),
                         cacheDuration
                     )
                 ));

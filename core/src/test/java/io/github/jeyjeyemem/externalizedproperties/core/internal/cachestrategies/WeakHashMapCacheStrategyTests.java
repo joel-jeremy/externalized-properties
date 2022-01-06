@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.WeakHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,6 +40,44 @@ public class WeakHashMapCacheStrategyTests {
     }
 
     @Nested
+    class WeakKeyReference {
+        @Test
+        @DisplayName("should automatically remove cache key when weak references are cleared")
+        public void test1() throws InterruptedException {
+            CacheKey cacheKey1 = new CacheKey("cache.key.1");
+            CacheKey cacheKey2 = new CacheKey("cache.key.2");
+    
+            CacheStrategy<CacheKey, String> cacheStrategy = 
+                new WeakHashMapCacheStrategy<>();
+    
+            // Cache and assert.
+            cacheStrategy.cache(cacheKey1, "cache.value.1");
+            cacheStrategy.cache(cacheKey2, "cache.value.2");
+            assertTrue(cacheStrategy.get(cacheKey1).isPresent());
+            assertTrue(cacheStrategy.get(cacheKey2).isPresent());
+
+            // Clear references.
+            cacheKey1 = null;
+            cacheKey2 = null;
+
+            // Original key references were null so they can be cleared/collected.
+            CacheKey cacheKey1Copy = new CacheKey("cache.key.1");
+            CacheKey cacheKey2Copy = new CacheKey("cache.key.2");
+
+            assertTimeoutPreemptively(Duration.ofSeconds(86400), () -> {
+                // Wait for GC to clear references.
+                while (cacheStrategy.get(cacheKey1Copy).isPresent() ||
+                        cacheStrategy.get(cacheKey1Copy).isPresent()) {
+                    System.gc();
+                }
+            });
+            
+            assertFalse(cacheStrategy.get(cacheKey1Copy).isPresent());
+            assertFalse(cacheStrategy.get(cacheKey2Copy).isPresent());
+        }
+    }
+
+    @Nested
     class CacheMethod {
         @Test
         @DisplayName("should cache value to the cache map")
@@ -47,49 +85,15 @@ public class WeakHashMapCacheStrategyTests {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
-            WeakHashMap<String, String> cache = new WeakHashMap<>();
             CacheStrategy<String, String> cacheStrategy = 
-                new WeakHashMapCacheStrategy<>(cache);
+                new WeakHashMapCacheStrategy<>();
     
             cacheStrategy.cache(cacheKey, cacheValue);
     
             assertEquals(
                 cacheValue, 
-                cache.get(cacheKey)
+                cacheStrategy.get(cacheKey).get()
             );
-        }
-
-        @Test
-        @DisplayName("should automatically remove cache key when weak references are cleared")
-        public void test2() throws InterruptedException {
-            // Use String constructor to explicitly create
-            // new String instance and prevent string interning.
-            // This allows GC to clear this reference when set to null.
-            String cacheKey1 = new String("cache.key.1");
-            String cacheKey2 = new String("cache.key.2");
-    
-            WeakHashMap<String, String> cache = new WeakHashMap<>();
-            CacheStrategy<String, String> cacheStrategy = 
-                new WeakHashMapCacheStrategy<>(cache);
-    
-            cacheStrategy.cache(cacheKey1, "cache.value.1");
-            cacheStrategy.cache(cacheKey2, "cache.value.2");
-
-            assertTrue(cache.containsKey(cacheKey1));
-            assertTrue(cache.containsKey(cacheKey2));
-
-            // Clear references.
-            cacheKey1 = null;
-            cacheKey2 = null;
-
-            assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-                // Wait for GC to clear references.
-                while (!cache.isEmpty()) {
-                    System.gc();
-                }
-            });
-            
-            assertTrue(cache.isEmpty());
         }
     }
 
@@ -101,11 +105,10 @@ public class WeakHashMapCacheStrategyTests {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
-            WeakHashMap<String, String> cache = new WeakHashMap<>();
-            cache.put(cacheKey, cacheValue);
-    
             CacheStrategy<String, String> cacheStrategy = 
-                new WeakHashMapCacheStrategy<>(cache);
+                new WeakHashMapCacheStrategy<>();
+
+            cacheStrategy.cache(cacheKey, cacheValue);
     
             Optional<String> cachedPropertyValue = 
                 cacheStrategy.get(cacheKey);
@@ -121,11 +124,10 @@ public class WeakHashMapCacheStrategyTests {
         @DisplayName("should return empty Optional when key is not found in cache map")
         public void test2() {
             String cacheKey = "cache.key";
-    
-            WeakHashMap<String, String> empty = new WeakHashMap<>();
-    
+            
+            // Empty cache.
             CacheStrategy<String, String> cacheStrategy = 
-                new WeakHashMapCacheStrategy<>(empty);
+                new WeakHashMapCacheStrategy<>();
     
             Optional<String> cachedPropertyValue = 
                 cacheStrategy.get(cacheKey);
@@ -142,16 +144,18 @@ public class WeakHashMapCacheStrategyTests {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
-            WeakHashMap<String, String> cache = new WeakHashMap<>();
-            cache.put(cacheKey, cacheValue);
-    
             CacheStrategy<String, String> cacheStrategy = 
-                new WeakHashMapCacheStrategy<>(cache);
+                new WeakHashMapCacheStrategy<>();
+            
+            // Cache and assert.
+            cacheStrategy.cache(cacheKey, cacheValue);
+            assertTrue(cacheStrategy.get(cacheKey).isPresent());
     
+            // Expire the cache key.
             cacheStrategy.expire(cacheKey);
     
             // Deleted from cache map.
-            assertFalse(cache.containsKey(cacheKey));
+            assertFalse(cacheStrategy.get(cacheKey).isPresent());
         }
     }
 
@@ -160,19 +164,61 @@ public class WeakHashMapCacheStrategyTests {
         @Test
         @DisplayName("should expire all cached values from the cache map")
         public void test1() {
-            String cacheKey = "cache.key";
-            String cacheValue = "property.value";
-    
-            WeakHashMap<String, String> cache = new WeakHashMap<>();
-            cache.put(cacheKey, cacheValue);
-    
+            String cacheKey1 = "cache.key.1";
+            String cacheValue1 = "property.value.1";
+            String cacheKey2 = "cache.key.2";
+            String cacheValue2 = "property.value.2";
+            String cacheKey3 = "cache.key.3";
+            String cacheValue3 = "property.value.3";
+
             CacheStrategy<String, String> cacheStrategy = 
-                new WeakHashMapCacheStrategy<>(cache);
+                new WeakHashMapCacheStrategy<>();
+
+            // Cache and assert.
+            cacheStrategy.cache(cacheKey1, cacheValue1);
+            cacheStrategy.cache(cacheKey2, cacheValue2);
+            cacheStrategy.cache(cacheKey3, cacheValue3);
+            assertTrue(cacheStrategy.get(cacheKey1).isPresent());
+            assertTrue(cacheStrategy.get(cacheKey2).isPresent());
+            assertTrue(cacheStrategy.get(cacheKey3).isPresent());
     
+            // Expire all cached items.
             cacheStrategy.expireAll();
     
-            // All items deleted from cache map.
-            assertTrue(cache.isEmpty());
+            assertFalse(cacheStrategy.get(cacheKey1).isPresent());
+            assertFalse(cacheStrategy.get(cacheKey2).isPresent());
+            assertFalse(cacheStrategy.get(cacheKey3).isPresent());
+        }
+    }
+
+    public static class CacheKey {
+        private final String key;
+        
+        public CacheKey(String key) {
+            this.key = key;
+        }
+
+        public String key() {
+            return key;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+
+            if (obj instanceof CacheKey) {
+                CacheKey other = (CacheKey)obj;
+                return Objects.equals(other.key, key);
+            }
+
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(key);
         }
     }
 }
