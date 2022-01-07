@@ -40,64 +40,55 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
     @Override
     public ConversionResult<Object[]> convert(ConversionContext context) {
         requireNonNull(context, "context");
+        
+        // Do not allow T[].
+        throwIfArrayHasTypeVariables(context);
 
-        try {    
-            // Do not allow T[].
-            throwIfArrayHasTypeVariables(context);
+        Class<?> rawTargetType = context.rawTargetType();
+        String propertyValue = context.value();
+        if (propertyValue.isEmpty()) {
+            return ConversionResult.of(newArray(rawTargetType, 0));
+        }
 
-            String propertyValue = context.value();
-            if (propertyValue.isEmpty()) {
-                return ConversionResult.of(new String[0]);
-            }
+        final String[] values = getValues(context);
 
-            final String[] values = getValues(context);
+        Class<?> rawArrayComponentType = rawTargetType.getComponentType();
+        if (rawArrayComponentType == null) {
+            // Not an array.
+            return ConversionResult.skip();
+        }
+        
+        // If array is String[] or Object[], return the string values.
+        if (String.class.equals(rawArrayComponentType) || 
+                Object.class.equals(rawArrayComponentType)) {
+            return ConversionResult.of(values);
+        }
 
-            Class<?> rawArrayComponentType = context.rawTargetType().getComponentType();
-            if (rawArrayComponentType == null) {
-                // Not an array.
-                return ConversionResult.skip();
-            }
-            
-            // If array is String[] or Object[], return the string values.
-            if (String.class.equals(rawArrayComponentType) || 
-                    Object.class.equals(rawArrayComponentType)) {
-                return ConversionResult.of(values);
-            }
-
-            // Generic array component type handling e.g. Optional<String>[]
-            GenericArrayType genericArrayType = TypeUtilities.asGenericArrayType(
-                context.targetType()
-            );
-            
-            if (genericArrayType != null) {
-                Type genericArrayComponentType = genericArrayType.getGenericComponentType();
-            
-                return ConversionResult.of(
-                    convertValuesToArrayComponentType(
-                        context,
-                        values,
-                        genericArrayComponentType
-                    )
-                );
-            }
-
-            // Just convert to raw type.
+        // Generic array component type handling e.g. Optional<String>[]
+        GenericArrayType genericArrayType = TypeUtilities.asGenericArrayType(
+            context.targetType()
+        );
+        
+        if (genericArrayType != null) {
+            Type genericArrayComponentType = genericArrayType.getGenericComponentType();
+        
             return ConversionResult.of(
                 convertValuesToArrayComponentType(
                     context,
                     values,
-                    rawArrayComponentType
+                    genericArrayComponentType
                 )
             );
-        } catch (Exception ex) {
-            throw new ConversionException(
-                String.format(
-                    "Failed to convert value to an array: %s",
-                    context.value()
-                ),  
-                ex
-            );
         }
+
+        // Just convert to raw type.
+        return ConversionResult.of(
+            convertValuesToArrayComponentType(
+                context,
+                values,
+                rawArrayComponentType
+            )
+        );
     }
 
     private Object[] convertValuesToArrayComponentType(
@@ -105,7 +96,7 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
             String[] values,
             Type arrayComponentType
     ) {
-        Object[] convertedArray = (Object[])Array.newInstance(
+        Object[] convertedArray = newArray(
             TypeUtilities.getRawType(arrayComponentType), 
             values.length
         );
@@ -117,6 +108,13 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
         }
 
         return convertedArray;
+    }
+
+    private Object[] newArray(Class<?> arrayComponentType, int length) {
+        return (Object[])Array.newInstance(
+            arrayComponentType, 
+            length
+        );
     }
 
     private String[] getValues(ConversionContext context) {

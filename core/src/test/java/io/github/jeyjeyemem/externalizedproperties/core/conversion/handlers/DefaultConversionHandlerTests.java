@@ -210,8 +210,8 @@ public class DefaultConversionHandlerTests {
                 "2"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
 
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -259,8 +259,8 @@ public class DefaultConversionHandlerTests {
                 "2"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -308,8 +308,8 @@ public class DefaultConversionHandlerTests {
                 "2.0"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -357,8 +357,8 @@ public class DefaultConversionHandlerTests {
                 "2.0"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -406,8 +406,8 @@ public class DefaultConversionHandlerTests {
                 "2"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -455,8 +455,8 @@ public class DefaultConversionHandlerTests {
                 "false"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -504,8 +504,8 @@ public class DefaultConversionHandlerTests {
                 "2"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -553,8 +553,8 @@ public class DefaultConversionHandlerTests {
                 "c,b,a"
             );
 
-            ConversionResult<Object> listResult = handler.convert(listContext);
-            ConversionResult<Object> collectionResult = handler.convert(collectionContext);
+            ConversionResult<?> listResult = handler.convert(listContext);
+            ConversionResult<?> collectionResult = handler.convert(collectionContext);
             
             assertNotNull(listResult);
             assertNotNull(collectionResult);
@@ -596,7 +596,7 @@ public class DefaultConversionHandlerTests {
                 "a,b,c"
             );
             
-            ConversionResult<Object> arrayResult = handler.convert(context);
+            ConversionResult<?> arrayResult = handler.convert(context);
 
             assertNotNull(arrayResult);
             Object arrayValue = arrayResult.value();
@@ -628,7 +628,7 @@ public class DefaultConversionHandlerTests {
                 "optional-value"
             );
             
-            ConversionResult<Object> optionalResult = handler.convert(context);
+            ConversionResult<?> optionalResult = handler.convert(context);
             assertNotNull(optionalResult);
             Object optionalValue = optionalResult.value();
             

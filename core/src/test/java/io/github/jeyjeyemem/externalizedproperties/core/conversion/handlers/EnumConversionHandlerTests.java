@@ -1,15 +1,15 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.EnumProxyInterface;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ListProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.EnumProxyInterface.TestEnum;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -118,8 +118,8 @@ public class EnumConversionHandlerTests {
 
             ProxyMethodInfo proxyMethodInfo = 
                 StubProxyMethodInfo.fromMethod(
-                    ListProxyInterface.class,
-                    "listProperty"
+                    PrimitiveProxyInterface.class,
+                    "intPrimitiveProperty"
                 );
             
             Converter converter = new InternalConverter(handler);
@@ -127,7 +127,65 @@ public class EnumConversionHandlerTests {
             ConversionContext context = new ConversionContext(
                 converter,
                 proxyMethodInfo,
-                "1,2,3"
+                "1"
+            );
+            
+            ConversionResult<?> result = handler.convert(context);
+            assertEquals(ConversionResult.skip(), result);
+        }
+
+        /**
+         * Non-proxy tests.
+         */
+        @Test
+        @DisplayName("should convert resolved property to enum.")
+        public void nonProxyTest1() {
+            EnumConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                TestEnum.class,
+                TestEnum.ONE.name()
+            );
+
+            ConversionResult<Enum<?>> result = handler.convert(context);
+            assertNotNull(result);
+
+            Enum<?> testEnum = result.value();
+            assertEquals(TestEnum.ONE, testEnum);
+        }
+
+        @Test
+        @DisplayName("should throw when property value is not a valid enum value.")
+        public void nonProxyTest2() {
+            EnumConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                TestEnum.class,
+                "INVALID_ENUM_VALUE"
+            );
+
+            assertThrows(ConversionException.class, () -> {
+                handler.convert(context);
+            });
+        }
+
+        @Test
+        @DisplayName("should return skipped result when target type is not an enum.")
+        public void nonProxyTest3() {
+            EnumConversionHandler handler = handlerToTest();
+            
+            Converter converter = new InternalConverter(handler);
+
+            ConversionContext context = new ConversionContext(
+                converter,
+                Integer.class,
+                "1"
             );
             
             ConversionResult<?> result = handler.convert(context);

@@ -1,9 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionResult;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
@@ -115,7 +114,7 @@ public class PrimitiveConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return skipped result when target type is not a primitive type.")
+        @DisplayName("should return skip result when target type is not a primitive type.")
         public void test2() {
             PrimitiveConversionHandler handler = handlerToTest();
 
@@ -168,8 +167,8 @@ public class PrimitiveConversionHandlerTests {
                 "2"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -217,8 +216,8 @@ public class PrimitiveConversionHandlerTests {
                 "2"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -266,8 +265,8 @@ public class PrimitiveConversionHandlerTests {
                 "2.0"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -315,8 +314,8 @@ public class PrimitiveConversionHandlerTests {
                 "2.0"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -364,8 +363,8 @@ public class PrimitiveConversionHandlerTests {
                 "2"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -413,8 +412,8 @@ public class PrimitiveConversionHandlerTests {
                 "false"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -462,8 +461,8 @@ public class PrimitiveConversionHandlerTests {
                 "invalid_boolean"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -511,8 +510,8 @@ public class PrimitiveConversionHandlerTests {
                 "2"
             );
 
-            ConversionResult<Object> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<Object> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -560,11 +559,11 @@ public class PrimitiveConversionHandlerTests {
                 "invalid_byte"
             );
             
-            assertThrows(ConversionException.class, () -> {
+            assertThrows(NumberFormatException.class, () -> {
                 handler.convert(wrapperContext);
             });
             
-            assertThrows(ConversionException.class, () -> {
+            assertThrows(NumberFormatException.class, () -> {
                 handler.convert(primitiveContext);
             });
         }
@@ -600,11 +599,11 @@ public class PrimitiveConversionHandlerTests {
                 "invalid_short"
             );
             
-            assertThrows(ConversionException.class, () -> {
+            assertThrows(NumberFormatException.class, () -> {
                 handler.convert(wrapperContext);
             });
             
-            assertThrows(ConversionException.class, () -> {
+            assertThrows(NumberFormatException.class, () -> {
                 handler.convert(primitiveContext);
             });
         }
@@ -640,11 +639,11 @@ public class PrimitiveConversionHandlerTests {
                 "invalid_int"
             );
             
-            assertThrows(ConversionException.class, () -> {
+            assertThrows(NumberFormatException.class, () -> {
                 handler.convert(wrapperContext);
             });
             
-            assertThrows(ConversionException.class, () -> {
+            assertThrows(NumberFormatException.class, () -> {
                 handler.convert(primitiveContext);
             });
         }
@@ -680,11 +679,11 @@ public class PrimitiveConversionHandlerTests {
                 "invalid_long"
             );
             
-            assertThrows(ConversionException.class, () -> {
+            assertThrows(NumberFormatException.class, () -> {
                 handler.convert(wrapperContext);
             });
             
-            assertThrows(ConversionException.class, () -> {
+            assertThrows(NumberFormatException.class, () -> {
                 handler.convert(primitiveContext);
             });
         }
@@ -720,11 +719,11 @@ public class PrimitiveConversionHandlerTests {
                 "invalid_float"
             );
             
-            assertThrows(ConversionException.class, () -> {
+            assertThrows(NumberFormatException.class, () -> {
                 handler.convert(wrapperContext);
             });
             
-            assertThrows(ConversionException.class, () -> {
+            assertThrows(NumberFormatException.class, () -> {
                 handler.convert(primitiveContext);
             });
         }
@@ -760,11 +759,11 @@ public class PrimitiveConversionHandlerTests {
                 "invalid_double"
             );
             
-            assertThrows(ConversionException.class, () -> {
+            assertThrows(NumberFormatException.class, () -> {
                 handler.convert(wrapperContext);
             });
             
-            assertThrows(ConversionException.class, () -> {
+            assertThrows(NumberFormatException.class, () -> {
                 handler.convert(primitiveContext);
             });
         }

@@ -27,41 +27,35 @@ public class OptionalConversionHandler implements ConversionHandler<Optional<?>>
     public ConversionResult<Optional<?>> convert(ConversionContext context) {
         requireNonNull(context, "context");
 
-        try {
-            Type[] genericTypeParams = context.targetTypeGenericTypeParameters();
-            
-            // Assume initially as Optional of string type.
-            Type targetOptionalType = String.class;
-            if (genericTypeParams.length > 0) {
-                // Do not allow Optional<T>, Optional<T extends ...>, etc.
-                targetOptionalType = throwIfOptionalHasTypeVariable(genericTypeParams[0]);
-            }
-
-            String value = context.value();
-            Class<?> rawTargetOptionalType = TypeUtilities.getRawType(targetOptionalType);
-
-            // If Optional<String> or Optional<Object>, return String value.
-            if (String.class.equals(rawTargetOptionalType) || 
-                    Object.class.equals(rawTargetOptionalType)) {
-                return ConversionResult.of(Optional.of(value));
-            }
-
-            return ConversionResult.of(
-                convertToOptionalType(
-                    context,
-                    value,
-                    targetOptionalType
-                )
-            );
-        } catch (Exception ex) {
-            throw new ConversionException(String.format(
-                    "Failed to convert value to %s type: %s",
-                    context.rawTargetType(),
-                    context.value()
-                ),  
-                ex
-            );
+        Type[] genericTypeParams = context.targetTypeGenericTypeParameters();
+        
+        // Assume initially as Optional of string type.
+        Type targetOptionalType = String.class;
+        if (genericTypeParams.length > 0) {
+            // Do not allow Optional<T>, Optional<T extends ...>, etc.
+            targetOptionalType = throwIfOptionalHasTypeVariable(genericTypeParams[0]);
         }
+
+        String propertyValue = context.value();
+        if (propertyValue.isEmpty()) {
+            return ConversionResult.of(Optional.empty());
+        }
+
+        Class<?> rawTargetOptionalType = TypeUtilities.getRawType(targetOptionalType);
+
+        // If Optional<String> or Optional<Object>, return String value.
+        if (String.class.equals(rawTargetOptionalType) || 
+                Object.class.equals(rawTargetOptionalType)) {
+            return ConversionResult.of(Optional.of(propertyValue));
+        }
+
+        return ConversionResult.of(
+            convertToOptionalType(
+                context,
+                propertyValue,
+                targetOptionalType
+            )
+        );
     }
 
     private Optional<?> convertToOptionalType(

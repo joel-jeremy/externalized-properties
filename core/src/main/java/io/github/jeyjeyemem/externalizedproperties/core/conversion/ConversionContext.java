@@ -60,7 +60,6 @@ public class ConversionContext {
             ProxyMethodInfo proxyMethodInfo,
             String value
     ) {
-        
         this.converter = requireNonNull(converter, "converter");
         this.proxyMethodInfo = requireNonNull(proxyMethodInfo, "proxyMethodInfo");
         this.value = requireNonNull(value, "value");

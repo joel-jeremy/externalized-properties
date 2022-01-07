@@ -31,5 +31,5 @@ public interface ConversionHandler<T> {
      * invocation).
      * @return The conversion result.
      */
-    ConversionResult<T> convert(ConversionContext context);
+    ConversionResult<? extends T> convert(ConversionContext context);
 }

@@ -63,48 +63,37 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
     public ConversionResult<List<?>> convert(ConversionContext context) {
         requireNonNull(context, "context");
         
-        try {
-            Type[] genericTypeParams = context.targetTypeGenericTypeParameters();
+        Type[] genericTypeParams = context.targetTypeGenericTypeParameters();
 
-            // Assume initially as List of strings.
-            Type targetListType = String.class;
-            if (genericTypeParams.length > 0) {
-                // Do not allow List<T>, List<T extends ...>, etc.
-                targetListType = throwIfListHasTypeVariable(genericTypeParams[0]);
-            }
-
-            String propertyValue = context.value();
-            if (propertyValue.isEmpty()) {
-                return ConversionResult.of(newList(0));
-            }
-
-            final String[] values = getValues(context);
-            
-            Class<?> rawTargetListType = TypeUtilities.getRawType(targetListType);
-
-            // If List<String> or List<Object>, return String values.
-            if (String.class.equals(rawTargetListType) || 
-                    Object.class.equals(rawTargetListType)) {
-                return ConversionResult.of(newList(values));
-            }
-
-            return ConversionResult.of(
-                convertValuesToListType(
-                    context,
-                    values,
-                    targetListType
-                )
-            );
-        } catch (Exception ex) {
-            throw new ConversionException(
-                String.format(
-                    "Failed to convert value to %s type: %s",
-                    context.rawTargetType(),
-                    context.value()
-                ),  
-                ex
-            );
+        // Assume initially as List of strings.
+        Type targetListType = String.class;
+        if (genericTypeParams.length > 0) {
+            // Do not allow List<T>, List<T extends ...>, etc.
+            targetListType = throwIfListHasTypeVariable(genericTypeParams[0]);
         }
+
+        String propertyValue = context.value();
+        if (propertyValue.isEmpty()) {
+            return ConversionResult.of(newList(0));
+        }
+
+        final String[] values = getValues(context);
+        
+        Class<?> rawTargetListType = TypeUtilities.getRawType(targetListType);
+
+        // If List<String> or List<Object>, return String values.
+        if (String.class.equals(rawTargetListType) || 
+                Object.class.equals(rawTargetListType)) {
+            return ConversionResult.of(newList(values));
+        }
+
+        return ConversionResult.of(
+            convertValuesToListType(
+                context,
+                values,
+                targetListType
+            )
+        );
     }
 
     private List<?> convertValuesToListType(

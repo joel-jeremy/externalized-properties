@@ -38,7 +38,7 @@ public class EnumConversionHandler implements ConversionHandler<Enum<?>> {
         }
         
         throw new ConversionException(String.format(
-            "Invalid (%s) value: %s",
+            "Invalid (%s) enum value: %s",
             enumClass.getName(),
             context.value()
         ));

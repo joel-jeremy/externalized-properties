@@ -22,7 +22,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 public class DefaultConversionHandler implements ConversionHandler<Object> {
 
     // private final List<ConversionHandler<?>> defaultConversionHandlers;
-    private final ClassValue<ConversionHandler<Object>> conversionHandlersByTargetType;
+    private final ClassValue<ConversionHandler<?>> conversionHandlersByTargetType;
 
     /**
      * Constructs a {@link DefaultConversionHandler} instance 
@@ -44,15 +44,12 @@ public class DefaultConversionHandler implements ConversionHandler<Object> {
                 new OptionalConversionHandler()
             );
 
-        conversionHandlersByTargetType = new ClassValue<ConversionHandler<Object>>() {
+        conversionHandlersByTargetType = new ClassValue<ConversionHandler<?>>() {
             @Override
-            protected ConversionHandler<Object> computeValue(Class<?> targetType) {
+            protected ConversionHandler<?> computeValue(Class<?> targetType) {
                 for (ConversionHandler<?> conversionHandler : defaultHandlers) {
                     if (conversionHandler.canConvertTo(targetType)) {
-                        @SuppressWarnings("unchecked")
-                        ConversionHandler<Object> casted = 
-                            (ConversionHandler<Object>)conversionHandler;
-                        return casted;
+                        return conversionHandler;
                     }
                 }
                 return null;
@@ -69,11 +66,11 @@ public class DefaultConversionHandler implements ConversionHandler<Object> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<Object> convert(ConversionContext context) {
+    public ConversionResult<?> convert(ConversionContext context) {
         requireNonNull(context, "context");
 
         Class<?> rawTargetType = context.rawTargetType();
-        ConversionHandler<Object> conversionHandler = 
+        ConversionHandler<?> conversionHandler = 
             conversionHandlersByTargetType.get(rawTargetType);
         if (conversionHandler == null) {
             return ConversionResult.skip();
