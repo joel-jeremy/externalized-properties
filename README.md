@@ -52,6 +52,10 @@ module foo.bar {
 }
 ```
 
+## Sample Projects
+
+Sample projects can be found in: <https://github.com/jeyjeyemem/externalized-properties-samples>
+
 ## Features
 
 Externalized Properties makes the best of of Java's strong typing by proxying an interface and using that as a facade to resolve properties.
