@@ -18,7 +18,7 @@ public class SystemPropertyResolverTests {
     @Nested
     class ResolveMethod {
         @Test
-        @DisplayName("should resolve property value from system properties")
+        @DisplayName("should resolve property value from system properties.")
         public void test1() {
             SystemPropertyResolver resolver = resolverToTest();
             Optional<String> result = resolver.resolve("java.version");
@@ -33,7 +33,7 @@ public class SystemPropertyResolverTests {
 
         @Test
         @DisplayName(
-            "should return empty Optional when system property is not found"
+            "should return empty Optional when system property is not found."
         )
         public void test2() {
             SystemPropertyResolver resolver = resolverToTest();
@@ -49,7 +49,7 @@ public class SystemPropertyResolverTests {
     @Nested
     class ResolveMethodWithVarArgsOverload {
         @Test
-        @DisplayName("should resolve values from system properties")
+        @DisplayName("should resolve values from system properties.")
         public void test1() {
             SystemPropertyResolver resolver = resolverToTest();
 
@@ -73,7 +73,7 @@ public class SystemPropertyResolverTests {
 
         @Test
         @DisplayName(
-            "should return result with unresolved properties when system property is not found"
+            "should return result with unresolved properties when system property is not found."
         )
         public void test2() {
             SystemPropertyResolver resolver = resolverToTest();
@@ -101,7 +101,7 @@ public class SystemPropertyResolverTests {
     @Nested
     class ResolveMethodWithCollectionOverload {
         @Test
-        @DisplayName("should resolve values from system properties")
+        @DisplayName("should resolve values from system properties.")
         public void test1() {
             SystemPropertyResolver resolver = resolverToTest();
 
@@ -125,7 +125,7 @@ public class SystemPropertyResolverTests {
 
         @Test
         @DisplayName(
-            "should return result with unresolved properties when system property is not found"
+            "should return result with unresolved properties when system property is not found."
         )
         public void test2() {
             SystemPropertyResolver resolver = resolverToTest();

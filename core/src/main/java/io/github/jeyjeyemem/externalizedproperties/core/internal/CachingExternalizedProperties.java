@@ -155,14 +155,15 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
 
     /** {@inheritDoc} */
     @Override
-    @SuppressWarnings("unchecked")
     public <T> Optional<T> resolveProperty(
             String propertyName, 
             TypeReference<T> targetType
     ) {
         Optional<Optional<?>> cached = resolvedPropertyCacheStrategy.get(propertyName);
         if (cached.isPresent()) {
-            return (Optional<T>)cached.get();
+            @SuppressWarnings("unchecked")
+            Optional<T> cachedValue = (Optional<T>)cached.get();
+            return cachedValue;
         }
 
         // Property name variable already expanded.
