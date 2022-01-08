@@ -7,13 +7,11 @@ import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionRes
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.StripEmptyValues;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
-import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.Tokenizer;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.regex.Pattern;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -28,7 +26,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  * the method can be annotated with the {@link StripEmptyValues} annotation. 
  */
 public class ArrayConversionHandler implements ConversionHandler<Object[]> {
-    private static final String DEFAULT_DELIMITER = ",";
+    private final Tokenizer tokenizer = new Tokenizer(",");
 
     /** {@inheritDoc} */
     @Override
@@ -50,7 +48,7 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
             return ConversionResult.of(newArray(rawTargetType, 0));
         }
 
-        final String[] values = getValues(context);
+        final String[] values = tokenizer.tokenizeValue(context);
 
         Class<?> rawArrayComponentType = rawTargetType.getComponentType();
         if (rawArrayComponentType == null) {
@@ -115,27 +113,6 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
             arrayComponentType, 
             length
         );
-    }
-
-    private String[] getValues(ConversionContext context) {
-        String value = context.value();
-        ProxyMethodInfo proxyMethodInfo = context.proxyMethodInfo().orElse(null);
-        if (proxyMethodInfo != null) {
-            // Determine delimiter.
-            String delimiter = proxyMethodInfo.findAnnotation(Delimiter.class)
-                .map(d -> d.value())
-                .orElse(DEFAULT_DELIMITER);
-
-            if (proxyMethodInfo.hasAnnotation(StripEmptyValues.class)) {
-                // Filter empty values.
-                return Arrays.stream(value.split(delimiter))
-                    .filter(v -> !v.isEmpty())
-                    .toArray(String[]::new);
-            }
-            return value.split(Pattern.quote(delimiter));
-        }
-
-        return value.split(DEFAULT_DELIMITER);
     }
 
     private void throwIfArrayHasTypeVariables(ConversionContext context) {

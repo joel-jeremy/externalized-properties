@@ -7,15 +7,13 @@ import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionRes
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.StripEmptyValues;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
-import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.Tokenizer;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.IntFunction;
-import java.util.regex.Pattern;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -30,8 +28,8 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  * the proxy method can be annotated with the {@link StripEmptyValues} annotation.  
  */
 public class ListConversionHandler implements ConversionHandler<List<?>> {
-    private static final String DEFAULT_DELIMITER = ",";
     private final IntFunction<List<?>> listFactory;
+    private final Tokenizer tokenizer = new Tokenizer(",");
 
     /**
      * Default constructor. 
@@ -77,7 +75,7 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
             return ConversionResult.of(newList(0));
         }
 
-        final String[] values = getValues(context);
+        final String[] values = tokenizer.tokenizeValue(context);
         
         Class<?> rawTargetListType = TypeUtilities.getRawType(targetListType);
 
@@ -110,27 +108,6 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
         }
 
         return convertedList;
-    }
-
-    private String[] getValues(ConversionContext context) {
-        String value = context.value();
-        ProxyMethodInfo proxyMethodInfo = context.proxyMethodInfo().orElse(null);
-        if (proxyMethodInfo != null) {
-            // Determine delimiter.
-            String delimiter = proxyMethodInfo.findAnnotation(Delimiter.class)
-                .map(d -> d.value())
-                .orElse(DEFAULT_DELIMITER);
-
-            if (proxyMethodInfo.hasAnnotation(StripEmptyValues.class)) {
-                // Filter empty values.
-                return Arrays.stream(value.split(delimiter))
-                    .filter(v -> !v.isEmpty())
-                    .toArray(String[]::new);
-            }
-            return value.split(Pattern.quote(delimiter));
-        }
-
-        return value.split(DEFAULT_DELIMITER);
     }
 
     private List<Object> newList(int length) {
