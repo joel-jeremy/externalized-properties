@@ -13,7 +13,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
 /**
- * {@link Resolver} implementation which resolves requested properties 
+ * A {@link Resolver} implementation which resolves requested properties 
  * from a given properties map.
  */
 public class MapResolver implements Resolver {

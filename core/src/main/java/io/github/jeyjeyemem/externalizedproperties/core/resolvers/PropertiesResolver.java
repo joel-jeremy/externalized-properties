@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * {@link Resolver} implementation which resolves requested properties 
+ * A {@link Resolver} implementation which resolves requested properties 
  * from a given properties instance.
  */
 public class PropertiesResolver extends MapResolver {

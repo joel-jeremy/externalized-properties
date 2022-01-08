@@ -9,7 +9,7 @@ import java.util.ServiceLoader;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * {@link Resolver} implementation which resolves requested properties 
+ * A {@link Resolver} implementation which resolves requested properties 
  * from resolvers that are loaded from {@link ServiceLoader}.
  */
 public class ServiceLoaderResolver extends CompositeResolver {

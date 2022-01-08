@@ -15,7 +15,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
 /**
- * An {@link Resolver} decorator which caches resolved properties
+ * A {@link Resolver} decorator which caches resolved properties
  * for a specified duration.
  */
 public class CachingResolver implements Resolver {

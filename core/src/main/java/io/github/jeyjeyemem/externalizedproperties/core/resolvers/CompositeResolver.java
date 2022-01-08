@@ -18,7 +18,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
 /**
- * An {@link Resolver} decorator which resolves requested properties 
+ * A {@link Resolver} decorator which resolves requested properties 
  * from a collection of {@link Resolver}s.
  */
 public class CompositeResolver implements Resolver, Iterable<Resolver> {
