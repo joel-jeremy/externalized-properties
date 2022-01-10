@@ -80,7 +80,7 @@ public class EnumConversionHandlerTests {
                 TestEnum.ONE.name()
             );
 
-            ConversionResult<Enum<?>> result = handler.convert(context);
+            ConversionResult<? extends Enum<?>> result = handler.convert(context);
             assertNotNull(result);
 
             Enum<?> testEnum = result.value();
@@ -150,7 +150,7 @@ public class EnumConversionHandlerTests {
                 TestEnum.ONE.name()
             );
 
-            ConversionResult<Enum<?>> result = handler.convert(context);
+            ConversionResult<? extends Enum<?>> result = handler.convert(context);
             assertNotNull(result);
 
             Enum<?> testEnum = result.value();

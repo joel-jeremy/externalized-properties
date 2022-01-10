@@ -18,14 +18,14 @@ import java.util.function.IntFunction;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * Supports conversion of values to a {@link List} or {@link Collection}.
+ * Supports conversion of values to a {@link List} or {@link Collection} instance.
  * 
- * @implNote By default, this uses ',' as default delimiter when splitting values.
- * This can overriden by annotating the proxy method with {@link Delimiter} annotation
- * in which case the {@link Delimiter#value()} attribute will be used as the delimiter. 
+ * @apiNote By default, this uses ',' as default delimiter when splitting resolved property values.
+ * This can overriden by annotating the proxy interface method with {@link Delimiter} annotation
+ * in which case the {@link Delimiter#value()} attribute will be used as the delimiter.
  * 
- * @implNote If stripping of empty values from the list/collection is desired, 
- * the proxy method can be annotated with the {@link StripEmptyValues} annotation.  
+ * @apiNote If stripping of empty values from the array is desired, 
+ * the proxy interface method can be annotated with the {@link StripEmptyValues} annotation.  
  */
 public class ListConversionHandler implements ConversionHandler<List<?>> {
     private final IntFunction<List<?>> listFactory;
@@ -33,7 +33,8 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
 
     /**
      * Default constructor. 
-     * This uses {@link ArrayList} as {@link List} or {@link Collection} implementation.
+     * Instances constructed via this constructor will use {@link ArrayList} 
+     * as {@link List} or {@link Collection} implementation.
      */
     public ListConversionHandler() {
         this(ArrayList::new);
@@ -43,7 +44,7 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
      * Constructor.
      * 
      * @param listFactory The list factory. This must return a list instance
-     * (optionally with given the length). This must not return null.
+     * (optionally with given the length). This function must not return null.
      */
     public ListConversionHandler(IntFunction<List<?>> listFactory) {
         this.listFactory = requireNonNull(listFactory, "listFactory");
@@ -58,7 +59,7 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<List<?>> convert(ConversionContext context) {
+    public ConversionResult<? extends List<?>> convert(ConversionContext context) {
         requireNonNull(context, "context");
         
         Type[] genericTypeParams = context.targetTypeGenericTypeParameters();
@@ -67,7 +68,7 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
         Type targetListType = String.class;
         if (genericTypeParams.length > 0) {
             // Do not allow List<T>, List<T extends ...>, etc.
-            targetListType = throwIfListHasTypeVariable(genericTypeParams[0]);
+            targetListType = throwIfTypeVariable(genericTypeParams[0]);
         }
 
         String propertyValue = context.value();
@@ -129,7 +130,7 @@ public class ListConversionHandler implements ConversionHandler<List<?>> {
         return list;
     }
 
-    private Type throwIfListHasTypeVariable(Type listGenericTypeParameter) {
+    private Type throwIfTypeVariable(Type listGenericTypeParameter) {
         if (TypeUtilities.isTypeVariable(listGenericTypeParameter)) {
             throw new ConversionException(
                 "Type variables e.g. List<T> are not supported."

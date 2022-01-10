@@ -39,6 +39,9 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  * <li>{@link Year}</li>
  * <li>{@link YearMonth}</li>
  * </ul>
+ * 
+ * @apiNote The {@link DateTimeFormat} annotation may be used to specify a date/time 
+ * format/pattern to use when converting to date/time types.
  */
 public class DateTimeConversionHandler implements ConversionHandler<Object> {
 
@@ -204,8 +207,7 @@ public class DateTimeConversionHandler implements ConversionHandler<Object> {
     private DateTimeFormat getDateTimeFormatOrNull(ConversionContext context) {
         ProxyMethodInfo proxyMethodInfo = context.proxyMethodInfo().orElse(null);
         if (proxyMethodInfo != null) {
-            return proxyMethodInfo.findAnnotation(DateTimeFormat.class)
-                .orElse(null);
+            return proxyMethodInfo.findAnnotation(DateTimeFormat.class).orElse(null);
         }
         return null;
     }

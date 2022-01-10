@@ -81,7 +81,7 @@ public class OptionalConversionHandlerTests {
                 "value"
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
 
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -116,7 +116,7 @@ public class OptionalConversionHandlerTests {
                 "1"
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
 
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -146,7 +146,7 @@ public class OptionalConversionHandlerTests {
                 "value"
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -178,7 +178,7 @@ public class OptionalConversionHandlerTests {
                 "value"
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -239,7 +239,7 @@ public class OptionalConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -278,7 +278,7 @@ public class OptionalConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -318,7 +318,7 @@ public class OptionalConversionHandlerTests {
                 "" // Empty.
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -343,7 +343,7 @@ public class OptionalConversionHandlerTests {
                 "value"
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
 
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -372,7 +372,7 @@ public class OptionalConversionHandlerTests {
                 "1"
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
 
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -396,7 +396,7 @@ public class OptionalConversionHandlerTests {
                 "value"
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -422,7 +422,7 @@ public class OptionalConversionHandlerTests {
                 "value"
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -471,7 +471,7 @@ public class OptionalConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -504,7 +504,7 @@ public class OptionalConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -538,7 +538,7 @@ public class OptionalConversionHandlerTests {
                 "" // Empty.
             );
 
-            ConversionResult<Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = handler.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();

@@ -12,7 +12,7 @@ import java.util.Optional;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * Supports conversion of values to an {@link Optional}.
+ * Supports conversion of values to an {@link Optional} instance.
  */
 public class OptionalConversionHandler implements ConversionHandler<Optional<?>> {
     
@@ -24,7 +24,7 @@ public class OptionalConversionHandler implements ConversionHandler<Optional<?>>
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<Optional<?>> convert(ConversionContext context) {
+    public ConversionResult<? extends Optional<?>> convert(ConversionContext context) {
         requireNonNull(context, "context");
 
         Type[] genericTypeParams = context.targetTypeGenericTypeParameters();
@@ -33,7 +33,7 @@ public class OptionalConversionHandler implements ConversionHandler<Optional<?>>
         Type targetOptionalType = String.class;
         if (genericTypeParams.length > 0) {
             // Do not allow Optional<T>, Optional<T extends ...>, etc.
-            targetOptionalType = throwIfOptionalHasTypeVariable(genericTypeParams[0]);
+            targetOptionalType = throwIfTypeVariable(genericTypeParams[0]);
         }
 
         String propertyValue = context.value();
@@ -69,7 +69,7 @@ public class OptionalConversionHandler implements ConversionHandler<Optional<?>>
         ));
     }
 
-    private Type throwIfOptionalHasTypeVariable(Type optionalGenericTypeParameter) {
+    private Type throwIfTypeVariable(Type optionalGenericTypeParameter) {
         if (TypeUtilities.isTypeVariable(optionalGenericTypeParameter)) {
             throw new ConversionException(
                 "Type variables e.g. Optional<T> are not supported."

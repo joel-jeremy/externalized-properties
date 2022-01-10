@@ -19,7 +19,7 @@ public class EnumConversionHandler implements ConversionHandler<Enum<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<Enum<?>> convert(ConversionContext context) {
+    public ConversionResult<? extends Enum<?>> convert(ConversionContext context) {
         requireNonNull(context, "context");
         
         Class<?> enumClass = context.rawTargetType();

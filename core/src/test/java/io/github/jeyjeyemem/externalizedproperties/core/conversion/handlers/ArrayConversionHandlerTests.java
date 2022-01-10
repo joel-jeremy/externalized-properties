@@ -48,7 +48,7 @@ public class ArrayConversionHandlerTests {
         @DisplayName("should return false when target type is not an array.")
         public void test3() {
             ArrayConversionHandler handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(String.class);
+            boolean canConvert = handler.canConvertTo(Integer.class);
             assertFalse(canConvert);
         }
     }
@@ -67,7 +67,7 @@ public class ArrayConversionHandlerTests {
         public void test2() {
             ArrayConversionHandler handler = handlerToTest();
 
-            // Method return type is a List and not an array e.g. String[]
+            // Method return type is an int and not an array e.g. String[]
             ProxyMethodInfo proxyMethodInfo = 
                 StubProxyMethodInfo.fromMethod(
                     PrimitiveProxyInterface.class,
@@ -82,7 +82,7 @@ public class ArrayConversionHandlerTests {
                 "value1,value2,value3"
             ));
 
-            // Method return type is a List and not an array
+            // Method return type is an int and not an array
             assertEquals(ConversionResult.skip(), result);
         }
 
@@ -99,11 +99,12 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
 
-            ConversionResult<Object[]> result = handler.convert(new ConversionContext(
-                converter,
-                proxyMethodInfo,
-                "value1,value2,value3"
-            ));
+            ConversionResult<? extends Object[]> result = 
+                handler.convert(new ConversionContext(
+                    converter,
+                    proxyMethodInfo,
+                    "value1,value2,value3"
+                ));
 
             assertNotNull(result);
             Object[] array = result.value();
@@ -133,7 +134,7 @@ public class ArrayConversionHandlerTests {
                 new PrimitiveConversionHandler()
             );
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
@@ -166,7 +167,7 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
@@ -193,7 +194,7 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
@@ -226,7 +227,7 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
@@ -259,7 +260,7 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
@@ -320,7 +321,7 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
@@ -358,7 +359,7 @@ public class ArrayConversionHandlerTests {
                 new OptionalConversionHandler() // Register additional Optional handler.
             );
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
@@ -400,7 +401,7 @@ public class ArrayConversionHandlerTests {
                 new OptionalConversionHandler() // Register additional Optional handler.
             );
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     proxyMethodInfo,
@@ -479,7 +480,7 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            ConversionResult<Object[]> result = handler.convert(new ConversionContext(
+            ConversionResult<? extends Object[]> result = handler.convert(new ConversionContext(
                 converter,
                 String[].class,
                 "value1,,value3,,value5"
@@ -509,7 +510,7 @@ public class ArrayConversionHandlerTests {
                 new PrimitiveConversionHandler()
             );
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     Integer[].class,
@@ -536,7 +537,7 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     String[].class,
@@ -557,7 +558,7 @@ public class ArrayConversionHandlerTests {
 
             Converter converter = new InternalConverter(handler);
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     String[].class,
@@ -584,7 +585,7 @@ public class ArrayConversionHandlerTests {
             
             Converter converter = new InternalConverter(handler);
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     Object[].class,
@@ -638,7 +639,7 @@ public class ArrayConversionHandlerTests {
                 new OptionalConversionHandler() // Register additional Optional handler.
             );
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     new TypeReference<Optional<String>[]>(){}.type(),
@@ -674,7 +675,7 @@ public class ArrayConversionHandlerTests {
                 new OptionalConversionHandler() // Register additional Optional handler.
             );
             
-            ConversionResult<Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = handler.convert(
                 new ConversionContext(
                     converter,
                     new TypeReference<Optional<?>[]>(){}.type(),

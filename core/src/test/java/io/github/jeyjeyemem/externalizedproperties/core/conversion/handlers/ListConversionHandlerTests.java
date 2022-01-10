@@ -107,7 +107,7 @@ public class ListConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -140,7 +140,7 @@ public class ListConversionHandlerTests {
                 "value1#value2#value3"
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
 
             assertNotNull(result);
             List<?> list = result.value();
@@ -177,7 +177,7 @@ public class ListConversionHandlerTests {
                 "1,2,3"
             );
             
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -193,7 +193,9 @@ public class ListConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return String values when List's generic type parameter is a wildcard.")
+        @DisplayName(
+            "should return String values when List's generic type parameter is a wildcard."
+        )
         public void test5() {
             ListConversionHandler handler = handlerToTest();
 
@@ -211,7 +213,7 @@ public class ListConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -246,7 +248,7 @@ public class ListConversionHandlerTests {
                     "value1,value2,value3"
                 );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
         
             assertNotNull(result);
             List<?> list = result.value();
@@ -280,7 +282,7 @@ public class ListConversionHandlerTests {
                 "" // Empty value.
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -309,7 +311,7 @@ public class ListConversionHandlerTests {
                     "value1,,value3,,value5" // Has empty values.
                 );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
         
             assertNotNull(result);
             List<?> list = result.value();
@@ -343,7 +345,7 @@ public class ListConversionHandlerTests {
                 "value1,,value3,,value5" // Has empty values.
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -410,7 +412,7 @@ public class ListConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -454,7 +456,7 @@ public class ListConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -529,7 +531,7 @@ public class ListConversionHandlerTests {
                 "value1,,value3,,value5"
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -561,7 +563,7 @@ public class ListConversionHandlerTests {
                 "1,2,3"
             );
             
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -577,7 +579,9 @@ public class ListConversionHandlerTests {
         }
 
         @Test
-        @DisplayName("should return String values when List's generic type parameter is a wildcard.")
+        @DisplayName(
+            "should return String values when List's generic type parameter is a wildcard."
+        )
         public void nonProxyTest3() {
             ListConversionHandler handler = handlerToTest();
             
@@ -589,7 +593,7 @@ public class ListConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -617,7 +621,7 @@ public class ListConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
         
             assertNotNull(result);
             List<?> list = result.value();
@@ -645,7 +649,7 @@ public class ListConversionHandlerTests {
                 "" // Empty value.
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -667,7 +671,7 @@ public class ListConversionHandlerTests {
                 "value1,,value3,,value5" // Has empty values.
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
         
             assertNotNull(result);
             List<?> list = result.value();
@@ -722,7 +726,7 @@ public class ListConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -760,7 +764,7 @@ public class ListConversionHandlerTests {
                 "value1,value2,value3"
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -832,7 +836,7 @@ public class ListConversionHandlerTests {
                 "value1,,value3,,value5"
             );
 
-            ConversionResult<List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = handler.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();

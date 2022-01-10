@@ -18,12 +18,12 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 /**
  * Supports conversion of values to an array.
  * 
- * @implNote By default, this uses ',' as default delimiter when splitting resolved property values.
- * This can overriden by annotating the proxy method with {@link Delimiter} annotation
+ * @apiNote By default, this uses ',' as default delimiter when splitting resolved property values.
+ * This can overriden by annotating the proxy interface method with {@link Delimiter} annotation
  * in which case the {@link Delimiter#value()} attribute will be used as the delimiter.
  * 
- * @implNote If stripping of empty values from the array is desired, 
- * the method can be annotated with the {@link StripEmptyValues} annotation. 
+ * @apiNote If stripping of empty values from the array is desired, 
+ * the proxy interface method can be annotated with the {@link StripEmptyValues} annotation. 
  */
 public class ArrayConversionHandler implements ConversionHandler<Object[]> {
     private final Tokenizer tokenizer = new Tokenizer(",");
@@ -36,7 +36,7 @@ public class ArrayConversionHandler implements ConversionHandler<Object[]> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<Object[]> convert(ConversionContext context) {
+    public ConversionResult<? extends Object[]> convert(ConversionContext context) {
         requireNonNull(context, "context");
         
         // Do not allow T[].
