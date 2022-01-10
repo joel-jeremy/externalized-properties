@@ -23,7 +23,7 @@ public class CompositeResolverTests {
     @Nested
     class FromMethod {
         @Test
-        @DisplayName("should throw when resolvers collection argument is null or empty")
+        @DisplayName("should throw when resolvers collection argument is null or empty.")
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -39,7 +39,7 @@ public class CompositeResolverTests {
         }
 
         @Test
-        @DisplayName("should throw when resolvers varargs argument is null or empty")
+        @DisplayName("should throw when resolvers varargs argument is null or empty.")
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -58,7 +58,7 @@ public class CompositeResolverTests {
     @Nested
     class FlattenMethod {
         @Test
-        @DisplayName("should throw when resolvers collection argument is null or empty")
+        @DisplayName("should throw when resolvers collection argument is null or empty.")
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -74,7 +74,7 @@ public class CompositeResolverTests {
         }
 
         @Test
-        @DisplayName("should throw when resolvers varargs argument is null or empty")
+        @DisplayName("should throw when resolvers varargs argument is null or empty.")
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -90,7 +90,7 @@ public class CompositeResolverTests {
         }
 
         @Test
-        @DisplayName("should discard any nested composite property resolvers")
+        @DisplayName("should discard any nested composite property resolvers.")
         public void test3() {
             CompositeResolver resolver1 = 
                 CompositeResolver.from(new SystemPropertyResolver());
@@ -128,7 +128,7 @@ public class CompositeResolverTests {
         @Test
         @DisplayName(
             "should return the resolver instance " + 
-            "when only one resolver remained after the flattening operation"
+            "when only one resolver remained after the flattening operation."
         )
         public void test4() {
             CompositeResolver resolver = 
@@ -144,7 +144,7 @@ public class CompositeResolverTests {
     @Nested
     class ResolveMethod {
         @Test
-        @DisplayName("should throw when property name argument is null or empty")
+        @DisplayName("should throw when property name argument is null or empty.")
         public void validationTest1() {
             CompositeResolver compositeResolver = resolverToTest(
                 new StubResolver()
@@ -162,7 +162,7 @@ public class CompositeResolverTests {
         }
 
         @Test
-        @DisplayName("should resolve property value from the child resolver")
+        @DisplayName("should resolve property value from the child resolver.")
         public void test1() {
             StubResolver resolver = new StubResolver();
             
@@ -182,7 +182,7 @@ public class CompositeResolverTests {
         @Test
         @DisplayName(
             "should return empty Optional " + 
-            "when property is not found from any of the child resolvers"
+            "when property is not found from any of the child resolvers."
         )
         public void test2() {
             StubResolver resolver1 = new StubResolver(
@@ -208,7 +208,9 @@ public class CompositeResolverTests {
         }
 
         @Test
-        @DisplayName("should be able to resolve property value from one or more child resolvers")
+        @DisplayName(
+            "should be able to resolve property value from one or more child resolvers."
+        )
         public void test3() {
             StubResolver resolver1 = new StubResolver(
                 propertyName -> propertyName.endsWith("1") ? 
@@ -253,7 +255,7 @@ public class CompositeResolverTests {
         @Test
         @DisplayName(
             "should skip resolving from downstream resolvers " + 
-            "when the property has already been resolved"
+            "when the property has already been resolved."
         )
         public void test4() {
             StubResolver resolver1 = new StubResolver(
@@ -299,7 +301,7 @@ public class CompositeResolverTests {
     @Nested
     class ResolveMethodWithVarArgsOverload {
         @Test
-        @DisplayName("should throw when property names varargs argument is null or empty")
+        @DisplayName("should throw when property names varargs argument is null or empty.")
         public void validationTest1() {
             CompositeResolver compositeResolver = resolverToTest(
                 new StubResolver()
@@ -317,7 +319,7 @@ public class CompositeResolverTests {
         }
 
         @Test
-        @DisplayName("should resolve property values from the child resolver")
+        @DisplayName("should resolve property values from the child resolver.")
         public void test1() {
             String[] propertiesToResolve = new String[] { "property.name1", "property.name2" };
 
@@ -343,7 +345,7 @@ public class CompositeResolverTests {
         @Test
         @DisplayName(
             "should return result with unresolved properties " + 
-            "when property is not found from any of the child resolvers"
+            "when property is not found from any of the child resolvers."
         )
         public void test2() {
             String[] propertiesToResolve = new String[] { 
@@ -378,7 +380,9 @@ public class CompositeResolverTests {
         }
 
         @Test
-        @DisplayName("should be able to resolve property values from one or more child resolvers")
+        @DisplayName(
+            "should be able to resolve property values from one or more child resolvers."
+        )
         public void test3() {
             StubResolver resolver1 = new StubResolver(
                 propertyName -> propertyName.endsWith("1") ? 
@@ -448,7 +452,7 @@ public class CompositeResolverTests {
         @Test
         @DisplayName(
             "should skip resolving from downstream resolvers " + 
-            "when the property has already been resolved"
+            "when the property has already been resolved."
         )
         public void test4() {
             StubResolver resolver1 = new StubResolver(
@@ -523,7 +527,7 @@ public class CompositeResolverTests {
     @Nested
     class ResolveMethodWithCollectionOverload {
         @Test
-        @DisplayName("should throw when property names collection argument is null or empty")
+        @DisplayName("should throw when property names collection argument is null or empty.")
         public void validationTest1() {
             CompositeResolver compositeResolver = resolverToTest(
                 new StubResolver()
@@ -541,7 +545,7 @@ public class CompositeResolverTests {
         }
 
         @Test
-        @DisplayName("should resolve property values from the child resolver")
+        @DisplayName("should resolve property values from the child resolver.")
         public void test1() {
             List<String> propertiesToResolve = Arrays.asList(
                 "property.name1",
@@ -572,7 +576,7 @@ public class CompositeResolverTests {
         @Test
         @DisplayName(
             "should return result with unresolved properties " + 
-            "when property is not found from any of the child resolvers"
+            "when property is not found from any of the child resolvers."
         )
         public void test2() {
             List<String> propertiesToResolve = Arrays.asList(
@@ -607,7 +611,9 @@ public class CompositeResolverTests {
         }
 
         @Test
-        @DisplayName("should be able to resolve property values from one or more child resolvers")
+        @DisplayName(
+            "should be able to resolve property values from one or more child resolvers."
+        )
         public void test3() {
             List<String> propertiesToResolve = Arrays.asList(
                 "property.name.1",
@@ -681,7 +687,7 @@ public class CompositeResolverTests {
         @Test
         @DisplayName(
             "should skip resolving from downstream resolvers " + 
-            "when the property has already been resolved"
+            "when the property has already been resolved."
         )
         public void test4() {
             List<String> propertiesToResolve = Arrays.asList(
@@ -760,7 +766,7 @@ public class CompositeResolverTests {
     @Nested
     class ToStringMethod {
         @Test
-        @DisplayName("should return resolver collection string")
+        @DisplayName("should return resolver collection string.")
         public void test1() {
             List<Resolver> resolvers = Arrays.asList(
                 new SystemPropertyResolver(),
@@ -776,9 +782,7 @@ public class CompositeResolverTests {
         }
     }
 
-    private CompositeResolver resolverToTest(
-            Resolver... resolvers
-    ) {
+    private CompositeResolver resolverToTest(Resolver... resolvers) {
         return CompositeResolver.from(resolvers);
     }
 }

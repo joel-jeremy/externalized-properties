@@ -24,7 +24,7 @@ public class PropertiesResolverTests {
     @Nested
     class Constructor {
         @Test
-        @DisplayName("should throw when properties argument is null")
+        @DisplayName("should throw when properties argument is null.")
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -33,7 +33,7 @@ public class PropertiesResolverTests {
         }
 
         @Test
-        @DisplayName("should throw when unresolved property handler argument is null")
+        @DisplayName("should throw when unresolved property handler argument is null.")
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -42,7 +42,7 @@ public class PropertiesResolverTests {
         }
 
         @Test
-        @DisplayName("should ignore properties with non-String keys or values")
+        @DisplayName("should ignore properties with non-String keys or values.")
         public void propertiesTest3() {
             Properties props = new Properties();
             props.put("property.nonstring", 123);
@@ -67,7 +67,7 @@ public class PropertiesResolverTests {
     @Nested
     class ResolveMethod {
         @Test
-        @DisplayName("should resolve property value from the given properties")
+        @DisplayName("should resolve property value from the given properties.")
         public void test1() {
             Properties props = new Properties();
             props.setProperty("property.name", "property.value");
@@ -88,7 +88,7 @@ public class PropertiesResolverTests {
         @Test
         @DisplayName(
             "should return empty Optional " + 
-            "when property is not found from the given properties"
+            "when property is not found from the given properties."
         )
         public void test2() {
             PropertiesResolver resolver = resolverToTest(EMPTY_PROPERTIES);
@@ -103,7 +103,7 @@ public class PropertiesResolverTests {
         @Test
         @DisplayName(
             "should invoke unresolved property handler " + 
-            "when property is not found from the given properties"
+            "when property is not found from the given properties."
         )
         public void test3() {
             AtomicBoolean unresolvedPropertyHandlerInvoked = new AtomicBoolean(false);
@@ -134,7 +134,7 @@ public class PropertiesResolverTests {
     @Nested
     class ResolveMethodWithVarArgsOverload {
         @Test
-        @DisplayName("should resolve property values from the given properties")
+        @DisplayName("should resolve property values from the given properties.")
         public void test1() {
             Properties props = new Properties();
             props.setProperty("property.name1", "property.value1");
@@ -164,7 +164,7 @@ public class PropertiesResolverTests {
         @Test
         @DisplayName(
             "should return result with unresolved properties " + 
-            "when property is not found from the given properties"
+            "when property is not found from the given properties."
         )
         public void test2() {
             PropertiesResolver resolver = resolverToTest(EMPTY_PROPERTIES);
@@ -191,7 +191,7 @@ public class PropertiesResolverTests {
         @Test
         @DisplayName(
             "should invoke unresolved property handler " + 
-            "when property is not found from the given properties"
+            "when property is not found from the given properties."
         )
         public void test3() {
             AtomicBoolean unresolvedPropertyHandlerInvoked = new AtomicBoolean(false);
@@ -232,7 +232,7 @@ public class PropertiesResolverTests {
     @Nested
     class ResolveMethodWithCollectionOverload {
         @Test
-        @DisplayName("should resolve property values from the given properties")
+        @DisplayName("should resolve property values from the given properties.")
         public void test1() {
             Properties props = new Properties();
             props.setProperty("property.name1", "property.value1");
@@ -262,7 +262,7 @@ public class PropertiesResolverTests {
         @Test
         @DisplayName(
             "should return result with unresolved properties " + 
-            "when property is not found from the given properties"
+            "when property is not found from the given properties."
         )
         public void test2() {
             PropertiesResolver resolver = resolverToTest(EMPTY_PROPERTIES);
@@ -289,7 +289,7 @@ public class PropertiesResolverTests {
         @Test
         @DisplayName(
             "should invoke unresolved property handler " + 
-            "when property is not found from the given properties"
+            "when property is not found from the given properties."
         )
         public void test3() {
             AtomicBoolean unresolvedPropertyHandlerInvoked = new AtomicBoolean(false);
@@ -327,9 +327,7 @@ public class PropertiesResolverTests {
         }
     }
 
-    private PropertiesResolver resolverToTest(
-            Properties properties
-    ) {
+    private PropertiesResolver resolverToTest(Properties properties) {
         return new PropertiesResolver(properties);
     }
 

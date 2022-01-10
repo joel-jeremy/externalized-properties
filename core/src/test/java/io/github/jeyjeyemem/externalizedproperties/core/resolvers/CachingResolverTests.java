@@ -25,7 +25,7 @@ public class CachingResolverTests {
     @Nested
     class Constructor {
         @Test
-        @DisplayName("should throw when decorated argument is null")
+        @DisplayName("should throw when decorated argument is null.")
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -34,7 +34,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should throw when cache strategy argument is null")
+        @DisplayName("should throw when cache strategy argument is null.")
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -49,7 +49,7 @@ public class CachingResolverTests {
     @Nested
     class ResolveMethod {
         @Test
-        @DisplayName("should throw when property name argument is null or empty")
+        @DisplayName("should throw when property name argument is null or empty.")
         public void validationTest1() {
             CachingResolver resolver = resolverToTest(
                 new StubResolver()
@@ -67,7 +67,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should resolve property value from the decorated resolver")
+        @DisplayName("should resolve property value from the decorated resolver.")
         public void test1() {
             String propertyName = "property";
             StubResolver decorated = new StubResolver();
@@ -87,7 +87,7 @@ public class CachingResolverTests {
         @Test
         @DisplayName(
             "should return empty Optional " + 
-            "when property is not found from the decorated resolver"
+            "when property is not found from the decorated resolver."
         )
         public void test2() {
             CachingResolver resolver = resolverToTest(
@@ -102,7 +102,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should cache resolved property")
+        @DisplayName("should cache resolved property.")
         public void cacheTest1() {
             String propertyName = "property";
             StubResolver decorated = new StubResolver();
@@ -126,7 +126,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should not cache unresolved property")
+        @DisplayName("should not cache unresolved property.")
         public void cacheTest2() {
             StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
 
@@ -148,7 +148,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should return cached property")
+        @DisplayName("should return cached property.")
         public void cacheTest3() {
             String propertyName = "property.cached";
             StubResolver decorated = new StubResolver();
@@ -177,12 +177,10 @@ public class CachingResolverTests {
         }
     }
 
-
-
     @Nested
     class ResolveMethodWithVarArgsOverload {
         @Test
-        @DisplayName("should throw when property names varargs argument is null or empty")
+        @DisplayName("should throw when property names varargs argument is null or empty.")
         public void validationTest1() {
             CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver()
@@ -200,7 +198,9 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should throw when property names varargs contain any null or empty values")
+        @DisplayName(
+            "should throw when property names varargs contain any null or empty values."
+        )
         public void validationTest2() {
             CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver()
@@ -218,7 +218,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should resolve property values from the decorated resolver")
+        @DisplayName("should resolve property values from the decorated resolver.")
         public void test1() {
             String[] propertyNames = new String[] { "property1", "property2" };
             StubResolver decorated = new StubResolver();
@@ -241,7 +241,7 @@ public class CachingResolverTests {
         @Test
         @DisplayName(
             "should return result with unresolved properties " + 
-            "when property is not found from the decorated resolver"
+            "when property is not found from the decorated resolver."
         )
         public void test2() {
             String[] nonExistentProperties = new String[] {
@@ -266,7 +266,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should cache resolved properties")
+        @DisplayName("should cache resolved properties.")
         public void cacheTest1() {
             String[] propertyNames = new String[] { "property1", "property2" };
             StubResolver decorated = new StubResolver();
@@ -292,7 +292,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should not cache unresolved properties")
+        @DisplayName("should not cache unresolved properties.")
         public void cacheTest2() {
             String[] nonExistentProperties = new String[] {
                 "nonexistent.property1", 
@@ -319,7 +319,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should return cached properties")
+        @DisplayName("should return cached properties.")
         public void cacheTest3() {
             String[] propertyNames = new String[] { "property.cached1", "property.cached2" };
             StubResolver decorated = new StubResolver();
@@ -357,7 +357,7 @@ public class CachingResolverTests {
     @Nested
     class ResolveMethodWithCollectionOverload {
         @Test
-        @DisplayName("should throw when property names collection argument is null or empty")
+        @DisplayName("should throw when property names collection argument is null or empty.")
         public void validationTest1() {
             CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver()
@@ -376,7 +376,7 @@ public class CachingResolverTests {
 
         @Test
         @DisplayName(
-            "should throw when property names collection contains any null or empty values"
+            "should throw when property names collection contains any null or empty values."
         )
         public void validationTest2() {
             CachingResolver resolver = resolverToTest(
@@ -395,7 +395,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should resolve property values from the decorated resolver")
+        @DisplayName("should resolve property values from the decorated resolver.")
         public void test1() {
             List<String> propertyNames = Arrays.asList("property1", "property2");
             StubResolver decorated = new StubResolver();
@@ -418,7 +418,7 @@ public class CachingResolverTests {
         @Test
         @DisplayName(
             "should return result with unresolved properties " + 
-            "when property is not found from the decorated resolver"
+            "when property is not found from the decorated resolver."
         )
         public void test2() {
             List<String> nonExistentProperties = Arrays.asList(
@@ -443,7 +443,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should cache resolved properties")
+        @DisplayName("should cache resolved properties.")
         public void cacheTest1() {
             List<String> propertyNames = Arrays.asList("property1", "property2");
             StubResolver decorated = new StubResolver();
@@ -469,7 +469,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should not cache unresolved properties")
+        @DisplayName("should not cache unresolved properties.")
         public void cacheTest2() {
             List<String> nonExistentProperties = Arrays.asList(
                 "nonexistent.property1", 
@@ -496,7 +496,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should return cached properties")
+        @DisplayName("should return cached properties.")
         public void cacheTest3() {
             List<String> propertyNames = Arrays.asList("property.cached1", "property.cached2");
             StubResolver decorated = new StubResolver();
@@ -531,9 +531,7 @@ public class CachingResolverTests {
         }
     }
 
-    private CachingResolver resolverToTest(
-            Resolver decorated
-    ) {
+    private CachingResolver resolverToTest(Resolver decorated) {
         return resolverToTest(
             decorated,
             new StubCacheStrategy<>()

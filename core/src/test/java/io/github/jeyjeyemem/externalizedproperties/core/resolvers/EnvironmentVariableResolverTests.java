@@ -17,7 +17,7 @@ public class EnvironmentVariableResolverTests {
     @Nested
     class ResolveMethod {
         @Test
-        @DisplayName("should resolve property value from environment variables")
+        @DisplayName("should resolve property value from environment variables.")
         public void test1() {
             EnvironmentVariableResolver resolver = resolverToTest();
             Optional<String> result = resolver.resolve(
@@ -34,7 +34,7 @@ public class EnvironmentVariableResolverTests {
 
         @Test
         @DisplayName(
-            "should return empty Optional when environment variable is not found"
+            "should return empty Optional when environment variable is not found."
         )
         public void test2() {
             EnvironmentVariableResolver resolver = resolverToTest();
@@ -50,7 +50,7 @@ public class EnvironmentVariableResolverTests {
     @Nested
     class ResolveMethodWithVarArgsOverload {
         @Test
-        @DisplayName("should resolve property values from environment variables")
+        @DisplayName("should resolve property values from environment variables.")
         public void test1() {
             EnvironmentVariableResolver resolver = resolverToTest();
             ResolverResult result = resolver.resolve(
@@ -74,7 +74,8 @@ public class EnvironmentVariableResolverTests {
 
         @Test
         @DisplayName(
-            "should return result with unresolved properties when environment variable is not found"
+            "should return result with unresolved properties when " + 
+            "environment variable is not found."
         )
         public void test2() {
             EnvironmentVariableResolver resolver = resolverToTest();
@@ -92,7 +93,7 @@ public class EnvironmentVariableResolverTests {
     @Nested
     class ResolveMethodWithCollectionOverload {
         @Test
-        @DisplayName("should resolve property values from environment variables")
+        @DisplayName("should resolve property values from environment variables.")
         public void test1() {
             EnvironmentVariableResolver resolver = resolverToTest();
             ResolverResult result = resolver.resolve(
@@ -118,7 +119,8 @@ public class EnvironmentVariableResolverTests {
 
         @Test
         @DisplayName(
-            "should return result with unresolved properties when environment variable is not found"
+            "should return result with unresolved properties when " +
+            "environment variable is not found."
         )
         public void test2() {
             EnvironmentVariableResolver resolver = resolverToTest();

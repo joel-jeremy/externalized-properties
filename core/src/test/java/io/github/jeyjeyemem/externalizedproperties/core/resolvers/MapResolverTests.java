@@ -26,7 +26,7 @@ public class MapResolverTests {
     @Nested
     class Constructor {
         @Test
-        @DisplayName("should throw when property source map argument is null")
+        @DisplayName("should throw when property source map argument is null.")
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -35,7 +35,7 @@ public class MapResolverTests {
         }
 
         @Test
-        @DisplayName("should throw when unresolved property handler argument is null")
+        @DisplayName("should throw when unresolved property handler argument is null.")
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -45,10 +45,10 @@ public class MapResolverTests {
     }
 
     @Nested
-    class ResolveMethodSingleProperty {
+    class ResolveMethod {
 
         @Test
-        @DisplayName("should throw when property name argument is null or empty")
+        @DisplayName("should throw when property name argument is null or empty.")
         public void validationTest1() {
             MapResolver resolver = resolverToTest();
 
@@ -64,7 +64,7 @@ public class MapResolverTests {
         }
 
         @Test
-        @DisplayName("should resolve values from the given map")
+        @DisplayName("should resolve values from the given map.")
         public void test1() {
             Map<String, String> map = new HashMap<>();
             map.put("property.name", "property.value");
@@ -85,7 +85,7 @@ public class MapResolverTests {
         @Test
         @DisplayName(
             "should return empty Optional " + 
-            "when property is not found from the given map"
+            "when property is not found from the given map."
         )
         public void test2() {
             MapResolver resolver = resolverToTest();
@@ -100,7 +100,7 @@ public class MapResolverTests {
         @Test
         @DisplayName(
             "should invoke unresolved property handler " + 
-            "when property is not found from the given map"
+            "when property is not found from the given map."
         )
         public void test3() {
             AtomicBoolean unresolvedPropertyHandlerInvoked = new AtomicBoolean(false);
@@ -131,7 +131,7 @@ public class MapResolverTests {
     @Nested
     class ResolveMethodWithVarArgsOverload {
         @Test
-        @DisplayName("should throw when property names varargs argument is null or empty")
+        @DisplayName("should throw when property names varargs argument is null or empty.")
         public void validationTest1() {
             MapResolver resolver = resolverToTest();
 
@@ -147,7 +147,9 @@ public class MapResolverTests {
         }
 
         @Test
-        @DisplayName("should throw when property names varargs contain any null or empty values")
+        @DisplayName(
+            "should throw when property names varargs contain any null or empty values."
+        )
         public void validationTest2() {
             MapResolver resolver = resolverToTest();
             
@@ -163,7 +165,7 @@ public class MapResolverTests {
         }
 
         @Test
-        @DisplayName("should resolve values from the given map")
+        @DisplayName("should resolve values from the given map.")
         public void test1() {
             Map<String, String> map = new HashMap<>();
             map.put("property.name1", "property.value1");
@@ -193,7 +195,7 @@ public class MapResolverTests {
         @Test
         @DisplayName(
             "should return result with unresolved properties " + 
-            "when property is not found from the given map"
+            "when property is not found from the given map."
         )
         public void test2() {
             MapResolver resolver = resolverToTest();
@@ -220,7 +222,7 @@ public class MapResolverTests {
         @Test
         @DisplayName(
             "should invoke unresolved property handler " + 
-            "when property is not found from the given map"
+            "when property is not found from the given map."
         )
         public void test3() {
             AtomicBoolean unresolvedPropertyHandlerInvoked = new AtomicBoolean(false);
@@ -261,7 +263,7 @@ public class MapResolverTests {
     @Nested
     class ResolveMethodWithCollectionOverload {
         @Test
-        @DisplayName("should throw when property names collection argument is null or empty")
+        @DisplayName("should throw when property names collection argument is null or empty.")
         public void validationTest1() {
         MapResolver resolver = resolverToTest();
 
@@ -278,7 +280,7 @@ public class MapResolverTests {
 
         @Test
         @DisplayName(
-            "should throw when property names collection contains any null or empty values"
+            "should throw when property names collection contains any null or empty values."
         )
         public void validationTest2() {
             MapResolver resolver = resolverToTest();
@@ -295,7 +297,7 @@ public class MapResolverTests {
         }
 
         @Test
-        @DisplayName("should resolve values from the given map")
+        @DisplayName("should resolve values from the given map.")
         public void test1() {
             Map<String, String> map = new HashMap<>();
             map.put("property.name1", "property.value1");
@@ -325,7 +327,7 @@ public class MapResolverTests {
         @Test
         @DisplayName(
             "should return result with unresolved properties " + 
-            "when property is not found from the given map"
+            "when property is not found from the given map."
         )
         public void test2() {
             MapResolver resolver = resolverToTest();
@@ -352,7 +354,7 @@ public class MapResolverTests {
         @Test
         @DisplayName(
             "should invoke unresolved property handler " + 
-            "when property is not found from the given map"
+            "when property is not found from the given map."
         )
         public void test3() {
             AtomicBoolean unresolvedPropertyHandlerInvoked = new AtomicBoolean(false);
@@ -394,9 +396,7 @@ public class MapResolverTests {
         return new MapResolver(new HashMap<>());
     }
 
-    private MapResolver resolverToTest(
-            Map<String, String> map
-    ) {
+    private MapResolver resolverToTest(Map<String, String> map) {
         return new MapResolver(map);
     }
 
