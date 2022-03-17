@@ -48,7 +48,7 @@ public class ExternalizedPropertyInvocationHandler implements InvocationHandler 
             return objectMethodResult;
         }
 
-        ProxyMethod proxyMethod = new ProxyMethod(
+        ProxyMethodInvoker proxyMethod = new ProxyMethodInvoker(
             proxy, 
             method,
             externalizedProperties,

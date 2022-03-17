@@ -1,188 +1,187 @@
 plugins {
-  id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
-  id 'com.github.kt3k.coveralls' version '2.12.0'
-  id 'me.champeau.jmh' version '0.6.6' apply false
+    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+    id 'com.github.kt3k.coveralls' version '2.12.0'
+    id 'me.champeau.jmh' version '0.6.6' apply false
 }
 
 apply plugin: 'jacoco'
 
-allprojects{
-  group = 'io.github.jeyjeyemem.externalizedproperties'
+allprojects {
+    group = 'io.github.jeyjeyemem.externalizedproperties'
 
-  def snapshotSuffix = rootProject.hasProperty('release') ? '' : '-SNAPSHOT'
-  version = '1.0.0' + snapshotSuffix
+    def snapshotSuffix = rootProject.hasProperty('release') ? '' : '-SNAPSHOT'
+    version = '1.0.0' + snapshotSuffix
 
-  repositories {
-    mavenLocal()
-    mavenCentral()
-  }
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
 }
 
 subprojects {
-  apply plugin: 'java-library'
-  apply plugin: 'maven-publish'
-  apply plugin: 'signing'
-  apply plugin: 'jacoco'
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+    apply plugin: 'signing'
+    apply plugin: 'jacoco'
 
-  dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
-  }
-
-  test { 
-    useJUnitPlatform() 
-  }
-
-  java {
-    toolchain {
-      languageVersion = JavaLanguageVersion.of(11)
+    dependencies {
+        // Use JUnit Jupiter for testing.
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
     }
 
-    withJavadocJar()
-    withSourcesJar()
-  }
-
-  compileJava {
-    options.release = 8
-  }
-
-  javadoc {
-    configure(options) {
-      tags(
-        'apiNote:a:API Note:',
-        'implSpec:a:Implementation Requirements:',
-        'implNote:a:Implementation Note:'
-      )
+    test { 
+        useJUnitPlatform() 
     }
-  }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(11)
+        }
+
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    compileJava {
+        options.release = 8
+    }
+
+    javadoc {
+        configure(options) {
+            tags(
+                'apiNote:a:API Note:',
+                'implSpec:a:Implementation Requirements:',
+                'implNote:a:Implementation Note:'
+            )
+        }
+    }
   
-  jacocoTestReport {
-    group = 'Coverage reports'
-    description = 'Generates a test coverage report for a project'
+    jacocoTestReport {
+        group = 'Coverage reports'
+        description = 'Generates a test coverage report for a project'
 
-    reports {
-      html.required = true // human readable
-      xml.required = true  // required by coveralls
+        reports {
+            html.required = true // human readable
+            xml.required = true  // required by coveralls
+        }
     }
-  }
 
-  publishing {
-    publications {
-      mavenJava(MavenPublication) {
-        from components.java
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
 
-        pom {
-          name = jar.archiveBaseName
-          description = project.description
-          packaging = 'jar'
+                pom {
+                    name = jar.archiveBaseName
+                    description = project.description
+                    packaging = 'jar'
+                    url = 'https://github.com/jeyjeyemem/externalized-properties'
 
-          url = 'https://github.com/jeyjeyemem/externalized-properties'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
 
-          licenses {
-            license {
-              name = 'The Apache License, Version 2.0'
-              url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    developers {
+                        developer {
+                            id = 'jeyjeyemem'
+                            name = 'Joel Jeremy M. Marquez'
+                            email = 'joeljeremy.marquez@gmail.com'
+                        }
+                    }
+
+                    scm {
+                        connection = 'scm:git:https://github.com/jeyjeyemem/externalized-properties.git'
+                        developerConnection = 'scm:git:https://github.com/jeyjeyemem/externalized-properties.git'
+                        url = 'https://github.com/jeyjeyemem/externalized-properties'
+                    }
+                }
             }
-          }
+        }
 
-          developers {
-            developer {
-              id = 'jeyjeyemem'
-              name = 'Joel Jeremy M. Marquez'
-              email = 'joeljeremy.marquez@gmail.com'
+        if (project.hasProperty('github-packages')) {
+            repositories {
+                maven {
+                    url = 'https://maven.pkg.github.com/jeyjeyemem/externalized-properties'
+                    name = 'github-packages'
+                    credentials {
+                        username = System.getenv('GITHUB_ACTOR') ?: property('githubActor')
+                        password = System.getenv('GITHUB_TOKEN') ?: property('githubToken')
+                    }
+                }
             }
-          }
-
-          scm {
-            connection = 'scm:git:https://github.com/jeyjeyemem/externalized-properties.git'
-            developerConnection = 'scm:git:https://github.com/jeyjeyemem/externalized-properties.git'
-            url = 'https://github.com/jeyjeyemem/externalized-properties'
-          }
         }
-      }
     }
 
-    if (project.hasProperty('github-packages')) {
-      repositories {
-        maven {
-          url = 'https://maven.pkg.github.com/jeyjeyemem/externalized-properties'
-          name = 'github-packages'
-          credentials {
-            username = System.getenv('GITHUB_ACTOR') ?: property('githubActor')
-            password = System.getenv('GITHUB_TOKEN') ?: property('githubToken')
-          }
-        }
-      }
+    if (project.hasProperty('release')) {
+        // If release property is set, do not allow publishing with SNAPSHOT dependencies.
+        Task checkSnapshotDependencies = project.tasks.create('checkSnapshotDependencies', {
+            doFirst {
+                def snapshots = project.configurations.findAll {
+                    it.canBeResolved
+                }.resolvedConfiguration.resolvedArtifacts.flatten().findAll {
+                    it.moduleVersion.id.version.endsWith('-SNAPSHOT')
+                }.unique()
+                if (!snapshots.isEmpty()) {
+                    throw new GradleException(
+                        "Cannot release with SNAPSHOT dependencies: $snapshots.moduleVersion"
+                    )
+                }
+            }
+        })
+        project.tasks.publish.dependsOn checkSnapshotDependencies
     }
-  }
 
-  if (project.hasProperty('release')) {
-    // If release property is set, do not allow publishing with SNAPSHOT dependencies.
-    Task checkSnapshotDependencies = project.tasks.create('checkSnapshotDependencies', {
-      doFirst {
-        def snapshots = project.configurations.findAll {
-          it.canBeResolved
-        }.resolvedConfiguration.resolvedArtifacts.flatten().findAll {
-          it.moduleVersion.id.version.endsWith('-SNAPSHOT')
-        }.unique()
-        if (!snapshots.isEmpty()) {
-          throw new GradleException(
-            "Cannot release with SNAPSHOT dependencies: $snapshots.moduleVersion"
-          )
+    if (project.hasProperty('ossrh')) {
+        signing {
+            required rootProject.hasProperty('release')
+            sign publishing.publications.mavenJava
         }
-      }
-    })
-    project.tasks.publish.dependsOn checkSnapshotDependencies
-  }
-
-  if (project.hasProperty('ossrh')) {
-    signing {
-      required rootProject.hasProperty('release')
-      sign publishing.publications.mavenJava
     }
-  }
 }
 
 if (project.hasProperty('ossrh')) {
-  nexusPublishing {
-    repositories {
-      sonatype {
-        nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
-        snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-        username = System.getenv('OSSRH_USERNAME') ?: property('ossrhUsername')
-        password = System.getenv('OSSRH_PASSWORD') ?: property('ossrhPassword')
-      }
+    nexusPublishing {
+        repositories {
+            sonatype {
+                nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+                snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                username = System.getenv('OSSRH_USERNAME') ?: property('ossrhUsername')
+                password = System.getenv('OSSRH_PASSWORD') ?: property('ossrhPassword')
+            }
+        }
     }
-  }
 }
 
 def coveredProjects = subprojects.findAll()
 
 tasks.register('jacocoFullReport', JacocoReport) {
-  group = 'Coverage reports'
-  description = 'Generates an aggregate report from all subprojects'
+    group = 'Coverage reports'
+    description = 'Generates an aggregate report from all subprojects'
 
-  coveredProjects.each {
-    sourceSets it.sourceSets.main
-    mustRunAfter it.tasks.withType(Test)
-    executionData fileTree(it.buildDir.absolutePath).include('jacoco/*.exec')
-  }
+    coveredProjects.each {
+        sourceSets it.sourceSets.main
+        mustRunAfter it.tasks.withType(Test)
+        executionData fileTree(it.buildDir.absolutePath).include('jacoco/*.exec')
+    }
 
-  reports {
-    html.required = true // human readable
-    xml.required = true  // required by coveralls
-  }
+    reports {
+        html.required = true // human readable
+        xml.required = true  // required by coveralls
+    }
 }
 
 coveralls {
-  sourceDirs = coveredProjects.sourceSets.main.allSource.srcDirs.flatten()
-  jacocoReportPath = "${buildDir}/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
+    sourceDirs = coveredProjects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
 }
 
 tasks.named('coveralls').configure {
-  group = 'Coverage reports'
-  description = 'Uploads the aggregated coverage report to Coveralls'
+    group = 'Coverage reports'
+    description = 'Uploads the aggregated coverage report to Coveralls'
 
-  dependsOn jacocoFullReport
-  onlyIf { System.getenv('CI') }
+    dependsOn jacocoFullReport
+    onlyIf { System.getenv('CI') }
 }

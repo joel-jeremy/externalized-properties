@@ -1,10 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ArrayProxyInterface;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.JavaPropertiesProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ListProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
@@ -69,7 +67,7 @@ public class ExternalizedPropertiesBuilderTests {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> ExternalizedPropertiesBuilder.newBuilder()
-                    .conversionHandlers((Collection<ConversionHandler<?>>)null)
+                    .converters((Collection<Converter<?>>)null)
             );
         }
     
@@ -79,7 +77,7 @@ public class ExternalizedPropertiesBuilderTests {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> ExternalizedPropertiesBuilder.newBuilder()
-                    .conversionHandlers((ConversionHandler<?>[])null)
+                    .converters((Converter<?>[])null)
             );
         }
     }
@@ -108,13 +106,39 @@ public class ExternalizedPropertiesBuilderTests {
     }
 
     @Nested
+    class VariableExpanderMethod {
+        @Test
+        @DisplayName("should throw when variable expander factory argument is null")
+        public void test1() {
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> ExternalizedPropertiesBuilder.newBuilder()
+                    .variableExpander(null)
+            );
+        }
+    }
+
+    @Nested
     class BuildMethod {
         @Test
-        @DisplayName("should throw when on build when there are no resolvers")
+        @DisplayName("should throw on build when there are no resolvers")
         public void test1() {
             assertThrows(
                 IllegalStateException.class,
                 () -> ExternalizedPropertiesBuilder.newBuilder().build()
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw on build when variable expander factory returns null"
+        )
+        public void test2() {
+            assertThrows(
+                IllegalStateException.class,
+                () -> ExternalizedPropertiesBuilder.newBuilder()
+                    .variableExpander(resolver -> null)
+                    .build()
             );
         }
     }
@@ -161,7 +185,7 @@ public class ExternalizedPropertiesBuilderTests {
             // - Optionals
             ExternalizedProperties ep = ExternalizedPropertiesBuilder.newBuilder()
                 .resolvers(new MapResolver(map))
-                .withDefaultConversionHandlers()
+                .withDefaultConverters()
                 .build();
     
             testDefaultConversionHandlers(ep);
@@ -235,13 +259,14 @@ public class ExternalizedPropertiesBuilderTests {
                     .withProxyEagerLoading()
                     .build();
 
-            BasicProxyInterface proxy = externalizedProperties.proxy(BasicProxyInterface.class);
+            JavaPropertiesProxyInterface proxy = 
+                externalizedProperties.proxy(JavaPropertiesProxyInterface.class);
 
             assertNotNull(proxy);
 
             // Properties were already eagerly resolved via resolver.
-            assertTrue(resolver.resolvedPropertyNames().contains("property"));
-            assertTrue(resolver.resolvedPropertyNames().contains("property.with.default.value"));
+            assertTrue(resolver.resolvedPropertyNames().contains("java.version"));
+            assertTrue(resolver.resolvedPropertyNames().contains("PATH"));
         }
     }
 

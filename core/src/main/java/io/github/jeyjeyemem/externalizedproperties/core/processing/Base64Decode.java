@@ -1,5 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.processing;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ProcessingContext;
 import io.github.jeyjeyemem.externalizedproperties.core.Processor;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ProcessingException;
 
@@ -32,16 +33,16 @@ public class Base64Decode implements Processor {
 
     /** {@inheritDoc} */
     @Override
-    public String processProperty(String property) {
-        requireNonNull(property, "property");
+    public String process(ProcessingContext context) {
+        requireNonNull(context, "context");
         try {
-            byte[] bytes = property.getBytes();
+            byte[] bytes = context.value().getBytes();
             byte[] decoded = decoder.decode(bytes);
             return new String(decoded);
         } catch (Exception ex) {
             throw new ProcessingException(
-                "Exception occurred while attempting to decode property using Base64: " +
-                property,
+                "Exception occurred while attempting to decode value using Base64: " +
+                context.value(),
                 ex
             );
         }

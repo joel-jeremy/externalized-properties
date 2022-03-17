@@ -1,6 +1,9 @@
 package io.github.jeyjeyemem.externalizedproperties.core.processing;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ProcessingContext;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ProcessingException;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ProcessorProxyInterface;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,7 +34,7 @@ public class Base64DecodeTests {
             Base64Decode base64Decode = new Base64Decode();
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> base64Decode.processProperty(null)
+                () -> base64Decode.process(null)
             );
         }
 
@@ -42,7 +45,12 @@ public class Base64DecodeTests {
             String base64Property = base64Encode(property, Base64.getEncoder());
             
             Base64Decode base64Decode = new Base64Decode();
-            String decoded = base64Decode.processProperty(base64Property);
+            String decoded = base64Decode.process(
+                new ProcessingContext(
+                    ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64Decode"), 
+                    base64Property
+                )
+            );
 
             assertEquals(property, decoded);
         }
@@ -56,7 +64,12 @@ public class Base64DecodeTests {
             String base64Property = base64Encode(property, Base64.getUrlEncoder());
             
             Base64Decode base64Decode = new Base64Decode(decoder);
-            String decoded = base64Decode.processProperty(base64Property);
+            String decoded = base64Decode.process(
+                new ProcessingContext(
+                    ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64Decode"), 
+                    base64Property
+                )
+            );
 
             assertEquals(property, decoded);
         }
@@ -72,7 +85,12 @@ public class Base64DecodeTests {
 
             assertThrows(
                 ProcessingException.class, 
-                () -> base64Decode.processProperty(invalidBase64)
+                () -> base64Decode.process(
+                    new ProcessingContext(
+                        ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64Decode"), 
+                        invalidBase64
+                    )
+                )
             );
         }
 

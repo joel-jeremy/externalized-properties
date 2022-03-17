@@ -17,12 +17,16 @@ import java.util.stream.Collectors;
  * the specified table name and it's property name and value column mappings.
  */
 public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
-    // Params in order: 
-    // 1. property name column
-    // 2. property value column
-    // 3. table name
-    // 4. property name column
-    // 5. property names mapped to comma-separated ?
+    /**
+     * Params in order: 
+     * <ol>
+     *  <li>property name column</li>
+     *  <li>property value column</li>
+     *  <li>table name</li>
+     *  <li>property name column</li>
+     *  <li>property names mapped to comma-separated ?</li>
+     * </ol>
+     */
     private static final String DEFAULT_QUERY_TEMPLATE = "SELECT %s, %s FROM %s WHERE %s IN (%s)";
 
     /**

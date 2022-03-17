@@ -1,6 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.WeakHashMapCacheStrategy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -28,6 +30,9 @@ public class CachingInvocationHandler implements InvocationHandler {
      * are the resolved properties. It is recommended that the {@link CacheStrategy} 
      * implementation only holds weak references to the {@link Method} key in order to avoid
      * leaks and class unloading issues.
+     * 
+     * @see WeakConcurrentHashMapCacheStrategy
+     * @see WeakHashMapCacheStrategy
      */
     public CachingInvocationHandler(
             InvocationHandler decorated,

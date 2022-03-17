@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.EnumConversionHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.converters.EnumConverter;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.converters.PrimitiveConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -17,7 +17,6 @@ import org.openjdk.jmh.annotations.Warmup;
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -31,38 +30,45 @@ import java.util.stream.Stream;
 public abstract class ConversionBenchmarks {
     @State(Scope.Benchmark)
     public static class BenchmarkState {
-        private ExternalizedProperties externalizedProperties;
-        private ExternalizedProperties externalizedPropertiesWithCaching;
-        private ExternalizedProperties externalizedPropertiesWithMultipleConversionHandlers;
         private ProxyInterface proxyInterface;
         private ProxyInterface proxyInterfaceWithCaching;
         private ProxyInterface proxyInterfaceWithMultipleConversionHandler;
 
         @Setup
-        public void setup() {
+        public void setup() throws NoSuchMethodException, SecurityException {
             /**
              * Basic setup. No caching.
              */
-            externalizedProperties = ExternalizedPropertiesBuilder.newBuilder()
-                .resolvers(new MapResolver(
-                    Collections.singletonMap("testInt", "1")
-                ))
-                .withDefaultConversionHandlers()
-                .build();
+            ExternalizedProperties externalizedProperties =     
+                ExternalizedPropertiesBuilder.newBuilder()
+                    .converters(new PrimitiveConverter())
+                    .build();
 
             proxyInterface = externalizedProperties.proxy(ProxyInterface.class);
+
+            // context = new ConversionContext(
+            //     converter, 
+            //     new ProxyMethod(
+            //         proxyInterface,
+            //         proxyInterface.getClass().getDeclaredMethod("test"),
+            //         externalizedProperties,
+            //         new MethodHandleFactory()
+            //     ), 
+            //     "1"
+            // );
 
             /**
              * Setup with caching.
              */
-            externalizedPropertiesWithCaching = ExternalizedPropertiesBuilder.newBuilder()
-                .resolvers(new MapResolver(
-                    Collections.singletonMap("testInt", "1")
-                ))
-                .withCaching()
-                .withCacheDuration(Duration.ofHours(24))
-                .withDefaultConversionHandlers()
-                .build();
+            ExternalizedProperties externalizedPropertiesWithCaching = 
+                ExternalizedPropertiesBuilder.newBuilder()
+                    .resolvers(new MapResolver(
+                        Collections.singletonMap("testInt", "1")
+                    ))
+                    .withResolverCaching()
+                    .withCacheDuration(Duration.ofHours(24))
+                    .converters(new PrimitiveConverter())
+                    .build();
 
             proxyInterfaceWithCaching = 
                 externalizedPropertiesWithCaching.proxy(ProxyInterface.class);
@@ -70,18 +76,18 @@ public abstract class ConversionBenchmarks {
             /**
              * Basic setup. No caching.
              */
-            externalizedPropertiesWithMultipleConversionHandlers = 
+            ExternalizedProperties externalizedPropertiesWithMultipleConversionHandlers = 
                 ExternalizedPropertiesBuilder.newBuilder()
                     .resolvers(new MapResolver(
                         Collections.singletonMap("testInt", "1")
                     ))
                     // Add a bunch more conversion handlers.
-                    .conversionHandlers(
-                        Stream.generate(() -> new EnumConversionHandler())
-                            .limit(50)
-                            .toArray(ConversionHandler<?>[]::new)
+                    .converters(
+                        Stream.generate(() -> new EnumConverter())
+                            .limit(10)
+                            .toArray(Converter<?>[]::new)
                     )
-                    .withDefaultConversionHandlers()
+                    .converters(new PrimitiveConverter())
                     .build();
 
             proxyInterfaceWithMultipleConversionHandler = 
@@ -128,10 +134,10 @@ public abstract class ConversionBenchmarks {
      * @param state The benchmark state.
      * @return For you, blackhole.
      */
-    @Benchmark
-    public Optional<Integer> resolveProperty(BenchmarkState state) {
-        return state.externalizedProperties.resolveProperty("testInt", Integer.class);
-    }
+    // @Benchmark
+    // public Object resolveProperty(BenchmarkState state) {
+    //     return state.externalizedProperties.convert(state.context).value();
+    // }
 
     /**
      * Benchmark resolution of properties directly from ExternalizedProperties
@@ -140,10 +146,10 @@ public abstract class ConversionBenchmarks {
      * @param state The benchmark state.
      * @return For you, blackhole.
      */
-    @Benchmark
-    public Optional<Integer> resolvePropertyWithCaching(BenchmarkState state) {
-        return state.externalizedPropertiesWithCaching.resolveProperty("testInt", Integer.class);
-    }
+    // @Benchmark
+    // public Optional<Integer> resolvePropertyWithCaching(BenchmarkState state) {
+    //     return state.externalizedPropertiesWithCaching.resolveProperty("testInt", Integer.class);
+    // }
 
     /**
      * Benchmark resolution of properties directly from ExternalizedProperties
@@ -152,15 +158,15 @@ public abstract class ConversionBenchmarks {
      * @param state The benchmark state.
      * @return For you, blackhole.
      */
-    @Benchmark
-    public Optional<Integer> resolvePropertyWithMultipleConversionHandlers(
-            BenchmarkState state
-    ) {
-        return state.externalizedPropertiesWithMultipleConversionHandlers.resolveProperty(
-            "testInt", 
-            Integer.class
-        );
-    }
+    // @Benchmark
+    // public Optional<Integer> resolvePropertyWithMultipleConversionHandlers(
+    //         BenchmarkState state
+    // ) {
+    //     return state.externalizedPropertiesWithMultipleConversionHandlers.resolveProperty(
+    //         "testInt", 
+    //         Integer.class
+    //     );
+    // }
 
     /**
      * Benchmark resolution of properties from a proxy interface and conversion to int.

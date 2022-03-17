@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ArrayProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ListProxyInterface;
 import org.junit.jupiter.api.DisplayName;
@@ -40,7 +40,7 @@ public class TypeReferenceTests {
             // Method returns a List<String>.
             // Used for comparison of generic type.
             Method method = 
-                StubProxyMethodInfo.getMethod(
+                ProxyMethodUtils.getMethod(
                     ListProxyInterface.class, 
                     "listProperty"
                 );
@@ -68,7 +68,7 @@ public class TypeReferenceTests {
             // Method returns a Optional<Optional<String>>[].
             // Used for comparison of generic type.
             Method method = 
-                StubProxyMethodInfo.getMethod(
+                ProxyMethodUtils.getMethod(
                     ArrayProxyInterface.class, 
                     "arrayPropertyNestedGeneric"
                 );

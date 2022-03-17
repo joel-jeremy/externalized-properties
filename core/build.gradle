@@ -3,14 +3,14 @@ apply plugin: 'me.champeau.jmh'
 description = 'Externalized Properties Core.'
 
 jar {
-  manifest {
-    attributes(
-      'Automatic-Module-Name': 'io.github.jeyjeyemem.externalizedproperties.core'
-    )
-  }
+    manifest {
+        attributes(
+            'Automatic-Module-Name': 'io.github.jeyjeyemem.externalizedproperties.core'
+        )
+    }
 }
 
 jmh {
-  resultsFile = project.file("${project.buildDir}/reports/jmh/results.json")
-  resultFormat = 'JSON'
+    resultsFile = project.file("${project.buildDir}/reports/jmh/results.json")
+    resultFormat = 'JSON'
 }

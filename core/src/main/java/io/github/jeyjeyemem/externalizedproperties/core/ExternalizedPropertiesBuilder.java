@@ -1,31 +1,29 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.Converter;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.handlers.DefaultConversionHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.CachingExternalizedProperties;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalExternalizedProperties;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalVariableExpander;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ConcurrentHashMapCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ExpiringCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.InternalConverter;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.processing.ProcessorRegistry;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.RootConverter;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.processing.RootProcessor;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.CachingInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.EagerLoadingInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.ExternalizedPropertyInvocationHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.InvocationHandlerFactory;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CachingResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositeResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.DefaultResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.EnvironmentVariableResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.BasicVariableExpander;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -34,12 +32,14 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  */
 public class ExternalizedPropertiesBuilder {
     private List<Resolver> resolvers = new ArrayList<>();
-    private List<ConversionHandler<?>> conversionHandlers = new ArrayList<>();
-    private List<Processor> processors = new ArrayList<>();
+    private List<Converter<?>> converters = new ArrayList<>();
+    private List<Processor> processingHandlers = new ArrayList<>();
+    private Function<Resolver, VariableExpander> variableExpanderFactory =
+        BasicVariableExpander::new;
     
     // Caching settings.
     private Duration cacheDuration = getDefaultCacheDuration();
-    private boolean withCaching = false;
+    private boolean withResolverCaching = false;
     private boolean withProxyEagerLoading = false;
     private boolean withProxyInvocationCaching = false;
 
@@ -51,16 +51,16 @@ public class ExternalizedPropertiesBuilder {
 
     /**
      * Enable default configurations. This will enable default {@link Resolver}s 
-     * and {@link ConversionHandler}s via the {@link #withDefaultResolvers()} and 
-     * {@link #withDefaultConversionHandlers()} methods and enable caching via 
-     * {@link #withCaching()} and {@link #withProxyInvocationCaching()} methods.
+     * and {@link Converter}s via the {@link #withDefaultResolvers()} and 
+     * {@link #withDefaultConverters()} methods and enable caching via 
+     * {@link #withResolverCaching()} and {@link #withProxyInvocationCaching()} methods.
      * 
      * @return This builder.
      */
     public ExternalizedPropertiesBuilder withDefaults() {
         return withDefaultResolvers()
-            .withDefaultConversionHandlers()
-            .withCaching()
+            .withDefaultConverters()
+            .withResolverCaching()
             .withProxyInvocationCaching();
     }
 
@@ -76,23 +76,23 @@ public class ExternalizedPropertiesBuilder {
     }
 
     /**
-     * Adds the {@link DefaultConversionHandler} to the registered 
-     * {@link ConversionHandler}s.
+     * Adds the {@link DefaultConverter} to the registered 
+     * {@link Converter}s.
      * 
      * @return This builder.
      */
-    public ExternalizedPropertiesBuilder withDefaultConversionHandlers() {
+    public ExternalizedPropertiesBuilder withDefaultConverters() {
         this.withDefaultConversionHandlers = true;
         return this;
     }
 
     /**
-     * Enable caching of resolved properties and variable expansion results.
+     * Enable caching of properties resolved via {@link Resolver}s.
      * 
      * @return This builder.
      */
-    public ExternalizedPropertiesBuilder withCaching() {
-        this.withCaching = true;
+    public ExternalizedPropertiesBuilder withResolverCaching() {
+        this.withResolverCaching = true;
         return this;
     }
 
@@ -136,7 +136,6 @@ public class ExternalizedPropertiesBuilder {
      */
     public ExternalizedPropertiesBuilder resolvers(Resolver... resolvers) {
         requireNonNull(resolvers, "resolvers");
-
         return resolvers(Arrays.asList(resolvers));
     }
 
@@ -148,39 +147,36 @@ public class ExternalizedPropertiesBuilder {
      */
     public ExternalizedPropertiesBuilder resolvers(Collection<Resolver> resolvers) {
         requireNonNull(resolvers, "resolvers");
-
         this.resolvers.addAll(resolvers);
         return this;
     }
 
     /**
-     * The array of {@link ConversionHandler}s to convert properties
+     * The array of {@link Converter}s to convert properties
      * to various types.
      * 
-     * @param conversionHandlers The conversion handlers.
+     * @param converters The converters.
      * @return This builder.
      */
-    public ExternalizedPropertiesBuilder conversionHandlers(
-            ConversionHandler<?>... conversionHandlers
+    public ExternalizedPropertiesBuilder converters(
+            Converter<?>... converters
     ) {
-        requireNonNull(conversionHandlers, "conversionHandlers");
-
-        return conversionHandlers(Arrays.asList(conversionHandlers));
+        requireNonNull(converters, "converters");
+        return converters(Arrays.asList(converters));
     }
 
     /**
-     * The collection of {@link ConversionHandler}s to convert properties
+     * The collection of {@link Converter}s to convert properties
      * to various types.
      * 
-     * @param conversionHandlers The conversion handlers.
+     * @param converters The converters.
      * @return This builder.
      */
-    public ExternalizedPropertiesBuilder conversionHandlers(
-            Collection<ConversionHandler<?>> conversionHandlers
+    public ExternalizedPropertiesBuilder converters(
+            Collection<Converter<?>> converters
     ) {
-        requireNonNull(conversionHandlers, "conversionHandlers");
-        
-        this.conversionHandlers.addAll(conversionHandlers);
+        requireNonNull(converters, "converters");
+        this.converters.addAll(converters);
         return this;
     }
 
@@ -190,9 +186,10 @@ public class ExternalizedPropertiesBuilder {
      * @param processors The processors to register.
      * @return This builder.
      */
-    public ExternalizedPropertiesBuilder processors(Processor... processors) {
+    public ExternalizedPropertiesBuilder processors(
+            Processor... processors
+    ) {
         requireNonNull(processors, "processors");
-
         return processors(Arrays.asList(processors));
     }
 
@@ -202,10 +199,26 @@ public class ExternalizedPropertiesBuilder {
      * @param processors The processors to register.
      * @return This builder.
      */
-    public ExternalizedPropertiesBuilder processors(Collection<Processor> processors) {
+    public ExternalizedPropertiesBuilder processors(
+            Collection<Processor> processors
+    ) {
         requireNonNull(processors, "processors");
+        this.processingHandlers.addAll(processors);
+        return this;
+    }
 
-        this.processors.addAll(processors);
+    /**
+     * The factory for creating the {@link VariableExpander}.
+     * 
+     * @param variableExpanderFactory The factory for creating the 
+     * {@link VariableExpander}.
+     * @return This builder.
+     */
+    public ExternalizedPropertiesBuilder variableExpander(
+            Function<Resolver, VariableExpander> variableExpanderFactory
+    ) {
+        requireNonNull(variableExpanderFactory, "variableExpanderFactory");
+        this.variableExpanderFactory = variableExpanderFactory;
         return this;
     }
 
@@ -216,32 +229,32 @@ public class ExternalizedPropertiesBuilder {
      */
     public ExternalizedProperties build() {
         Resolver resolver = buildResolver();
-        Converter converter = buildConverter();
-        ProcessorRegistry processorRegistry = buildProcessorRegistry();
+        Converter<?> converter = buildConverter();
+        Processor processor = buildProcessor();
         VariableExpander variableExpander = buildVariableExpander(resolver);
         InvocationHandlerFactory invocationHandlerFactory = buildInvocationHandlerFactory();
 
         ExternalizedProperties externalizedProperties = new InternalExternalizedProperties(
             resolver, 
-            processorRegistry,
+            processor,
             converter,
             variableExpander,
             invocationHandlerFactory
         );
 
-        if (withCaching) {
-            return new CachingExternalizedProperties(
-                externalizedProperties,
-                new ExpiringCacheStrategy<>(
-                    new ConcurrentHashMapCacheStrategy<>(),
-                    cacheDuration
-                ),
-                new ExpiringCacheStrategy<>(
-                    new ConcurrentHashMapCacheStrategy<>(),
-                    cacheDuration
-                )
-            );
-        }
+        // if (withCaching) {
+        //     return new CachingExternalizedProperties(
+        //         externalizedProperties,
+        //         new ExpiringCacheStrategy<>(
+        //             new ConcurrentHashMapCacheStrategy<>(),
+        //             cacheDuration
+        //         ),
+        //         new ExpiringCacheStrategy<>(
+        //             new ConcurrentHashMapCacheStrategy<>(),
+        //             cacheDuration
+        //         )
+        //     );
+        // }
 
         return externalizedProperties;
     }
@@ -277,14 +290,16 @@ public class ExternalizedPropertiesBuilder {
         if (withProxyEagerLoading) {
             // Decorate with EagerLoadingInvocationHandler.
             factory = factory.compose((baseFactory, externalizedProperties, proxyInterface) -> 
-                new EagerLoadingInvocationHandler(
+                EagerLoadingInvocationHandler.eagerLoad(
                     baseFactory.createInvocationHandler(externalizedProperties, proxyInterface),
-                    externalizedProperties,
-                    proxyInterface,
                     new ExpiringCacheStrategy<>(
                         new WeakConcurrentHashMapCacheStrategy<>(),
                         cacheDuration
-                    )
+                    ),
+                    externalizedProperties.resolver(),
+                    externalizedProperties.converter(),
+                    externalizedProperties.processor(),
+                    proxyInterface
                 ));
         }
 
@@ -304,27 +319,37 @@ public class ExternalizedPropertiesBuilder {
             );
         }
 
-        return CompositeResolver.flatten(resolvers);
+        Resolver resolver = CompositeResolver.flatten(resolvers);
+        if (withResolverCaching) {
+            resolver = new CachingResolver(
+                resolver, 
+                new ExpiringCacheStrategy<>(
+                    new WeakConcurrentHashMapCacheStrategy<>(),
+                    cacheDuration
+                )
+            );
+        }
+        return resolver;
     }
 
-    private InternalConverter buildConverter() {
+    private Converter<?> buildConverter() {
         // Add default conversion handlers last.
         // Custom conversion handlers always take precedence.
         if (withDefaultConversionHandlers) {
-            conversionHandlers(new DefaultConversionHandler());
+            converters(new DefaultConverter());
         }
         
-        return new InternalConverter(conversionHandlers);
+        return new RootConverter(converters);
     }
 
-    private ProcessorRegistry buildProcessorRegistry() {
-        return new ProcessorRegistry(processors);
+    private Processor buildProcessor() {
+        return new RootProcessor(processingHandlers);
     }
 
-    private InternalVariableExpander buildVariableExpander(
+    private VariableExpander buildVariableExpander(
             Resolver resolver
     ) {
-        return new InternalVariableExpander(resolver);
+        return variableExpanderFactory.apply(resolver);
     }
 
     private Duration getDefaultCacheDuration() {

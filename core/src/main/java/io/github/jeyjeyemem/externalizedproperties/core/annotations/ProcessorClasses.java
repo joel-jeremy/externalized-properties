@@ -29,4 +29,13 @@ public @interface ProcessorClasses {
      * @return The array of processor classes to process the externalized property.
      */
     Class<? extends Processor>[] value();
+
+    /**
+     * The processor attributes to be made accessible to processors
+     * during processing.
+     * 
+     * @return The array of processor attributes to be made accessible to processors
+     * during processing.
+     */
+    ProcessorAttribute[] attributes() default {};
 }

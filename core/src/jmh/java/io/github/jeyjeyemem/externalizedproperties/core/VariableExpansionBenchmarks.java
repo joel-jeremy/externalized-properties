@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.BasicVariableExpander;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -13,7 +14,6 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -27,8 +27,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class VariableExpansionBenchmarks {
     @State(Scope.Benchmark)
     public static class BenchmarkState {
-        private ExternalizedProperties externalizedProperties;
-        private ExternalizedProperties externalizedPropertiesWithCaching;
+        private VariableExpander variableExpander;
 
         @Setup
         public void setup() {
@@ -37,18 +36,7 @@ public abstract class VariableExpansionBenchmarks {
             /**
              * Basic setup. No caching.
              */
-            externalizedProperties = ExternalizedPropertiesBuilder.newBuilder()
-                .resolvers(new MapResolver(propertySource))
-                .build();
-
-            /**
-             * Setup with caching.
-             */
-            externalizedPropertiesWithCaching = ExternalizedPropertiesBuilder.newBuilder()
-                .resolvers(new MapResolver(propertySource))
-                .withCaching()
-                .withCacheDuration(Duration.ofHours(24))
-                .build();
+            variableExpander = new BasicVariableExpander(new MapResolver(propertySource));
         }
     }
 
@@ -92,17 +80,6 @@ public abstract class VariableExpansionBenchmarks {
      */
     @Benchmark
     public String variableExpansion(BenchmarkState state) {
-        return state.externalizedProperties.expandVariables("${test}");
-    }
-
-    /**
-     * Benchmark variable expansion while caching is enabled.
-     * 
-     * @param state The benchmark state.
-     * @return For you, blackhole.
-     */
-    @Benchmark
-    public String variableExpansionWithCaching(BenchmarkState state) {
-        return state.externalizedPropertiesWithCaching.expandVariables("${test}");
+        return state.variableExpander.expandVariables("${test}");
     }
 }

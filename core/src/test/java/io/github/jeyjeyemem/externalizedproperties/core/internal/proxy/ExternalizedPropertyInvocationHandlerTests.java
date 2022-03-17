@@ -1,15 +1,17 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
+import io.github.jeyjeyemem.externalizedproperties.core.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBuilder;
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionHandler;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositeResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubProxyMethodInfo;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.DefaultValueProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.NoAnnotationProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.VariableProxyInterface;
@@ -43,7 +45,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 BasicProxyInterface.class,
                 "property"
             );
@@ -70,8 +72,11 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
-                BasicProxyInterface.class,
+            Class<DefaultValueProxyInterface> proxyInterface = 
+                DefaultValueProxyInterface.class;
+            
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
                 "propertyWithDefaultValue"
             );
 
@@ -79,7 +84,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 new ExternalizedPropertyInvocationHandler(externalizedProperties);
 
             Object result = handler.invoke(
-                externalizedProperties.proxy(BasicProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
                 new Object[0]
             );
@@ -97,8 +102,11 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
-                BasicProxyInterface.class,
+            Class<DefaultValueProxyInterface> proxyInterface = 
+                DefaultValueProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
                 "propertyWithDefaultValueParameter",
                 String.class
             );
@@ -108,7 +116,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             String providedDefaultValue = "provided.default.value";
             Object result = handler.invoke(
-                externalizedProperties.proxy(BasicProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface),
                 proxyMethod, 
                 new Object[] { providedDefaultValue }
             );
@@ -122,8 +130,11 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
-                BasicProxyInterface.class,
+            Class<DefaultValueProxyInterface> proxyInterface = 
+                DefaultValueProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
                 "propertyWithDefaultValue"
             );
 
@@ -131,7 +142,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 new ExternalizedPropertyInvocationHandler(externalizedProperties);
 
             Object result = handler.invoke(
-                externalizedProperties.proxy(BasicProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
                 new Object[0]
             );
@@ -145,8 +156,11 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
-                BasicProxyInterface.class,
+            Class<DefaultValueProxyInterface> proxyInterface = 
+                DefaultValueProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
                 "propertyWithDefaultValueParameter",
                 String.class
             );
@@ -157,7 +171,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             // Pass default value.
             String providedDefaultValue = "provided.default.value";
             Object result = handler.invoke(
-                externalizedProperties.proxy(BasicProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
                 new Object[] { providedDefaultValue }
             );
@@ -173,8 +187,11 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
-                BasicProxyInterface.class,
+            Class<NoAnnotationProxyInterface> proxyInterface = 
+                NoAnnotationProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
                 "propertyWithNoAnnotationButWithDefaultValue"
             );
 
@@ -182,7 +199,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 new ExternalizedPropertyInvocationHandler(externalizedProperties);
 
             Object result = handler.invoke(
-                externalizedProperties.proxy(BasicProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
                 new Object[0]
             );
@@ -199,8 +216,11 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
-                BasicProxyInterface.class,
+            Class<NoAnnotationProxyInterface> proxyInterface = 
+                NoAnnotationProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
                 "propertyWithNoAnnotationButWithDefaultValueParameter",
                 String.class
             );
@@ -211,7 +231,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             // Pass default value.
             String providedDefaultValue = "provided.default.value";
             Object result = handler.invoke(
-                externalizedProperties.proxy(BasicProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
                 new Object[] { providedDefaultValue }
             );
@@ -225,7 +245,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 BasicProxyInterface.class,
                 "property"
             );
@@ -248,8 +268,8 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
-                BasicProxyInterface.class,
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                NoAnnotationProxyInterface.class,
                 "propertyWithNoAnnotationAndNoDefaultValue"
             );
 
@@ -277,12 +297,12 @@ public class ExternalizedPropertyInvocationHandlerTests {
             PrimitiveProxyInterface proxy = 
                 externalizedProperties.proxy(PrimitiveProxyInterface.class);
 
-            Method intWrapperMethod = StubProxyMethodInfo.getMethod(
+            Method intWrapperMethod = ProxyMethodUtils.getMethod(
                 PrimitiveProxyInterface.class,
                 "integerWrapperProperty"
             );
 
-            Method intPrimitiveMethod = StubProxyMethodInfo.getMethod(
+            Method intPrimitiveMethod = ProxyMethodUtils.getMethod(
                 PrimitiveProxyInterface.class,
                 "intPrimitiveProperty"
             );
@@ -322,7 +342,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 VariableProxyInterface.class,
                 "variableProperty"
             );
@@ -347,7 +367,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 VariableProxyInterface.class,
                 "variableProperty"
             );
@@ -379,7 +399,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 OptionalProxyInterface.class,
                 "optionalProperty"
             );
@@ -409,7 +429,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
             
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 OptionalProxyInterface.class,
                 "optionalPropertyWithDefaultValue"
             );
@@ -441,7 +461,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
             
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 OptionalProxyInterface.class,
                 "optionalPropertyWithDefaultValue"
             );
@@ -470,7 +490,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 OptionalProxyInterface.class,
                 "optionalPropertyWithDefaultValue"
             );
@@ -498,7 +518,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 OptionalProxyInterface.class,
                 "optionalPropertyWithDefaultValueParameter",
                 String.class
@@ -530,7 +550,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 OptionalProxyInterface.class,
                 "optionalPropertyWithNoAnnotationAndWithDefaultValue"
             );
@@ -561,7 +581,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 OptionalProxyInterface.class,
                 "optionalPropertyWithNoAnnotationAndWithDefaultValueParameter",
                 String.class
@@ -593,7 +613,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 OptionalProxyInterface.class,
                 "optionalProperty"
             );
@@ -622,7 +642,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(Collections.emptyMap());
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 OptionalProxyInterface.class,
                 "optionalPropertyWithNoAnnotationAndNoDefaultValue"
             );
@@ -651,7 +671,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
             ExternalizedProperties externalizedProperties = externalizedProperties(map);
 
-            Method proxyMethod = StubProxyMethodInfo.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 OptionalProxyInterface.class,
                 "nonStringOptionalProperty"
             );
@@ -684,7 +704,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties.proxy(BasicProxyInterface.class);
 
             Method objectEqualsMethod = 
-                StubProxyMethodInfo.getMethod(
+                ProxyMethodUtils.getMethod(
                     Object.class,
                     "equals",
                     Object.class
@@ -716,7 +736,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties.proxy(BasicProxyInterface.class);
 
             Method objectEqualsMethod = 
-                StubProxyMethodInfo.getMethod(
+                ProxyMethodUtils.getMethod(
                     Object.class,
                     "equals",
                     Object.class
@@ -748,7 +768,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties.proxy(EqualsProxyInterfaceTest.class);
 
             Method objectEqualsMethod = 
-                StubProxyMethodInfo.getMethod(
+                ProxyMethodUtils.getMethod(
                     EqualsProxyInterfaceTest.class,
                     "equals"
                 );
@@ -778,7 +798,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties.proxy(BasicProxyInterface.class);
 
             Method objectHashCodeMethod = 
-                StubProxyMethodInfo.getMethod(
+                ProxyMethodUtils.getMethod(
                     Object.class,
                     "hashCode"
                 );
@@ -808,7 +828,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
                 externalizedProperties.proxy(BasicProxyInterface.class);
 
             Method objectToStringMethod = 
-                StubProxyMethodInfo.getMethod(
+                ProxyMethodUtils.getMethod(
                     Object.class,
                     "toString"
                 );
@@ -835,7 +855,7 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
     private ExternalizedProperties externalizedProperties(
             Map<String, String> propertySource,
-            ConversionHandler<?>... conversionHandlers
+            Converter<?>... conversionHandlers
     ) {
         return externalizedProperties(
             Arrays.asList(new MapResolver(propertySource)),
@@ -845,17 +865,17 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
     private ExternalizedProperties externalizedProperties(
             Collection<Resolver> resolvers,
-            Collection<ConversionHandler<?>> conversionHandlers
+            Collection<Converter<?>> conversionHandlers
     ) {
         Resolver resolver = CompositeResolver.flatten(resolvers);
         
         ExternalizedPropertiesBuilder builder = 
             ExternalizedPropertiesBuilder.newBuilder()
                 .resolvers(resolver)
-                .conversionHandlers(conversionHandlers);
+                .converters(conversionHandlers);
 
         if (conversionHandlers.size() == 0) {
-            builder.withDefaultConversionHandlers();
+            builder.withDefaultConverters();
         }
 
         return builder.build();

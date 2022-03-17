@@ -1,5 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
+import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ConcurrentHashMapCacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CachingResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -30,7 +32,8 @@ public abstract class ResolutionBenchmarks {
     @State(Scope.Benchmark)
     public static class BenchmarkState {
         private Map<String, String> baselineMap;
-        private ExternalizedProperties externalizedProperties;
+        private Resolver resolver;
+        private Resolver resolverWithCaching;
         private ProxyInterface proxyInterface;
         private ProxyInterface proxyInterfaceWithCaching;
         private ProxyInterface proxyInterfaceWithInvocationCaching;
@@ -50,9 +53,16 @@ public abstract class ResolutionBenchmarks {
             /**
              * Basic setup. No caching.
              */
-            externalizedProperties = ExternalizedPropertiesBuilder.newBuilder()
-                .resolvers(new MapResolver(propertySource))
-                .build();
+            resolver = new MapResolver(propertySource);
+            resolverWithCaching = new CachingResolver(
+                new MapResolver(propertySource),
+                new ConcurrentHashMapCacheStrategy<>()
+            );
+
+            ExternalizedProperties externalizedProperties = 
+                ExternalizedPropertiesBuilder.newBuilder()
+                    .resolvers(new MapResolver(propertySource))
+                    .build();
 
             proxyInterface = externalizedProperties.proxy(ProxyInterface.class);
 
@@ -61,7 +71,7 @@ public abstract class ResolutionBenchmarks {
              */
             externalizedPropertiesWithCaching = ExternalizedPropertiesBuilder.newBuilder()
                 .resolvers(new MapResolver(propertySource))
-                .withCaching()
+                .withResolverCaching()
                 .withCacheDuration(Duration.ofHours(3))
                 .build();
 
@@ -166,8 +176,8 @@ public abstract class ResolutionBenchmarks {
      * @return For you, blackhole.
      */
     @Benchmark
-    public Optional<String> resolveProperty(BenchmarkState state) {
-        return state.externalizedProperties.resolveProperty("test");
+    public Optional<String> resolver(BenchmarkState state) {
+        return state.resolver.resolve("test");
     }
 
     /**
@@ -178,8 +188,8 @@ public abstract class ResolutionBenchmarks {
      * @return For you, blackhole.
      */
     @Benchmark
-    public Optional<String> resolvePropertyWithCaching(BenchmarkState state) {
-        return state.externalizedPropertiesWithCaching.resolveProperty("test");
+    public Optional<String> resolverWithCaching(BenchmarkState state) {
+        return state.resolverWithCaching.resolve("test");
     }
 
     /**
