@@ -117,8 +117,9 @@ public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = buildExternalizedProperties();
 
     // Direct resolution via ExternalizedProperties API.
-    Optional<String> databaseUrl = externalizedProperties.resolveProperty("DATABASE_URL");
-    Optional<String> databaseDriver = externalizedProperties.resolveProperty("DATABASE_DRIVER");
+    Resolver resolver = externalizedProperties.resolver();
+    Optional<String> databaseUrl = resolver.resolveProperty("DATABASE_URL");
+    Optional<String> databaseDriver = resolver.resolveProperty("DATABASE_DRIVER");
 
     // Use property:
     System.out.println("Database URL: " + databaseUrl.get());
@@ -128,17 +129,17 @@ public static void main(String[] args) {
 
 ### Property Conversion
 
-Externalized Properties has powerful support for conversion of properties to various types. There are several build-in conversion handlers but developers are free to create a custom conversion handler by implementing the `ConversionHandler` interface.
+Externalized Properties has powerful support for conversion of properties to various types. There are several build-in converters but it is very easy to create a custom converter by implementing the `Converter` interface.
 
-To register conversion handlers to the library, it must be done through the builder:
+To register converters to the library, it must be done through the builder:
 
 ```java
 private ExternalizedProperties buildExternalizedProperties() {
     ExternalizedProperties externalizedProperties = ExternalizedPropertiesBuilder.newBuilder()
         .withDefaultResolvers()
-        .conversionHandlers(
-            new PrimitiveConversionHandler(),
-            new CustomConversionHandler()
+        .converters(
+            new PrimitiveConverter(),
+            new CustomConverter()
         )
         .build();
 
@@ -146,7 +147,7 @@ private ExternalizedProperties buildExternalizedProperties() {
 }
 ```
 
-To convert a property via the proxy interface, just set the method return type to the target type, and the library will handle the conversion behind the scenes - using the registered conversion handlers.
+To convert a property via the proxy interface, just set the method return type to the target type, and the library will handle the conversion behind the scenes - using the registered converters.
 
 ```java
 public interface ApplicationProperties {
@@ -167,28 +168,9 @@ public static void main(String[] args) {
 }
 ```
 
-To convert a property via the `ExternalizedProperties` API, the `resolveProperty` method which accepts a target type must be used:
-
-```java
-public static void main(String[] args) {
-    ExternalizedProperties externalizedProperties = buildExternalizedProperties();
-
-    // Use properties.
-    Optional<Integer> numberOfThreads = externalizedProperties.resolveProperty("number-of-threads", Integer.class);
-    // TypeReference class can be used to specify generic target types.
-    Optional<List<Integer>> validNumbers = externalizedProperties.resolveProperty(
-        "valid-numbers", 
-        new TypeReference<List<Integer>>(){}
-    );
-
-    System.out.println("Number of threads: " + numberOfThreads.get());
-    System.out.println("Valid numbers: " + validNumbers.get());
-}
-```
-
 ### Conversion to Generic Types
 
-Externalized Properties has good support for generic types. Given the proxy interface:
+Externalized Properties has powerful support for generic types. Given the proxy interface:
 
 ```java
 public interface ApplicationProperties {
@@ -197,7 +179,7 @@ public interface ApplicationProperties {
 }
 ```
 
-Externalized Properties provides enough information to conversion handlers for them to be able to convert each item from the `list-of-numbers` property to an integer (provided a conversion handler is registered to convert to an integer).
+Externalized Properties is capable of converting each item from the `list-of-numbers` property to an integer (provided a converter is registered to convert to an integer).
 
 An arbitraty generic type parameter depth is supported. For example,
 
@@ -208,4 +190,4 @@ public interface ApplicationProperties {
 }
 ````
 
-Conversion handlers should be able to extract the generic type information from the conversion context and convert each item to an `Optional<Integer>`.
+Each item in the list will be converted to an `Optional<Integer>`.

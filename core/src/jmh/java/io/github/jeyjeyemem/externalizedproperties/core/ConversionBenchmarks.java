@@ -41,6 +41,9 @@ public abstract class ConversionBenchmarks {
              */
             ExternalizedProperties externalizedProperties =     
                 ExternalizedPropertiesBuilder.newBuilder()
+                    .resolvers(new MapResolver(
+                        Collections.singletonMap("testInt", "1")
+                    ))
                     .converters(new PrimitiveConverter())
                     .build();
 
