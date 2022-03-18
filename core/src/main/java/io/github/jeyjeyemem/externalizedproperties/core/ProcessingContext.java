@@ -5,15 +5,17 @@ import io.github.jeyjeyemem.externalizedproperties.core.annotations.ProcessorCla
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
+/**
+ * Context object for {@link Processor}s.
+ */
 public class ProcessingContext {
     private final ProxyMethod proxyMethod;
     private final String value;
@@ -104,21 +106,22 @@ public class ProcessingContext {
             return Collections.emptyMap();
         }
 
-        Map<String, String> attributesForProcessor = 
-            Arrays.stream(processorClasses.attributes())
-                .filter(p ->
-                    // If no forProcessors, add attribute for all processors
-                    p.forProcessors().length == 0 ||
-                    // If there is forProcessors, only add to those specific processors
-                    Arrays.stream(p.forProcessors())
-                        .anyMatch(fp -> fp.equals(processorClass))
-                )
-                .collect(Collectors.toMap(
-                    ProcessorAttribute::name, 
-                    ProcessorAttribute::value
-                ));
+        Map<String, String> attributes = new HashMap<>();
+        for (ProcessorAttribute attribute : processorClasses.attributes()) {
+            // Attribute is not specific to a processor. We'll take it.
+            if (attribute.forProcessors().length == 0) {
+                attributes.put(attribute.name(), attribute.value());
+            }
 
-        return Collections.unmodifiableMap(attributesForProcessor);
+            // Take attributes that are for the given processor class.
+            for (Class<? extends Processor> forProcessor : attribute.forProcessors()) {
+                if (forProcessor.equals(processorClass)) {
+                    attributes.put(attribute.name(), attribute.value());
+                }
+            }
+        }
+
+        return Collections.unmodifiableMap(attributes);
     }
 
     /**
