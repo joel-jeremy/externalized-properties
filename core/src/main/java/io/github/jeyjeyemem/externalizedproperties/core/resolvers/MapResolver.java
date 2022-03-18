@@ -99,18 +99,19 @@ public class MapResolver implements Resolver {
 
     private String getPropertyOrNull(String propertyName) {
         String propertyValue = propertySource.get(propertyName);
-        if (propertyValue == null) {
-            // Try to resolve from unresolved handler and cache result.
-            propertyValue = unresolvedPropertyHandler.apply(propertyName);
-            if (propertyValue == null) {
-                // Unable to resolve property.
-                return null;
-            }
-
-            propertySource.putIfAbsent(propertyName, propertyValue);
+        if (propertyValue != null) {
+            return propertyValue;
         }
-        
-        return propertyValue;
+
+        // Try to resolve from unresolved handler and cache result.
+        propertyValue = unresolvedPropertyHandler.apply(propertyName);
+        if (propertyValue != null) {
+            propertySource.putIfAbsent(propertyName, propertyValue);
+            return propertyValue;
+        }
+
+        // Unable to resolve property.
+        return null;
     }
 
     private void throwIfNullOrEmptyValue(String propertyName) {
