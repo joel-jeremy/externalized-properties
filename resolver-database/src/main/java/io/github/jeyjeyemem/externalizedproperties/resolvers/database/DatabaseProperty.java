@@ -11,8 +11,8 @@ public class DatabaseProperty {
             String name,
             String value
     ) {
-        if (name == null) {
-            throw new IllegalArgumentException("name must not be null.");
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("name must not be null or empty.");
         }
         if (value == null) {
             throw new IllegalArgumentException("value must not be null.");
