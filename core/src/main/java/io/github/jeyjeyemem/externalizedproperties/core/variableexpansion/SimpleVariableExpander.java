@@ -8,12 +8,12 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
 /**
- * A basic {@link VariableExpander} implementation.
+ * A simple {@link VariableExpander} implementation.
  * This resolves the variables from the resolver.
  * 
  * @implNote By default, this will match the basic pattern: ${variable}
  */
-public class BasicVariableExpander implements VariableExpander {
+public class SimpleVariableExpander implements VariableExpander {
 
     private static final String DEFAULT_VARIABLE_PREFIX = "${";
     private static final String DEFAULT_VARIABLE_END_SUFFIX = "}";
@@ -28,7 +28,7 @@ public class BasicVariableExpander implements VariableExpander {
      * 
      * @param resolver The resolver to lookup variable values from.
      */
-    public BasicVariableExpander(Resolver resolver) {
+    public SimpleVariableExpander(Resolver resolver) {
         this(
             resolver, 
             DEFAULT_VARIABLE_PREFIX, 
@@ -44,7 +44,7 @@ public class BasicVariableExpander implements VariableExpander {
      * @param variablePrefix The variable prefix to look for when expanding variables.
      * @param variableSuffix The variable suffix to look for when expanding variables.
      */
-    public BasicVariableExpander(
+    public SimpleVariableExpander(
             Resolver resolver,
             String variablePrefix,
             String variableSuffix

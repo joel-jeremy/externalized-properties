@@ -1,5 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.awsssm;
 
+import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.function.Supplier;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -30,16 +31,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Testcontainers(disabledWithoutDocker = true)
 public class AwsSsmResolverTests {
 
-    private static DockerImageName LOCALSTACK_IMAGE = DockerImageName.parse(
-        "localstack/localstack:0.13.0"
+    static final DockerImageName LOCALSTACK_IMAGE = DockerImageName.parse(
+        "localstack/localstack:0.14.1"
     );
     
     @Container
-    private static LocalStackContainer LOCALSTACK = new LocalStackContainer(LOCALSTACK_IMAGE)
-        .withServices(Service.SSM);
+    static final LocalStackContainer LOCALSTACK = 
+        new LocalStackContainer(LOCALSTACK_IMAGE)
+            .withServices(Service.SSM);
+
+    // Should only be called after container has started 
+    // e.g. in @Nested classes or @Test methods.
+    static final Supplier<SsmClient> SSM_CLIENT_FACTORY = () -> SsmClient.builder()
+        .endpointOverride(LOCALSTACK.getEndpointOverride(Service.SSM))
+        .credentialsProvider(StaticCredentialsProvider.create(
+            AwsBasicCredentials.create(
+                LOCALSTACK.getAccessKey(), 
+                LOCALSTACK.getSecretKey()
+            )
+        ))
+        .region(Region.of(LOCALSTACK.getRegion()))
+        .build();
 
     @BeforeAll
-    public static void setup() throws IOException, InterruptedException {
+    static void setup() throws IOException, InterruptedException {
         createTestSsmParameters();
     }
 
@@ -47,7 +62,7 @@ public class AwsSsmResolverTests {
     class Constructor {
         @Test
         @DisplayName("should throw when ssm client argument is null")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new AwsSsmResolver(null)
@@ -58,20 +73,11 @@ public class AwsSsmResolverTests {
     @Nested
     class ResolveMethod {
 
-        private final SsmClient ssmClient = SsmClient.builder()
-            .endpointOverride(LOCALSTACK.getEndpointOverride(Service.SSM))
-            .credentialsProvider(StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(
-                    LOCALSTACK.getAccessKey(), 
-                    LOCALSTACK.getSecretKey()
-                )
-            ))
-            .region(Region.of(LOCALSTACK.getRegion()))
-            .build();
+        private final SsmClient ssmClient = SSM_CLIENT_FACTORY.get();
             
         @Test
         @DisplayName("should throw when propertyName argument is null")
-        public void test1() {
+        void test1() {
             AwsSsmResolver awsSsmPropertyResolver = 
                 new AwsSsmResolver(ssmClient);
 
@@ -82,7 +88,7 @@ public class AwsSsmResolverTests {
 
         @Test
         @DisplayName("should throw when propertyName argument is empty")
-        public void test2() {
+        void test2() {
             AwsSsmResolver awsSsmPropertyResolver = 
                 new AwsSsmResolver(ssmClient);
                 
@@ -93,7 +99,7 @@ public class AwsSsmResolverTests {
 
         @Test
         @DisplayName("should resolve property from AWS SSM")
-        public void test3() {
+        void test3() {
             AwsSsmResolver awsSsmPropertyResolver = 
                 new AwsSsmResolver(ssmClient);
 
@@ -105,7 +111,7 @@ public class AwsSsmResolverTests {
 
         @Test
         @DisplayName("should return empty Optional when property is not found in AWS SSM")
-        public void tes4() {
+        void tes4() {
             AwsSsmResolver awsSsmPropertyResolver = 
                 new AwsSsmResolver(ssmClient);
 
@@ -120,20 +126,11 @@ public class AwsSsmResolverTests {
     @Nested
     class ResolveMethodWithCollectionOverload {
 
-        private final SsmClient ssmClient = SsmClient.builder()
-            .endpointOverride(LOCALSTACK.getEndpointOverride(Service.SSM))
-            .credentialsProvider(StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(
-                    LOCALSTACK.getAccessKey(), 
-                    LOCALSTACK.getSecretKey()
-                )
-            ))
-            .region(Region.of(LOCALSTACK.getRegion()))
-            .build();
+        private final SsmClient ssmClient = SSM_CLIENT_FACTORY.get();
             
         @Test
         @DisplayName("should throw when propertyNames argument is null")
-        public void test1() {
+        void test1() {
             AwsSsmResolver awsSsmPropertyResolver = 
                 new AwsSsmResolver(ssmClient);
 
@@ -144,7 +141,7 @@ public class AwsSsmResolverTests {
 
         @Test
         @DisplayName("should throw when propertyNames argument is empty")
-        public void test2() {
+        void test2() {
             AwsSsmResolver awsSsmPropertyResolver = 
                 new AwsSsmResolver(ssmClient);
                 
@@ -155,7 +152,7 @@ public class AwsSsmResolverTests {
 
         @Test
         @DisplayName("should resolve all properties from AWS SSM")
-        public void test3() {
+        void test3() {
             AwsSsmResolver awsSsmPropertyResolver = 
                 new AwsSsmResolver(ssmClient);
 
@@ -189,7 +186,7 @@ public class AwsSsmResolverTests {
         @DisplayName(
             "should return result with resolved and unresolved properties from AWS SSM"
         )
-        public void test4() {
+        void test4() {
             AwsSsmResolver awsSsmPropertyResolver = 
                 new AwsSsmResolver(ssmClient);
 
@@ -222,20 +219,11 @@ public class AwsSsmResolverTests {
     @Nested
     class ResolveMethodWithVarArgsOverload {
 
-        private final SsmClient ssmClient = SsmClient.builder()
-            .endpointOverride(LOCALSTACK.getEndpointOverride(Service.SSM))
-            .credentialsProvider(StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(
-                    LOCALSTACK.getAccessKey(), 
-                    LOCALSTACK.getSecretKey()
-                )
-            ))
-            .region(Region.of(LOCALSTACK.getRegion()))
-            .build();
+        private final SsmClient ssmClient = SSM_CLIENT_FACTORY.get();
             
         @Test
         @DisplayName("should throw when propertyNames argument is null")
-        public void test1() {
+        void test1() {
             AwsSsmResolver awsSsmPropertyResolver = 
                 new AwsSsmResolver(ssmClient);
 
@@ -246,7 +234,7 @@ public class AwsSsmResolverTests {
 
         @Test
         @DisplayName("should throw when propertyNames argument is empty")
-        public void test2() {
+        void test2() {
             AwsSsmResolver awsSsmPropertyResolver = 
                 new AwsSsmResolver(ssmClient);
                 
@@ -257,7 +245,7 @@ public class AwsSsmResolverTests {
 
         @Test
         @DisplayName("should resolve all properties from AWS SSM")
-        public void test3() {
+        void test3() {
             AwsSsmResolver awsSsmPropertyResolver = 
                 new AwsSsmResolver(ssmClient);
 
@@ -291,7 +279,7 @@ public class AwsSsmResolverTests {
         @DisplayName(
             "should return result with resolved and unresolved properties from AWS SSM"
         )
-        public void test4() {
+        void test4() {
             AwsSsmResolver awsSsmPropertyResolver = 
                 new AwsSsmResolver(ssmClient);
 
@@ -322,7 +310,7 @@ public class AwsSsmResolverTests {
     }
     
     // Create parameters for testing.
-    private static void createTestSsmParameters() throws IOException, InterruptedException {
+    static void createTestSsmParameters() throws IOException, InterruptedException {
         LOCALSTACK.execInContainer(
             "awslocal",
             "ssm",

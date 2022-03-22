@@ -12,7 +12,7 @@ public class DatabasePropertyTests {
     class WithMethod {
         @Test
         @DisplayName("should throw when name is null")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> DatabaseProperty.with(null, "value")
@@ -21,7 +21,7 @@ public class DatabasePropertyTests {
 
         @Test
         @DisplayName("should throw when name is empty")
-        public void test2() {
+        void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> DatabaseProperty.with("", "value")
@@ -30,7 +30,7 @@ public class DatabasePropertyTests {
 
         @Test
         @DisplayName("should throw when value is null")
-        public void test3() {
+        void test3() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> DatabaseProperty.with("name", null)
@@ -39,7 +39,7 @@ public class DatabasePropertyTests {
 
         @Test
         @DisplayName("should allow empty value")
-        public void test4() {
+        void test4() {
             DatabaseProperty resolvedProperty = DatabaseProperty.with("name", "");
 
             assertEquals("name", resolvedProperty.name());

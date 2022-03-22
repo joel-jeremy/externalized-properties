@@ -1,5 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors;
 
+import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.DatabaseProperty;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.QueryExecutor;
 
@@ -9,7 +12,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -17,17 +22,15 @@ import java.util.stream.Collectors;
  * the specified table name and it's property name and value column mappings.
  */
 public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
-    /**
-     * Params in order: 
-     * <ol>
-     *  <li>property name column</li>
-     *  <li>property value column</li>
-     *  <li>table name</li>
-     *  <li>property name column</li>
-     *  <li>property names mapped to comma-separated ?</li>
-     * </ol>
-     */
-    private static final String DEFAULT_QUERY_TEMPLATE = "SELECT %s, %s FROM %s WHERE %s IN (%s)";
+    private static final String DEFAULT_QUERY_TEMPLATE = 
+        "SELECT t.${propertyNameColumn}, t.${propertyValueColumn} " + 
+        "FROM ${table} t WHERE t.${propertyNameColumn} " + 
+        "IN (${propertyNamesStatementParameter})";
+    
+    private static final String DEFAULT_QUERY_TEMPLATE_WITH_SCHEMA = 
+        "SELECT t.${propertyNameColumn}, t.${propertyValueColumn} " + 
+        "FROM ${schema}.${table} t WHERE t.${propertyNameColumn} " + 
+        "IN (${propertyNamesStatementParameter})";
 
     /**
      * Query properties from the database.
@@ -49,11 +52,21 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
     }
 
     /**
-     * Name of the database table.
+     * The target database schema. 
+     * By default, this will return an empty string.
      * 
-     * @return The name of the database table.
+     * @return The target database schema.
      */
-    protected abstract String tableName();
+    protected String schema() {
+        return "";
+    }
+
+    /**
+     * The target database table.
+     * 
+     * @return The target database table.
+     */
+    protected abstract String table();
 
     /**
      * Name of property name column.
@@ -125,19 +138,31 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
 
     /**
      * Generate SQL query to use in querying the properties from database.
+     * The resulting SQL query will be processed via {@link Connection#prepareStatement(String)}
+     * so it may contain property name placeholders which will then be set via
+     * {@link #configureStatementParameters}.
      * 
      * @param propertyNamesToResolve The names of the properties to resolve from database.
      * @return The SQL query to use in querying the properties from database.
      */
     protected String generateSqlQuery(Collection<String> propertyNamesToResolve) {
-        return String.format(
-            DEFAULT_QUERY_TEMPLATE, 
-            propertyNameColumnOrThrow(),
-            propertyValueColumnOrThrow(),
-            tableNameOrThrow(),
-            propertyNameColumnOrThrow(),
-            buildInClause(propertyNamesToResolve) // Builds ?,?,?...
-        );
+        String template = DEFAULT_QUERY_TEMPLATE;
+        String schema = schemaOrThrow();
+        if (!schema.trim().isEmpty()) {
+            template = DEFAULT_QUERY_TEMPLATE_WITH_SCHEMA;
+        }
+
+        Map<String, String> props = new HashMap<>();
+        props.put("propertyNameColumn", propertyNameColumnOrThrow());
+        props.put("propertyValueColumn", propertyValueColumnOrThrow());
+        props.put("schema", schema);
+        props.put("table", tableOrThrow());
+        props.put("propertyNamesStatementParameter", buildInClause(propertyNamesToResolve));
+
+        VariableExpander variableExpander = 
+            new SimpleVariableExpander(new MapResolver(props));
+
+        return variableExpander.expandVariables(template);
     }
 
     /**
@@ -161,14 +186,24 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
         preparedStatement.setFetchSize(propertyNamesToResolve.size());
     }
 
-    private String tableNameOrThrow() {
-        String tableName = tableName();
-        if (tableName == null || tableName.trim().isEmpty()) {
+    private String schemaOrThrow() {
+        String schema = schema();
+        if (schema == null) {
             throw new IllegalStateException(
-                "tableName() method must not return null or blank."
+                "schema() method must not return null."
             );
         }
-        return tableName;
+        return schema;
+    }
+
+    private String tableOrThrow() {
+        String table = table();
+        if (table == null || table.trim().isEmpty()) {
+            throw new IllegalStateException(
+                "table() method must not return null or blank."
+            );
+        }
+        return table;
     }
 
     private String propertyNameColumnOrThrow() {

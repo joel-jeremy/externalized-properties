@@ -9,7 +9,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.Externali
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.VoidReturnTypeProxyInterface;
-import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.BasicVariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -1425,7 +1425,7 @@ public class InternalExternalizedPropertiesTests {
             new RootConverter(
                 new DefaultConverter()
             ),
-            new BasicVariableExpander(resolver),
+            new SimpleVariableExpander(resolver),
             (ep, proxyInterface) -> 
                 new ExternalizedPropertyInvocationHandler(ep)
         );

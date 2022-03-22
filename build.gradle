@@ -24,13 +24,12 @@ subprojects {
     apply plugin: 'signing'
     apply plugin: 'jacoco'
 
-    dependencies {
-        // Use JUnit Jupiter for testing.
-        testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
-    }
-
-    test { 
-        useJUnitPlatform() 
+    testing {
+        suites { 
+            test { 
+                useJUnitJupiter('5.7.2') 
+            }
+        }
     }
 
     java {

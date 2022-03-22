@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class BasicVariableExpanderTests {
+public class SimpleVariableExpanderTests {
     @Nested
     class Constructor {
         @Test
@@ -18,7 +18,7 @@ public class BasicVariableExpanderTests {
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new BasicVariableExpander(null)
+                () -> new SimpleVariableExpander(null)
             );
         }
 
@@ -27,7 +27,7 @@ public class BasicVariableExpanderTests {
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new BasicVariableExpander(
+                () -> new SimpleVariableExpander(
                     new SystemPropertyResolver(),
                     null,
                     "}"
@@ -36,7 +36,7 @@ public class BasicVariableExpanderTests {
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new BasicVariableExpander(
+                () -> new SimpleVariableExpander(
                     new SystemPropertyResolver(),
                     "",
                     "}"
@@ -49,7 +49,7 @@ public class BasicVariableExpanderTests {
         public void test3() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new BasicVariableExpander(
+                () -> new SimpleVariableExpander(
                     new SystemPropertyResolver(),
                     "${",
                     null
@@ -58,7 +58,7 @@ public class BasicVariableExpanderTests {
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new BasicVariableExpander(
+                () -> new SimpleVariableExpander(
                     new SystemPropertyResolver(),
                     "${",
                     ""
@@ -72,7 +72,7 @@ public class BasicVariableExpanderTests {
         @Test
         @DisplayName("should throw when value argument is null")
         public void validationTest1() {
-            BasicVariableExpander variableExpander =  variableExpander(
+            SimpleVariableExpander variableExpander =  variableExpander(
                 new SystemPropertyResolver()
             );
 
@@ -86,7 +86,7 @@ public class BasicVariableExpanderTests {
         @DisplayName("should expand variable with value from resolver")
         public void test1() {
             SystemPropertyResolver resolver = new SystemPropertyResolver();
-            BasicVariableExpander variableExpander = variableExpander(
+            SimpleVariableExpander variableExpander = variableExpander(
                 resolver
             );
 
@@ -104,7 +104,7 @@ public class BasicVariableExpanderTests {
         @DisplayName("should expand multiple variables with values from resolvers")
         public void test2() {
             SystemPropertyResolver resolver = new SystemPropertyResolver();
-            BasicVariableExpander variableExpander = variableExpander(
+            SimpleVariableExpander variableExpander = variableExpander(
                 resolver
             );
 
@@ -124,7 +124,7 @@ public class BasicVariableExpanderTests {
         @Test
         @DisplayName("should return original string when there are no variables")
         public void test3() {
-            BasicVariableExpander variableExpander =  variableExpander(
+            SimpleVariableExpander variableExpander =  variableExpander(
                 new SystemPropertyResolver()
             );
 
@@ -139,7 +139,7 @@ public class BasicVariableExpanderTests {
         @Test
         @DisplayName("should throw when variable cannot be resolver from any resolvers")
         public void test4() {
-            BasicVariableExpander variableExpander = variableExpander(
+            SimpleVariableExpander variableExpander = variableExpander(
                 new SystemPropertyResolver()
             );
 
@@ -152,7 +152,7 @@ public class BasicVariableExpanderTests {
         @Test
         @DisplayName("should return empty when value is empty")
         public void test5() {
-            BasicVariableExpander variableExpander = variableExpander(
+            SimpleVariableExpander variableExpander = variableExpander(
                 new SystemPropertyResolver()
             );
 
@@ -165,7 +165,7 @@ public class BasicVariableExpanderTests {
             "variable prefix and variable suffix"
         )
         public void test6() {
-            BasicVariableExpander variableExpander =  variableExpander(
+            SimpleVariableExpander variableExpander =  variableExpander(
                 new SystemPropertyResolver()
             );
 
@@ -180,7 +180,7 @@ public class BasicVariableExpanderTests {
             "when there is there is a variable prefix detected but no variable suffix"
         )
         public void test7() {
-            BasicVariableExpander variableExpander = variableExpander(
+            SimpleVariableExpander variableExpander = variableExpander(
                 new SystemPropertyResolver()
             );
 
@@ -195,7 +195,7 @@ public class BasicVariableExpanderTests {
         )
         public void test8() {
             SystemPropertyResolver resolver = new SystemPropertyResolver();
-            BasicVariableExpander variableExpander = variableExpander(
+            SimpleVariableExpander variableExpander = variableExpander(
                 resolver,
                 "#",
                 "^"
@@ -212,16 +212,16 @@ public class BasicVariableExpanderTests {
         }
     }
 
-    private BasicVariableExpander variableExpander(Resolver resolver) {
-        return new BasicVariableExpander(resolver);
+    private SimpleVariableExpander variableExpander(Resolver resolver) {
+        return new SimpleVariableExpander(resolver);
     }
 
-    private BasicVariableExpander variableExpander(
+    private SimpleVariableExpander variableExpander(
             Resolver resolver,
             String variablePrefix,
             String variableSuffix
     ) {
-        return new BasicVariableExpander(
+        return new SimpleVariableExpander(
             resolver,
             variablePrefix,
             variableSuffix

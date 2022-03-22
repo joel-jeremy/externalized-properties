@@ -16,7 +16,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositeResol
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.DefaultResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.EnvironmentVariableResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.BasicVariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class ExternalizedPropertiesBuilder {
     private List<Converter<?>> converters = new ArrayList<>();
     private List<Processor> processingHandlers = new ArrayList<>();
     private Function<Resolver, VariableExpander> variableExpanderFactory =
-        BasicVariableExpander::new;
+        SimpleVariableExpander::new;
     
     // Caching settings.
     private Duration cacheDuration = getDefaultCacheDuration();

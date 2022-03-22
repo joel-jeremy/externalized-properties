@@ -1,8 +1,5 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
-
 /**
  * The database property.
  */
@@ -14,8 +11,14 @@ public class DatabaseProperty {
             String name,
             String value
     ) {
-        this.name = requireNonNullOrEmptyString(name, "name");
-        this.value = requireNonNull(value, "value");
+        if (name == null) {
+            throw new IllegalArgumentException("name must not be null.");
+        }
+        if (value == null) {
+            throw new IllegalArgumentException("value must not be null.");
+        }
+        this.name = name;
+        this.value = value;
     }
 
     /**

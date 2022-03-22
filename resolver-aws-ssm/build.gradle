@@ -2,13 +2,13 @@ description = 'Externalized Properties AWS SSM property resolver.'
 
 dependencies {
     implementation project(':core')
-    implementation platform('software.amazon.awssdk:bom:2.17.93')
+    implementation platform('software.amazon.awssdk:bom:2.17.152')
     implementation 'software.amazon.awssdk:ssm'
-    testImplementation 'org.testcontainers:junit-jupiter:1.16.2'
-    testImplementation 'org.testcontainers:localstack:1.16.2'
+    testImplementation 'org.testcontainers:junit-jupiter:1.16.3'
+    testImplementation 'org.testcontainers:localstack:1.16.3'
     // Testcontainers localstack still depends on AWS SDK v1.
     // https://github.com/testcontainers/testcontainers-java/issues/1442#issuecomment-694342883
-    testRuntimeOnly "com.amazonaws:aws-java-sdk-s3:1.12.122"
+    testRuntimeOnly "com.amazonaws:aws-java-sdk-s3:1.12.181"
 }
 
 jar {

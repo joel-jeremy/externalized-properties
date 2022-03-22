@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.BasicVariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -36,7 +36,7 @@ public abstract class VariableExpansionBenchmarks {
             /**
              * Basic setup. No caching.
              */
-            variableExpander = new BasicVariableExpander(new MapResolver(propertySource));
+            variableExpander = new SimpleVariableExpander(new MapResolver(propertySource));
         }
     }
 

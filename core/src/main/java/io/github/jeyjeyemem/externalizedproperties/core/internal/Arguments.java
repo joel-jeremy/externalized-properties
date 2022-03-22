@@ -19,7 +19,7 @@ public class Arguments {
      */
     public static <T> T requireNonNull(T arg, String argName) {
         if (arg == null) {
-            throw new IllegalArgumentException("Argument " + argName + " must not be null.");
+            throw new IllegalArgumentException(argName + " must not be null.");
         }
         return arg;
     }
@@ -34,7 +34,7 @@ public class Arguments {
      */
     public static String requireNonNullOrEmptyString(String arg, String argName) {
         if (isNullOrEmpty(arg)) {
-            throw new IllegalArgumentException("Argument " + argName + " must not be null or empty.");
+            throw new IllegalArgumentException(argName + " must not be null or empty.");
         }
         return arg;
     }
@@ -53,7 +53,7 @@ public class Arguments {
             String argName
     ) {
         if (arg == null || arg.isEmpty()) {
-            throw new IllegalArgumentException("Argument " + argName + " must not be null or empty.");
+            throw new IllegalArgumentException(argName + " must not be null or empty.");
         }
         return arg;
     }

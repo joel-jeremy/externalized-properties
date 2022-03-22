@@ -2,14 +2,13 @@ package io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexec
 
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.ConnectionProvider;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.DatabaseProperty;
-import io.github.jeyjeyemem.externalizedproperties.resolvers.database.testentities.H2DataSourceConnectionProvider;
+import io.github.jeyjeyemem.externalizedproperties.resolvers.database.testentities.H2Utils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -18,20 +17,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AbstractNameValueQueryExecutorTests {
-    private static final String PROPERTY_VALUE_COLUMN = "value";
-    private static final String PROPERTY_NAME_COLUMN = "name";
-    private static final String TABLE_NAME = "externalized_properties";
-    private static final int NUMBER_OF_TEST_ENTRIES = 2;
-    // Use DB_CLOSE_DELAY=-1 so that h2 in-memory database contents are not lost when closing. 
-    private static final ConnectionProvider CONNECTION_PROVIDER = 
-        new H2DataSourceConnectionProvider(
-            "jdbc:h2:mem:AbstractNameValueQueryExecutorTests;DB_CLOSE_DELAY=-1", 
-            "sa", 
-            ""
+    // Reuse SimpleNameValueQueryExecutor database elements.
+    static final String TABLE = SimpleNameValueQueryExecutor.TABLE;
+    static final String PROPERTY_NAME_COLUMN = SimpleNameValueQueryExecutor.PROPERTY_NAME_COLUMN;
+    static final String PROPERTY_VALUE_COLUMN = SimpleNameValueQueryExecutor.PROPERTY_VALUE_COLUMN;
+
+    static final int NUMBER_OF_TEST_ENTRIES = 2;
+
+    static final String H2_CONNECTION_STRING = H2Utils.buildConnectionString(
+        AbstractNameValueQueryExecutorTests.class.getSimpleName()
+    );
+    
+    static final ConnectionProvider CONNECTION_PROVIDER = 
+        H2Utils.createConnectionProvider(
+            H2_CONNECTION_STRING, 
+            "sa"
         );
 
     @BeforeAll
-    public static void setup() throws SQLException {
+    static void setup() throws SQLException {
         createTestDatabaseConfigurationEntries();
     }
 
@@ -39,13 +43,49 @@ public class AbstractNameValueQueryExecutorTests {
     class QueryPropertiesMethod {
 
         @Test
-        @DisplayName("should throw when tableName abstract method returns null")
-        public void test1() {
+        @DisplayName("should throw when schema abstract method returns null")
+        void test1() {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
                     @Override
-                    protected String tableName() {
+                    protected String schema() {
+                        return null; // Null
+                    }
+
+                    @Override
+                    protected String table() {
+                        return TABLE;
+                    }
+
+                    @Override
+                    protected String propertyNameColumn() {
+                        return PROPERTY_NAME_COLUMN;
+                    }
+
+                    @Override
+                    protected String propertyValueColumn() {
+                        return PROPERTY_VALUE_COLUMN;
+                    }
+
+                };
+
+            assertThrows(IllegalStateException.class, 
+                () -> queryExecutor.queryProperties(
+                    CONNECTION_PROVIDER.getConnection(),
+                    Arrays.asList("test.property.1")
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when table abstract method returns null")
+        void test2() {
+            AbstractNameValueQueryExecutor queryExecutor = 
+                new AbstractNameValueQueryExecutor() {
+
+                    @Override
+                    protected String table() {
                         return null; // Null
                     }
 
@@ -70,13 +110,13 @@ public class AbstractNameValueQueryExecutorTests {
         }
 
         @Test
-        @DisplayName("should throw when tableName abstract method returns an empty string")
-        public void test2() {
+        @DisplayName("should throw when table abstract method returns an empty string")
+        void test3() {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
                     @Override
-                    protected String tableName() {
+                    protected String table() {
                         return ""; // Empty string
                     }
 
@@ -102,13 +142,13 @@ public class AbstractNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when propertyNameColumn abstract method returns null")
-        public void test3() {
+        void test4() {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
                     @Override
-                    protected String tableName() {
-                        return TABLE_NAME;
+                    protected String table() {
+                        return TABLE;
                     }
 
                     @Override
@@ -133,13 +173,13 @@ public class AbstractNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when propertyNameColumn abstract method returns an empty string")
-        public void test4() {
+        void test5() {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
                     @Override
-                    protected String tableName() {
-                        return TABLE_NAME;
+                    protected String table() {
+                        return TABLE;
                     }
 
                     @Override
@@ -164,13 +204,13 @@ public class AbstractNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when propertyValueColumn abstract method returns null")
-        public void test5() {
+        void test6() {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
                     @Override
-                    protected String tableName() {
-                        return TABLE_NAME;
+                    protected String table() {
+                        return TABLE;
                     }
 
                     @Override
@@ -195,13 +235,13 @@ public class AbstractNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when propertyValueColumn abstract method returns an empty string")
-        public void test6() {
+        void test7() {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
                     @Override
-                    protected String tableName() {
-                        return TABLE_NAME;
+                    protected String table() {
+                        return TABLE;
                     }
 
                     @Override
@@ -226,13 +266,13 @@ public class AbstractNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should query requested properties")
-        public void test7() throws SQLException {
+        void test8() throws SQLException {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
                     @Override
-                    protected String tableName() {
-                        return TABLE_NAME;
+                    protected String table() {
+                        return TABLE;
                     }
 
                     @Override
@@ -247,69 +287,259 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
-                List<String> propertiesToQuery = Arrays.asList(
-                    "test.property.1",
-                    "test.property.2"
-                );
-                
-                List<DatabaseProperty> resolved = queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(),
+            List<String> propertiesToQuery = Arrays.asList(
+                "test.property.1",
+                "test.property.2"
+            );
+            
+            List<DatabaseProperty> resolved = queryExecutor.queryProperties(
+                CONNECTION_PROVIDER.getConnection(),
+                propertiesToQuery
+            );
+
+            assertEquals(propertiesToQuery.size(), resolved.size());
+            
+            assertEquals(
+                "test/property/value/1", 
+                resolved.stream()
+                    .filter(rp -> rp.name().equals("test.property.1"))
+                    .map(DatabaseProperty::value)
+                    .findFirst()
+                    .orElse(null)
+            );
+
+            assertEquals(
+                "test/property/value/2", 
+                resolved.stream()
+                    .filter(rp -> rp.name().equals("test.property.2"))
+                    .map(DatabaseProperty::value)
+                    .findFirst()
+                    .orElse(null)
+            );
+        }
+
+        @Test
+        @DisplayName("should query requested properties from the specified schema")
+        void test9() throws SQLException {
+            AbstractNameValueQueryExecutor queryExecutor = 
+                new AbstractNameValueQueryExecutor() {
+
+                    @Override
+                    protected String schema() {
+                        return "PUBLIC"; // PUBLIC is H2's default schema.
+                    }
+
+                    @Override
+                    protected String table() {
+                        return TABLE;
+                    }
+
+                    @Override
+                    protected String propertyNameColumn() {
+                        return PROPERTY_NAME_COLUMN;
+                    }
+
+                    @Override
+                    protected String propertyValueColumn() {
+                        return PROPERTY_VALUE_COLUMN;
+                    }
+
+                };
+
+            List<String> propertiesToQuery = Arrays.asList(
+                "test.property.1",
+                "test.property.2"
+            );
+            
+            List<DatabaseProperty> resolved = queryExecutor.queryProperties(
+                CONNECTION_PROVIDER.getConnection(),
+                propertiesToQuery
+            );
+
+            assertEquals(propertiesToQuery.size(), resolved.size());
+            
+            assertEquals(
+                "test/property/value/1", 
+                resolved.stream()
+                    .filter(rp -> rp.name().equals("test.property.1"))
+                    .map(DatabaseProperty::value)
+                    .findFirst()
+                    .orElse(null)
+            );
+
+            assertEquals(
+                "test/property/value/2", 
+                resolved.stream()
+                    .filter(rp -> rp.name().equals("test.property.2"))
+                    .map(DatabaseProperty::value)
+                    .findFirst()
+                    .orElse(null)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when schema is invalid")
+        void test10() {
+            AbstractNameValueQueryExecutor queryExecutor = 
+                new AbstractNameValueQueryExecutor() {
+
+                    @Override
+                    protected String schema() {
+                        return "NON_EXISTENT_SCHEMA"; // No schema with this name
+                    }
+
+                    @Override
+                    protected String table() {
+                        return TABLE;
+                    }
+
+                    @Override
+                    protected String propertyNameColumn() {
+                        return PROPERTY_NAME_COLUMN;
+                    }
+
+                    @Override
+                    protected String propertyValueColumn() {
+                        return PROPERTY_VALUE_COLUMN;
+                    }
+
+                };
+
+            List<String> propertiesToQuery = Arrays.asList(
+                "test.property.1",
+                "test.property.2"
+            );
+
+            assertThrows(
+                SQLException.class, 
+                () -> queryExecutor.queryProperties(
+                    CONNECTION_PROVIDER.getConnection(), 
                     propertiesToQuery
-                );
+                )
+            );
+        }
 
-                assertEquals(propertiesToQuery.size(), resolved.size());
-                
-                assertEquals(
-                    "test/property/value/1", 
-                    resolved.stream()
-                        .filter(rp -> rp.name().equals("test.property.1"))
-                        .map(DatabaseProperty::value)
-                        .findFirst()
-                        .orElse(null)
-                );
+        @Test
+        @DisplayName("should throw when table is invalid")
+        void test11() {
+            AbstractNameValueQueryExecutor queryExecutor = 
+                new AbstractNameValueQueryExecutor() {
 
-                assertEquals(
-                    "test/property/value/2", 
-                    resolved.stream()
-                        .filter(rp -> rp.name().equals("test.property.2"))
-                        .map(DatabaseProperty::value)
-                        .findFirst()
-                        .orElse(null)
-                );
+                    @Override
+                    protected String table() {
+                        return "NON_EXISTENT_TABLE";
+                    }
+
+                    @Override
+                    protected String propertyNameColumn() {
+                        return PROPERTY_NAME_COLUMN;
+                    }
+
+                    @Override
+                    protected String propertyValueColumn() {
+                        return PROPERTY_VALUE_COLUMN;
+                    }
+
+                };
+
+            List<String> propertiesToQuery = Arrays.asList(
+                "test.property.1",
+                "test.property.2"
+            );
+
+            assertThrows(
+                SQLException.class, 
+                () -> queryExecutor.queryProperties(
+                    CONNECTION_PROVIDER.getConnection(), 
+                    propertiesToQuery
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when property name column is invalid")
+        void test12() {
+            AbstractNameValueQueryExecutor queryExecutor = 
+                new AbstractNameValueQueryExecutor() {
+
+                    @Override
+                    protected String table() {
+                        return TABLE;
+                    }
+
+                    @Override
+                    protected String propertyNameColumn() {
+                        return "INVALID_COLUMN";
+                    }
+
+                    @Override
+                    protected String propertyValueColumn() {
+                        return PROPERTY_VALUE_COLUMN;
+                    }
+
+                };
+
+            List<String> propertiesToQuery = Arrays.asList(
+                "test.property.1",
+                "test.property.2"
+            );
+
+            assertThrows(
+                SQLException.class, 
+                () -> queryExecutor.queryProperties(
+                    CONNECTION_PROVIDER.getConnection(), 
+                    propertiesToQuery
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when property name column is invalid")
+        void test13() {
+            AbstractNameValueQueryExecutor queryExecutor = 
+                new AbstractNameValueQueryExecutor() {
+
+                    @Override
+                    protected String table() {
+                        return TABLE;
+                    }
+
+                    @Override
+                    protected String propertyNameColumn() {
+                        return PROPERTY_NAME_COLUMN;
+                    }
+
+                    @Override
+                    protected String propertyValueColumn() {
+                        return "INVALID_COLUMN";
+                    }
+
+                };
+
+            List<String> propertiesToQuery = Arrays.asList(
+                "test.property.1",
+                "test.property.2"
+            );
+
+            assertThrows(
+                SQLException.class, 
+                () -> queryExecutor.queryProperties(
+                    CONNECTION_PROVIDER.getConnection(), 
+                    propertiesToQuery
+                )
+            );
         }
     }
 
     private static void createTestDatabaseConfigurationEntries() throws SQLException {
         try (Connection connection = CONNECTION_PROVIDER.getConnection()) {
 
-            initialExternalizedPropertiesTable(connection);
+            H2Utils.createPropertiesTable(
+                connection, 
+                NUMBER_OF_TEST_ENTRIES
+            );
 
             connection.commit();
-        }
-    }
-
-    private static void initialExternalizedPropertiesTable(
-            Connection connection
-    ) throws SQLException {
-        // Matches the default columns and table name in
-        // SimpleNameValueQueryExecutor
-        PreparedStatement createTable = connection.prepareStatement(
-            "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( " +
-            PROPERTY_NAME_COLUMN + " VARCHAR(255), " +
-            PROPERTY_VALUE_COLUMN + " VARCHAR(255), " +
-            "description VARCHAR(255))"
-        );
-        createTable.executeUpdate();
-
-        PreparedStatement insert = connection.prepareStatement(
-            "INSERT INTO " + TABLE_NAME + " VALUES(?,?,?)"
-        );
-
-        for (int i = 1; i <= NUMBER_OF_TEST_ENTRIES; i++) {
-            insert.setString(1, "test.property." + i);
-            insert.setString(2, "test/property/value/" + i);
-            insert.setString(3, "Test property " + i + " description");
-            insert.executeUpdate();
         }
     }
 }
