@@ -177,7 +177,7 @@ public class AwsSsmResolverIntegrationTests {
             );
 
             assertEquals(
-                "test.property.value.2", 
+                "test.property.2.value", 
                 result.findRequiredProperty("/test/property/2")
             );
         }
@@ -208,7 +208,7 @@ public class AwsSsmResolverIntegrationTests {
             );
 
             assertEquals(
-                "test.property.value.2", 
+                "test.property.2.value", 
                 result.findRequiredProperty("/test/property/2")
             );
 
@@ -270,7 +270,7 @@ public class AwsSsmResolverIntegrationTests {
             );
 
             assertEquals(
-                "test.property.value.2", 
+                "test.property.2.value", 
                 result.findRequiredProperty("/test/property/2")
             );
         }
@@ -301,7 +301,7 @@ public class AwsSsmResolverIntegrationTests {
             );
 
             assertEquals(
-                "test.property.value.2", 
+                "test.property.2.value", 
                 result.findRequiredProperty("/test/property/2")
             );
 

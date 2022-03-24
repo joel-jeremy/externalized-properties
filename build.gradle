@@ -4,7 +4,26 @@ plugins {
     id 'me.champeau.jmh' version '0.6.6' apply false
 }
 
-apply plugin: 'jacoco'
+apply plugin: 'test-report-aggregation'
+apply plugin: 'jacoco-report-aggregation'
+
+reporting {
+    reports {
+        testAggregateTestReport(AggregateTestReport) { 
+            testType = TestSuiteType.UNIT_TEST
+        }
+        testCodeCoverageReport(JacocoCoverageReport) { 
+            testType = TestSuiteType.UNIT_TEST
+        }
+    }
+}
+
+def javaProjects = subprojects.findAll { new File(it.projectDir, "src").exists() }
+
+dependencies {
+    testReportAggregation javaProjects
+    jacocoAggregation javaProjects
+}
 
 allprojects {
     group = 'io.github.jeyjeyemem.externalizedproperties'
@@ -18,8 +37,6 @@ allprojects {
     }
 }
 
-def javaProjects = subprojects.findAll { new File(it.projectDir, "src").exists() }
-
 configure(javaProjects) {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
@@ -29,7 +46,17 @@ configure(javaProjects) {
     testing {
         suites { 
             test { 
-                useJUnitJupiter('5.7.2') 
+                useJUnitJupiter() 
+            }
+            integrationTest(JvmTestSuite) {
+                testType = TestSuiteType.INTEGRATION_TEST
+                targets {
+                    all {
+                        testTask.configure {
+                            shouldRunAfter test
+                        }
+                    }
+                }
             }
         }
     }
@@ -59,16 +86,6 @@ configure(javaProjects) {
                 'implSpec:a:Implementation Requirements:',
                 'implNote:a:Implementation Note:'
             )
-        }
-    }
-  
-    jacocoTestReport {
-        group = 'Coverage reports'
-        description = 'Generates a test coverage report for a project'
-
-        reports {
-            html.required = true // human readable
-            xml.required = true  // required by coveralls
         }
     }
 
@@ -161,31 +178,15 @@ if (project.hasProperty('ossrh')) {
     }
 }
 
-tasks.register('jacocoFullReport', JacocoReport) {
-    group = 'Coverage reports'
-    description = 'Generates an aggregate report from all subprojects'
-
-    javaProjects.each {
-        sourceSets it.sourceSets.main
-        mustRunAfter it.tasks.withType(Test)
-        executionData fileTree(it.buildDir.absolutePath).include('jacoco/*.exec')
-    }
-
-    reports {
-        html.required = true // human readable
-        xml.required = true  // required by coveralls
-    }
-}
-
 coveralls {
     sourceDirs = javaProjects.sourceSets.main.allSource.srcDirs.flatten()
-    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
+    jacocoReportPath = "${buildDir}/reports/jacoco/testCodeCoveregeReport/testCodeCoveregeReport.xml"
 }
 
 tasks.named('coveralls').configure {
     group = 'Coverage reports'
     description = 'Uploads the aggregated coverage report to Coveralls'
 
-    dependsOn jacocoFullReport
+    dependsOn testCodeCoverageReport
     onlyIf { System.getenv('CI') }
 }
