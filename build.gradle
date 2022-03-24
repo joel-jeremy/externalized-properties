@@ -18,7 +18,9 @@ allprojects {
     }
 }
 
-subprojects {
+def javaProjects = subprojects.findAll { new File(it.projectDir, "src").exists() }
+
+configure(javaProjects) {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'signing'
@@ -33,6 +35,11 @@ subprojects {
     }
 
     java {
+        // Use project path relative to the root project path as base name of archives. 
+        // For nested projects such as resolvers, the ':' will be replaced by '-' 
+        // i.e. resolvers:database -> resolvers-database.jar
+        archivesBaseName = rootProject.relativeProjectPath(project.path).replace(':', '-')
+        
         toolchain {
             languageVersion = JavaLanguageVersion.of(11)
         }
@@ -154,13 +161,11 @@ if (project.hasProperty('ossrh')) {
     }
 }
 
-def coveredProjects = subprojects.findAll()
-
 tasks.register('jacocoFullReport', JacocoReport) {
     group = 'Coverage reports'
     description = 'Generates an aggregate report from all subprojects'
 
-    coveredProjects.each {
+    javaProjects.each {
         sourceSets it.sourceSets.main
         mustRunAfter it.tasks.withType(Test)
         executionData fileTree(it.buildDir.absolutePath).include('jacoco/*.exec')
@@ -173,7 +178,7 @@ tasks.register('jacocoFullReport', JacocoReport) {
 }
 
 coveralls {
-    sourceDirs = coveredProjects.sourceSets.main.allSource.srcDirs.flatten()
+    sourceDirs = javaProjects.sourceSets.main.allSource.srcDirs.flatten()
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoFullReport/jacocoFullReport.xml"
 }
 
