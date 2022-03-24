@@ -281,7 +281,7 @@ public class ArrayConverterTests {
 
         @Test
         @DisplayName(
-            "should throw when no conversion handler is registered that can handle " + 
+            "should throw when no converter is registered that can handle " + 
             "the array's component type."
         )
         public void test9() {
@@ -606,7 +606,7 @@ public class ArrayConverterTests {
 
         // @Test
         // @DisplayName(
-        //     "should throw when no conversion handler is registered that can handle " + 
+        //     "should throw when no converter is registered that can handle " + 
         //     "the array's component type."
         // )
         // public void nonProxyTest7() {

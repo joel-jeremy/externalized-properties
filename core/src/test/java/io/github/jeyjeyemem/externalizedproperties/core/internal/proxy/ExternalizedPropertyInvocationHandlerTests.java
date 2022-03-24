@@ -2,7 +2,6 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBuilder;
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
@@ -855,26 +854,26 @@ public class ExternalizedPropertyInvocationHandlerTests {
 
     private ExternalizedProperties externalizedProperties(
             Map<String, String> propertySource,
-            Converter<?>... conversionHandlers
+            Converter<?>... converters
     ) {
         return externalizedProperties(
             Arrays.asList(new MapResolver(propertySource)),
-            Arrays.asList(conversionHandlers)
+            Arrays.asList(converters)
         );
     }
 
     private ExternalizedProperties externalizedProperties(
             Collection<Resolver> resolvers,
-            Collection<Converter<?>> conversionHandlers
+            Collection<Converter<?>> converters
     ) {
         Resolver resolver = CompositeResolver.flatten(resolvers);
         
-        ExternalizedPropertiesBuilder builder = 
-            ExternalizedPropertiesBuilder.newBuilder()
+        ExternalizedProperties.Builder builder = 
+            ExternalizedProperties.builder()
                 .resolvers(resolver)
-                .converters(conversionHandlers);
+                .converters(converters);
 
-        if (conversionHandlers.size() == 0) {
+        if (converters.size() == 0) {
             builder.withDefaultConverters();
         }
 

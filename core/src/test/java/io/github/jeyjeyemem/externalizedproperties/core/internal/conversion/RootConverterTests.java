@@ -31,7 +31,7 @@ public class RootConverterTests {
     class Constructor {
         @Test
         @DisplayName(
-            "should throw when conversion handlers collection argument is null."
+            "should throw when converters collection argument is null."
         )
         public void test1() {
             assertThrows(
@@ -44,7 +44,7 @@ public class RootConverterTests {
 
         @Test
         @DisplayName(
-            "should throw when conversion handlers varargs argument is null."
+            "should throw when converters varargs argument is null."
         )
         public void test2() {
             assertThrows(
@@ -209,7 +209,7 @@ public class RootConverterTests {
 
         @Test
         @DisplayName(
-            "should skip to next conversion handler when skip result is returned."
+            "should skip to next converter when skip result is returned."
         )
         public void test6() throws InterruptedException {
             Converter<?> handler1 = new Converter<Object>() {

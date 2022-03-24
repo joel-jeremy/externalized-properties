@@ -73,9 +73,9 @@ public class ConversionResult<T> {
 
     /**
      * Returns a singleton instance of {@link ConversionResult} which indicates that
-     * the conversion handler is unsuccessful in handling conversion to the 
+     * the converter is unsuccessful in handling conversion to the 
      * target type and that the converter should skip/move to the next registered 
-     * conversion handler in the conversion pipeline.
+     * converter in the conversion pipeline.
      * 
      * @implSpec This always return the same object reference which means that
      * {@code ConversionResult.skip() == ConversionResult.skip()} should evaluate to
@@ -83,9 +83,9 @@ public class ConversionResult<T> {
      * 
      * @param <T> The type of the result value.
      * @return A singleton instance of {@link ConversionResult} which indicates that
-     * the conversion handler is unsuccessful in handling conversion to the target 
+     * the converter is unsuccessful in handling conversion to the target 
      * type and that the converter should skip/move to the next registered 
-     * conversion handler in the conversion pipeline.
+     * converter in the conversion pipeline.
      */
     public static <T> ConversionResult<T> skip() {
         @SuppressWarnings("unchecked")

@@ -32,7 +32,7 @@ public abstract class ConversionBenchmarks {
     public static class BenchmarkState {
         private ProxyInterface proxyInterface;
         private ProxyInterface proxyInterfaceWithCaching;
-        private ProxyInterface proxyInterfaceWithMultipleConversionHandler;
+        private ProxyInterface proxyInterfaceWithMultipleConverter;
 
         @Setup
         public void setup() throws NoSuchMethodException, SecurityException {
@@ -40,7 +40,7 @@ public abstract class ConversionBenchmarks {
              * Basic setup. No caching.
              */
             ExternalizedProperties externalizedProperties =     
-                ExternalizedPropertiesBuilder.newBuilder()
+                ExternalizedProperties.builder()
                     .resolvers(new MapResolver(
                         Collections.singletonMap("testInt", "1")
                     ))
@@ -64,7 +64,7 @@ public abstract class ConversionBenchmarks {
              * Setup with caching.
              */
             ExternalizedProperties externalizedPropertiesWithCaching = 
-                ExternalizedPropertiesBuilder.newBuilder()
+                ExternalizedProperties.builder()
                     .resolvers(new MapResolver(
                         Collections.singletonMap("testInt", "1")
                     ))
@@ -79,12 +79,12 @@ public abstract class ConversionBenchmarks {
             /**
              * Basic setup. No caching.
              */
-            ExternalizedProperties externalizedPropertiesWithMultipleConversionHandlers = 
-                ExternalizedPropertiesBuilder.newBuilder()
+            ExternalizedProperties externalizedPropertiesWithMultipleConverters = 
+                ExternalizedProperties.builder()
                     .resolvers(new MapResolver(
                         Collections.singletonMap("testInt", "1")
                     ))
-                    // Add a bunch more conversion handlers.
+                    // Add a bunch more converters.
                     .converters(
                         Stream.generate(() -> new EnumConverter())
                             .limit(10)
@@ -93,8 +93,8 @@ public abstract class ConversionBenchmarks {
                     .converters(new PrimitiveConverter())
                     .build();
 
-            proxyInterfaceWithMultipleConversionHandler = 
-                externalizedPropertiesWithMultipleConversionHandlers.proxy(
+            proxyInterfaceWithMultipleConverter = 
+                externalizedPropertiesWithMultipleConverters.proxy(
                     ProxyInterface.class
                 );
         }
@@ -162,10 +162,10 @@ public abstract class ConversionBenchmarks {
      * @return For you, blackhole.
      */
     // @Benchmark
-    // public Optional<Integer> resolvePropertyWithMultipleConversionHandlers(
+    // public Optional<Integer> resolvePropertyWithMultipleConverters(
     //         BenchmarkState state
     // ) {
-    //     return state.externalizedPropertiesWithMultipleConversionHandlers.resolveProperty(
+    //     return state.externalizedPropertiesWithMultipleConverters.resolveProperty(
     //         "testInt", 
     //         Integer.class
     //     );
@@ -200,11 +200,11 @@ public abstract class ConversionBenchmarks {
      * @return For you, blackhole.
      */
     @Benchmark
-    public int proxyInterfaceWithMultipleConversionHandler(BenchmarkState state) {
-        return state.proxyInterfaceWithMultipleConversionHandler.testInt();
+    public int proxyInterfaceWithMultipleConverter(BenchmarkState state) {
+        return state.proxyInterfaceWithMultipleConverter.testInt();
     }
 
-    // private static class IntegerConversionHandler implements ConversionHandler<Integer> {
+    // private static class IntegerConverter implements Converter<Integer> {
     //     @Override
     //     public boolean canConvertTo(Class<?> targetType) {
     //         return Integer.TYPE.equals(targetType) || Integer.class.equals(targetType);

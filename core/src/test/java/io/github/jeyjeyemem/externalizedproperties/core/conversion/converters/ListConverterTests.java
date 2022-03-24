@@ -400,7 +400,7 @@ public class ListConverterTests {
 
         @Test
         @DisplayName(
-            "should throw when no conversion handler is registered that can handle " + 
+            "should throw when no converter is registered that can handle " + 
             "the List's generic type parameter."
         )
         public void test11() {
@@ -414,7 +414,7 @@ public class ListConverterTests {
             
             Converter<?> converter = new RootConverter(handler);
             
-            // No registered conversion handler for Integer.
+            // No registered converter for Integer.
             assertThrows(ExternalizedPropertiesException.class, () -> {
                 handler.convert(
                     new ConversionContext(
@@ -802,7 +802,7 @@ public class ListConverterTests {
 
         // @Test
         // @DisplayName(
-        //     "should throw when no conversion handler is registered that can handle " + 
+        //     "should throw when no converter is registered that can handle " + 
         //     "the List's generic type parameter."
         // )
         // public void nonProxyTest7() {
@@ -810,7 +810,7 @@ public class ListConverterTests {
             
         //     Converter<?> converter = new RootConverter(handler);
             
-        //     // No registered conversion handler for Integer.
+        //     // No registered converter for Integer.
         //     assertThrows(ExternalizedPropertiesException.class, () -> {
         //         handler.convert(
         //             new ConversionContext(

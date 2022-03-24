@@ -3,7 +3,6 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBuilder;
 import io.github.jeyjeyemem.externalizedproperties.core.Processor;
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
@@ -127,7 +126,7 @@ public class EagerLoadingInvocationHandler implements InvocationHandler {
         // Single use instance to load properties.
         // This is non-eager loading to avoid recursion.
         ExternalizedProperties nonEagerLoading = 
-            ExternalizedPropertiesBuilder.newBuilder()
+            ExternalizedProperties.builder()
                 .resolvers(resolver)
                 .converters(converter)
                 .processors(processor)

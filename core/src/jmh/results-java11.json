@@ -113,7 +113,7 @@
     },
     {
         "jmhVersion" : "1.29",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksThrpt.proxyInterfaceWithMultipleConversionHandler",
+        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksThrpt.proxyInterfaceWithMultipleConverter",
         "mode" : "thrpt",
         "threads" : 1,
         "forks" : 1,
@@ -281,7 +281,7 @@
     },
     {
         "jmhVersion" : "1.29",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksThrpt.resolvePropertyWithMultipleConversionHandlers",
+        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksThrpt.resolvePropertyWithMultipleConverters",
         "mode" : "thrpt",
         "threads" : 1,
         "forks" : 1,
@@ -449,7 +449,7 @@
     },
     {
         "jmhVersion" : "1.29",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksThrptMultiThreaded.proxyInterfaceWithMultipleConversionHandler",
+        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksThrptMultiThreaded.proxyInterfaceWithMultipleConverter",
         "mode" : "thrpt",
         "threads" : 8,
         "forks" : 1,
@@ -617,7 +617,7 @@
     },
     {
         "jmhVersion" : "1.29",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksThrptMultiThreaded.resolvePropertyWithMultipleConversionHandlers",
+        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksThrptMultiThreaded.resolvePropertyWithMultipleConverters",
         "mode" : "thrpt",
         "threads" : 8,
         "forks" : 1,
@@ -2017,7 +2017,7 @@
     },
     {
         "jmhVersion" : "1.29",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksAvgt.proxyInterfaceWithMultipleConversionHandler",
+        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksAvgt.proxyInterfaceWithMultipleConverter",
         "mode" : "avgt",
         "threads" : 1,
         "forks" : 1,
@@ -2185,7 +2185,7 @@
     },
     {
         "jmhVersion" : "1.29",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksAvgt.resolvePropertyWithMultipleConversionHandlers",
+        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksAvgt.resolvePropertyWithMultipleConverters",
         "mode" : "avgt",
         "threads" : 1,
         "forks" : 1,
@@ -2353,7 +2353,7 @@
     },
     {
         "jmhVersion" : "1.29",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksAvgtMultiThreaded.proxyInterfaceWithMultipleConversionHandler",
+        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksAvgtMultiThreaded.proxyInterfaceWithMultipleConverter",
         "mode" : "avgt",
         "threads" : 8,
         "forks" : 1,
@@ -2521,7 +2521,7 @@
     },
     {
         "jmhVersion" : "1.29",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksAvgtMultiThreaded.resolvePropertyWithMultipleConversionHandlers",
+        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ConversionBenchmarks.ConversionBenchmarksAvgtMultiThreaded.resolvePropertyWithMultipleConverters",
         "mode" : "avgt",
         "threads" : 8,
         "forks" : 1,

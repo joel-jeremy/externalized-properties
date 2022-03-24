@@ -20,10 +20,10 @@ public interface Converter<T> {
      * 
      * @implNote If implementation does not support conversion to the target type, 
      * it may return {@link ConversionResult#skip()} to instruct the converter to skip 
-     * the conversion handler and proceed to convert using the next registered conversion 
+     * the converter and proceed to convert using the next registered conversion 
      * handler.
      * However, if an exception is thrown, the conversion will fail and will not attempt
-     * to convert using the other registered conversion handlers.
+     * to convert using the other registered converters.
      * 
      * @param context The conversion context which contains information
      * on the value to convert and the target type. This may also contain information

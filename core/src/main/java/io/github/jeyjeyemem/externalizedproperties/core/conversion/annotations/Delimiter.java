@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * Specify a delimiter which can be used to override 
- * the default delimiter in collection/array conversion handlers.
+ * the default delimiter in collection/array converters.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

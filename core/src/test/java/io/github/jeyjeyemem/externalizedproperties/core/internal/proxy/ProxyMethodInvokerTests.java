@@ -1,7 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBuilder;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.MethodHandleFactory;
@@ -23,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ProxyMethodInvokerTests {
     private final ExternalizedProperties externalizedProperties = 
-        ExternalizedPropertiesBuilder.newBuilder()
+        ExternalizedProperties.builder()
             .withDefaults()
             .build();
     

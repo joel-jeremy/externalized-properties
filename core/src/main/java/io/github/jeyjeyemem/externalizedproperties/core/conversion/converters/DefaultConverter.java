@@ -10,7 +10,7 @@ import java.util.List;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * Default property converter which delegates to the following conversion handlers 
+ * Default property converter which delegates to the following converters 
  * (in order):
  * <ol>
  *  <li>{@link PrimitiveConverter}</li>
@@ -21,12 +21,11 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  */
 public class DefaultConverter implements Converter<Object> {
 
-    // private final List<ConversionHandler<?>> defaultConversionHandlers;
-    private final ClassValue<Converter<?>> conversionHandlersByTargetType;
+    private final ClassValue<Converter<?>> convertersByTargetType;
 
     /**
      * Constructs a {@link DefaultConverter} instance 
-     * which delegates to the following conversion handlers (in order):
+     * which delegates to the following converters (in order):
      * <ol>
      *  <li>{@link PrimitiveConverter}</li>
      *  <li>{@link ListConverter}</li>
@@ -44,12 +43,12 @@ public class DefaultConverter implements Converter<Object> {
                 new OptionalConverter()
             );
 
-        conversionHandlersByTargetType = new ClassValue<Converter<?>>() {
+        convertersByTargetType = new ClassValue<Converter<?>>() {
             @Override
             protected Converter<?> computeValue(Class<?> targetType) {
-                for (Converter<?> conversionHandler : defaultHandlers) {
-                    if (conversionHandler.canConvertTo(targetType)) {
-                        return conversionHandler;
+                for (Converter<?> converter : defaultHandlers) {
+                    if (converter.canConvertTo(targetType)) {
+                        return converter;
                     }
                 }
                 return null;
@@ -61,7 +60,7 @@ public class DefaultConverter implements Converter<Object> {
     @Override
     public boolean canConvertTo(Class<?> targetType) {
         if (targetType == null) return false;
-        return conversionHandlersByTargetType.get(targetType) != null;
+        return convertersByTargetType.get(targetType) != null;
     }
 
     /** {@inheritDoc} */
@@ -70,12 +69,11 @@ public class DefaultConverter implements Converter<Object> {
         requireNonNull(context, "context");
 
         Class<?> rawTargetType = context.rawTargetType();
-        Converter<?> conversionHandler = 
-            conversionHandlersByTargetType.get(rawTargetType);
-        if (conversionHandler == null) {
+        Converter<?> converter = convertersByTargetType.get(rawTargetType);
+        if (converter == null) {
             return ConversionResult.skip();
         }
 
-        return conversionHandler.convert(context);
+        return converter.convert(context);
     }
 }

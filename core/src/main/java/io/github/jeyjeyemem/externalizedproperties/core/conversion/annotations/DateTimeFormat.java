@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Specify a date/time format which can be used to override 
- * the default date/time format in date/time conversion handlers.
+ * the default date/time format in date/time converters.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

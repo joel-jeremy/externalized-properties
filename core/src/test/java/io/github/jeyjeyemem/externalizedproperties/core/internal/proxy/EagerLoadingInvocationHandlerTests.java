@@ -2,7 +2,6 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesBuilder;
 import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.RootConverter;
@@ -298,7 +297,7 @@ public class EagerLoadingInvocationHandlerTests {
             StubResolver resolver = new StubResolver();
 
             ExternalizedProperties externalizedProperties = 
-                ExternalizedPropertiesBuilder.newBuilder()
+                ExternalizedProperties.builder()
                     .resolvers(resolver)
                     .build();
 
@@ -356,7 +355,7 @@ public class EagerLoadingInvocationHandlerTests {
             StubResolver resolver = new StubResolver();
 
             ExternalizedProperties externalizedProperties = 
-                ExternalizedPropertiesBuilder.newBuilder()
+                ExternalizedProperties.builder()
                     .resolvers(resolver)
                     .build();
 
@@ -418,7 +417,7 @@ public class EagerLoadingInvocationHandlerTests {
             );
 
             ExternalizedProperties externalizedProperties = 
-                ExternalizedPropertiesBuilder.newBuilder()
+                ExternalizedProperties.builder()
                     .resolvers(resolver)
                     .build();
 

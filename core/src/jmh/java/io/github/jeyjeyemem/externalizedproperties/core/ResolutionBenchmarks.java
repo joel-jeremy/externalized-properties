@@ -60,7 +60,7 @@ public abstract class ResolutionBenchmarks {
             );
 
             ExternalizedProperties externalizedProperties = 
-                ExternalizedPropertiesBuilder.newBuilder()
+                ExternalizedProperties.builder()
                     .resolvers(new MapResolver(propertySource))
                     .build();
 
@@ -69,7 +69,7 @@ public abstract class ResolutionBenchmarks {
             /**
              * Setup with caching.
              */
-            externalizedPropertiesWithCaching = ExternalizedPropertiesBuilder.newBuilder()
+            externalizedPropertiesWithCaching = ExternalizedProperties.builder()
                 .resolvers(new MapResolver(propertySource))
                 .withResolverCaching()
                 .withCacheDuration(Duration.ofHours(3))
@@ -82,7 +82,7 @@ public abstract class ResolutionBenchmarks {
              * Setup with proxy invocation caching.
              */
             ExternalizedProperties externalizedPropertiesWithInvocationCaching = 
-                ExternalizedPropertiesBuilder.newBuilder()
+                ExternalizedProperties.builder()
                     .resolvers(new MapResolver(propertySource))
                     .withProxyInvocationCaching()
                     .withCacheDuration(Duration.ofHours(24))
@@ -95,7 +95,7 @@ public abstract class ResolutionBenchmarks {
              * Setup with proxy eager loading.
              */
             ExternalizedProperties externalizedPropertiesWithEagerLoading = 
-                ExternalizedPropertiesBuilder.newBuilder()
+                ExternalizedProperties.builder()
                     .resolvers(new MapResolver(propertySource))
                     .withProxyEagerLoading()
                     .withCacheDuration(Duration.ofHours(24))
