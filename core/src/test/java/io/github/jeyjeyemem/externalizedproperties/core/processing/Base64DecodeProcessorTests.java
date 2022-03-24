@@ -13,15 +13,15 @@ import java.util.Base64;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class Base64DecodeTests {
+public class Base64DecodeProcessorTests {
     @Nested
     class Constructor {
         @Test
         @DisplayName("should throw when decoder argument is null")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class,
-                () -> new Base64Decode((Base64.Decoder)null)
+                () -> new Base64DecodeProcessor((Base64.Decoder)null)
             );
         }
     }
@@ -30,8 +30,8 @@ public class Base64DecodeTests {
     class ProcessPropertyMethod {
         @Test
         @DisplayName("should throw when property argument is null")
-        public void test1() {
-            Base64Decode base64Decode = new Base64Decode();
+        void test1() {
+            Base64DecodeProcessor base64Decode = new Base64DecodeProcessor();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> base64Decode.process(null)
@@ -40,11 +40,11 @@ public class Base64DecodeTests {
 
         @Test
         @DisplayName("should apply base 64 decoding to property")
-        public void test2() {
+        void test2() {
             String property = "test";
             String base64Property = base64Encode(property, Base64.getEncoder());
             
-            Base64Decode base64Decode = new Base64Decode();
+            Base64DecodeProcessor base64Decode = new Base64DecodeProcessor();
             String decoded = base64Decode.process(
                 new ProcessingContext(
                     ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64Decode"), 
@@ -57,13 +57,13 @@ public class Base64DecodeTests {
 
         @Test
         @DisplayName("should apply base 64 decoding to property using configured decoder")
-        public void test3() {
+        void test3() {
             String property = "test";
             Base64.Decoder decoder = Base64.getUrlDecoder();
             
             String base64Property = base64Encode(property, Base64.getUrlEncoder());
             
-            Base64Decode base64Decode = new Base64Decode(decoder);
+            Base64DecodeProcessor base64Decode = new Base64DecodeProcessor(decoder);
             String decoded = base64Decode.process(
                 new ProcessingContext(
                     ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64Decode"), 
@@ -76,12 +76,12 @@ public class Base64DecodeTests {
 
         @Test
         @DisplayName("should wrap exceptions in ProcessingException and propagate.")
-        public void test4() {
+        void test4() {
             Base64.Decoder decoder = Base64.getDecoder();
             
             String invalidBase64 = "%%%";
             
-            Base64Decode base64Decode = new Base64Decode(decoder);
+            Base64DecodeProcessor base64Decode = new Base64DecodeProcessor(decoder);
 
             assertThrows(
                 ProcessingException.class, 

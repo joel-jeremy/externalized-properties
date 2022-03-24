@@ -13,7 +13,7 @@ import java.util.List;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * The default {@link Converter} implementation.
+ * The root {@link Converter} implementation.
  * This delegates to a configured collection of {@link Converter}s.
  */
 public class RootConverter implements Converter<Object> {
@@ -42,20 +42,9 @@ public class RootConverter implements Converter<Object> {
      * to handle the actual conversion.
      */
     public RootConverter(Collection<Converter<?>> converters) {
-        requireNonNull(converters, "converters");
-
-        this.convertersByTargetType = new ClassValue<List<Converter<?>>>() {
-            @Override
-            protected List<Converter<?>> computeValue(Class<?> targetType) {
-                List<Converter<?>> supportsTargetType = new ArrayList<>();
-                for (Converter<?> handler : converters) {
-                    if (handler.canConvertTo(targetType)) {
-                        supportsTargetType.add(handler);
-                    }
-                }
-                return supportsTargetType;
-            }
-        };
+        this.convertersByTargetType = new ConvertersByTargetType(
+            requireNonNull(converters, "converters")
+        );
     }
 
     /** {@inheritDoc} */
@@ -112,5 +101,38 @@ public class RootConverter implements Converter<Object> {
     private static final ConversionResult<?> SKIP_RESULT = ConversionResult.skip();
     private static boolean skipped(ConversionResult<?> result) {
         return result == SKIP_RESULT;
+    }
+
+    private static class ConvertersByTargetType extends ClassValue<List<Converter<?>>> {
+
+        private final Collection<Converter<?>> registeredConverters;
+
+        /**
+         * Constructor.
+         * 
+         * @param registeredConverters The registered {@link Converter} instances.
+         */
+        public ConvertersByTargetType(Collection<Converter<?>> registeredConverters) {
+            this.registeredConverters = registeredConverters;
+        }
+
+        /**
+         * This method will return a converter instance based on the specified target type.
+         * 
+         * @param targetType The target type to convert to.
+         * @return The list of {@link Converter} instances which support conversion to the
+         * target type.
+         */
+        @Override
+        protected List<Converter<?>> computeValue(Class<?> targetType) {
+            List<Converter<?>> supportsTargetType = new ArrayList<>();
+            for (Converter<?> converter : registeredConverters) {
+                if (converter.canConvertTo(targetType)) {
+                    supportsTargetType.add(converter);
+                }
+            }
+            return supportsTargetType;
+        }
+
     }
 }

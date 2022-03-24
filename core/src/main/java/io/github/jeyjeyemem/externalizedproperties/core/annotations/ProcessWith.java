@@ -9,8 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Methods marked with this annotation will undergo property processing
- * using the specified process classes.
+ * Annotation types annotated with this will be processed using the specified processor class. 
  * 
  * @apiNote Processor classes defined in this annotation should be registered via 
  * {@link ExternalizedProperties.Builder#processors(Processor...)} or 
@@ -19,22 +18,13 @@ import java.lang.annotation.Target;
  * will not be able to find an instance for the processor class will throw an 
  * exception.
  */
+@Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface ProcessorClasses {
+public @interface ProcessWith {
     /**
-     * The processor classes to process the externalized property.
+     * The type of the processor to process the annotated type.
      * 
-     * @return The array of processor classes to process the externalized property.
+     * @return The type of the processor to process the annotated type.
      */
-    Class<? extends Processor>[] value();
-
-    /**
-     * The processor attributes to be made accessible to processors
-     * during processing.
-     * 
-     * @return The array of processor attributes to be made accessible to processors
-     * during processing.
-     */
-    ProcessorAttribute[] attributes() default {};
+    Class<? extends Processor> value();
 }

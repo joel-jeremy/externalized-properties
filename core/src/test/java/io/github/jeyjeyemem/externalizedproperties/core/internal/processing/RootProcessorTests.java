@@ -3,7 +3,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal.processing;
 import io.github.jeyjeyemem.externalizedproperties.core.ProcessingContext;
 import io.github.jeyjeyemem.externalizedproperties.core.Processor;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ProcessingException;
-import io.github.jeyjeyemem.externalizedproperties.core.processing.Base64Decode;
+import io.github.jeyjeyemem.externalizedproperties.core.processing.Base64DecodeProcessor;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ProcessorProxyInterface;
@@ -22,7 +22,7 @@ public class RootProcessorTests {
     class Constructor {
         @Test
         @DisplayName("should throw when processors varargs argument is null")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootProcessor((Processor[])null)
@@ -31,7 +31,7 @@ public class RootProcessorTests {
 
         @Test
         @DisplayName("should throw when processors collection argument is null")
-        public void test2() {
+        void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootProcessor((Collection<Processor>)null)
@@ -43,9 +43,9 @@ public class RootProcessorTests {
     class ProcessMethod {
         @Test
         @DisplayName("should throw when context argument is null")
-        public void test1() {
+        void test1() {
             RootProcessor processor = new RootProcessor(
-                new Base64Decode()
+                new Base64DecodeProcessor()
             );
 
             assertThrows(
@@ -58,9 +58,9 @@ public class RootProcessorTests {
         @DisplayName(
             "should process property using configured processor classes"
         )
-        public void test2() {
+        void test2() {
             RootProcessor processor = new RootProcessor(
-                new Base64Decode()
+                new Base64DecodeProcessor()
             );
 
             ProxyMethod proxyMethod =
@@ -87,7 +87,7 @@ public class RootProcessorTests {
         @DisplayName(
             "should when required processor class is not configured"
         )
-        public void test3() {
+        void test3() {
             Processor stubProcessor = new Processor() {
                 @Override
                 public String process(ProcessingContext context) {

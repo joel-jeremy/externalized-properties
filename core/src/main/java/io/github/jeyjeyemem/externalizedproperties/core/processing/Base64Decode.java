@@ -1,50 +1,23 @@
 package io.github.jeyjeyemem.externalizedproperties.core.processing;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ProcessingContext;
-import io.github.jeyjeyemem.externalizedproperties.core.Processor;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ProcessingException;
+import io.github.jeyjeyemem.externalizedproperties.core.annotations.ProcessWith;
 
-import java.util.Base64;
-
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Processor to apply base 64 decoding to a property.
+ * Processor annotation to apply base64 decoding to the value.
  */
-public class Base64Decode implements Processor {
-    private final Base64.Decoder decoder;
-
+@ProcessWith(Base64DecodeProcessor.class)
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Base64Decode {
     /**
-     * Default constructor. This will use {@link Base64#getDecoder()} to do
-     * the base 64 decoding.
-     */
-    public Base64Decode() {
-        this(Base64.getDecoder());
-    }
-
-    /**
-     * Default constructor. 
+     * The decoder to use.
      * 
-     * @param decoder The base 64 decoder to use to decode the property.
+     * @return The decoder to use.
      */
-    public Base64Decode(Base64.Decoder decoder) {
-        this.decoder = requireNonNull(decoder, "decoder");
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String process(ProcessingContext context) {
-        requireNonNull(context, "context");
-        try {
-            byte[] bytes = context.value().getBytes();
-            byte[] decoded = decoder.decode(bytes);
-            return new String(decoded);
-        } catch (Exception ex) {
-            throw new ProcessingException(
-                "Exception occurred while attempting to decode value using Base64: " +
-                context.value(),
-                ex
-            );
-        }
-    }
+    String decoder() default "";
 }
