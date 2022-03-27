@@ -9,6 +9,9 @@ import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
  */
 public class NoOpVariableExpander implements VariableExpander {
 
+    /**
+     * Singleton instance.
+     */
     public static final NoOpVariableExpander INSTANCE = Singleton.INSTANCE;
 
     private NoOpVariableExpander(){}

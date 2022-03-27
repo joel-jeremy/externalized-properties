@@ -134,9 +134,9 @@ public class ProxyMethodInvoker {
         throw new UnresolvedPropertiesException(
             propertyName,
             String.format(
-                "Failed to resolve property '%s' for proxy method (%s). " + 
+                "Failed to resolve property '%s' for proxy interface method (%s). " + 
                 "To prevent exceptions when a property cannot be resolved, " +
-                "consider changing method's return type to an Optional.",
+                "consider changing proxy interface method's return type to an Optional.",
                 propertyName,
                 proxyMethod.methodSignatureString()
             )

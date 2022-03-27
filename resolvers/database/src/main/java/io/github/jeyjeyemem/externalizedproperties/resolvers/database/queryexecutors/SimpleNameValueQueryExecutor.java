@@ -26,21 +26,45 @@ public class SimpleNameValueQueryExecutor extends AbstractNameValueQueryExecutor
     private static final String PROPERTY_VALUE_COLUMN_SYSTEM_PROPERTY = 
         SimpleNameValueQueryExecutor.class.getName() + ".propertyValueColumn";
 
+    /**
+     * The database schema to query properties from.
+     * By default, no schema is specified in the query unless overriden via the
+     * {@code io.github.jeyjeyemem.externalizedproperties.resolvers.database.
+     * queryexecutors.SimpleNameValueQueryExecutor.schema} system property.
+     */
     public static final String SCHEMA = System.getProperty(
         SCHEMA_SYSTEM_PROPERTY,
         ""
     );
 
+    /**
+     * The database table to query properties from.
+     * By default, table name is {@code externalized_properties} unless overriden 
+     * via the {@code io.github.jeyjeyemem.externalizedproperties.resolvers.database.
+     * queryexecutors.SimpleNameValueQueryExecutor.table} system property.
+     */
     public static final String TABLE = System.getProperty(
         TABLE_SYSTEM_PROPERTY,
         "externalized_properties"
     );
 
+    /**
+     * The name of the table column which represents the property name.
+     * By default, column name is {@code property_name} unless overriden via the
+     * {@code io.github.jeyjeyemem.externalizedproperties.resolvers.database.
+     * queryexecutors.SimpleNameValueQueryExecutor.propertyNameColumn} system property.
+     */
     public static final String PROPERTY_NAME_COLUMN = System.getProperty(
         PROPERTY_NAME_COLUMN_SYSTEM_PROPERTY,
         "property_name"
     );
 
+    /**
+     * The name of the table column which represents the property value.
+     * By default, column name is {@code property_value} unless overriden via the
+     * {@code io.github.jeyjeyemem.externalizedproperties.resolvers.database.
+     * queryexecutors.SimpleNameValueQueryExecutor.propertyValueColumn} system property.
+     */
     public static final String PROPERTY_VALUE_COLUMN = System.getProperty(
         PROPERTY_VALUE_COLUMN_SYSTEM_PROPERTY,
         "property_value"

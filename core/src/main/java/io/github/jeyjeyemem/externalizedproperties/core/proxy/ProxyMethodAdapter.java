@@ -10,6 +10,9 @@ import java.util.Optional;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
+/**
+ * Adapts a {@link Method} to a {@link ProxyMethod}. 
+ */
 public class ProxyMethodAdapter implements ProxyMethod {
 
     private final Method method;
