@@ -26,8 +26,8 @@ public class EnumConverterTests {
         @Test
         @DisplayName("should return false when target type is null.")
         public void test1() {
-            EnumConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(null);
+            EnumConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(null);
             assertFalse(canConvert);
         }
 
@@ -36,8 +36,8 @@ public class EnumConverterTests {
             "should return true when target type is an enum."
         )
         public void test2() {
-            EnumConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(TestEnum.class);
+            EnumConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(TestEnum.class);
             assertTrue(canConvert);
         }
 
@@ -46,8 +46,8 @@ public class EnumConverterTests {
             "should return false when target type is not an enum."
         )
         public void test3() {
-            EnumConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(String.class);
+            EnumConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(String.class);
             assertFalse(canConvert);
         }
     }
@@ -57,14 +57,14 @@ public class EnumConverterTests {
         @Test
         @DisplayName("should throw when context is null.")
         public void test1() {
-            EnumConverter handler = handlerToTest();
-            assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
+            EnumConverter converter = converterToTest();
+            assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
         }
 
         @Test
         @DisplayName("should convert resolved property to enum.")
         public void test2() {
-            EnumConverter handler = handlerToTest();
+            EnumConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -72,15 +72,15 @@ public class EnumConverterTests {
                     "enumProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 TestEnum.ONE.name()
             );
 
-            ConversionResult<? extends Enum<?>> result = handler.convert(context);
+            ConversionResult<? extends Enum<?>> result = converter.convert(context);
             assertNotNull(result);
 
             Enum<?> testEnum = result.value();
@@ -90,7 +90,7 @@ public class EnumConverterTests {
         @Test
         @DisplayName("should throw when property value is not a valid enum value.")
         public void test3() {
-            EnumConverter handler = handlerToTest();
+            EnumConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -98,23 +98,23 @@ public class EnumConverterTests {
                     "enumProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "INVALID_ENUM_VALUE"
             );
 
             assertThrows(ConversionException.class, () -> {
-                handler.convert(context);
+                converter.convert(context);
             });
         }
 
         @Test
         @DisplayName("should return skipped result when target type is not an enum.")
         public void test4() {
-            EnumConverter handler = handlerToTest();
+            EnumConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -122,15 +122,15 @@ public class EnumConverterTests {
                     "intPrimitiveProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "1"
             );
             
-            ConversionResult<?> result = handler.convert(context);
+            ConversionResult<?> result = converter.convert(context);
             assertEquals(ConversionResult.skip(), result);
         }
 
@@ -141,17 +141,17 @@ public class EnumConverterTests {
         // @Test
         // @DisplayName("should convert resolved property to enum.")
         // public void nonProxyTest1() {
-        //     EnumConverter handler = handlerToTest();
+        //     EnumConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         TestEnum.class,
         //         TestEnum.ONE.name()
         //     );
 
-        //     ConversionResult<? extends Enum<?>> result = handler.convert(context);
+        //     ConversionResult<? extends Enum<?>> result = converter.convert(context);
         //     assertNotNull(result);
 
         //     Enum<?> testEnum = result.value();
@@ -161,40 +161,40 @@ public class EnumConverterTests {
         // @Test
         // @DisplayName("should throw when property value is not a valid enum value.")
         // public void nonProxyTest2() {
-        //     EnumConverter handler = handlerToTest();
+        //     EnumConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         TestEnum.class,
         //         "INVALID_ENUM_VALUE"
         //     );
 
         //     assertThrows(ConversionException.class, () -> {
-        //         handler.convert(context);
+        //         converter.convert(context);
         //     });
         // }
 
         // @Test
         // @DisplayName("should return skipped result when target type is not an enum.")
         // public void nonProxyTest3() {
-        //     EnumConverter handler = handlerToTest();
+        //     EnumConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         Integer.class,
         //         "1"
         //     );
             
-        //     ConversionResult<?> result = handler.convert(context);
+        //     ConversionResult<?> result = converter.convert(context);
         //     assertEquals(ConversionResult.skip(), result);
         // }
     }
 
-    private EnumConverter handlerToTest() {
+    private EnumConverter converterToTest() {
         return new EnumConverter();
     }
 }

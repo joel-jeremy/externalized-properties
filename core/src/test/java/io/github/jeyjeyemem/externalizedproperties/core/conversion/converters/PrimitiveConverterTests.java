@@ -26,80 +26,80 @@ public class PrimitiveConverterTests {
         @Test
         @DisplayName("should return false when target type is null.")
         public void test1() {
-            PrimitiveConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(null);
+            PrimitiveConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(null);
             assertFalse(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is an Integer.")
         public void test2() {
-            PrimitiveConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Integer.class);
+            PrimitiveConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Integer.class);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is a primitive int.")
         public void test3() {
-            PrimitiveConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Integer.TYPE);
+            PrimitiveConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Integer.TYPE);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is a Long.")
         public void test4() {
-            PrimitiveConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Long.class);
+            PrimitiveConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Long.class);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is a primitive long.")
         public void test5() {
-            PrimitiveConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Long.TYPE);
+            PrimitiveConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Long.TYPE);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is a Float.")
         public void test6() {
-            PrimitiveConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Float.class);
+            PrimitiveConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Float.class);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is a primitive float.")
         public void test7() {
-            PrimitiveConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Float.TYPE);
+            PrimitiveConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Float.TYPE);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is a Double.")
         public void test8() {
-            PrimitiveConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Double.class);
+            PrimitiveConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Double.class);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is a primitive double.")
         public void test9() {
-            PrimitiveConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Double.TYPE);
+            PrimitiveConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Double.TYPE);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName("should return false when target type is not a primitive type.")
         public void test10() {
-            PrimitiveConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(List.class);
+            PrimitiveConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(List.class);
             assertFalse(canConvert);
         }
     }
@@ -109,14 +109,14 @@ public class PrimitiveConverterTests {
         @Test
         @DisplayName("should throw when context is null.")
         public void test1() {
-            PrimitiveConverter handler = handlerToTest();
-            assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
+            PrimitiveConverter converter = converterToTest();
+            assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
         }
 
         @Test
         @DisplayName("should return skip result when target type is not a primitive type.")
         public void test2() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -124,22 +124,22 @@ public class PrimitiveConverterTests {
                     "listProperty" // This method returns a List class
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "a,b,c"
             );
             
-            ConversionResult<?> result =  handler.convert(context);
+            ConversionResult<?> result =  converter.convert(context);
             assertEquals(ConversionResult.skip(), result);
         }
 
         @Test
         @DisplayName("should convert value to an Integer or primitive int.")
         public void test3() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -153,22 +153,22 @@ public class PrimitiveConverterTests {
                     "intPrimitiveProperty" // This method returns an int primitive
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethod,
                 "1"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethod,
                 "2"
             );
 
-            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = converter.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = converter.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -188,7 +188,7 @@ public class PrimitiveConverterTests {
         @Test
         @DisplayName("should convert value to a Long or primitive long.")
         public void test4() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -202,22 +202,22 @@ public class PrimitiveConverterTests {
                     "longPrimitiveProperty" // This method returns an long primitive
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethod,
                 "1"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethod,
                 "2"
             );
 
-            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = converter.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = converter.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -237,7 +237,7 @@ public class PrimitiveConverterTests {
         @Test
         @DisplayName("should convert value to a Float or primitive float.")
         public void test5() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -251,22 +251,22 @@ public class PrimitiveConverterTests {
                     "floatPrimitiveProperty" // This method returns an float primitive
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethod,
                 "1.0"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethod,
                 "2.0"
             );
 
-            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = converter.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = converter.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -286,7 +286,7 @@ public class PrimitiveConverterTests {
         @Test
         @DisplayName("should convert value to a Double or primitive double.")
         public void test6() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -300,22 +300,22 @@ public class PrimitiveConverterTests {
                     "doublePrimitiveProperty" // This method returns a double primitive
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethod,
                 "1.0"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethod,
                 "2.0"
             );
 
-            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = converter.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = converter.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -335,7 +335,7 @@ public class PrimitiveConverterTests {
         @Test
         @DisplayName("should convert value to a Short or primitive short.")
         public void test7() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -349,22 +349,22 @@ public class PrimitiveConverterTests {
                     "shortPrimitiveProperty" // This method returns a short primitive
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethod,
                 "1"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethod,
                 "2"
             );
 
-            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = converter.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = converter.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -384,7 +384,7 @@ public class PrimitiveConverterTests {
         @Test
         @DisplayName("should convert value to a Boolean or primitive boolean.")
         public void test8() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -398,22 +398,22 @@ public class PrimitiveConverterTests {
                     "booleanPrimitiveProperty" // This method returns a boolean primitive
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethod,
                 "true"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethod,
                 "false"
             );
 
-            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = converter.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = converter.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -433,7 +433,7 @@ public class PrimitiveConverterTests {
         @Test
         @DisplayName("should convert to false when property value is not a valid Boolean/boolean.")
         public void test9() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethodInfo = 
                 ProxyMethodUtils.fromMethod(
@@ -447,22 +447,22 @@ public class PrimitiveConverterTests {
                     "booleanPrimitiveProperty" // This method returns a primitive boolean
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethodInfo,
                 "invalid_boolean"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethodInfo,
                 "invalid_boolean"
             );
 
-            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = converter.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = converter.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -482,7 +482,7 @@ public class PrimitiveConverterTests {
         @Test
         @DisplayName("should convert value to a Byte or primitive byte.")
         public void test10() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -496,22 +496,22 @@ public class PrimitiveConverterTests {
                     "bytePrimitiveProperty" // This method returns a byte primitive
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethod,
                 "1"
             );
             
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethod,
                 "2"
             );
 
-            ConversionResult<?> wrapperResult = handler.convert(wrapperContext);
-            ConversionResult<?> primitiveResult = handler.convert(primitiveContext);
+            ConversionResult<?> wrapperResult = converter.convert(wrapperContext);
+            ConversionResult<?> primitiveResult = converter.convert(primitiveContext);
             
             assertNotNull(wrapperResult);
             assertNotNull(primitiveResult);
@@ -531,7 +531,7 @@ public class PrimitiveConverterTests {
         @Test
         @DisplayName("should throw when property value is not a valid Byte/byte.")
         public void test11() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethodInfo = 
                 ProxyMethodUtils.fromMethod(
@@ -545,33 +545,33 @@ public class PrimitiveConverterTests {
                     "bytePrimitiveProperty" // This method returns a primitive byte
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethodInfo,
                 "invalid_byte"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethodInfo,
                 "invalid_byte"
             );
             
             assertThrows(NumberFormatException.class, () -> {
-                handler.convert(wrapperContext);
+                converter.convert(wrapperContext);
             });
             
             assertThrows(NumberFormatException.class, () -> {
-                handler.convert(primitiveContext);
+                converter.convert(primitiveContext);
             });
         }
 
         @Test
         @DisplayName("should throw when property value is not a valid Short/short.")
         public void test12() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethodInfo = 
                 ProxyMethodUtils.fromMethod(
@@ -585,33 +585,33 @@ public class PrimitiveConverterTests {
                     "shortPrimitiveProperty" // This method returns a primitive short
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethodInfo,
                 "invalid_short"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethodInfo,
                 "invalid_short"
             );
             
             assertThrows(NumberFormatException.class, () -> {
-                handler.convert(wrapperContext);
+                converter.convert(wrapperContext);
             });
             
             assertThrows(NumberFormatException.class, () -> {
-                handler.convert(primitiveContext);
+                converter.convert(primitiveContext);
             });
         }
 
         @Test
         @DisplayName("should throw when property value is not a valid Integer/int.")
         public void test13() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethodInfo = 
                 ProxyMethodUtils.fromMethod(
@@ -625,33 +625,33 @@ public class PrimitiveConverterTests {
                     "intPrimitiveProperty" // This method returns a primitive int
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethodInfo,
                 "invalid_int"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethodInfo,
                 "invalid_int"
             );
             
             assertThrows(NumberFormatException.class, () -> {
-                handler.convert(wrapperContext);
+                converter.convert(wrapperContext);
             });
             
             assertThrows(NumberFormatException.class, () -> {
-                handler.convert(primitiveContext);
+                converter.convert(primitiveContext);
             });
         }
 
         @Test
         @DisplayName("should throw when property value is not a valid Long/long.")
         public void test14() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethodInfo = 
                 ProxyMethodUtils.fromMethod(
@@ -665,33 +665,33 @@ public class PrimitiveConverterTests {
                     "longPrimitiveProperty" // This method returns a primitive long
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethodInfo,
                 "invalid_long"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethodInfo,
                 "invalid_long"
             );
             
             assertThrows(NumberFormatException.class, () -> {
-                handler.convert(wrapperContext);
+                converter.convert(wrapperContext);
             });
             
             assertThrows(NumberFormatException.class, () -> {
-                handler.convert(primitiveContext);
+                converter.convert(primitiveContext);
             });
         }
 
         @Test
         @DisplayName("should throw when property value is not a valid Float/float.")
         public void test15() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethodInfo = 
                 ProxyMethodUtils.fromMethod(
@@ -705,33 +705,33 @@ public class PrimitiveConverterTests {
                     "floatPrimitiveProperty" // This method returns a primitive float
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethodInfo,
                 "invalid_float"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethodInfo,
                 "invalid_float"
             );
             
             assertThrows(NumberFormatException.class, () -> {
-                handler.convert(wrapperContext);
+                converter.convert(wrapperContext);
             });
             
             assertThrows(NumberFormatException.class, () -> {
-                handler.convert(primitiveContext);
+                converter.convert(primitiveContext);
             });
         }
         
         @Test
         @DisplayName("should throw when property value is not a valid Double/double.")
         public void test16() {
-            PrimitiveConverter handler = handlerToTest();
+            PrimitiveConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethodInfo = 
                 ProxyMethodUtils.fromMethod(
@@ -745,31 +745,31 @@ public class PrimitiveConverterTests {
                     "doublePrimitiveProperty" // This method returns a primitive double
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext wrapperContext = new ConversionContext(
-                converter,
+                rootConverter,
                 wrapperProxyMethodInfo,
                 "invalid_double"
             );
 
             ConversionContext primitiveContext = new ConversionContext(
-                converter,
+                rootConverter,
                 primitiveProxyMethodInfo,
                 "invalid_double"
             );
             
             assertThrows(NumberFormatException.class, () -> {
-                handler.convert(wrapperContext);
+                converter.convert(wrapperContext);
             });
             
             assertThrows(NumberFormatException.class, () -> {
-                handler.convert(primitiveContext);
+                converter.convert(primitiveContext);
             });
         }
     }
 
-    private PrimitiveConverter handlerToTest() {
+    private PrimitiveConverter converterToTest() {
         return new PrimitiveConverter();
     }
 }

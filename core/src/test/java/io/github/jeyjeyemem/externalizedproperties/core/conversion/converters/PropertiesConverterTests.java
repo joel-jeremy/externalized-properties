@@ -32,24 +32,24 @@ public class PropertiesConverterTests {
         @Test
         @DisplayName("should return false when target type is null.")
         public void test1() {
-            PropertiesConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(null);
+            PropertiesConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(null);
             assertFalse(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is a Properties class.")
         public void test2() {
-            PropertiesConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Properties.class);
+            PropertiesConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Properties.class);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName("should return false when target type is not a Properties class.")
         public void test3() {
-            PropertiesConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Integer.class);
+            PropertiesConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Integer.class);
             assertFalse(canConvert);
         }
     }
@@ -59,14 +59,14 @@ public class PropertiesConverterTests {
         @Test
         @DisplayName("should throw when context is null.")
         public void test1() {
-            PropertiesConverter handler = handlerToTest();
-            assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
+            PropertiesConverter converter = converterToTest();
+            assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
         }
 
         @Test
         @DisplayName("should convert value to Properties.")
         public void test2() {
-            PropertiesConverter handler = handlerToTest();
+            PropertiesConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -74,11 +74,11 @@ public class PropertiesConverterTests {
                     "properties"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionResult<? extends Properties> result = 
-                handler.convert(new ConversionContext(
-                    converter,
+                converter.convert(new ConversionContext(
+                    rootConverter,
                     proxyMethod,
                     PROPERTIES_TEXT
                 ));
@@ -96,7 +96,7 @@ public class PropertiesConverterTests {
         @Test
         @DisplayName("should return empty Properties when value is empty.")
         public void test3() {
-            PropertiesConverter handler = handlerToTest();
+            PropertiesConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -104,11 +104,11 @@ public class PropertiesConverterTests {
                     "properties"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
             
-            ConversionResult<? extends Properties> result = handler.convert(
+            ConversionResult<? extends Properties> result = converter.convert(
                 new ConversionContext(
-                    converter,
+                    rootConverter,
                     proxyMethod,
                     "" // Empty value.
                 )
@@ -123,7 +123,7 @@ public class PropertiesConverterTests {
         @Test
         @DisplayName("should throw when properties cannot be loaded.")
         public void test4() {
-            PropertiesConverter handler = handlerToTest();
+            PropertiesConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -131,12 +131,12 @@ public class PropertiesConverterTests {
                     "properties"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
             
             assertThrows(
                 ConversionException.class, 
-                () -> handler.convert(new ConversionContext(
-                    converter,
+                () -> converter.convert(new ConversionContext(
+                    rootConverter,
                     proxyMethod,
                     "\\uxxxx" // Invalid character encoding.
                 ))
@@ -150,13 +150,13 @@ public class PropertiesConverterTests {
         // @Test
         // @DisplayName("should convert value to Properties.")
         // public void nonProxyTest2() {
-        //     PropertiesConverter handler = handlerToTest();
+        //     PropertiesConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
             
-        //     ConversionResult<? extends Properties> result = handler.convert(
+        //     ConversionResult<? extends Properties> result = converter.convert(
         //         new ConversionContext(
-        //             converter,
+        //             rootConverter,
         //             Properties.class,
         //             PROPERTIES_TEXT
         //         )
@@ -175,13 +175,13 @@ public class PropertiesConverterTests {
         // @Test
         // @DisplayName("should return empty Properties when value is empty.")
         // public void nonProxyTest3() {
-        //     PropertiesConverter handler = handlerToTest();
+        //     PropertiesConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
             
-        //     ConversionResult<? extends Properties> result = handler.convert(
+        //     ConversionResult<? extends Properties> result = converter.convert(
         //         new ConversionContext(
-        //             converter,
+        //             rootConverter,
         //             Properties.class,
         //             "" // Empty value.
         //         )
@@ -196,14 +196,14 @@ public class PropertiesConverterTests {
         // @Test
         // @DisplayName("should throw when properties cannot be loaded.")
         // public void test4() {
-        //     PropertiesConverter handler = handlerToTest();
+        //     PropertiesConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
             
         //     assertThrows(
         //         ConversionException.class, 
-        //         () -> handler.convert(new ConversionContext(
-        //             converter,
+        //         () -> converter.convert(new ConversionContext(
+        //             rootConverter,
         //             Properties.class,
         //             "\\uxxxx" // Invalid character encoding.
         //         ))
@@ -211,7 +211,7 @@ public class PropertiesConverterTests {
         // }
     }
 
-    private PropertiesConverter handlerToTest() {
+    private PropertiesConverter converterToTest() {
         return new PropertiesConverter();
     }
 }

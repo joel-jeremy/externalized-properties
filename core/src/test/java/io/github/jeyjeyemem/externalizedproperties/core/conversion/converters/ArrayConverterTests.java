@@ -30,24 +30,24 @@ public class ArrayConverterTests {
         @Test
         @DisplayName("should return false when target type is null.")
         public void test1() {
-            ArrayConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(null);
+            ArrayConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(null);
             assertFalse(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is an array class.")
         public void test2() {
-            ArrayConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(String[].class);
+            ArrayConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(String[].class);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName("should return false when target type is not an array.")
         public void test3() {
-            ArrayConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Integer.class);
+            ArrayConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Integer.class);
             assertFalse(canConvert);
         }
     }
@@ -57,14 +57,14 @@ public class ArrayConverterTests {
         @Test
         @DisplayName("should throw when context is null.")
         public void test1() {
-            ArrayConverter handler = handlerToTest();
-            assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
+            ArrayConverter converter = converterToTest();
+            assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
         }
 
         @Test
         @DisplayName("should return skip result when target type is not an array.")
         public void test2() {
-            ArrayConverter handler = handlerToTest();
+            ArrayConverter converter = converterToTest();
 
             // Method return type is an int and not an array e.g. String[]
             ProxyMethod proxyMethod = 
@@ -73,10 +73,10 @@ public class ArrayConverterTests {
                     "intPrimitiveProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
-            ConversionResult<?> result = handler.convert(new ConversionContext(
-                converter,
+            ConversionResult<?> result = converter.convert(new ConversionContext(
+                rootConverter,
                 proxyMethod,
                 "value1,value2,value3"
             ));
@@ -88,7 +88,7 @@ public class ArrayConverterTests {
         @Test
         @DisplayName("should convert value to an array.")
         public void test3() {
-            ArrayConverter handler = handlerToTest();
+            ArrayConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -96,11 +96,11 @@ public class ArrayConverterTests {
                     "arrayProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionResult<? extends Object[]> result = 
-                handler.convert(new ConversionContext(
-                    converter,
+                converter.convert(new ConversionContext(
+                    rootConverter,
                     proxyMethod,
                     "value1,value2,value3"
                 ));
@@ -120,7 +120,7 @@ public class ArrayConverterTests {
         @Test
         @DisplayName("should convert value according to the array's component type.")
         public void test4() {
-            ArrayConverter handler = handlerToTest();
+            ArrayConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -128,14 +128,14 @@ public class ArrayConverterTests {
                     "arrayIntegerWrapper"
                 );
             
-            Converter<?> converter = new RootConverter(
-                handler,
+            Converter<?> rootConverter = new RootConverter(
+                converter,
                 new PrimitiveConverter()
             );
             
-            ConversionResult<? extends Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = converter.convert(
                 new ConversionContext(
-                    converter,
+                    rootConverter,
                     proxyMethod,
                     "1,2,3"
                 )
@@ -156,7 +156,7 @@ public class ArrayConverterTests {
         @Test
         @DisplayName("should return empty array when value is empty.")
         public void test5() {
-            ArrayConverter handler = handlerToTest();
+            ArrayConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -164,11 +164,11 @@ public class ArrayConverterTests {
                     "arrayProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
             
-            ConversionResult<? extends Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = converter.convert(
                 new ConversionContext(
-                    converter,
+                    rootConverter,
                     proxyMethod,
                     "" // Empty value.
                 )
@@ -183,7 +183,7 @@ public class ArrayConverterTests {
         @Test
         @DisplayName("should retain empty values from value.")
         public void test6() {
-            ArrayConverter handler = handlerToTest();
+            ArrayConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -191,11 +191,11 @@ public class ArrayConverterTests {
                     "arrayProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
             
-            ConversionResult<? extends Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = converter.convert(
                 new ConversionContext(
-                    converter,
+                    rootConverter,
                     proxyMethod,
                     "value1,,value3,,value5" // Has empty values.
                 )
@@ -216,7 +216,7 @@ public class ArrayConverterTests {
         @Test
         @DisplayName("should strip empty values when annotated with @StripEmptyValues.")
         public void test7() {
-            ArrayConverter handler = handlerToTest();
+            ArrayConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -224,11 +224,11 @@ public class ArrayConverterTests {
                     "arrayPropertyStripEmpty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
             
-            ConversionResult<? extends Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = converter.convert(
                 new ConversionContext(
-                    converter,
+                    rootConverter,
                     proxyMethod,
                     "value1,,value3,,value5" // Has empty values.
                 )
@@ -249,7 +249,7 @@ public class ArrayConverterTests {
         @Test
         @DisplayName("should return Strings when array component type is Object.")
         public void test8() {
-            ArrayConverter handler = handlerToTest();
+            ArrayConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -257,11 +257,11 @@ public class ArrayConverterTests {
                     "arrayPropertyObject"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
             
-            ConversionResult<? extends Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = converter.convert(
                 new ConversionContext(
-                    converter,
+                    rootConverter,
                     proxyMethod,
                     "value1,value2,value3"
                 )
@@ -281,11 +281,11 @@ public class ArrayConverterTests {
 
         @Test
         @DisplayName(
-            "should throw when no converter is registered that can handle " + 
+            "should throw when no rootConverter is registered that can handle " + 
             "the array's component type."
         )
         public void test9() {
-            ArrayConverter handler = handlerToTest();
+            ArrayConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -293,13 +293,13 @@ public class ArrayConverterTests {
                     "arrayIntegerWrapper"
                 );
             
-            // No registered handler for Integer.
-            Converter<?> converter = new RootConverter(handler);
+            // No registered converter for Integer.
+            Converter<?> rootConverter = new RootConverter(converter);
             
             assertThrows(ConversionException.class, () -> {
-                handler.convert(
+                converter.convert(
                     new ConversionContext(
-                        converter,
+                        rootConverter,
                         proxyMethod,
                         "1,2,3,4,5"
                     )
@@ -310,7 +310,7 @@ public class ArrayConverterTests {
         @Test
         @DisplayName("should use custom delimiter defined by @Delimiter.")
         public void test10() {
-            ArrayConverter handler = handlerToTest();
+            ArrayConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -318,11 +318,11 @@ public class ArrayConverterTests {
                     "arrayCustomDelimiter"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
             
-            ConversionResult<? extends Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = converter.convert(
                 new ConversionContext(
-                    converter,
+                    rootConverter,
                     proxyMethod,
                     "value1|value2|value3" // Custom delimiter
                 )
@@ -345,7 +345,7 @@ public class ArrayConverterTests {
             "should convert value according to the array's generic component type."
         )
         public void test11() {
-            ArrayConverter handler = handlerToTest();
+            ArrayConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -353,14 +353,14 @@ public class ArrayConverterTests {
                     "arrayPropertyGeneric" // Returns a generic type array Optional<String>[]
                 );
             
-            Converter<?> converter = new RootConverter(
-                handler,
-                new OptionalConverter() // Register additional Optional handler.
+            Converter<?> rootConverter = new RootConverter(
+                converter,
+                new OptionalConverter() // Register additional Optional converter.
             );
             
-            ConversionResult<? extends Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = converter.convert(
                 new ConversionContext(
-                    converter,
+                    rootConverter,
                     proxyMethod,
                     "value1,value2,value3"
                 )
@@ -387,7 +387,7 @@ public class ArrayConverterTests {
             "should convert generic type parameter wildcards to Strings."
         )
         public void test12() {
-            ArrayConverter handler = handlerToTest();
+            ArrayConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -395,14 +395,14 @@ public class ArrayConverterTests {
                     "arrayPropertyGenericWildcard" // Returns a generic type array Optional<?>[]
                 );
             
-            Converter<?> converter = new RootConverter(
-                handler,
-                new OptionalConverter() // Register additional Optional handler.
+            Converter<?> rootConverter = new RootConverter(
+                converter,
+                new OptionalConverter() // Register additional Optional converter.
             );
             
-            ConversionResult<? extends Object[]> result = handler.convert(
+            ConversionResult<? extends Object[]> result = converter.convert(
                 new ConversionContext(
-                    converter,
+                    rootConverter,
                     proxyMethod,
                     "value1,value2,value3"
                 )
@@ -427,7 +427,7 @@ public class ArrayConverterTests {
         @Test
         @DisplayName("should throw when target type has a type variable e.g. List<T>.")
         public void test13() {
-            ArrayConverter handler = handlerToTest();
+            ArrayConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -435,18 +435,18 @@ public class ArrayConverterTests {
                     "arrayPropertyT" // Returns a generic type array <T> T[]
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
             
             ConversionContext context = 
                 new ConversionContext(
-                    converter,
+                    rootConverter,
                     proxyMethod,
                     "value1,value2,value3"
                 );
             
             assertThrows(
                 ConversionException.class, 
-                () -> handler.convert(context)
+                () -> converter.convert(context)
             );
         }
 
@@ -457,13 +457,13 @@ public class ArrayConverterTests {
         // @Test
         // @DisplayName("should return skip result when target type is not an array.")
         // public void nonProxyTests1() {
-        //     ArrayConverter handler = handlerToTest();
+        //     ArrayConverter converter = converterToTest();
 
         //     // Target type is List and not an array e.g. String[]
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
-        //     ConversionResult<?> result = handler.convert(new ConversionContext(
-        //         converter,
+        //     ConversionResult<?> result = converter.convert(new ConversionContext(
+        //         rootConverter,
         //         Integer.class,
         //         "value1,value2,value3"
         //     ));
@@ -475,12 +475,12 @@ public class ArrayConverterTests {
         // @Test
         // @DisplayName("should convert value to an array.")
         // public void nonProxyTest2() {
-        //     ArrayConverter handler = handlerToTest();
+        //     ArrayConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
             
-        //     ConversionResult<? extends Object[]> result = handler.convert(new ConversionContext(
-        //         converter,
+        //     ConversionResult<? extends Object[]> result = converter.convert(new ConversionContext(
+        //         rootConverter,
         //         String[].class,
         //         "value1,,value3,,value5"
         //     ));
@@ -502,16 +502,16 @@ public class ArrayConverterTests {
         // @Test
         // @DisplayName("should convert value according to the array's component type.")
         // public void nonProxyTest3() {
-        //     ArrayConverter handler = handlerToTest();
+        //     ArrayConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(
-        //         handler,
+        //     Converter<?> rootConverter = new RootConverter(
+        //         converter,
         //         new PrimitiveConverter()
         //     );
             
-        //     ConversionResult<? extends Object[]> result = handler.convert(
+        //     ConversionResult<? extends Object[]> result = converter.convert(
         //         new ConversionContext(
-        //             converter,
+        //             rootConverter,
         //             Integer[].class,
         //             "1,2,3"
         //         )
@@ -532,13 +532,13 @@ public class ArrayConverterTests {
         // @Test
         // @DisplayName("should return empty array when value is empty.")
         // public void nonProxyTest4() {
-        //     ArrayConverter handler = handlerToTest();
+        //     ArrayConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
             
-        //     ConversionResult<? extends Object[]> result = handler.convert(
+        //     ConversionResult<? extends Object[]> result = converter.convert(
         //         new ConversionContext(
-        //             converter,
+        //             rootConverter,
         //             String[].class,
         //             "" // Empty value.
         //         )
@@ -553,13 +553,13 @@ public class ArrayConverterTests {
         // @Test
         // @DisplayName("should retain empty values from value.")
         // public void nonProxyTest5() {
-        //     ArrayConverter handler = handlerToTest();
+        //     ArrayConverter converter = converterToTest();
 
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
             
-        //     ConversionResult<? extends Object[]> result = handler.convert(
+        //     ConversionResult<? extends Object[]> result = converter.convert(
         //         new ConversionContext(
-        //             converter,
+        //             rootConverter,
         //             String[].class,
         //             "value1,,value3,,value5" // Has empty values.
         //         )
@@ -580,13 +580,13 @@ public class ArrayConverterTests {
         // @Test
         // @DisplayName("should return Strings when array component type is Object.")
         // public void nonProxyTest6() {
-        //     ArrayConverter handler = handlerToTest();
+        //     ArrayConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
             
-        //     ConversionResult<? extends Object[]> result = handler.convert(
+        //     ConversionResult<? extends Object[]> result = converter.convert(
         //         new ConversionContext(
-        //             converter,
+        //             rootConverter,
         //             Object[].class,
         //             "value1,value2,value3"
         //         )
@@ -606,19 +606,19 @@ public class ArrayConverterTests {
 
         // @Test
         // @DisplayName(
-        //     "should throw when no converter is registered that can handle " + 
+        //     "should throw when no rootConverter is registered that can handle " + 
         //     "the array's component type."
         // )
         // public void nonProxyTest7() {
-        //     ArrayConverter handler = handlerToTest();
+        //     ArrayConverter converter = converterToTest();
             
-        //     // No registered handler for Integer.
-        //     Converter<?> converter = new RootConverter(handler);
+        //     // No registered converter for Integer.
+        //     Converter<?> rootConverter = new RootConverter(converter);
             
         //     assertThrows(ConversionException.class, () -> {
-        //         handler.convert(
+        //         converter.convert(
         //             new ConversionContext(
-        //                 converter,
+        //                 rootConverter,
         //                 Integer[].class,
         //                 "1,2,3,4,5"
         //             )
@@ -631,16 +631,16 @@ public class ArrayConverterTests {
         //     "should convert value according to the array's generic component type."
         // )
         // public void nonProxyTest8() {
-        //     ArrayConverter handler = handlerToTest();
+        //     ArrayConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(
-        //         handler,
-        //         new OptionalConverter() // Register additional Optional handler.
+        //     Converter<?> rootConverter = new RootConverter(
+        //         converter,
+        //         new OptionalConverter() // Register additional Optional converter.
         //     );
             
-        //     ConversionResult<? extends Object[]> result = handler.convert(
+        //     ConversionResult<? extends Object[]> result = converter.convert(
         //         new ConversionContext(
-        //             converter,
+        //             rootConverter,
         //             new TypeReference<Optional<String>[]>(){}.type(),
         //             "value1,value2,value3"
         //         )
@@ -667,16 +667,16 @@ public class ArrayConverterTests {
         //     "should convert generic type parameter wildcards to Strings."
         // )
         // public void nonProxyTest9() {
-        //     ArrayConverter handler = handlerToTest();
+        //     ArrayConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(
-        //         handler,
-        //         new OptionalConverter() // Register additional Optional handler.
+        //     Converter<?> rootConverter = new RootConverter(
+        //         converter,
+        //         new OptionalConverter() // Register additional Optional converter.
         //     );
             
-        //     ConversionResult<? extends Object[]> result = handler.convert(
+        //     ConversionResult<? extends Object[]> result = converter.convert(
         //         new ConversionContext(
-        //             converter,
+        //             rootConverter,
         //             new TypeReference<Optional<?>[]>(){}.type(),
         //             "value1,value2,value3"
         //         )
@@ -701,24 +701,24 @@ public class ArrayConverterTests {
         // @Test
         // @DisplayName("should throw when target type has a type variable e.g. List<T>.")
         // public <T> void nonProxyTest10() {
-        //     ArrayConverter handler = handlerToTest();
+        //     ArrayConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
             
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<T[]>(){}.type(),
         //         "value1,value2,value3"
         //     );
             
         //     assertThrows(
         //         ConversionException.class, 
-        //         () -> handler.convert(context)
+        //         () -> converter.convert(context)
         //     );
         // }
     }
 
-    private ArrayConverter handlerToTest() {
+    private ArrayConverter converterToTest() {
         return new ArrayConverter();
     }
 }

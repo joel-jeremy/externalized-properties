@@ -30,24 +30,24 @@ public class OptionalConverterTests {
         @Test
         @DisplayName("should return false when target type is null.")
         public void test1() {
-            OptionalConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(null);
+            OptionalConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(null);
             assertFalse(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is an Optional class.")
         public void test2() {
-            OptionalConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Optional.class);
+            OptionalConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Optional.class);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName("should return false when target type is not an Optional class.")
         public void test3() {
-            OptionalConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(String.class);
+            OptionalConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(String.class);
             assertFalse(canConvert);
         }
     }
@@ -57,14 +57,14 @@ public class OptionalConverterTests {
         @Test
         @DisplayName("should throw when context is null.")
         public void test1() {
-            OptionalConverter handler = handlerToTest();
-            assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
+            OptionalConverter converter = converterToTest();
+            assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
         }
 
         @Test
         @DisplayName("should convert value to an Optional.")
         public void test2() {
-            OptionalConverter handler = handlerToTest();
+            OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -72,15 +72,15 @@ public class OptionalConverterTests {
                     "optionalProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value"
             );
 
-            ConversionResult<? extends Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = converter.convert(context);
 
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -96,7 +96,7 @@ public class OptionalConverterTests {
             "should convert value according to the Optional's generic type parameter."
         )
         public void test3() {
-            OptionalConverter handler = handlerToTest();
+            OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -104,18 +104,18 @@ public class OptionalConverterTests {
                     "nonStringOptionalProperty"
                 );
             
-            Converter<?> converter = new RootConverter(
-                handler,
+            Converter<?> rootConverter = new RootConverter(
+                converter,
                 new PrimitiveConverter()
             );
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "1"
             );
 
-            ConversionResult<? extends Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = converter.convert(context);
 
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -132,7 +132,7 @@ public class OptionalConverterTests {
             "type parameters i.e. Optional.class"
         )
         public void test4() {
-            OptionalConverter handler = handlerToTest();
+            OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -140,10 +140,10 @@ public class OptionalConverterTests {
                     "nonStringOptionalProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "1",
                 // Override proxy method return type with a raw Optional
@@ -151,7 +151,7 @@ public class OptionalConverterTests {
                 Optional.class
             );
 
-            ConversionResult<? extends Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -166,7 +166,7 @@ public class OptionalConverterTests {
         @Test
         @DisplayName("should return String value when Optional's generic type parameter is Object.")
         public void test5() {
-            OptionalConverter handler = handlerToTest();
+            OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -174,15 +174,15 @@ public class OptionalConverterTests {
                     "optionalPropertyObject"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value"
             );
 
-            ConversionResult<? extends Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -198,7 +198,7 @@ public class OptionalConverterTests {
             "should return String value when Optional's generic type parameter is a wildcard."
         )
         public void test6() {
-            OptionalConverter handler = handlerToTest();
+            OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -206,15 +206,15 @@ public class OptionalConverterTests {
                     "optionalPropertyWildcard"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value"
             );
 
-            ConversionResult<? extends Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -228,7 +228,7 @@ public class OptionalConverterTests {
         @Test
         @DisplayName("should throw when target type has a type variable e.g. Optional<T>.")
         public void test7() {
-            OptionalConverter handler = handlerToTest();
+            OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -236,17 +236,17 @@ public class OptionalConverterTests {
                     "optionalPropertyT"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value"
             );
                 
             assertThrows(
                 ConversionException.class, 
-                () -> handler.convert(context)
+                () -> converter.convert(context)
             );
         }
 
@@ -256,7 +256,7 @@ public class OptionalConverterTests {
             "Generic type parameter is also a parameterized type e.g. Optional<List<String>>."
         )
         public void test8() {
-            OptionalConverter handler = handlerToTest();
+            OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -264,18 +264,18 @@ public class OptionalConverterTests {
                     "optionalPropertyNestedGenerics"
                 );
             
-            Converter<?> converter = new RootConverter(
-                handler,
-                new ListConverter() // Register additional List handler.
+            Converter<?> rootConverter = new RootConverter(
+                converter,
+                new ListConverter() // Register additional List converter.
             );
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value1,value2,value3"
             );
 
-            ConversionResult<? extends Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -295,7 +295,7 @@ public class OptionalConverterTests {
             "Generic type parameter is a generic array e.g. Optional<Optional<String>[]>."
         )
         public void test9() {
-            OptionalConverter handler = handlerToTest();
+            OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -303,18 +303,18 @@ public class OptionalConverterTests {
                     "optionalPropertyNestedGenericsArray"
                 );
             
-            Converter<?> converter = new RootConverter(
-                handler,
-                new ArrayConverter() // Register additional array handler.
+            Converter<?> rootConverter = new RootConverter(
+                converter,
+                new ArrayConverter() // Register additional array converter.
             );
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value1,value2,value3"
             );
 
-            ConversionResult<? extends Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -338,7 +338,7 @@ public class OptionalConverterTests {
             "should convert value to an empty Optional when property value is empty."
         )
         public void test10() {
-            OptionalConverter handler = handlerToTest();
+            OptionalConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -346,15 +346,15 @@ public class OptionalConverterTests {
                     "optionalProperty"
                 );
 
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "" // Empty.
             );
 
-            ConversionResult<? extends Optional<?>> result = handler.convert(context);
+            ConversionResult<? extends Optional<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Optional<?> optional = result.value();
@@ -370,17 +370,17 @@ public class OptionalConverterTests {
         // @Test
         // @DisplayName("should convert value to an Optional.")
         // public void nonProxyTest1() {
-        //     OptionalConverter handler = handlerToTest();
+        //     OptionalConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         Optional.class,
         //         "value"
         //     );
 
-        //     ConversionResult<? extends Optional<?>> result = handler.convert(context);
+        //     ConversionResult<? extends Optional<?>> result = converter.convert(context);
 
         //     assertNotNull(result);
         //     Optional<?> optional = result.value();
@@ -396,20 +396,20 @@ public class OptionalConverterTests {
         //     "should convert value according to the Optional's generic type parameter."
         // )
         // public void nonProxyTest2() {
-        //     OptionalConverter handler = handlerToTest();
+        //     OptionalConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(
-        //         handler,
+        //     Converter<?> rootConverter = new RootConverter(
+        //         converter,
         //         new PrimitiveConverter()
         //     );
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<Optional<Integer>>(){}.type(),
         //         "1"
         //     );
 
-        //     ConversionResult<? extends Optional<?>> result = handler.convert(context);
+        //     ConversionResult<? extends Optional<?>> result = converter.convert(context);
 
         //     assertNotNull(result);
         //     Optional<?> optional = result.value();
@@ -423,17 +423,17 @@ public class OptionalConverterTests {
         // @Test
         // @DisplayName("should return String value when Optional's generic type parameter is Object.")
         // public void nonProxyTest3() {
-        //     OptionalConverter handler = handlerToTest();
+        //     OptionalConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<Optional<Object>>(){}.type(),
         //         "value"
         //     );
 
-        //     ConversionResult<? extends Optional<?>> result = handler.convert(context);
+        //     ConversionResult<? extends Optional<?>> result = converter.convert(context);
             
         //     assertNotNull(result);
         //     Optional<?> optional = result.value();
@@ -449,17 +449,17 @@ public class OptionalConverterTests {
         //     "should return String value when Optional's generic type parameter is a wildcard."
         // )
         // public void nonProxyTest4() {
-        //     OptionalConverter handler = handlerToTest();
+        //     OptionalConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<Optional<?>>(){}.type(),
         //         "value"
         //     );
 
-        //     ConversionResult<? extends Optional<?>> result = handler.convert(context);
+        //     ConversionResult<? extends Optional<?>> result = converter.convert(context);
             
         //     assertNotNull(result);
         //     Optional<?> optional = result.value();
@@ -473,19 +473,19 @@ public class OptionalConverterTests {
         // @Test
         // @DisplayName("should throw when target type has a type variable e.g. Optional<T>.")
         // public <T> void nonProxyTest5() {
-        //     OptionalConverter handler = handlerToTest();
+        //     OptionalConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<Optional<T>>(){}.type(),
         //         "value"
         //     );
                 
         //     assertThrows(
         //         ConversionException.class, 
-        //         () -> handler.convert(context)
+        //         () -> converter.convert(context)
         //     );
         // }
 
@@ -495,20 +495,20 @@ public class OptionalConverterTests {
         //     "Generic type parameter is also a parameterized type e.g. Optional<List<String>>."
         // )
         // public void nonProxyTest6() {
-        //     OptionalConverter handler = handlerToTest();
+        //     OptionalConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(
-        //         handler,
-        //         new ListConverter() // Register additional List handler.
+        //     Converter<?> rootConverter = new RootConverter(
+        //         converter,
+        //         new ListConverter() // Register additional List converter.
         //     );
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<Optional<List<String>>>(){}.type(),
         //         "value1,value2,value3"
         //     );
 
-        //     ConversionResult<? extends Optional<?>> result = handler.convert(context);
+        //     ConversionResult<? extends Optional<?>> result = converter.convert(context);
             
         //     assertNotNull(result);
         //     Optional<?> optional = result.value();
@@ -528,20 +528,20 @@ public class OptionalConverterTests {
         //     "Generic type parameter is a generic array e.g. Optional<Optional<String>[]>."
         // )
         // public void nonProxyTest7() {
-        //     OptionalConverter handler = handlerToTest();
+        //     OptionalConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(
-        //         handler,
-        //         new ArrayConverter() // Register additional array handler.
+        //     Converter<?> rootConverter = new RootConverter(
+        //         converter,
+        //         new ArrayConverter() // Register additional array converter.
         //     );
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<Optional<Optional<String>[]>>(){}.type(),
         //         "value1,value2,value3"
         //     );
 
-        //     ConversionResult<? extends Optional<?>> result = handler.convert(context);
+        //     ConversionResult<? extends Optional<?>> result = converter.convert(context);
             
         //     assertNotNull(result);
         //     Optional<?> optional = result.value();
@@ -565,17 +565,17 @@ public class OptionalConverterTests {
         //     "should convert value to an empty Optional when property value is empty."
         // )
         // public void nonProxyTest8() {
-        //     OptionalConverter handler = handlerToTest();
+        //     OptionalConverter converter = converterToTest();
 
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         Optional.class,
         //         "" // Empty.
         //     );
 
-        //     ConversionResult<? extends Optional<?>> result = handler.convert(context);
+        //     ConversionResult<? extends Optional<?>> result = converter.convert(context);
             
         //     assertNotNull(result);
         //     Optional<?> optional = result.value();
@@ -585,7 +585,7 @@ public class OptionalConverterTests {
         // }
     }
 
-    private OptionalConverter handlerToTest() {
+    private OptionalConverter converterToTest() {
         return new OptionalConverter();
     }
 }

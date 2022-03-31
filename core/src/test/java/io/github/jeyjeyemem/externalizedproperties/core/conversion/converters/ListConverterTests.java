@@ -46,24 +46,24 @@ public class ListConverterTests {
         @Test
         @DisplayName("should return false when target type is null.")
         public void test1() {
-            ListConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(null);
+            ListConverter converter = rootConverterToTest();
+            boolean canConvert = converter.canConvertTo(null);
             assertFalse(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is a List class.")
         public void test2() {
-            ListConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(List.class);
+            ListConverter converter = rootConverterToTest();
+            boolean canConvert = converter.canConvertTo(List.class);
             assertTrue(canConvert);
         }
 
         @Test
         @DisplayName("should return true when target type is a Collection class.")
         public void test3() {
-            ListConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(Collection.class);
+            ListConverter converter = rootConverterToTest();
+            boolean canConvert = converter.canConvertTo(Collection.class);
             assertTrue(canConvert);
         }
 
@@ -72,8 +72,8 @@ public class ListConverterTests {
         @Test
         @DisplayName("should return false when target type is not a List/Collection class.")
         public void test4() {
-            ListConverter handler = handlerToTest();
-            boolean canConvert = handler.canConvertTo(String.class);
+            ListConverter converter = rootConverterToTest();
+            boolean canConvert = converter.canConvertTo(String.class);
             assertFalse(canConvert);
         }
     }
@@ -83,14 +83,14 @@ public class ListConverterTests {
         @Test
         @DisplayName("should throw when context is null.")
         public void test1() {
-            ListConverter handler = handlerToTest();
-            assertThrows(IllegalArgumentException.class, () -> handler.convert(null));
+            ListConverter converter = rootConverterToTest();
+            assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
         }
 
         @Test
         @DisplayName("should convert value to a List.")
         public void test2() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -98,15 +98,15 @@ public class ListConverterTests {
                     "listProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value1,value2,value3"
             );
 
-            ConversionResult<? extends List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = converter.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -126,7 +126,7 @@ public class ListConverterTests {
             "type parameters i.e. List.class"
         )
         public void test3() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -134,10 +134,10 @@ public class ListConverterTests {
                     "listInteger"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "1,2,3",
                 // Override proxy method return type with a raw List
@@ -145,7 +145,7 @@ public class ListConverterTests {
                 List.class
             );
                 
-            ConversionResult<? extends List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = converter.convert(context);
 
             assertNotNull(result);
             List<?> list = result.value();
@@ -163,7 +163,7 @@ public class ListConverterTests {
         @Test
         @DisplayName("should convert value to a List using custom delimiter.")
         public void test4() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -171,15 +171,15 @@ public class ListConverterTests {
                     "listCustomDelimiter"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
             
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value1#value2#value3"
             );
 
-            ConversionResult<? extends List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = converter.convert(context);
 
             assertNotNull(result);
             List<?> list = result.value();
@@ -197,7 +197,7 @@ public class ListConverterTests {
         @Test
         @DisplayName("should convert value according to the List's generic type parameter.")
         public void test5() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -205,18 +205,18 @@ public class ListConverterTests {
                     "listInteger"
                 );
             
-            Converter<?> converter = new RootConverter(
-                handler,
+            Converter<?> rootConverter = new RootConverter(
+                converter,
                 new PrimitiveConverter()
             );
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "1,2,3"
             );
             
-            ConversionResult<? extends List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = converter.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -236,7 +236,7 @@ public class ListConverterTests {
             "should return String values when List's generic type parameter is a wildcard."
         )
         public void test6() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -244,15 +244,15 @@ public class ListConverterTests {
                     "listPropertyWildcard"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value1,value2,value3"
             );
 
-            ConversionResult<? extends List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = converter.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -270,7 +270,7 @@ public class ListConverterTests {
         @Test
         @DisplayName("should return String values when List's generic type parameter is Object.")
         public void test7() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -278,16 +278,16 @@ public class ListConverterTests {
                     "listPropertyObject"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = 
                 new ConversionContext(
-                    converter,
+                    rootConverter,
                     proxyMethod,
                     "value1,value2,value3"
                 );
 
-            ConversionResult<? extends List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = converter.convert(context);
         
             assertNotNull(result);
             List<?> list = result.value();
@@ -305,7 +305,7 @@ public class ListConverterTests {
         @Test
         @DisplayName("should return empty List when property value is empty.")
         public void test8() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -313,15 +313,15 @@ public class ListConverterTests {
                     "listProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "" // Empty value.
             );
 
-            ConversionResult<? extends List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = converter.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -333,7 +333,7 @@ public class ListConverterTests {
         @Test
         @DisplayName("should retain empty values from property value.")
         public void test9() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -341,16 +341,16 @@ public class ListConverterTests {
                     "listProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = 
                 new ConversionContext(
-                    converter,
+                    rootConverter,
                     proxyMethod,
                     "value1,,value3,,value5" // Has empty values.
                 );
 
-            ConversionResult<? extends List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = converter.convert(context);
         
             assertNotNull(result);
             List<?> list = result.value();
@@ -368,7 +368,7 @@ public class ListConverterTests {
         @Test
         @DisplayName("should strip empty values when annotated with @StripEmptyValues.")
         public void test10() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -376,15 +376,15 @@ public class ListConverterTests {
                     "listPropertyStripEmpty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value1,,value3,,value5" // Has empty values.
             );
 
-            ConversionResult<? extends List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = converter.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -400,11 +400,11 @@ public class ListConverterTests {
 
         @Test
         @DisplayName(
-            "should throw when no converter is registered that can handle " + 
+            "should throw when no rootConverter is registered that can handle " + 
             "the List's generic type parameter."
         )
         public void test11() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -412,13 +412,13 @@ public class ListConverterTests {
                     "listInteger"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
             
-            // No registered converter for Integer.
+            // No registered rootConverter for Integer.
             assertThrows(ExternalizedPropertiesException.class, () -> {
-                handler.convert(
+                converter.convert(
                     new ConversionContext(
-                        converter,
+                        rootConverter,
                         proxyMethod,
                         "1,2,3,4,5"
                     )
@@ -432,7 +432,7 @@ public class ListConverterTests {
             "Generic type parameter is also a parameterized type e.g. List<Optional<String>>."
         )
         public void test12() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -440,18 +440,18 @@ public class ListConverterTests {
                     "listPropertyNestedGenerics" // Returns a List<Optional<String>>.
                 );
             
-            Converter<?> converter = new RootConverter(
-                handler,
-                new OptionalConverter() // Register additional Optional handler.
+            Converter<?> rootConverter = new RootConverter(
+                converter,
+                new OptionalConverter() // Register additional Optional converter.
             );
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value1,value2,value3"
             );
 
-            ConversionResult<? extends List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = converter.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -475,7 +475,7 @@ public class ListConverterTests {
             "Generic type parameter is generic array e.g. List<Optional<String>[]>."
         )
         public void test13() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -483,19 +483,19 @@ public class ListConverterTests {
                     "listPropertyNestedGenericsArray" // Returns a List<Optional<String>[]>.
                 );
             
-            Converter<?> converter = new RootConverter(
-                handler,
-                new ArrayConverter(), // Register additional array handler.
-                new OptionalConverter() // Register additional Optional handler.
+            Converter<?> rootConverter = new RootConverter(
+                converter,
+                new ArrayConverter(), // Register additional array converter.
+                new OptionalConverter() // Register additional Optional converter.
             );
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value1,value2,value3"
             );
 
-            ConversionResult<? extends List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = converter.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -529,7 +529,7 @@ public class ListConverterTests {
         @Test
         @DisplayName("should throw when target type has a type variable e.g. List<T>.")
         public void test14() {
-            ListConverter handler = handlerToTest();
+            ListConverter converter = rootConverterToTest();
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -537,17 +537,17 @@ public class ListConverterTests {
                     "listPropertyT"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
 
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
                 "value"
             );
                 
             assertThrows(
                 ConversionException.class, 
-                () -> handler.convert(context)
+                () -> converter.convert(context)
             );
         }
 
@@ -560,7 +560,7 @@ public class ListConverterTests {
             "should use provided list factory to construct lists/collections."
         )
         public void listFactoryTest1() {
-            ListConverter handler = handlerToTest(
+            ListConverter converter = converterToTest(
                 // Uses linked list.
                 length -> new LinkedList<>()
             );
@@ -571,15 +571,15 @@ public class ListConverterTests {
                     "listProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
             
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
-                "value1,,value3,,value5"
+                "value1,value2,value3,value4,value5"
             );
 
-            ConversionResult<? extends List<?>> result = handler.convert(context);
+            ConversionResult<? extends List<?>> result = converter.convert(context);
             
             assertNotNull(result);
             List<?> list = result.value();
@@ -591,7 +591,7 @@ public class ListConverterTests {
             assertEquals(5, list.size());
             assertTrue(list.stream().allMatch(v -> v instanceof String));
             assertIterableEquals(
-                Arrays.asList("value1", "", "value3", "", "value5"), 
+                Arrays.asList("value1", "value2", "value3", "value4", "value5"), 
                 list
             );
         }
@@ -601,7 +601,7 @@ public class ListConverterTests {
             "should throw when provided list factory returns null."
         )
         public void listFactoryTest2() {
-            ListConverter handler = handlerToTest(
+            ListConverter converter = converterToTest(
                 // Returns null.
                 length -> null
             );
@@ -612,18 +612,18 @@ public class ListConverterTests {
                     "listProperty"
                 );
             
-            Converter<?> converter = new RootConverter(handler);
+            Converter<?> rootConverter = new RootConverter(converter);
             
             ConversionContext context = new ConversionContext(
-                converter,
+                rootConverter,
                 proxyMethod,
-                "value1,,value3,,value5"
+                "value1,value2,value3,value4,value5"
             );
 
             // Throws IllegalStateException if list factory returned null.
             assertThrows(
                 IllegalStateException.class, 
-                () -> handler.convert(context)
+                () -> converter.convert(context)
             );
         }
 
@@ -636,17 +636,17 @@ public class ListConverterTests {
         //     "should convert value to a List."
         // )
         // public void nonProxyTest1() {
-        //     ListConverter handler = handlerToTest();
+        //     ListConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
             
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         List.class,
         //         "value1,,value3,,value5"
         //     );
 
-        //     ConversionResult<? extends List<?>> result = handler.convert(context);
+        //     ConversionResult<? extends List<?>> result = converter.convert(context);
             
         //     assertNotNull(result);
         //     List<?> list = result.value();
@@ -665,20 +665,20 @@ public class ListConverterTests {
         // @Test
         // @DisplayName("should convert value according to the List's generic type parameter.")
         // public void nonProxyTest2() {
-        //     ListConverter handler = handlerToTest();
+        //     ListConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(
-        //         handler,
+        //     Converter<?> rootConverter = new RootConverter(
+        //         converter,
         //         new PrimitiveConverter()
         //     );
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<List<Integer>>(){}.type(),
         //         "1,2,3"
         //     );
             
-        //     ConversionResult<? extends List<?>> result = handler.convert(context);
+        //     ConversionResult<? extends List<?>> result = converter.convert(context);
             
         //     assertNotNull(result);
         //     List<?> list = result.value();
@@ -698,17 +698,17 @@ public class ListConverterTests {
         //     "should return String values when List's generic type parameter is a wildcard."
         // )
         // public void nonProxyTest3() {
-        //     ListConverter handler = handlerToTest();
+        //     ListConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<List<?>>(){}.type(),
         //         "value1,value2,value3"
         //     );
 
-        //     ConversionResult<? extends List<?>> result = handler.convert(context);
+        //     ConversionResult<? extends List<?>> result = converter.convert(context);
             
         //     assertNotNull(result);
         //     List<?> list = result.value();
@@ -726,17 +726,17 @@ public class ListConverterTests {
         // @Test
         // @DisplayName("should return String values when List's generic type parameter is Object.")
         // public void nonProxyTest4() {
-        //     ListConverter handler = handlerToTest();
+        //     ListConverter converter = converterToTest();
 
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<List<Object>>(){}.type(),
         //         "value1,value2,value3"
         //     );
 
-        //     ConversionResult<? extends List<?>> result = handler.convert(context);
+        //     ConversionResult<? extends List<?>> result = converter.convert(context);
         
         //     assertNotNull(result);
         //     List<?> list = result.value();
@@ -754,17 +754,17 @@ public class ListConverterTests {
         // @Test
         // @DisplayName("should return empty List when property value is empty.")
         // public void nonProxyTest5() {
-        //     ListConverter handler = handlerToTest();
+        //     ListConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         List.class,
         //         "" // Empty value.
         //     );
 
-        //     ConversionResult<? extends List<?>> result = handler.convert(context);
+        //     ConversionResult<? extends List<?>> result = converter.convert(context);
             
         //     assertNotNull(result);
         //     List<?> list = result.value();
@@ -776,17 +776,17 @@ public class ListConverterTests {
         // @Test
         // @DisplayName("should retain empty values from property value.")
         // public void nonProxyTest6() {
-        //     ListConverter handler = handlerToTest();
+        //     ListConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         List.class,
         //         "value1,,value3,,value5" // Has empty values.
         //     );
 
-        //     ConversionResult<? extends List<?>> result = handler.convert(context);
+        //     ConversionResult<? extends List<?>> result = converter.convert(context);
         
         //     assertNotNull(result);
         //     List<?> list = result.value();
@@ -802,19 +802,19 @@ public class ListConverterTests {
 
         // @Test
         // @DisplayName(
-        //     "should throw when no converter is registered that can handle " + 
+        //     "should throw when no rootConverter is registered that can handle " + 
         //     "the List's generic type parameter."
         // )
         // public void nonProxyTest7() {
-        //     ListConverter handler = handlerToTest();
+        //     ListConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
             
-        //     // No registered converter for Integer.
+        //     // No registered rootConverter for Integer.
         //     assertThrows(ExternalizedPropertiesException.class, () -> {
-        //         handler.convert(
+        //         converter.convert(
         //             new ConversionContext(
-        //                 converter,
+        //                 rootConverter,
         //                 new TypeReference<List<Integer>>(){}.type(),
         //                 "1,2,3,4,5"
         //             )
@@ -828,20 +828,20 @@ public class ListConverterTests {
         //     "Generic type parameter is also a parameterized type e.g. List<Optional<String>>."
         // )
         // public void nonProxyTest8() {
-        //     ListConverter handler = handlerToTest();
+        //     ListConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(
-        //         handler,
-        //         new OptionalConverter() // Register additional Optional handler.
+        //     Converter<?> rootConverter = new RootConverter(
+        //         converter,
+        //         new OptionalConverter() // Register additional Optional converter.
         //     );
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<List<Optional<String>>>(){}.type(),
         //         "value1,value2,value3"
         //     );
 
-        //     ConversionResult<? extends List<?>> result = handler.convert(context);
+        //     ConversionResult<? extends List<?>> result = converter.convert(context);
             
         //     assertNotNull(result);
         //     List<?> list = result.value();
@@ -865,21 +865,21 @@ public class ListConverterTests {
         //     "Generic type parameter is generic array e.g. List<Optional<String>[]>."
         // )
         // public void nonProxyTest9() {
-        //     ListConverter handler = handlerToTest();
+        //     ListConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(
-        //         handler,
-        //         new ArrayConverter(), // Register additional array handler.
-        //         new OptionalConverter() // Register additional Optional handler.
+        //     Converter<?> rootConverter = new RootConverter(
+        //         converter,
+        //         new ArrayConverter(), // Register additional array converter.
+        //         new OptionalConverter() // Register additional Optional converter.
         //     );
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<List<Optional<String>[]>>(){}.type(),
         //         "value1,value2,value3"
         //     );
 
-        //     ConversionResult<? extends List<?>> result = handler.convert(context);
+        //     ConversionResult<? extends List<?>> result = converter.convert(context);
             
         //     assertNotNull(result);
         //     List<?> list = result.value();
@@ -913,28 +913,28 @@ public class ListConverterTests {
         // @Test
         // @DisplayName("should throw when target type has a type variable e.g. List<T>.")
         // public <T> void nonProxyTest10() {
-        //     ListConverter handler = handlerToTest();
+        //     ListConverter converter = converterToTest();
             
-        //     Converter<?> converter = new RootConverter(handler);
+        //     Converter<?> rootConverter = new RootConverter(converter);
 
         //     ConversionContext context = new ConversionContext(
-        //         converter,
+        //         rootConverter,
         //         new TypeReference<List<T>>(){}.type(),
         //         "value"
         //     );
                 
         //     assertThrows(
         //         ConversionException.class, 
-        //         () -> handler.convert(context)
+        //         () -> converter.convert(context)
         //     );
         // }
     }
 
-    private ListConverter handlerToTest() {
+    private ListConverter rootConverterToTest() {
         return new ListConverter();
     }
 
-    private ListConverter handlerToTest(IntFunction<List<?>> listFactory) {
+    private ListConverter converterToTest(IntFunction<List<?>> listFactory) {
         return new ListConverter(listFactory);
     }
 }
