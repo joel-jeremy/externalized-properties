@@ -3,6 +3,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.processing;
 import io.github.jeyjeyemem.externalizedproperties.core.ProcessingContext;
 import io.github.jeyjeyemem.externalizedproperties.core.Processor;
 
+import java.nio.charset.Charset;
 import java.util.Base64;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
@@ -27,7 +28,7 @@ public class Base64DecodeProcessor implements Processor {
      * @param defaultDecoder The default base 64 decoder to use to decode the property.
      */
     public Base64DecodeProcessor(Base64.Decoder defaultDecoder) {
-        this.defaultDecoder = requireNonNull(defaultDecoder, "decoder");
+        this.defaultDecoder = requireNonNull(defaultDecoder, "defaultDecoder");
     }
 
     /** {@inheritDoc} */
@@ -38,8 +39,9 @@ public class Base64DecodeProcessor implements Processor {
         try {
             byte[] bytes = context.value().getBytes();
             Base64.Decoder decoderToUse = determineDecoder(context);
+            Charset charset = determineCharset(context);
             byte[] decoded = decoderToUse.decode(bytes);
-            return new String(decoded);
+            return new String(decoded, charset);
         } catch (Exception ex) {
             throw new ProcessingException(
                 "Exception occurred while attempting to decode value using Base64: " +
@@ -47,6 +49,13 @@ public class Base64DecodeProcessor implements Processor {
                 ex
             );
         }
+    }
+
+    private Charset determineCharset(ProcessingContext context) {
+        return context.proxyMethod().findAnnotation(Base64Decode.class)
+            .filter(b64 -> !b64.charset().isEmpty())
+            .map(b64 -> Charset.forName(b64.charset()))
+            .orElse(Charset.defaultCharset());
     }
 
     private Base64.Decoder determineDecoder(ProcessingContext context) {

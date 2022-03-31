@@ -30,4 +30,11 @@ public @interface Base64Decode {
      * @return The encoding of the Base 64 string.
      */
     String encoding() default "";
+
+    /**
+     * The charset of the resulting base 64 decoded String.
+     * 
+     * @return The charset of the resulting base 64 decoded String.
+     */
+    String charset() default "";
 }
