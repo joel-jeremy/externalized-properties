@@ -4,14 +4,14 @@ import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
 import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertiesException;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyCollection;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
@@ -26,7 +26,7 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  * resource name (stripping the {@code classpath:} prefix) and return its contents.
  * 
  * @implNote Classpath resources are located via 
- * {@link ClassLoader#getResource(String)} which means that the resolver
+ * {@link ClassLoader#getResourceAsStream(String)} which means that the resolver
  * will locate and load resources based on the rules of the said API e.g. to
  * resolve a file on the classpath root, {@code classpath:app.properties} property
  * name may be used.
@@ -76,9 +76,9 @@ public class ClasspathResolver implements Resolver {
     {
         // Remove classpath: prefix.
         String resourceName = propertyName.substring("classpath:".length());
-        URL classpathResource = getClass()
+        InputStream classpathResource = getClass()
             .getClassLoader()
-            .getResource(resourceName);
+            .getResourceAsStream(resourceName);
         if (classpathResource == null) {
             throw new UnresolvedPropertiesException(
                 propertyName,
@@ -86,10 +86,12 @@ public class ClasspathResolver implements Resolver {
             );
         }
         
-        return readFileContents(Paths.get(classpathResource.toURI()));
+        return readFileContents(classpathResource);
     }
 
-    private String readFileContents(Path path) throws IOException {
-        return new String(Files.readAllBytes(path));
+    private String readFileContents(InputStream inputStream) throws IOException {
+        try (BufferedReader buf = new BufferedReader(new InputStreamReader(inputStream))) {
+            return buf.lines().collect(Collectors.joining(System.lineSeparator()));
+        }
     }
 }
