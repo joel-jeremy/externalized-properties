@@ -13,9 +13,21 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Base64Decode {
     /**
-     * The decoder to use.
+     * The encoding of the Base 64 string.
      * 
-     * @return The decoder to use.
+     * Valid values are:
+     * <ul>
+     *  <li>"basic" (RFC4648)</li>
+     *  <li>"url" (RFC4648 URL and file name safe)</li>
+     *  <li>"mime" (RFC2045)</li>
+     * </ul>
+     * 
+     * (Do not include the text enclosed in parenthesis)
+     * 
+     * <p>If no encoding if provided, {@link Base64DecodeProcessor} will
+     * use the default configured decoder.
+     * 
+     * @return The encoding of the Base 64 string.
      */
-    String decoder() default "";
+    String encoding() default "";
 }
