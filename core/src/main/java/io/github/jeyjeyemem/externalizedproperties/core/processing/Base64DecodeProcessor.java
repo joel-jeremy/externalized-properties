@@ -2,7 +2,6 @@ package io.github.jeyjeyemem.externalizedproperties.core.processing;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ProcessingContext;
 import io.github.jeyjeyemem.externalizedproperties.core.Processor;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ProcessingException;
 
 import java.util.Base64;
 

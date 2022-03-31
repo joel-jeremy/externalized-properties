@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.proxy;
 
-import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperty;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.Delimiter;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.DefaultValueProxyInterface;

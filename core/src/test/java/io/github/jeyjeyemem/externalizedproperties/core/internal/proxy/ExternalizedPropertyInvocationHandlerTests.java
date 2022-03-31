@@ -3,8 +3,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 import io.github.jeyjeyemem.externalizedproperties.core.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertiesException;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
+import io.github.jeyjeyemem.externalizedproperties.core.UnresolvedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositeResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
@@ -14,6 +13,7 @@ import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.NoAnn
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.VariableProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.VariableExpansionException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

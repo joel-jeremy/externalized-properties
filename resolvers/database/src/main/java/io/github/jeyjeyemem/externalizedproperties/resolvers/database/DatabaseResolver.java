@@ -1,8 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
 
 import java.sql.Connection;

@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.proxy;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeUtilities;
-import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

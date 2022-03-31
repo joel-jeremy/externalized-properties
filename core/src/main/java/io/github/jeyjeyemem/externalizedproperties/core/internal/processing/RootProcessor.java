@@ -2,8 +2,8 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal.processing;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ProcessingContext;
 import io.github.jeyjeyemem.externalizedproperties.core.Processor;
-import io.github.jeyjeyemem.externalizedproperties.core.annotations.ProcessWith;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ProcessingException;
+import io.github.jeyjeyemem.externalizedproperties.core.processing.ProcessWith;
+import io.github.jeyjeyemem.externalizedproperties.core.processing.ProcessingException;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;

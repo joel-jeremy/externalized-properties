@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy;
 
-import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.DateTimeFormat;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperty;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.DateTimeFormat;
 
 import java.time.DayOfWeek;
 import java.time.Instant;

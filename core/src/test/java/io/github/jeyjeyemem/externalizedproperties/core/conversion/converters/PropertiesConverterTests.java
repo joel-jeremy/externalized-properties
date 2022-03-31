@@ -3,7 +3,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.converters;
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.Converter;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;

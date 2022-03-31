@@ -1,7 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.processing;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ProcessingContext;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ProcessingException;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ProcessorProxyInterface;
 import org.junit.jupiter.api.DisplayName;

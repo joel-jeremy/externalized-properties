@@ -2,7 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertiesException;
+import io.github.jeyjeyemem.externalizedproperties.core.UnresolvedPropertiesException;
 
 import java.io.IOException;
 import java.nio.file.Files;

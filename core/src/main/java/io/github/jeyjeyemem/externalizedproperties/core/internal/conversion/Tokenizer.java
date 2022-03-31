@@ -1,8 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.conversion;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionContext;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.StripEmptyValues;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.Delimiter;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.StripEmptyValues;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.Arrays;

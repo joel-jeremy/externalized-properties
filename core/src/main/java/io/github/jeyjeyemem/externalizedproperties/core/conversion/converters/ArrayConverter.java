@@ -4,9 +4,9 @@ import io.github.jeyjeyemem.externalizedproperties.core.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeUtilities;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.StripEmptyValues;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ConversionException;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionException;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.Delimiter;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.StripEmptyValues;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.Tokenizer;
 
 import java.lang.reflect.Array;

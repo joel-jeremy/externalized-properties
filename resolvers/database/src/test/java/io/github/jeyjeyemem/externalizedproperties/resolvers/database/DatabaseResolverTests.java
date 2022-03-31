@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.AbstractNameValueQueryExecutor;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.testentities.H2Utils;

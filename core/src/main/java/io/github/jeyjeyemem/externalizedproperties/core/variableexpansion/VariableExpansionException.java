@@ -1,4 +1,6 @@
-package io.github.jeyjeyemem.externalizedproperties.core.exceptions;
+package io.github.jeyjeyemem.externalizedproperties.core.variableexpansion;
+
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesException;
 
 /**
  * Variable expansion related exception. 

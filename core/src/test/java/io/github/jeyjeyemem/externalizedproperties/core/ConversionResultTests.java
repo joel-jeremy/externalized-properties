@@ -1,6 +1,5 @@
-package io.github.jeyjeyemem.externalizedproperties.core.conversion;
+package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ConversionResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

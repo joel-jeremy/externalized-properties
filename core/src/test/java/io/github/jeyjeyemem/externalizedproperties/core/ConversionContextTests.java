@@ -1,7 +1,5 @@
-package io.github.jeyjeyemem.externalizedproperties.core.conversion;
+package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ConversionContext;
-import io.github.jeyjeyemem.externalizedproperties.core.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;

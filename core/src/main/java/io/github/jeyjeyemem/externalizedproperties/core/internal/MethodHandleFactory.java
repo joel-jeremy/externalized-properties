@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesException;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;

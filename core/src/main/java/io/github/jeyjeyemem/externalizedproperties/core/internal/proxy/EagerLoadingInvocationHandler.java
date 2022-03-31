@@ -3,10 +3,10 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesException;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.Processor;
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
-import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.WeakHashMapCacheStrategy;
 

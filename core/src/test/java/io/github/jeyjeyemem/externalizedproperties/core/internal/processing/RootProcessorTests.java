@@ -2,8 +2,8 @@ package io.github.jeyjeyemem.externalizedproperties.core.internal.processing;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ProcessingContext;
 import io.github.jeyjeyemem.externalizedproperties.core.Processor;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ProcessingException;
 import io.github.jeyjeyemem.externalizedproperties.core.processing.Base64DecodeProcessor;
+import io.github.jeyjeyemem.externalizedproperties.core.processing.ProcessingException;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ProcessorProxyInterface;

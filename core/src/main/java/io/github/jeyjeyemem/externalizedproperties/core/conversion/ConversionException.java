@@ -1,4 +1,6 @@
-package io.github.jeyjeyemem.externalizedproperties.core.exceptions;
+package io.github.jeyjeyemem.externalizedproperties.core.conversion;
+
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesException;
 
 /**
  * Conversion related exception. 

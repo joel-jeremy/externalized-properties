@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
-import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.MethodHandleFactory;
 
 import java.lang.reflect.InvocationHandler;

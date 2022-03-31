@@ -1,8 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.ExternalizedPropertiesException;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertiesException;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesException;
+import io.github.jeyjeyemem.externalizedproperties.core.UnresolvedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.MethodHandleFactory;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.DefaultValueProxyInterface;

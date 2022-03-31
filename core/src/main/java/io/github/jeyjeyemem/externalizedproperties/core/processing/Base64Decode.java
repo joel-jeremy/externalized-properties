@@ -1,7 +1,5 @@
 package io.github.jeyjeyemem.externalizedproperties.core.processing;
 
-import io.github.jeyjeyemem.externalizedproperties.core.annotations.ProcessWith;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

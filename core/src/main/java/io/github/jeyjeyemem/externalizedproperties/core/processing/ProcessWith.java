@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core.annotations;
+package io.github.jeyjeyemem.externalizedproperties.core.processing;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.Processor;

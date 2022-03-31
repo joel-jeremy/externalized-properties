@@ -3,7 +3,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.converters;
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.Converter;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.DateTimeFormat;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.DateTimeFormat;
 
 import java.lang.reflect.Type;
 import java.time.DayOfWeek;

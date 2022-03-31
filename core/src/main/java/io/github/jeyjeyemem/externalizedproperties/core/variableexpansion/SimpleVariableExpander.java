@@ -2,7 +2,6 @@ package io.github.jeyjeyemem.externalizedproperties.core.variableexpansion;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
 import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.VariableExpansionException;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;

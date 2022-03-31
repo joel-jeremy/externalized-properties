@@ -1,8 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy;
 
-import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.Delimiter;
-import io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations.StripEmptyValues;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperty;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.Delimiter;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.StripEmptyValues;
 
 import java.util.Collection;
 import java.util.List;

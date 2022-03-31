@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core.conversion.annotations;
+package io.github.jeyjeyemem.externalizedproperties.core.conversion;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

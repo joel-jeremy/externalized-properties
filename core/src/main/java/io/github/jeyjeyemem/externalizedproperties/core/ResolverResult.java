@@ -1,7 +1,5 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.exceptions.UnresolvedPropertiesException;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;

@@ -1,4 +1,6 @@
-package io.github.jeyjeyemem.externalizedproperties.core.exceptions;
+package io.github.jeyjeyemem.externalizedproperties.core.processing;
+
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesException;
 
 /**
  * Processing related exception.

@@ -1,4 +1,4 @@
-package io.github.jeyjeyemem.externalizedproperties.core.exceptions;
+package io.github.jeyjeyemem.externalizedproperties.core;
 
 /**
  * Generic Externalized Properties exception.

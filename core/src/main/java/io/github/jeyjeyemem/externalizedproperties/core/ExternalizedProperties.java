@@ -1,6 +1,5 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.annotations.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ExpiringCacheStrategy;
