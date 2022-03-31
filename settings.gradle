@@ -1,7 +1,4 @@
 rootProject.name = 'externalized-properties'
 
 include 'core'
-include 'resolver-aws-ssm'
-include 'resolver-database'
 include 'resolvers:database'
-include 'resolvers:aws-ssm'
