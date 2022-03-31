@@ -29,6 +29,7 @@ public class DefaultConverter implements Converter<Object> {
      * <ol>
      *  <li>{@link PrimitiveConverter}</li>
      *  <li>{@link ListConverter}</li>
+     *  <li>{@link SetConverter}</li>
      *  <li>{@link ArrayConverter}</li>
      *  <li>{@link OptionalConverter}</li>
      * </ol>
@@ -39,6 +40,7 @@ public class DefaultConverter implements Converter<Object> {
             Arrays.asList(
                 new PrimitiveConverter(),
                 new ListConverter(),
+                new SetConverter(),
                 new ArrayConverter(),
                 new OptionalConverter()
             );
