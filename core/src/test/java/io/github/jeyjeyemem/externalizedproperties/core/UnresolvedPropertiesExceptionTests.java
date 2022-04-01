@@ -1,19 +1,16 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.Asserts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UnresolvedPropertiesExceptionTests {
@@ -130,58 +127,7 @@ public class UnresolvedPropertiesExceptionTests {
             Set<String> unmodifiableSet = 
                 unresolvedPropertiesException.unresolvedPropertyNames();
 
-            verifyUnmodifiableCollection(unmodifiableSet, () -> "this should throw");
+            Asserts.assertUnmodifiableCollection(unmodifiableSet, () -> "this should throw");
         }
-    }
-
-    private <T> void verifyUnmodifiableCollection(
-            Collection<T> collectionToVerify, 
-            Supplier<T> itemSupplier
-    ) {
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.add(itemSupplier.get())
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.remove(itemSupplier.get())
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.addAll(
-                Collections.singletonList(itemSupplier.get())
-            )
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.clear()
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.removeAll(
-                Collections.singletonList(itemSupplier.get())
-            )
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.removeIf(r -> true)
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.retainAll(
-                Collections.singletonList(itemSupplier.get())
-            )
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.iterator().remove()
-        );
     }
 }

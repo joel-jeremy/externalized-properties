@@ -1,5 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -8,8 +9,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyArray;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyCollection;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
@@ -28,20 +31,12 @@ public class ResolverResult {
     /**
      * Constructor.
      * 
-     * @param requestedPropertyNames The requested property names.
-     * @param resolvedPropertiesByName The map of resolved properties keyed by 
-     * property names.
+     * @param builder The {@link ResolverResult.Builder} instance.
      */
-    private ResolverResult(
-            Collection<String> requestedPropertyNames,
-            Map<String, String> resolvedPropertiesByName
-    ) {
-        requireNonNull(requestedPropertyNames, "requestedPropertyNames");
-        requireNonNull(resolvedPropertiesByName, "resolvedPropertiesByName");
-
-        this.resolvedPropertiesByName = resolvedPropertiesByName;
+    private ResolverResult(Builder builder) {
+        this.resolvedPropertiesByName = builder.resolvedPropertiesByName;
         this.unresolvedPropertyNames = getUnresolvedPropertyNames(
-            requestedPropertyNames, 
+            builder.requestedPropertyNames, 
             resolvedPropertiesByName.keySet()
         );
     }
@@ -139,10 +134,7 @@ public class ResolverResult {
      * @return The builder.
      */
     public static Builder builder(String... requestedPropertyNames) {
-        return new Builder(requestedPropertyNames == null ?
-            Collections.emptyList() :
-            Arrays.asList(requestedPropertyNames)
-        );
+        return new Builder(requestedPropertyNames);
     }
 
     /**
@@ -162,7 +154,7 @@ public class ResolverResult {
     ) {
         Set<String> unresolvedPropertyNames = new HashSet<>(
             // Prevent internal hashmap resizing.
-            (int) ((float) propertiesToResolve.size() / 0.75F + 1.0F)
+            (int)(propertiesToResolve.size() / 0.75f) + 1
         );
 
         for (String propertyName : propertiesToResolve) {
@@ -186,17 +178,55 @@ public class ResolverResult {
          * 
          * @param requestedPropertyNames The requested property names.
          */
-        private Builder(Collection<String> requestedPropertyNames) {
-            this.requestedPropertyNames = requireNonNullOrEmptyCollection(
-                requestedPropertyNames, 
-                "requestedPropertyNames"
+        private Builder(String... requestedPropertyNames) {
+            this.requestedPropertyNames = Arrays.asList(
+                requireNonNullOrEmptyArray(
+                    requestedPropertyNames, 
+                    "requestedPropertyNames"
+                )
             );
 
-            this.resolvedPropertiesByName = new HashMap<>(
-                // Prevent hashmap resizing.
-                // 0.75 is HashMap's default load factor.
-                (int)(requestedPropertyNames.size() / 0.75f) + 1
+            this.resolvedPropertiesByName = initResolvedPropertyNames(
+                requestedPropertyNames.length
             );
+        }
+
+        /**
+         * Constructor.
+         * 
+         * @param requestedPropertyNames The requested property names.
+         */
+        private Builder(Collection<String> requestedPropertyNames) {
+            this.requestedPropertyNames = new ArrayList<>(
+                requireNonNullOrEmptyCollection(
+                    requestedPropertyNames, 
+                    "requestedPropertyNames"
+                )
+            );
+
+            this.resolvedPropertiesByName = initResolvedPropertyNames(
+                requestedPropertyNames.size()
+            );
+        }
+
+        /**
+         * Map requested property names to their values.
+         * 
+         * @param mapFunction The mapping function to map requested property names 
+         * to their values. The map function may return a {@code null} value. 
+         * Properties whose values are {@code null} will not be added to the result.
+         * @return This builder.
+         */
+        public Builder map(Function<String, String> mapFunction) {
+            requireNonNull(mapFunction, "mapFunction");
+
+            for (String requestedPropertyName : this.requestedPropertyNames) {
+                String propertyValue = mapFunction.apply(requestedPropertyName);
+                if (propertyValue != null) {
+                    add(requestedPropertyName, propertyValue);
+                }
+            }
+            return this;
         }
 
         /**
@@ -224,7 +254,10 @@ public class ResolverResult {
         public Builder addAll(Map<String, String> resolvedPropertiesByName) {
             requireNonNull(resolvedPropertiesByName, "resolvedPropertiesByName");
 
-            this.resolvedPropertiesByName.putAll(resolvedPropertiesByName);
+            for (Map.Entry<String, String> e : resolvedPropertiesByName.entrySet()) {
+                // Perform validations done by add method.
+                add(e.getKey(), e.getValue());
+            }
             return this;
         }
 
@@ -234,9 +267,16 @@ public class ResolverResult {
          * @return The built {@link ResolverResult}.
          */
         public ResolverResult build() {
-            return new ResolverResult(
-                requestedPropertyNames,
-                resolvedPropertiesByName
+            return new ResolverResult(this);
+        }
+
+        private static HashMap<String, String> initResolvedPropertyNames(
+                int numberOfRequestedProperties
+        ) {
+            return new HashMap<>(
+                // Prevent hashmap resizing.
+                // 0.75 is HashMap's default load factor.
+                (int)(numberOfRequestedProperties / 0.75f) + 1
             );
         }
     }

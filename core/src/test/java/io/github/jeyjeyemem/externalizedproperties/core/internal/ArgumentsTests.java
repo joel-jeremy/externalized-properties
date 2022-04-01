@@ -96,5 +96,44 @@ public class ArgumentsTests {
 
             assertSame(arg, result);
         }
+
+        @Nested
+        class RequireNonNullOrEmptyArrayMethod {
+            @Test
+            @DisplayName("should throw when arg array argument is null.")
+            public void test1() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> Arguments.requireNonNullOrEmptyArray(
+                        null,
+                        "arg"
+                    )
+                );
+            }
+            
+            @Test
+            @DisplayName("should throw when arg array argument is empty.")
+            public void test2() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> Arguments.requireNonNullOrEmptyArray(
+                        new String[0],
+                        "arg"
+                    )
+                );
+            }
+
+            @Test
+            @DisplayName("should return non-null or empty collection arg.")
+            public void test5() {
+                String[] arg = new String[] { "my-arg" };
+                String[] result = Arguments.requireNonNullOrEmptyArray(
+                    arg,
+                    "arg"
+                );
+
+                assertSame(arg, result);
+            }
+        }
     }
 }

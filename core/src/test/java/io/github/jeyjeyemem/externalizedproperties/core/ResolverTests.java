@@ -1,5 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.Asserts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -179,97 +179,23 @@ public class ResolverTests {
 
                 Map<String, String> resolvedProperties = result.resolvedProperties();
 
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.compute(
-                        "this should throw", 
-                        (k,v) -> "this should throw"
-                    )
+                Asserts.assertUnmodifiableMap(
+                    resolvedProperties, 
+                    () -> "Key - this should throw", 
+                    k -> "Value - this should throw"
                 );
 
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.computeIfAbsent(
-                        "this should throw",
-                        e -> "this should throw"
-                    )
-                );
-
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.computeIfPresent(
-                        "this should throw", 
-                        (k,v) -> "this should throw"
-                    )
-                );
-
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.merge(
-                        "this should", 
-                        "throw",
-                        (ov, nv) -> "this should throw"
-                    )
-                );
-
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.put("this should", "throw")
-                );
-
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.putAll(
-                        Collections.singletonMap("this should", "throw")
-                    )
-                );
-
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.putIfAbsent("this should", "throw")
-                );
-
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.remove("this should throw")
-                );
-
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.remove("this should", "throw")
-                );
-
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.replace("this should", "throw")
-                );
-
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.replace("this", "should", "throw")
-                );
-
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.replaceAll((k, v) -> "this should throw")
-                );
-
-                assertThrows(
-                    UnsupportedOperationException.class, 
-                    () -> resolvedProperties.clear()
-                );
-
-                verifyUnmodifiableCollection(
+                Asserts.assertUnmodifiableCollection(
                     resolvedProperties.entrySet(), 
                     () -> resolvedProperties.entrySet().stream()
                         .findFirst()
                         .get()
                 );
-                verifyUnmodifiableCollection(
+                Asserts.assertUnmodifiableCollection(
                     resolvedProperties.keySet(), 
                     () -> "this should throw"
                 );
-                verifyUnmodifiableCollection(
+                Asserts.assertUnmodifiableCollection(
                     resolvedProperties.values(), 
                     () -> "this should throw"
                 );
@@ -505,7 +431,7 @@ public class ResolverTests {
 
                 Set<String> resolvedPropertyNames = result.resolvedPropertyNames();
 
-                verifyUnmodifiableCollection(
+                Asserts.assertUnmodifiableCollection(
                     resolvedPropertyNames, 
                     () -> "this should throw"
                 );
@@ -572,7 +498,7 @@ public class ResolverTests {
 
                 Set<String> resolvedPropertyNames = result.unresolvedPropertyNames();
 
-                verifyUnmodifiableCollection(
+                Asserts.assertUnmodifiableCollection(
                     resolvedPropertyNames, 
                     () -> "this should throw"
                 );
@@ -736,56 +662,5 @@ public class ResolverTests {
             assertFalse(result.resolvedPropertyNames().contains("test.property.3"));
             assertTrue(result.unresolvedPropertyNames().contains("test.property.3"));
         }
-    }
-
-    private <T> void verifyUnmodifiableCollection(
-            Collection<T> collectionToVerify, 
-            Supplier<T> itemSupplier
-    ) {
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.add(itemSupplier.get())
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.remove(itemSupplier.get())
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.addAll(
-                Collections.singletonList(itemSupplier.get())
-            )
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.clear()
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.removeAll(
-                Collections.singletonList(itemSupplier.get())
-            )
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.removeIf(r -> true)
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.retainAll(
-                Collections.singletonList(itemSupplier.get())
-            )
-        );
-
-        assertThrows(
-            UnsupportedOperationException.class,
-            () -> collectionToVerify.iterator().remove()
-        );
     }
 }

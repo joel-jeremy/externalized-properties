@@ -61,16 +61,9 @@ public class StubResolver implements Resolver {
         if (propertyNames == null || propertyNames.isEmpty()) {
             throw new IllegalArgumentException("propertyNames must not be null or empty.");
         }
-        ResolverResult.Builder resultBuilder = ResolverResult.builder(propertyNames);
-
-        for (String propertyName : propertyNames) {
-            String resolvedValue = valueResolver.apply(propertyName);
-            if (resolvedValue != null) {
-                resultBuilder.add(propertyName, resolvedValue);
-            }
-        }
-
-        ResolverResult result = resultBuilder.build();
+        ResolverResult result = ResolverResult.builder(propertyNames)
+            .map(valueResolver)
+            .build();
 
         // Add for tracking.
         trackedResolvedProperties.putAll(result.resolvedProperties());

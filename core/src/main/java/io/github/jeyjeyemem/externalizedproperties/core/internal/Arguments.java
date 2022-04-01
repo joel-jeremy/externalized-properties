@@ -58,6 +58,25 @@ public class Arguments {
         return arg;
     }
 
+    /**
+     * Require argument to not be {@code null} or an empty {@link Collection}.
+     * 
+     * @param <T> The type of the collection argument.
+     * @param arg The {@link Collection} argument.
+     * @param argName The name of the {@link Collection} argument to be used in building the 
+     * {@link IllegalArgumentException} message if the argument failed validation.
+     * @return The {@link Collection} argument.
+     */
+    public static <T> T[] requireNonNullOrEmptyArray(
+            T[] arg, 
+            String argName
+    ) {
+        if (arg == null || arg.length == 0) {
+            throw new IllegalArgumentException(argName + " must not be null or empty.");
+        }
+        return arg;
+    }
+
     private static boolean isNullOrEmpty(String string) {
         return string == null || "".equals(string);
     }
