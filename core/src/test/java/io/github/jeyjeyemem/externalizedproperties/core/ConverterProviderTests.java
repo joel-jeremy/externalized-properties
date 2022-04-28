@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.converters.DefaultConverter;
+import io.github.jeyjeyemem.externalizedproperties.core.conversion.converters.PrimitiveConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.RootConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +20,37 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ConverterProviderTests {
+    @Nested
+    class OfMethod {
+        @Test
+        @DisplayName("should throw when converter argument is null")
+        void test1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ConverterProvider.of(null)
+            );
+        }
+
+        @Test
+        @DisplayName("should always return the provided converter instance")
+        void test2() {
+            PrimitiveConverter converter = new PrimitiveConverter();
+            ConverterProvider<?> provider = ConverterProvider.of(converter);
+            
+            ExternalizedProperties externalizedProperties = 
+                ExternalizedProperties.builder()
+                    .withDefaultResolvers()
+                    .converters(provider)
+                    .build();
+            RootConverter rootConverter = new RootConverter(
+                externalizedProperties, 
+                provider
+            );   
+
+            assertSame(converter, provider.get(externalizedProperties, rootConverter));
+        }
+    }
+
     @Nested
     class MemoizeMethod {
         @Test

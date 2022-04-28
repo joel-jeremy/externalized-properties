@@ -19,6 +19,33 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class VariableExpanderProviderTests {
     @Nested
+    class OfMethod {
+        @Test
+        @DisplayName("should throw when processor argument is null")
+        void test1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> VariableExpanderProvider.of(null)
+            );
+        }
+
+        @Test
+        @DisplayName("should always return the provided processor instance")
+        void test2() {
+            DummyVariableExpander variableExpander = new DummyVariableExpander();
+            VariableExpanderProvider<?> provider = 
+                VariableExpanderProvider.of(variableExpander);
+            ExternalizedProperties externalizedProperties = 
+                ExternalizedProperties.builder()
+                    .withDefaultResolvers()
+                    .variableExpander(provider)
+                    .build();
+
+            assertSame(variableExpander, provider.get(externalizedProperties));
+        }
+    }
+
+    @Nested
     class MemoizeMethod {
         @Test
         @DisplayName("should throw when the provider to memoize argument is null")

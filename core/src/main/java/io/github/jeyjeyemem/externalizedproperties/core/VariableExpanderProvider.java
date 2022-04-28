@@ -27,6 +27,7 @@ public interface VariableExpanderProvider<T extends VariableExpander> {
      * {@link VariableExpander} instance.
      */
     static <T extends VariableExpander> VariableExpanderProvider<T> of(T variableExpander) {
+        requireNonNull(variableExpander, "variableExpander");
         return externalizedProperties -> variableExpander;
     }
 

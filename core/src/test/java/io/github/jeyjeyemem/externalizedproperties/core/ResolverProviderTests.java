@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.DefaultResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.StubResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,10 +20,35 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ResolverProviderTests {
     @Nested
+    class OfMethod {
+        @Test
+        @DisplayName("should throw when resolver argument is null")
+        void test1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResolverProvider.of(null)
+            );
+        }
+
+        @Test
+        @DisplayName("should always return the provided resolver instance")
+        void test2() {
+            StubResolver resolver = new StubResolver();
+            ResolverProvider<?> provider = ResolverProvider.of(resolver);
+            ExternalizedProperties externalizedProperties = 
+                ExternalizedProperties.builder()
+                    .resolvers(provider)
+                    .build();
+
+            assertSame(resolver, provider.get(externalizedProperties));
+        }
+    }
+    
+    @Nested
     class MemoizeMethod {
         @Test
         @DisplayName("should throw when the provider to memoize argument is null")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> ResolverProvider.memoize(null)
@@ -31,7 +57,7 @@ public class ResolverProviderTests {
 
         @Test
         @DisplayName("should throw when memoized provider returns null")
-        public void test2() {
+        void test2() {
             ResolverProvider<?> provider = e -> null;
             ResolverProvider<?> memoized = ResolverProvider.memoize(provider);
             ExternalizedProperties externalizedProperties = 
@@ -47,7 +73,7 @@ public class ResolverProviderTests {
 
         @Test
         @DisplayName("should memoize result of the provider to memoize argument")
-        public void test3() {
+        void test3() {
             ResolverProvider<DefaultResolver> provider = DefaultResolver.provider();
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()
@@ -69,7 +95,7 @@ public class ResolverProviderTests {
             "should memoize result of the provider to memoize argument " +
             "in multithreaded environment"
         )
-        public void test4() throws InterruptedException {
+        void test4() throws InterruptedException {
             ResolverProvider<?> provider = DefaultResolver.provider();
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()
@@ -105,7 +131,7 @@ public class ResolverProviderTests {
 
         @Test
         @DisplayName("should return different instance for each memoized provider")
-        public void test5() throws InterruptedException {
+        void test5() throws InterruptedException {
             ResolverProvider<DefaultResolver> provider = DefaultResolver.provider();
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()

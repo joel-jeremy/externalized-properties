@@ -35,6 +35,7 @@ public interface ConverterProvider<T extends Converter<?>> {
      * {@link Converter} instance.
      */
     static <T extends Converter<?>> ConverterProvider<T> of(T converter) {
+        requireNonNull(converter, "converter");
         return (externalizedProperties, rootConverter) -> converter;
     }
 

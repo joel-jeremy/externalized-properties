@@ -28,6 +28,7 @@ public interface ProcessorProvider<T extends Processor> {
      * {@link Processor} instance.
      */
     static <T extends Processor> ProcessorProvider<T> of(T processor) {
+        requireNonNull(processor, "processor");
         return externalizedProperties -> processor;
     }
 

@@ -28,6 +28,7 @@ public interface ResolverProvider<T extends Resolver> {
      * {@link Resolver} instance.
      */
     static <T extends Resolver> ResolverProvider<T> of(T resolver) {
+        requireNonNull(resolver, "resolver");
         return externalizedProperties -> resolver;
     }
 

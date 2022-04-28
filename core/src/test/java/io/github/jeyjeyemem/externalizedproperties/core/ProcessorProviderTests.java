@@ -19,6 +19,32 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ProcessorProviderTests {
     @Nested
+    class OfMethod {
+        @Test
+        @DisplayName("should throw when processor argument is null")
+        void test1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ProcessorProvider.of(null)
+            );
+        }
+
+        @Test
+        @DisplayName("should always return the provided processor instance")
+        void test2() {
+            Base64DecodeProcessor processor = new Base64DecodeProcessor();
+            ProcessorProvider<?> provider = ProcessorProvider.of(processor);
+            ExternalizedProperties externalizedProperties = 
+                ExternalizedProperties.builder()
+                    .withDefaultResolvers()
+                    .processors(provider)
+                    .build();
+
+            assertSame(processor, provider.get(externalizedProperties));
+        }
+    }
+
+    @Nested
     class MemoizeMethod {
         @Test
         @DisplayName("should throw when the provider to memoize argument is null")
