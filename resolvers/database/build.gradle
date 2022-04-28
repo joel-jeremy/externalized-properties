@@ -9,7 +9,7 @@ dependencies {
 jar {
     manifest {
         attributes(
-            'Automatic-Module-Name': 'io.github.jeyjeyemem.externalizedproperties.resolvers.database'
+            'Automatic-Module-Name': 'io.github.joeljeremy7.externalizedproperties.resolvers.database'
         )
     }
 }

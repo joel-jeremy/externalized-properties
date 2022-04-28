@@ -1,7 +1,7 @@
 [
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineConcurrentMap",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineConcurrentMap",
         "mode" : "thrpt",
         "threads" : 1,
         "forks" : 3,
@@ -71,7 +71,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineEnvVar",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineEnvVar",
         "mode" : "thrpt",
         "threads" : 1,
         "forks" : 3,
@@ -141,7 +141,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineSystemProperty",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineSystemProperty",
         "mode" : "thrpt",
         "threads" : 1,
         "forks" : 3,
@@ -211,7 +211,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterface",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterface",
         "mode" : "thrpt",
         "threads" : 1,
         "forks" : 3,
@@ -281,7 +281,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansion",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansion",
         "mode" : "thrpt",
         "threads" : 1,
         "forks" : 3,
@@ -351,7 +351,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansionWithEagerLoading",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansionWithEagerLoading",
         "mode" : "thrpt",
         "threads" : 1,
         "forks" : 3,
@@ -421,7 +421,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansionWithInvocationCaching",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansionWithInvocationCaching",
         "mode" : "thrpt",
         "threads" : 1,
         "forks" : 3,
@@ -491,7 +491,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceWithEagerLoading",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceWithEagerLoading",
         "mode" : "thrpt",
         "threads" : 1,
         "forks" : 3,
@@ -561,7 +561,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceWithInvocationCaching",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceWithInvocationCaching",
         "mode" : "thrpt",
         "threads" : 1,
         "forks" : 3,
@@ -631,7 +631,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineConcurrentMap",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineConcurrentMap",
         "mode" : "thrpt",
         "threads" : 8,
         "forks" : 3,
@@ -701,7 +701,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineEnvVar",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineEnvVar",
         "mode" : "thrpt",
         "threads" : 8,
         "forks" : 3,
@@ -771,7 +771,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineSystemProperty",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineSystemProperty",
         "mode" : "thrpt",
         "threads" : 8,
         "forks" : 3,
@@ -841,7 +841,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterface",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterface",
         "mode" : "thrpt",
         "threads" : 8,
         "forks" : 3,
@@ -911,7 +911,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansion",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansion",
         "mode" : "thrpt",
         "threads" : 8,
         "forks" : 3,
@@ -981,7 +981,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansionWithEagerLoading",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansionWithEagerLoading",
         "mode" : "thrpt",
         "threads" : 8,
         "forks" : 3,
@@ -1051,7 +1051,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansionWithInvocationCaching",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansionWithInvocationCaching",
         "mode" : "thrpt",
         "threads" : 8,
         "forks" : 3,
@@ -1121,7 +1121,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceWithEagerLoading",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceWithEagerLoading",
         "mode" : "thrpt",
         "threads" : 8,
         "forks" : 3,
@@ -1191,7 +1191,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceWithInvocationCaching",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceWithInvocationCaching",
         "mode" : "thrpt",
         "threads" : 8,
         "forks" : 3,
@@ -1261,7 +1261,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineConcurrentMap",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineConcurrentMap",
         "mode" : "avgt",
         "threads" : 1,
         "forks" : 3,
@@ -1331,7 +1331,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineEnvVar",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineEnvVar",
         "mode" : "avgt",
         "threads" : 1,
         "forks" : 3,
@@ -1401,7 +1401,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineSystemProperty",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineSystemProperty",
         "mode" : "avgt",
         "threads" : 1,
         "forks" : 3,
@@ -1471,7 +1471,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterface",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterface",
         "mode" : "avgt",
         "threads" : 1,
         "forks" : 3,
@@ -1541,7 +1541,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansion",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansion",
         "mode" : "avgt",
         "threads" : 1,
         "forks" : 3,
@@ -1611,7 +1611,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansionWithEagerLoading",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansionWithEagerLoading",
         "mode" : "avgt",
         "threads" : 1,
         "forks" : 3,
@@ -1681,7 +1681,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansionWithInvocationCaching",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansionWithInvocationCaching",
         "mode" : "avgt",
         "threads" : 1,
         "forks" : 3,
@@ -1751,7 +1751,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceWithEagerLoading",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceWithEagerLoading",
         "mode" : "avgt",
         "threads" : 1,
         "forks" : 3,
@@ -1821,7 +1821,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceWithInvocationCaching",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceWithInvocationCaching",
         "mode" : "avgt",
         "threads" : 1,
         "forks" : 3,
@@ -1891,7 +1891,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineConcurrentMap",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineConcurrentMap",
         "mode" : "avgt",
         "threads" : 8,
         "forks" : 3,
@@ -1961,7 +1961,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineEnvVar",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineEnvVar",
         "mode" : "avgt",
         "threads" : 8,
         "forks" : 3,
@@ -2031,7 +2031,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineSystemProperty",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineSystemProperty",
         "mode" : "avgt",
         "threads" : 8,
         "forks" : 3,
@@ -2101,7 +2101,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterface",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterface",
         "mode" : "avgt",
         "threads" : 8,
         "forks" : 3,
@@ -2171,7 +2171,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansion",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansion",
         "mode" : "avgt",
         "threads" : 8,
         "forks" : 3,
@@ -2241,7 +2241,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansionWithEagerLoading",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansionWithEagerLoading",
         "mode" : "avgt",
         "threads" : 8,
         "forks" : 3,
@@ -2311,7 +2311,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansionWithInvocationCaching",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansionWithInvocationCaching",
         "mode" : "avgt",
         "threads" : 8,
         "forks" : 3,
@@ -2381,7 +2381,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceWithEagerLoading",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceWithEagerLoading",
         "mode" : "avgt",
         "threads" : 8,
         "forks" : 3,
@@ -2451,7 +2451,7 @@
     },
     {
         "jmhVersion" : "1.35",
-        "benchmark" : "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceWithInvocationCaching",
+        "benchmark" : "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceWithInvocationCaching",
         "mode" : "avgt",
         "threads" : 8,
         "forks" : 3,

@@ -15,7 +15,7 @@ publishing {
                 name = jar.archiveBaseName
                 description = project.description
                 packaging = 'jar'
-                url = 'https://github.com/jeyjeyemem/externalized-properties'
+                url = 'https://github.com/joeljeremy7/externalized-properties'
 
                 licenses {
                     license {
@@ -26,16 +26,16 @@ publishing {
 
                 developers {
                     developer {
-                        id = 'jeyjeyemem'
+                        id = 'joeljeremy7'
                         name = 'Joel Jeremy M. Marquez'
                         email = 'joeljeremy.marquez@gmail.com'
                     }
                 }
 
                 scm {
-                    connection = 'scm:git:https://github.com/jeyjeyemem/externalized-properties.git'
-                    developerConnection = 'scm:git:https://github.com/jeyjeyemem/externalized-properties.git'
-                    url = 'https://github.com/jeyjeyemem/externalized-properties'
+                    connection = 'scm:git:https://github.com/joeljeremy7/externalized-properties.git'
+                    developerConnection = 'scm:git:https://github.com/joeljeremy7/externalized-properties.git'
+                    url = 'https://github.com/joeljeremy7/externalized-properties'
                 }
             }
         }
@@ -44,7 +44,7 @@ publishing {
     if (project.hasProperty('github-packages')) {
         repositories {
             maven {
-                url = 'https://maven.pkg.github.com/jeyjeyemem/externalized-properties'
+                url = 'https://maven.pkg.github.com/joeljeremy7/externalized-properties'
                 name = 'github-packages'
                 credentials {
                     username = System.getenv('GITHUB_ACTOR') ?: property('githubActor')

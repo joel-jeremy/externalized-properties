@@ -9,7 +9,7 @@
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineConcurrentMap
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineConcurrentMap
 
 # Run progress: 0.00% complete, ETA 01:30:00
 # Fork: 1 of 3
@@ -51,7 +51,7 @@ Iteration   4: 184252.421 ops/ms
 Iteration   5: 184035.841 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineConcurrentMap":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineConcurrentMap":
   181275.916 ±(99.9%) 3423.190 ops/ms [Average]
   (min, avg, max) = (172871.491, 181275.916, 184950.909), stdev = 3202.054
   CI (99.9%): [177852.726, 184699.105] (assumes normal distribution)
@@ -67,7 +67,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineEnvVar
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineEnvVar
 
 # Run progress: 2.78% complete, ETA 01:28:26
 # Fork: 1 of 3
@@ -109,7 +109,7 @@ Iteration   4: 39019.003 ops/ms
 Iteration   5: 39396.756 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineEnvVar":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineEnvVar":
   39264.001 ±(99.9%) 389.986 ops/ms [Average]
   (min, avg, max) = (38198.970, 39264.001, 39807.164), stdev = 364.793
   CI (99.9%): [38874.016, 39653.987] (assumes normal distribution)
@@ -125,7 +125,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineSystemProperty
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineSystemProperty
 
 # Run progress: 5.56% complete, ETA 01:26:04
 # Fork: 1 of 3
@@ -167,7 +167,7 @@ Iteration   4: 137369.878 ops/ms
 Iteration   5: 138062.951 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineSystemProperty":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.baselineSystemProperty":
   136110.721 ±(99.9%) 2271.945 ops/ms [Average]
   (min, avg, max) = (130865.162, 136110.721, 138142.655), stdev = 2125.179
   CI (99.9%): [133838.776, 138382.666] (assumes normal distribution)
@@ -183,7 +183,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterface
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterface
 
 # Run progress: 8.33% complete, ETA 01:23:27
 # Fork: 1 of 3
@@ -225,7 +225,7 @@ Iteration   4: 8282.368 ops/ms
 Iteration   5: 8499.492 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterface":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterface":
   8080.630 ±(99.9%) 354.349 ops/ms [Average]
   (min, avg, max) = (7238.591, 8080.630, 8503.318), stdev = 331.458
   CI (99.9%): [7726.281, 8434.978] (assumes normal distribution)
@@ -241,7 +241,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansion
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansion
 
 # Run progress: 11.11% complete, ETA 01:20:56
 # Fork: 1 of 3
@@ -283,7 +283,7 @@ Iteration   4: 9913.570 ops/ms
 Iteration   5: 9164.651 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansion":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansion":
   10681.635 ±(99.9%) 691.471 ops/ms [Average]
   (min, avg, max) = (9164.651, 10681.635, 11619.830), stdev = 646.802
   CI (99.9%): [9990.164, 11373.106] (assumes normal distribution)
@@ -299,7 +299,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansionWithEagerLoading
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansionWithEagerLoading
 
 # Run progress: 13.89% complete, ETA 01:18:26
 # Fork: 1 of 3
@@ -341,7 +341,7 @@ Iteration   4: 60299.504 ops/ms
 Iteration   5: 58969.094 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansionWithEagerLoading":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansionWithEagerLoading":
   57957.259 ±(99.9%) 2673.788 ops/ms [Average]
   (min, avg, max) = (54387.809, 57957.259, 60536.977), stdev = 2501.063
   CI (99.9%): [55283.471, 60631.047] (assumes normal distribution)
@@ -357,7 +357,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansionWithInvocationCaching
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansionWithInvocationCaching
 
 # Run progress: 16.67% complete, ETA 01:15:53
 # Fork: 1 of 3
@@ -399,7 +399,7 @@ Iteration   4: 46340.333 ops/ms
 Iteration   5: 46700.315 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansionWithInvocationCaching":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceNoVariableExpansionWithInvocationCaching":
   55004.219 ±(99.9%) 6390.396 ops/ms [Average]
   (min, avg, max) = (46340.333, 55004.219, 60056.742), stdev = 5977.580
   CI (99.9%): [48613.823, 61394.614] (assumes normal distribution)
@@ -415,7 +415,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceWithEagerLoading
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceWithEagerLoading
 
 # Run progress: 19.44% complete, ETA 01:13:20
 # Fork: 1 of 3
@@ -457,7 +457,7 @@ Iteration   4: 46752.852 ops/ms
 Iteration   5: 46363.194 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceWithEagerLoading":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceWithEagerLoading":
   43847.427 ±(99.9%) 1772.756 ops/ms [Average]
   (min, avg, max) = (41891.157, 43847.427, 46752.852), stdev = 1658.237
   CI (99.9%): [42074.671, 45620.183] (assumes normal distribution)
@@ -473,7 +473,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceWithInvocationCaching
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceWithInvocationCaching
 
 # Run progress: 22.22% complete, ETA 01:10:50
 # Fork: 1 of 3
@@ -515,7 +515,7 @@ Iteration   4: 58385.704 ops/ms
 Iteration   5: 61431.339 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceWithInvocationCaching":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrpt.proxyInterfaceWithInvocationCaching":
   58590.833 ±(99.9%) 4853.899 ops/ms [Average]
   (min, avg, max) = (50276.286, 58590.833, 64039.477), stdev = 4540.341
   CI (99.9%): [53736.934, 63444.732] (assumes normal distribution)
@@ -531,7 +531,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineConcurrentMap
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineConcurrentMap
 
 # Run progress: 25.00% complete, ETA 01:08:17
 # Fork: 1 of 3
@@ -573,7 +573,7 @@ Iteration   4: 435717.034 ops/ms
 Iteration   5: 441058.075 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineConcurrentMap":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineConcurrentMap":
   416252.193 ±(99.9%) 34703.774 ops/ms [Average]
   (min, avg, max) = (360651.770, 416252.193, 461636.954), stdev = 32461.932
   CI (99.9%): [381548.419, 450955.967] (assumes normal distribution)
@@ -589,7 +589,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineEnvVar
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineEnvVar
 
 # Run progress: 27.78% complete, ETA 01:05:49
 # Fork: 1 of 3
@@ -631,7 +631,7 @@ Iteration   4: 113692.707 ops/ms
 Iteration   5: 110277.854 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineEnvVar":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineEnvVar":
   101298.464 ±(99.9%) 8434.632 ops/ms [Average]
   (min, avg, max) = (89810.498, 101298.464, 113692.707), stdev = 7889.760
   CI (99.9%): [92863.833, 109733.096] (assumes normal distribution)
@@ -647,7 +647,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineSystemProperty
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineSystemProperty
 
 # Run progress: 30.56% complete, ETA 01:03:18
 # Fork: 1 of 3
@@ -689,7 +689,7 @@ Iteration   4: 313346.511 ops/ms
 Iteration   5: 332716.481 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineSystemProperty":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.baselineSystemProperty":
   295981.105 ±(99.9%) 22835.229 ops/ms [Average]
   (min, avg, max) = (262355.810, 295981.105, 332716.481), stdev = 21360.088
   CI (99.9%): [273145.876, 318816.335] (assumes normal distribution)
@@ -705,7 +705,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterface
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterface
 
 # Run progress: 33.33% complete, ETA 01:00:48
 # Fork: 1 of 3
@@ -747,7 +747,7 @@ Iteration   4: 13842.255 ops/ms
 Iteration   5: 15567.187 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterface":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterface":
   14334.741 ±(99.9%) 2248.346 ops/ms [Average]
   (min, avg, max) = (11878.453, 14334.741, 18049.749), stdev = 2103.105
   CI (99.9%): [12086.395, 16583.088] (assumes normal distribution)
@@ -763,7 +763,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansion
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansion
 
 # Run progress: 36.11% complete, ETA 00:58:17
 # Fork: 1 of 3
@@ -805,7 +805,7 @@ Iteration   4: 17912.908 ops/ms
 Iteration   5: 20217.809 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansion":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansion":
   19687.795 ±(99.9%) 4269.919 ops/ms [Average]
   (min, avg, max) = (15010.228, 19687.795, 27261.618), stdev = 3994.085
   CI (99.9%): [15417.876, 23957.714] (assumes normal distribution)
@@ -821,7 +821,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansionWithEagerLoading
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansionWithEagerLoading
 
 # Run progress: 38.89% complete, ETA 00:55:47
 # Fork: 1 of 3
@@ -863,7 +863,7 @@ Iteration   4: 131128.138 ops/ms
 Iteration   5: 130136.877 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansionWithEagerLoading":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansionWithEagerLoading":
   141718.534 ±(99.9%) 15576.740 ops/ms [Average]
   (min, avg, max) = (118606.618, 141718.534, 161967.585), stdev = 14570.493
   CI (99.9%): [126141.794, 157295.275] (assumes normal distribution)
@@ -879,7 +879,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansionWithInvocationCaching
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansionWithInvocationCaching
 
 # Run progress: 41.67% complete, ETA 00:53:15
 # Fork: 1 of 3
@@ -921,7 +921,7 @@ Iteration   4: 164694.120 ops/ms
 Iteration   5: 147698.168 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansionWithInvocationCaching":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceNoVariableExpansionWithInvocationCaching":
   125007.365 ±(99.9%) 25560.057 ops/ms [Average]
   (min, avg, max) = (94295.953, 125007.365, 164694.120), stdev = 23908.893
   CI (99.9%): [99447.307, 150567.422] (assumes normal distribution)
@@ -937,7 +937,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceWithEagerLoading
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceWithEagerLoading
 
 # Run progress: 44.44% complete, ETA 00:50:45
 # Fork: 1 of 3
@@ -979,7 +979,7 @@ Iteration   4: 117020.916 ops/ms
 Iteration   5: 118692.968 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceWithEagerLoading":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceWithEagerLoading":
   105024.792 ±(99.9%) 10949.509 ops/ms [Average]
   (min, avg, max) = (88635.560, 105024.792, 119822.801), stdev = 10242.177
   CI (99.9%): [94075.283, 115974.301] (assumes normal distribution)
@@ -995,7 +995,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Throughput, ops/time
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceWithInvocationCaching
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceWithInvocationCaching
 
 # Run progress: 47.22% complete, ETA 00:48:14
 # Fork: 1 of 3
@@ -1037,7 +1037,7 @@ Iteration   4: 163835.983 ops/ms
 Iteration   5: 154857.369 ops/ms
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceWithInvocationCaching":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksThrptMultiThreaded.proxyInterfaceWithInvocationCaching":
   139293.950 ±(99.9%) 16463.578 ops/ms [Average]
   (min, avg, max) = (111300.675, 139293.950, 163835.983), stdev = 15400.041
   CI (99.9%): [122830.372, 155757.529] (assumes normal distribution)
@@ -1053,7 +1053,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineConcurrentMap
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineConcurrentMap
 
 # Run progress: 50.00% complete, ETA 00:45:41
 # Fork: 1 of 3
@@ -1095,7 +1095,7 @@ Iteration   4: 5.474 ns/op
 Iteration   5: 5.364 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineConcurrentMap":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineConcurrentMap":
   5.348 ±(99.9%) 0.165 ns/op [Average]
   (min, avg, max) = (5.109, 5.348, 5.584), stdev = 0.155
   CI (99.9%): [5.183, 5.514] (assumes normal distribution)
@@ -1111,7 +1111,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineEnvVar
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineEnvVar
 
 # Run progress: 52.78% complete, ETA 00:43:08
 # Fork: 1 of 3
@@ -1153,7 +1153,7 @@ Iteration   4: 24.583 ns/op
 Iteration   5: 24.679 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineEnvVar":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineEnvVar":
   24.726 ±(99.9%) 0.458 ns/op [Average]
   (min, avg, max) = (23.894, 24.726, 25.776), stdev = 0.428
   CI (99.9%): [24.268, 25.183] (assumes normal distribution)
@@ -1169,7 +1169,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineSystemProperty
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineSystemProperty
 
 # Run progress: 55.56% complete, ETA 00:40:36
 # Fork: 1 of 3
@@ -1211,7 +1211,7 @@ Iteration   4: 7.198 ns/op
 Iteration   5: 7.174 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineSystemProperty":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.baselineSystemProperty":
   7.355 ±(99.9%) 0.287 ns/op [Average]
   (min, avg, max) = (7.052, 7.355, 7.955), stdev = 0.268
   CI (99.9%): [7.069, 7.642] (assumes normal distribution)
@@ -1227,7 +1227,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterface
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterface
 
 # Run progress: 58.33% complete, ETA 00:38:03
 # Fork: 1 of 3
@@ -1269,7 +1269,7 @@ Iteration   4: 124.825 ns/op
 Iteration   5: 127.612 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterface":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterface":
   123.313 ±(99.9%) 6.016 ns/op [Average]
   (min, avg, max) = (117.822, 123.313, 139.614), stdev = 5.627
   CI (99.9%): [117.297, 129.329] (assumes normal distribution)
@@ -1285,7 +1285,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansion
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansion
 
 # Run progress: 61.11% complete, ETA 00:35:30
 # Fork: 1 of 3
@@ -1327,7 +1327,7 @@ Iteration   4: 92.822 ns/op
 Iteration   5: 89.609 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansion":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansion":
   95.700 ±(99.9%) 5.442 ns/op [Average]
   (min, avg, max) = (89.609, 95.700, 103.059), stdev = 5.090
   CI (99.9%): [90.258, 101.142] (assumes normal distribution)
@@ -1343,7 +1343,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansionWithEagerLoading
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansionWithEagerLoading
 
 # Run progress: 63.89% complete, ETA 00:32:58
 # Fork: 1 of 3
@@ -1385,7 +1385,7 @@ Iteration   4: 18.778 ns/op
 Iteration   5: 19.195 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansionWithEagerLoading":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansionWithEagerLoading":
   16.582 ±(99.9%) 1.062 ns/op [Average]
   (min, avg, max) = (15.852, 16.582, 19.195), stdev = 0.994
   CI (99.9%): [15.520, 17.644] (assumes normal distribution)
@@ -1401,7 +1401,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansionWithInvocationCaching
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansionWithInvocationCaching
 
 # Run progress: 66.67% complete, ETA 00:30:25
 # Fork: 1 of 3
@@ -1443,7 +1443,7 @@ Iteration   4: 17.400 ns/op
 Iteration   5: 17.619 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansionWithInvocationCaching":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceNoVariableExpansionWithInvocationCaching":
   17.322 ±(99.9%) 1.291 ns/op [Average]
   (min, avg, max) = (16.454, 17.322, 21.002), stdev = 1.208
   CI (99.9%): [16.031, 18.613] (assumes normal distribution)
@@ -1459,7 +1459,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceWithEagerLoading
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceWithEagerLoading
 
 # Run progress: 69.44% complete, ETA 00:27:53
 # Fork: 1 of 3
@@ -1501,7 +1501,7 @@ Iteration   4: 22.136 ns/op
 Iteration   5: 21.173 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceWithEagerLoading":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceWithEagerLoading":
   23.899 ±(99.9%) 2.400 ns/op [Average]
   (min, avg, max) = (21.173, 23.899, 27.716), stdev = 2.245
   CI (99.9%): [21.499, 26.300] (assumes normal distribution)
@@ -1517,7 +1517,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 1 thread, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceWithInvocationCaching
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceWithInvocationCaching
 
 # Run progress: 72.22% complete, ETA 00:25:21
 # Fork: 1 of 3
@@ -1559,7 +1559,7 @@ Iteration   4: 19.259 ns/op
 Iteration   5: 16.205 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceWithInvocationCaching":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgt.proxyInterfaceWithInvocationCaching":
   21.339 ±(99.9%) 8.087 ns/op [Average]
   (min, avg, max) = (16.205, 21.339, 39.127), stdev = 7.564
   CI (99.9%): [13.252, 29.426] (assumes normal distribution)
@@ -1575,7 +1575,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineConcurrentMap
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineConcurrentMap
 
 # Run progress: 75.00% complete, ETA 00:22:49
 # Fork: 1 of 3
@@ -1617,7 +1617,7 @@ Iteration   4: 25.539 ±(99.9%) 0.417 ns/op
 Iteration   5: 24.235 ±(99.9%) 0.638 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineConcurrentMap":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineConcurrentMap":
   22.361 ±(99.9%) 2.494 ns/op [Average]
   (min, avg, max) = (18.734, 22.361, 26.959), stdev = 2.333
   CI (99.9%): [19.867, 24.855] (assumes normal distribution)
@@ -1633,7 +1633,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineEnvVar
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineEnvVar
 
 # Run progress: 77.78% complete, ETA 00:20:17
 # Fork: 1 of 3
@@ -1675,7 +1675,7 @@ Iteration   4: 90.467 ±(99.9%) 1.742 ns/op
 Iteration   5: 77.657 ±(99.9%) 1.069 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineEnvVar":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineEnvVar":
   91.179 ±(99.9%) 12.333 ns/op [Average]
   (min, avg, max) = (71.163, 91.179, 111.208), stdev = 11.536
   CI (99.9%): [78.846, 103.512] (assumes normal distribution)
@@ -1691,7 +1691,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineSystemProperty
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineSystemProperty
 
 # Run progress: 80.56% complete, ETA 00:17:45
 # Fork: 1 of 3
@@ -1733,7 +1733,7 @@ Iteration   4: 35.590 ±(99.9%) 1.382 ns/op
 Iteration   5: 38.448 ±(99.9%) 1.816 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineSystemProperty":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.baselineSystemProperty":
   31.339 ±(99.9%) 8.582 ns/op [Average]
   (min, avg, max) = (22.763, 31.339, 49.333), stdev = 8.028
   CI (99.9%): [22.757, 39.921] (assumes normal distribution)
@@ -1749,7 +1749,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterface
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterface
 
 # Run progress: 83.33% complete, ETA 00:15:13
 # Fork: 1 of 3
@@ -1791,7 +1791,7 @@ Iteration   4: 686.899 ±(99.9%) 8.943 ns/op
 Iteration   5: 575.773 ±(99.9%) 16.882 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterface":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterface":
   791.031 ±(99.9%) 102.411 ns/op [Average]
   (min, avg, max) = (575.773, 791.031, 993.981), stdev = 95.795
   CI (99.9%): [688.620, 893.441] (assumes normal distribution)
@@ -1807,7 +1807,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansion
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansion
 
 # Run progress: 86.11% complete, ETA 00:12:41
 # Fork: 1 of 3
@@ -1849,7 +1849,7 @@ Iteration   4: 604.769 ±(99.9%) 9.000 ns/op
 Iteration   5: 400.369 ±(99.9%) 4.418 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansion":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansion":
   526.328 ±(99.9%) 101.791 ns/op [Average]
   (min, avg, max) = (391.765, 526.328, 715.400), stdev = 95.216
   CI (99.9%): [424.537, 628.119] (assumes normal distribution)
@@ -1865,7 +1865,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansionWithEagerLoading
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansionWithEagerLoading
 
 # Run progress: 88.89% complete, ETA 00:10:08
 # Fork: 1 of 3
@@ -1907,7 +1907,7 @@ Iteration   4: 62.792 ±(99.9%) 1.977 ns/op
 Iteration   5: 59.995 ±(99.9%) 1.261 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansionWithEagerLoading":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansionWithEagerLoading":
   72.988 ±(99.9%) 8.489 ns/op [Average]
   (min, avg, max) = (59.995, 72.988, 88.308), stdev = 7.941
   CI (99.9%): [64.499, 81.478] (assumes normal distribution)
@@ -1923,7 +1923,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansionWithInvocationCaching
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansionWithInvocationCaching
 
 # Run progress: 91.67% complete, ETA 00:07:36
 # Fork: 1 of 3
@@ -1965,7 +1965,7 @@ Iteration   4: 70.984 ±(99.9%) 2.226 ns/op
 Iteration   5: 58.223 ±(99.9%) 1.597 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansionWithInvocationCaching":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceNoVariableExpansionWithInvocationCaching":
   81.344 ±(99.9%) 11.479 ns/op [Average]
   (min, avg, max) = (58.223, 81.344, 98.925), stdev = 10.737
   CI (99.9%): [69.866, 92.823] (assumes normal distribution)
@@ -1981,7 +1981,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceWithEagerLoading
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceWithEagerLoading
 
 # Run progress: 94.44% complete, ETA 00:05:04
 # Fork: 1 of 3
@@ -2023,7 +2023,7 @@ Iteration   4: 104.837 ±(99.9%) 3.452 ns/op
 Iteration   5: 99.570 ±(99.9%) 3.299 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceWithEagerLoading":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceWithEagerLoading":
   100.102 ±(99.9%) 22.850 ns/op [Average]
   (min, avg, max) = (76.921, 100.102, 158.286), stdev = 21.374
   CI (99.9%): [77.251, 122.952] (assumes normal distribution)
@@ -2039,7 +2039,7 @@ Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.Re
 # Timeout: 10 min per iteration
 # Threads: 8 threads, will synchronize iterations
 # Benchmark mode: Average time, time/op
-# Benchmark: io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceWithInvocationCaching
+# Benchmark: io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceWithInvocationCaching
 
 # Run progress: 97.22% complete, ETA 00:02:32
 # Fork: 1 of 3
@@ -2081,7 +2081,7 @@ Iteration   4: 64.561 ±(99.9%) 1.569 ns/op
 Iteration   5: 63.565 ±(99.9%) 1.621 ns/op
 
 
-Result "io.github.jeyjeyemem.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceWithInvocationCaching":
+Result "io.github.joeljeremy7.externalizedproperties.core.ResolutionBenchmarks.ResolutionBenchmarksAvgtMultiThreaded.proxyInterfaceWithInvocationCaching":
   69.364 ±(99.9%) 6.639 ns/op [Average]
   (min, avg, max) = (55.553, 69.364, 78.951), stdev = 6.210
   CI (99.9%): [62.725, 76.004] (assumes normal distribution)

@@ -9,7 +9,7 @@ plugins {
 apply from: "${rootDir}/gradle/reporting.gradle"
 
 allprojects {
-    group = 'io.github.jeyjeyemem.externalizedproperties'
+    group = 'io.github.joeljeremy7.externalizedproperties'
 
     def snapshotSuffix = rootProject.hasProperty('release') ? '' : '-SNAPSHOT'
     version = '1.0.0' + snapshotSuffix

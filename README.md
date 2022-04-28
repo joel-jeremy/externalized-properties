@@ -1,8 +1,8 @@
 # Externalized Properties
 
-[![Gradle Build](https://github.com/jeyjeyemem/externalized-properties/actions/workflows/gradle-build.yaml/badge.svg)](https://github.com/jeyjeyemem/externalized-properties/actions/workflows/gradle-build.yaml)
-[![Coverage Status](https://coveralls.io/repos/github/jeyjeyemem/externalized-properties/badge.svg?branch=main)](https://coveralls.io/github/jeyjeyemem/externalized-properties?branch=main)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/jeyjeyemem/externalized-properties/blob/main/LICENSE)
+[![Gradle Build](https://github.com/joeljeremy7/externalized-properties/actions/workflows/gradle-build.yaml/badge.svg)](https://github.com/joeljeremy7/externalized-properties/actions/workflows/gradle-build.yaml)
+[![Coverage Status](https://coveralls.io/repos/github/joeljeremy7/externalized-properties/badge.svg?branch=main)](https://coveralls.io/github/joeljeremy7/externalized-properties?branch=main)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/joeljeremy7/externalized-properties/blob/main/LICENSE)
 
 A lightweight and extensible library to resolve application properties from various external sources.
 
@@ -14,21 +14,21 @@ The goal of this library is to make it easy for applications to implement config
 
 ## Wiki
 
-- For more information and examples please browse through the wiki: <https://github.com/jeyjeyemem/externalized-properties/wiki>
+- For more information and examples please browse through the wiki: <https://github.com/joeljeremy7/externalized-properties/wiki>
 
 ## Getting Started
 
 ### Gradle
 
 ```gradle
-implementation 'io.github.jeyjeyemem.externalizedproperties:core:1.0.0-SNAPSHOT'
+implementation 'io.github.joeljeremy7.externalizedproperties:core:1.0.0-SNAPSHOT'
 ```
 
 ### Maven
 
 ```xml
 <dependency>
-    <groupId>io.github.jeyjeyemem.externalizedproperties</groupId>
+    <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
     <artifactId>core</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 </dependency>
@@ -38,21 +38,21 @@ implementation 'io.github.jeyjeyemem.externalizedproperties:core:1.0.0-SNAPSHOT'
 
 Externalized Properties jars are published with Automatic-Module-Name manifest attribute:
 
-- Core - `io.github.jeyjeyemem.externalizedproperties.core`
-- Database Resolver - `io.github.jeyjeyemem.externalizedproperties.resolvers.database`
+- Core - `io.github.joeljeremy7.externalizedproperties.core`
+- Database Resolver - `io.github.joeljeremy7.externalizedproperties.resolvers.database`
 
 Module authors can use above module names in their module-info.java:
 
 ```java
 module foo.bar {
-    requires io.github.jeyjeyemem.externalizedproperties.core;
-    requires io.github.jeyjeyemem.externalizedproperties.resolvers.database;
+    requires io.github.joeljeremy7.externalizedproperties.core;
+    requires io.github.joeljeremy7.externalizedproperties.resolvers.database;
 }
 ```
 
 ## Sample Projects
 
-Sample projects can be found in: <https://github.com/jeyjeyemem/externalized-properties-samples>
+Sample projects can be found in: <https://github.com/joeljeremy7/externalized-properties-samples>
 
 ## Features
 
