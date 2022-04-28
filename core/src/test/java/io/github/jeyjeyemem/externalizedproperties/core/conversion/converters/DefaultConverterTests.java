@@ -3,9 +3,11 @@ package io.github.jeyjeyemem.externalizedproperties.core.conversion.converters;
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.ConverterProvider;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ArrayProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.DateTimeProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.EnumProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.EnumProxyInterface.TestEnum;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ListProxyInterface;
@@ -17,11 +19,26 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -67,16 +84,8 @@ public class DefaultConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return false when target type is null.")
-        void test1() {
-            DefaultConverter converter = converterToTest();
-            boolean canConvert = converter.canConvertTo(null);
-            assertFalse(canConvert);
-        }
-
-        @Test
         @DisplayName("should return true when target type is an Integer.")
-        void test2() {
+        void primitiveTest1() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Integer.class);
             assertTrue(canConvert);
@@ -84,7 +93,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should return true when target type is a primitive int.")
-        void test3() {
+        void primitiveTest2() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Integer.TYPE);
             assertTrue(canConvert);
@@ -92,7 +101,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should return true when target type is a Long.")
-        void test4() {
+        void primitiveTest3() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Long.class);
             assertTrue(canConvert);
@@ -100,7 +109,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should return true when target type is a primitive long.")
-        void test5() {
+        void primitiveTest4() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Long.TYPE);
             assertTrue(canConvert);
@@ -108,7 +117,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should return true when target type is a Float.")
-        void test6() {
+        void primitiveTest5() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Float.class);
             assertTrue(canConvert);
@@ -116,7 +125,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should return true when target type is a primitive float.")
-        void test7() {
+        void primitiveTest6() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Float.TYPE);
             assertTrue(canConvert);
@@ -124,7 +133,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should return true when target type is a Double.")
-        void test8() {
+        void primitiveTest7() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Double.class);
             assertTrue(canConvert);
@@ -132,7 +141,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should return true when target type is a primitive double.")
-        void test9() {
+        void primitiveTest8() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Double.TYPE);
             assertTrue(canConvert);
@@ -140,7 +149,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should return true when target type is a List.")
-        void test10() {
+        void listTest1() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(List.class);
             assertTrue(canConvert);
@@ -148,15 +157,23 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should return true when target type is a Collection.")
-        void test11() {
+        void listTest2() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Collection.class);
             assertTrue(canConvert);
         }
 
         @Test
+        @DisplayName("should return true when target type is a Set.")
+        void setTest1() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Set.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
         @DisplayName("should return true when target type is an Array.")
-        void test12() {
+        void arrayTest1() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(String[].class);
             assertTrue(canConvert);
@@ -164,18 +181,130 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should return true when target type is an Optional.")
-        void test13() {
+        void optionalTest1() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Optional.class);
             assertTrue(canConvert);
         }
 
         @Test
-        @DisplayName("should return false when target type is not supported.")
-        void test14() {
+        @DisplayName("should return true when target type is an enum.")
+        void enumTest1() {
             DefaultConverter converter = converterToTest();
-            // Not primitive, List/Collection, array or Optional.
             boolean canConvert = converter.canConvertTo(TestEnum.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is LocalDateTime.")
+        void dateTimeTest1() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(LocalDateTime.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is LocalDate.")
+        void dateTimeTest2() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(LocalDate.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is LocalTime.")
+        void dateTimeTest3() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(LocalTime.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is OffsetDateTime.")
+        void dateTimeTest4() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(OffsetDateTime.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is OffsetTime.")
+        void dateTimeTest5() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(OffsetTime.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is ZonedDateTime.")
+        void dateTimeTest6() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(ZonedDateTime.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is Instant.")
+        void dateTimeTest7() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Instant.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is DayOfWeek.")
+        void dateTimeTest8() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(DayOfWeek.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is Month.")
+        void dateTimeTest9() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Month.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is MonthDay.")
+        void dateTimeTest10() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(MonthDay.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is Year.")
+        void dateTimeTest11() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Year.class);
+            assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is YearMonth.")
+        void dateTimeTest12() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(YearMonth.class);
+            assertTrue(canConvert);
+        }
+        
+        @Test
+        @DisplayName("should return false when target type is null.")
+        void unsupportedTest1() {
+            DefaultConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(null);
+            assertFalse(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return false when target type is not supported.")
+        void unsupportedTest2() {
+            DefaultConverter converter = converterToTest();
+            // Unsupported.
+            boolean canConvert = converter.canConvertTo(Properties.class);
             assertFalse(canConvert);
         }
     }
@@ -184,26 +313,26 @@ public class DefaultConverterTests {
     class ConvertMethod {
         @Test
         @DisplayName("should return skip result when target type is not supported.")
-        void test1() {
+        void unsupportedTest1() {
             DefaultConverter converter = converterToTest();
 
             // Not primitive, List/Collection, array or Optional.
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
-                    EnumProxyInterface.class,
-                    "enumProperty" // This method returns a TestEnum.
+                    PropertyProxyInterface.class,
+                    "customType" // This method returns a CustomType.
                 );
 
             ConversionResult<?> result = converter.convert(
                 proxyMethod,
-                TestEnum.ONE.name()
+                ""
             );
             assertEquals(ConversionResult.skip(), result);
         }
 
         @Test
         @DisplayName("should convert resolved property to an Integer or primitive int.")
-        void test2() {
+        void primitiveTest1() {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
@@ -245,7 +374,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should convert resolved property to a Long or primitive long.")
-        void test3() {
+        void primitiveTest2() {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
@@ -287,7 +416,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should convert resolved property to a Float or primitive float.")
-        void test4() {
+        void primitiveTest3() {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
@@ -329,7 +458,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should convert resolved property to a Double or primitive double.")
-        void test5() {
+        void primitiveTest4() {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
@@ -371,7 +500,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should convert resolved property to a Short or primitive short.")
-        void test6() {
+        void primitiveTest5() {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
@@ -413,7 +542,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should convert resolved property to a Boolean or primitive boolean.")
-        void test7() {
+        void primitiveTest6() {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
@@ -455,7 +584,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should convert resolved property to a Byte or primitive byte.")
-        void test8() {
+        void primitiveTest7() {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = 
@@ -497,7 +626,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should convert resolved property to a List or Collection.")
-        void test9() {
+        void listTest1() {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod listProxyMethodInfo = 
@@ -545,7 +674,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should convert resolved property to a Set.")
-        void test10() {
+        void setTest1() {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod setProxyMethodInfo = 
@@ -570,7 +699,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should convert resolved property to an array.")
-        void test11() {
+        void arrayTest1() {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
@@ -597,7 +726,7 @@ public class DefaultConverterTests {
 
         @Test
         @DisplayName("should convert resolved property to an Optional.")
-        void test12() {
+        void optionalTest1() {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
@@ -620,6 +749,338 @@ public class DefaultConverterTests {
             assertTrue(opt.isPresent());
             assertEquals("optional-value", opt.get());
         }
+
+        @Test
+        @DisplayName("should convert resolved property to enum.")
+        void enumTest1() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    EnumProxyInterface.class,
+                    "enumProperty"
+                );
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                TestEnum.ONE.name()
+            );
+            assertNotNull(result);
+
+            Object testEnum = result.value();
+            assertEquals(TestEnum.ONE, testEnum);
+        }
+
+        @Test
+        @DisplayName("should convert value to LocalDateTime.")
+        void dateTimeTest1() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    DateTimeProxyInterface.class,
+                    "localDateTime"
+                );
+            
+            LocalDateTime input = LocalDateTime.of(2022, 12, 19, 12, 30, 0);
+            String localDateTimeString = input.toString();
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                localDateTimeString
+            );
+            assertNotNull(result);
+            
+            Object localDateTime = result.value();
+            assertTrue(localDateTime instanceof LocalDateTime);
+            assertEquals(input, (LocalDateTime)localDateTime);
+        }
+
+        @Test
+        @DisplayName("should convert value to LocalDate.")
+        void dateTimeTest2() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    DateTimeProxyInterface.class,
+                    "localDate"
+                );
+            LocalDate input = LocalDate.of(2022, 12, 19);
+            String localDateString = input.toString();
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                localDateString
+            );
+            
+            assertNotNull(result);
+            
+            Object localDate = result.value();
+            assertTrue(localDate instanceof LocalDate);
+            assertEquals(input, (LocalDate)localDate);
+        }
+
+        @Test
+        @DisplayName("should convert value to LocalTime.")
+        void dateTimeTest3() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    DateTimeProxyInterface.class,
+                    "localTime"
+                );
+            
+            LocalTime input = LocalTime.of(12, 30, 0);
+            String localTimeString = input.toString();
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                localTimeString
+            );
+            assertNotNull(result);
+            
+            Object localDateTime = result.value();
+            assertTrue(localDateTime instanceof LocalTime);
+            assertEquals(input, (LocalTime)localDateTime);
+        }
+
+        @Test
+        @DisplayName("should convert value to OffsetDateTime.")
+        void dateTimeTest4() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    DateTimeProxyInterface.class,
+                    "offsetDateTime"
+                );
+            
+            OffsetDateTime input = OffsetDateTime.of(
+                LocalDate.of(2022, 12, 19), 
+                LocalTime.of(12, 30), 
+                ZoneOffset.ofHours(8)
+            );
+            String offsetDateTimeString = input.toString();
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                offsetDateTimeString
+            );
+            assertNotNull(result);
+            
+            Object offsetDateTime = result.value();
+            assertTrue(offsetDateTime instanceof OffsetDateTime);
+            assertEquals(input, (OffsetDateTime)offsetDateTime);
+        }
+
+        @Test
+        @DisplayName("should convert value to OffsetTime.")
+        void dateTimeTest5() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    DateTimeProxyInterface.class,
+                    "offsetTime"
+                );
+            
+            OffsetTime input = OffsetTime.of( 
+                LocalTime.of(12, 30), 
+                ZoneOffset.ofHours(8)
+            );
+            String offsetTimeString = input.toString();
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                offsetTimeString
+            );
+            assertNotNull(result);
+            
+            Object offsetTime = result.value();
+            assertTrue(offsetTime instanceof OffsetTime);
+            assertEquals(input, (OffsetTime)offsetTime);
+        }
+
+        @Test
+        @DisplayName("should convert value to ZonedDateTime.")
+        void dateTimeTest7() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    DateTimeProxyInterface.class,
+                    "zonedDateTime"
+                );
+            
+            ZonedDateTime input = ZonedDateTime.of(
+                LocalDate.of(2022, 12, 19),
+                LocalTime.of(12, 30), 
+                ZoneId.of("Asia/Manila")
+            );
+            String zonedDateTimeString = input.toString();
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                zonedDateTimeString
+            );
+            assertNotNull(result);
+            
+            Object zonedDateTime = result.value();
+            assertTrue(zonedDateTime instanceof ZonedDateTime);
+            assertEquals(input, (ZonedDateTime)zonedDateTime);
+        }
+
+        @Test
+        @DisplayName("should convert value to Instant.")
+        void dateTimeTest8() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    DateTimeProxyInterface.class,
+                    "instant"
+                );
+            
+            Instant input = Instant.now();
+            String instantString = input.toString();
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                instantString
+            );
+            assertNotNull(result);
+            
+            Object instant = result.value();
+            assertTrue(instant instanceof Instant);
+            assertEquals(input, (Instant)instant);
+        }
+
+        @Test
+        @DisplayName("should convert value to DayOfWeek.")
+        void dateTimeTest9() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    DateTimeProxyInterface.class,
+                    "dayOfWeek"
+                );
+            
+            DayOfWeek input = DayOfWeek.SUNDAY;
+            String dayOfWeekString = input.name();
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                dayOfWeekString
+            );
+            assertNotNull(result);
+            
+            Object dayOfWeek = result.value();
+            assertTrue(dayOfWeek instanceof DayOfWeek);
+            assertEquals(input, (DayOfWeek)dayOfWeek);
+        }
+
+        @Test
+        @DisplayName("should convert value to Month.")
+        void dateTimeTest10() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    DateTimeProxyInterface.class,
+                    "month"
+                );
+            
+            Month input = Month.AUGUST;
+            String monthString = input.name();
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                monthString
+            );
+            assertNotNull(result);
+            
+            Object month = result.value();
+            assertTrue(month instanceof Month);
+            assertEquals(input, (Month)month);
+        }
+
+        @Test
+        @DisplayName("should convert value to MonthDay.")
+        void dateTimeTest11() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    DateTimeProxyInterface.class,
+                    "monthDay"
+                );
+            
+            MonthDay input = MonthDay.of(Month.DECEMBER, 19);
+            String monthDayString = input.toString();
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                monthDayString
+            );
+            assertNotNull(result);
+            
+            Object monthDay = result.value();
+            assertTrue(monthDay instanceof MonthDay);
+            assertEquals(input, (MonthDay)monthDay);
+        }
+
+        @Test
+        @DisplayName("should convert value to Year.")
+        void dateTimeTest12() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    DateTimeProxyInterface.class,
+                    "year"
+                );
+            
+            Year input = Year.of(2022);
+            String yearString = input.toString();
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                yearString
+            );
+            assertNotNull(result);
+            
+            Object year = result.value();
+            assertTrue(year instanceof Year);
+            assertEquals(input, (Year)year);
+        }
+
+        @Test
+        @DisplayName("should convert value to YearMonth.")
+        void dateTimeTest13() {
+            DefaultConverter converter = converterToTest();
+
+            ProxyMethod proxyMethod = 
+                ProxyMethodUtils.fromMethod(
+                    DateTimeProxyInterface.class,
+                    "yearMonth"
+                );
+            
+            YearMonth input = YearMonth.of(2022, Month.AUGUST);
+            String yearMonthString = input.toString();
+
+            ConversionResult<?> result = converter.convert(
+                proxyMethod,
+                yearMonthString
+            );
+            assertNotNull(result);
+            
+            Object yearMonth = result.value();
+            assertTrue(yearMonth instanceof YearMonth);
+            assertEquals(input, (YearMonth)yearMonth);
+        }
     }
 
     private DefaultConverter converterToTest() {
@@ -637,4 +1098,11 @@ public class DefaultConverterTests {
         
         return provider.get(externalizedProperties, rootConverter);
     }
+
+    static interface PropertyProxyInterface {
+        @ExternalizedProperty("custom.type")
+        CustomType customType();
+    }
+
+    static class CustomType {}
 }
