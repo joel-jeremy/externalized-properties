@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubCacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.StubCacheStrategy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

@@ -6,8 +6,10 @@ import java.lang.reflect.Type;
 /**
  * This class is used to reference a type (possibly a generic type).
  * 
+ * @param <T> The referenced type.
  * @apiNote This needs to be instantiated as an anonymous class in order for the 
- * type parameter to be detected e.g. {@code new TypeReference<List<Integer>>()&#123;&#125;}.
+ * type parameter to be detected e.g. 
+ * <code>new TypeReference{@literal<}List{@literal<}Integer{@literal>}{@literal>}(){}</code>.
  */
 public abstract class TypeReference<T> {
     private final Type type;

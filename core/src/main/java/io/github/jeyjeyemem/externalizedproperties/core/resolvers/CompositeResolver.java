@@ -1,7 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverProvider;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,21 +10,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
+import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyCollection;
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
 
 /**
  * A {@link Resolver} decorator which resolves requested properties 
  * from a collection of {@link Resolver}s.
  */
 public class CompositeResolver implements Resolver, Iterable<Resolver> {
-    
-    private static final Logger LOGGER = Logger.getLogger(CompositeResolver.class.getName());
 
     private final Collection<Resolver> resolvers;
 
@@ -42,67 +39,20 @@ public class CompositeResolver implements Resolver, Iterable<Resolver> {
     /**
      * Resolve property from a collection of {@link Resolver}s.
      * 
+     * @param proxyMethod The proxy method.
      * @param propertyName The property name.
      * @return The resolved property value. Otherwise, an empty {@link Optional}.
      */
     @Override
-    public Optional<String> resolve(String propertyName) {
-        requireNonNullOrEmptyString(propertyName, "propertyName");
-
+    public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
         for (Resolver resolver : resolvers) {
-            Optional<String> resolved = resolver.resolve(propertyName);
+            Optional<String> resolved = resolver.resolve(proxyMethod, propertyName);
             if (resolved.isPresent()) {
                 return resolved;
             }
         }
 
         return Optional.empty();
-    }
-
-    /**
-     * Resolve properties from a collection of {@link Resolver}s.
-     * 
-     * @param propertyNames The property names.
-     * @return The {@link ResolverResult} which contains the resolved properties
-     * and unresolved properties, if there are any.
-     */
-    @Override
-    public ResolverResult resolve(Collection<String> propertyNames) {
-        requireNonNullOrEmptyCollection(propertyNames, "propertyNames");
-
-        ResolverResult.Builder resultBuilder = ResolverResult.builder(propertyNames);
-        List<String> unresolvedPropertyNames = new ArrayList<>(propertyNames);
-
-        for (Resolver resolver : resolvers) {
-            ResolverResult result = resolver.resolve(unresolvedPropertyNames);
-            for (Map.Entry<String, String> newResolvedProperty : result.resolvedProperties().entrySet()) {
-                LOGGER.log(
-                    Level.FINE,
-                    "Resolved {0} externalized property from {1}.",
-                    new Object[] {
-                        newResolvedProperty.getKey(),
-                        resolver.getClass()
-                    }
-                );
-                unresolvedPropertyNames.remove(newResolvedProperty.getKey());
-                resultBuilder.add(
-                    newResolvedProperty.getKey(), 
-                    newResolvedProperty.getValue()
-                );
-            }
-
-            // Stop when all properties are already resolved.
-            if (unresolvedPropertyNames.isEmpty()) {
-                LOGGER.log(
-                    Level.FINE,
-                    "All externalized properties have been resolved: {0}",
-                    propertyNames
-                );
-                break;
-            }
-        }
-
-        return resultBuilder.build();
     }
 
     /**
@@ -113,6 +63,78 @@ public class CompositeResolver implements Resolver, Iterable<Resolver> {
     @Override
     public String toString() {
         return resolvers.toString();
+    }
+
+    /**
+     * The {@link ResolverProvider} for {@link CompositeResolver}.
+     * 
+     * @param resolverProviders The {@link ResolverProvider}s.
+     * @return The {@link ResolverProvider} for {@link CompositeResolver}.
+     */
+    public static ResolverProvider<CompositeResolver> provider(
+            ResolverProvider<?>... resolverProviders
+    ) {
+        requireNonNull(resolverProviders, "resolverProviders");
+        return provider(Arrays.asList(resolverProviders));
+    }
+
+    /**
+     * The {@link ResolverProvider} for {@link CompositeResolver}.
+     * 
+     * @param resolverProviders The {@link ResolverProvider}s.
+     * @return The {@link ResolverProvider} for {@link CompositeResolver}.
+     */
+    public static ResolverProvider<CompositeResolver> provider(
+            Collection<ResolverProvider<?>> resolverProviders
+    ) {
+        requireNonNull(resolverProviders, "resolverProviders");
+        return externalizedProperties -> new CompositeResolver(
+            resolverProviders.stream()
+                .map(rp -> rp.get(externalizedProperties))
+                .collect(Collectors.toList())
+        );
+    }
+
+    /**
+     * The {@link ResolverProvider} which creates a {@link Resolver} via 
+     * {@link CompositeResolver#flatten(Collection)}.
+     * 
+     * @implNote This may not necessarily return a {@link CompositeResolver} instance. 
+     * If the flattening operation resulted in a single resolver remaining, 
+     * that resolver instance will be returned. Otherwise, a {@link CompositeResolver} 
+     * instance will be returned which is composed of all the remaining resolvers.
+     * 
+     * @param resolverProviders The {@link ResolverProvider}s.
+     * @return The {@link ResolverProvider} for {@link CompositeResolver}.
+     */
+    public static ResolverProvider<Resolver> flattenedProvider(
+            ResolverProvider<?>... resolverProviders
+    ) {
+        requireNonNull(resolverProviders, "resolverProviders");
+        return flattenedProvider(Arrays.asList(resolverProviders));
+    }
+
+    /**
+     * The {@link ResolverProvider} which creates a {@link Resolver} via 
+     * {@link CompositeResolver#flatten(Collection)}.
+     * 
+     * @implNote This may not necessarily return a {@link CompositeResolver} instance. 
+     * If the flattening operation resulted in a single resolver remaining, 
+     * that resolver instance will be returned. Otherwise, a {@link CompositeResolver} 
+     * instance will be returned which is composed of all the remaining resolvers.
+     * 
+     * @param resolverProviders The {@link ResolverProvider}s.
+     * @return The {@link ResolverProvider} for {@link CompositeResolver}.
+     */
+    public static ResolverProvider<Resolver> flattenedProvider(
+            Collection<ResolverProvider<?>> resolverProviders
+    ) {
+        requireNonNull(resolverProviders, "resolverProviders");
+        return externalizedProperties -> CompositeResolver.flatten(
+            resolverProviders.stream()
+                .map(rp -> rp.get(externalizedProperties))
+                .collect(Collectors.toList())
+        );
     }
 
     /**

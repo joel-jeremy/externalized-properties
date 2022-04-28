@@ -100,4 +100,17 @@ public class H2Utils {
             insert.executeUpdate();
         }
     }
+
+    public static void createUser(
+            Connection connection,
+            String username, 
+            String password
+    ) throws SQLException {
+        // Prepared statement parameters don't work on DDL commands.
+        PreparedStatement createUser = connection.prepareStatement(
+            "CREATE USER " + username + 
+            " PASSWORD '" + password + "' ADMIN"
+        );
+        createUser.executeUpdate();
+    }
 }

@@ -71,6 +71,7 @@ public class ExpiringCacheStrategy<K, V> implements CacheStrategy<K, V> {
         decorated.expireAll();
     }
 
+    @SuppressWarnings("FutureReturnValueIgnored")
     private void scheduleForExpiry(K cacheKey) {
         expiryScheduler.schedule(
             () -> expire(cacheKey), 

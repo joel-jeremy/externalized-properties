@@ -1,5 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
@@ -32,10 +34,10 @@ public class TypeUtilities {
      * 
      * @param type The type to derive the raw class from.
      * @return The raw class of the given type.
-     * @throws IllegalArgumentException if the type is unsupported.
+     * @throws IllegalArgumentException if the type null or is unsupported.
      */
     public static Class<?> getRawType(Type type) {
-        requireNonNull(type, "Cannot get raw type of null.");
+        requireNonNull(type, "type");
 
         if (isClass(type)) {
             return (Class<?>)type;
@@ -75,12 +77,12 @@ public class TypeUtilities {
             // Only get first of the bounds because Java doesn't allow multiple extends/super
             // as of writing.
 
-            // Return lower bounds i.e for <T super String>, return String.
+            // Return lower bounds i.e for <? super String>, return String.
             if (wt.getLowerBounds().length > 0) {
                 return getRawType(wt.getLowerBounds()[0]);
             }
 
-            // Return upper bounds i.e for <T extends String>, return String.
+            // Return upper bounds i.e for <? extends String>, return String.
             return getRawType(wt.getUpperBounds()[0]);
         }
 
@@ -123,7 +125,7 @@ public class TypeUtilities {
      * @return The {@link Class} instance if the given type is a {@link Class} instance.
      * Otherwise, {@code null}.
      */
-    public static Class<?> asClass(Type type) {
+    public static @Nullable Class<?> asClass(Type type) {
         if (type instanceof Class<?>) {
             return (Class<?>)type;
         }
@@ -148,7 +150,7 @@ public class TypeUtilities {
      * @return The {@link ParameterizedType} instance if the given type is a {@link ParameterizedType} 
      * instance. Otherwise, {@code null}.
      */
-    public static ParameterizedType asParameterizedType(Type type) {
+    public static @Nullable ParameterizedType asParameterizedType(Type type) {
         if (type instanceof ParameterizedType) {
             return (ParameterizedType)type;
         }
@@ -173,7 +175,7 @@ public class TypeUtilities {
      * @return The {@link GenericArrayType} instance if the given type is a {@link GenericArrayType} 
      * instance. Otherwise, {@code null}.
      */
-    public static GenericArrayType asGenericArrayType(Type type) {
+    public static @Nullable GenericArrayType asGenericArrayType(Type type) {
         if (type instanceof GenericArrayType) {
             return (GenericArrayType)type;
         }
@@ -198,7 +200,7 @@ public class TypeUtilities {
      * @return The {@link TypeVariable} instance if the given type is a {@link TypeVariable} 
      * instance. Otherwise, {@code null}.
      */
-    public static TypeVariable<?> asTypeVariable(Type type) {
+    public static @Nullable TypeVariable<?> asTypeVariable(Type type) {
         if (type instanceof TypeVariable<?>) {
             return (TypeVariable<?>)type;
         }
@@ -223,7 +225,7 @@ public class TypeUtilities {
      * @return The {@link WildcardType} instance if the given type is a {@link WildcardType} 
      * instance. Otherwise, {@code null}.
      */
-    public static WildcardType asWildcardType(Type type) {
+    public static @Nullable WildcardType asWildcardType(Type type) {
         if (type instanceof WildcardType) {
             return (WildcardType)type;
         }

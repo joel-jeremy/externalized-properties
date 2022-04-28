@@ -1,6 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.ProxyMethodUtils;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ArrayProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ListProxyInterface;
 import org.junit.jupiter.api.DisplayName;

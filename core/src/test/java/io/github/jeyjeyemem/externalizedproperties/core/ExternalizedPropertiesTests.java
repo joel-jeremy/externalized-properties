@@ -1,12 +1,13 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ArrayProxyInterface;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.JavaPropertiesProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.EnvironmentVariablesProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.SystemPropertiesProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ListProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.StubResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,22 +42,22 @@ public class ExternalizedPropertiesTests {
         @Nested
         class ResolversMethod {
             @Test
-            @DisplayName("should throw when resolvers collection argument is null")
+            @DisplayName("should throw when resolver providers collection argument is null")
             void test1() {
                 assertThrows(
                     IllegalArgumentException.class,
                     () -> ExternalizedProperties.builder()
-                        .resolvers((Collection<Resolver>)null)
+                        .resolvers((Collection<ResolverProvider<?>>)null)
                 );
             }
 
             @Test
-            @DisplayName("should throw when resolvers varargs argument is null")
+            @DisplayName("should throw when resolver providers varargs argument is null")
             void test2() {
                 assertThrows(
                     IllegalArgumentException.class,
                     () -> ExternalizedProperties.builder()
-                        .resolvers((Resolver[])null)
+                        .resolvers((ResolverProvider[])null)
                 );
             }
         }
@@ -64,22 +65,22 @@ public class ExternalizedPropertiesTests {
         @Nested
         class ConvertersMethod {
             @Test
-            @DisplayName("should throw when converters collection argument is null")
+            @DisplayName("should throw when converter providers collection argument is null")
             void test1() {
                 assertThrows(
                     IllegalArgumentException.class,
                     () -> ExternalizedProperties.builder()
-                        .converters((Collection<Converter<?>>)null)
+                        .converters((Collection<ConverterProvider<?>>)null)
                 );
             }
         
             @Test
-            @DisplayName("should throw when converters varargs argument is null")
+            @DisplayName("should throw when converter providers varargs argument is null")
             void test2() {
                 assertThrows(
                     IllegalArgumentException.class,
                     () -> ExternalizedProperties.builder()
-                        .converters((Converter<?>[])null)
+                        .converters((ConverterProvider[])null)
                 );
             }
         }
@@ -87,22 +88,22 @@ public class ExternalizedPropertiesTests {
         @Nested
         class ProcessorsMethod {
             @Test
-            @DisplayName("should throw when processors collection argument is null")
+            @DisplayName("should throw when processor providers collection argument is null")
             void test1() {
                 assertThrows(
                     IllegalArgumentException.class,
                     () -> ExternalizedProperties.builder()
-                        .processors((Collection<Processor>)null)
+                        .processors((Collection<ProcessorProvider<?>>)null)
                 );
             }
         
             @Test
-            @DisplayName("should throw when processors varargs argument is null")
+            @DisplayName("should throw when processor providers varargs argument is null")
             void test2() {
                 assertThrows(
                     IllegalArgumentException.class,
                     () -> ExternalizedProperties.builder()
-                        .processors((Processor[])null)
+                        .processors((ProcessorProvider[])null)
                 );
             }
         }
@@ -128,19 +129,6 @@ public class ExternalizedPropertiesTests {
                 assertThrows(
                     IllegalStateException.class,
                     () -> ExternalizedProperties.builder().build()
-                );
-            }
-
-            @Test
-            @DisplayName(
-                "should throw on build when variable expander factory returns null"
-            )
-            void test2() {
-                assertThrows(
-                    IllegalStateException.class,
-                    () -> ExternalizedProperties.builder()
-                        .variableExpander(resolver -> null)
-                        .build()
                 );
             }
         }
@@ -186,7 +174,7 @@ public class ExternalizedPropertiesTests {
                 // - Arrays
                 // - Optionals
                 ExternalizedProperties ep = ExternalizedProperties.builder()
-                    .resolvers(new MapResolver(map))
+                    .resolvers(MapResolver.provider(map))
                     .withDefaultConverters()
                     .build();
         
@@ -257,24 +245,30 @@ public class ExternalizedPropertiesTests {
 
                 ExternalizedProperties externalizedProperties = 
                     ExternalizedProperties.builder()
-                        .resolvers(resolver)
+                        .resolvers(ep -> resolver)
                         .withProxyEagerLoading()
                         .build();
 
-                JavaPropertiesProxyInterface proxy = 
-                    externalizedProperties.proxy(JavaPropertiesProxyInterface.class);
+                SystemPropertiesProxyInterface systemPropsProxy = 
+                    externalizedProperties.proxy(SystemPropertiesProxyInterface.class);
 
-                assertNotNull(proxy);
+                EnvironmentVariablesProxyInterface envVarsProxy = 
+                    externalizedProperties.proxy(EnvironmentVariablesProxyInterface.class);
+
+                assertNotNull(systemPropsProxy);
+                assertNotNull(envVarsProxy);
 
                 // Properties were already eagerly resolved via resolver.
                 assertTrue(resolver.resolvedPropertyNames().contains("java.version"));
-                assertTrue(resolver.resolvedPropertyNames().contains("PATH"));
+                assertTrue(resolver.resolvedPropertyNames().contains("path"));
             }
         }
 
         private void testDefaultResolvers(ExternalizedProperties ep) {
-            JavaPropertiesProxyInterface proxyInterface = 
-                ep.proxy(JavaPropertiesProxyInterface.class);
+            SystemPropertiesProxyInterface proxyInterface = 
+                ep.proxy(SystemPropertiesProxyInterface.class);
+            EnvironmentVariablesProxyInterface envProxyInterface = 
+                ep.proxy(EnvironmentVariablesProxyInterface.class);
 
             // Resolved from system properties.
             assertEquals(
@@ -285,7 +279,7 @@ public class ExternalizedPropertiesTests {
             // Resolved from environment variables.
             assertEquals(
                 System.getenv("PATH"), 
-                proxyInterface.pathEnv()
+                envProxyInterface.path()
             );
         }
 

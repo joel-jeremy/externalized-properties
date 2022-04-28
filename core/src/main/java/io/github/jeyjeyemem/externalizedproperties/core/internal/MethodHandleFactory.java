@@ -19,7 +19,7 @@ import java.util.WeakHashMap;
 public class MethodHandleFactory {
     // Not Java 1.7, 1.8, etc.
     private static final boolean IS_RUNNING_ON_JAVA_9_OR_LATER = 
-        !System.getProperty("java.specification.version").startsWith("1.");
+        !javaVersion().startsWith("1.");
 
     private final Map<Method, MethodHandle> weakMethodHandleCache = new WeakHashMap<>(); 
 
@@ -45,7 +45,7 @@ public class MethodHandleFactory {
                 return Java9MethodHandleFactory.buildMethodHandle(method);
             }
 
-            return Java8MethodHandlerFactory.buildMethodHandle(method);
+            return Java8MethodHandleFactory.buildMethodHandle(method);
         } catch (Throwable ex) {
             throw new ExternalizedPropertiesException(
                 "Error occurred while trying to build method handle for method: " +
@@ -55,10 +55,9 @@ public class MethodHandleFactory {
         }
     }
 
-    private static class Java8MethodHandlerFactory {
+    private static class Java8MethodHandleFactory {
         private static MethodHandle buildMethodHandle(Method method) 
-                throws Exception 
-        {
+                throws Exception {
             // This will only work on Java 8.
             // For Java9+, the new private lookup API should be used.
             final Constructor<Lookup> constructor = Lookup.class
@@ -74,24 +73,22 @@ public class MethodHandleFactory {
     }
 
     private static class Java9MethodHandleFactory {
-        // This is null if not on Java 9+.
+        // This will only work on Java 9+.
         // This method should be present in Java 9+.
         // Method handle for MethodHandles.privateLookupIn(...) method.
-        private final static MethodHandle JAVA_9_PRIVATE_LOOKUP_IN_MH =
+        private final static MethodHandle JAVA_9_MH_PRIVATE_LOOKUP_IN =
             privateLookupInMethodHandleOrThrow();
         
         private static MethodHandle buildMethodHandle(Method method) 
-                throws Throwable 
-        {
+                throws Throwable {
             Lookup privateLookup = privateLookupIn(method.getDeclaringClass());
             return privateLookup.in(method.getDeclaringClass())
                 .unreflectSpecial(method, method.getDeclaringClass());
         }
 
         private static Lookup privateLookupIn(Class<?> classToLookup) 
-                throws Throwable 
-        {
-            return (Lookup)JAVA_9_PRIVATE_LOOKUP_IN_MH.invokeWithArguments(
+                throws Throwable {
+            return (Lookup)JAVA_9_MH_PRIVATE_LOOKUP_IN.invokeWithArguments(
                 classToLookup,
                 MethodHandles.lookup()
             );
@@ -108,10 +105,14 @@ public class MethodHandleFactory {
             } catch (Exception e) {
                 throw new IllegalStateException(
                     "Unable to find MethodHandles.privateLookupIn method " + 
-                    "while running on Java 9+.", 
+                    "while running on Java " + javaVersion() + ".", 
                     e
                 );
             }
         }
+    }
+
+    private static String javaVersion() {
+        return System.getProperty("java.specification.version");
     }
 }

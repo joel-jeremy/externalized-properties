@@ -1,13 +1,14 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.converters;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.Converter;
+import io.github.jeyjeyemem.externalizedproperties.core.ConverterProvider;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeUtilities;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Delimiter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.StripEmptyValues;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.Tokenizer;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.Type;
 import java.util.HashSet;
@@ -29,26 +30,59 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 public class SetConverter implements Converter<Set<?>> {
     private final IntFunction<Set<?>> setFactory;
     private final Tokenizer tokenizer = new Tokenizer(",");
+    private final Converter<?> rootConverter;
 
     /**
      * Default constructor. 
      * Instances constructed via this constructor will use {@link HashSet} 
      * as {@link Set} implementation.
+     * 
+     * @param rootConverter The root converter.
      */
-    public SetConverter() {
+    public SetConverter(Converter<?> rootConverter) {
         // Prevent hashmap resizing.
         // 0.75 is HashMap's default load factor.
-        this(size -> new HashSet<>((int) (size/0.75f) + 1));
+        this(rootConverter, size -> new HashSet<>((int) (size/0.75f) + 1));
     }
 
     /**
      * Constructor.
      * 
+     * @param rootConverter The root converter.
      * @param setFactory The set factory. This must return a set instance
      * (optionally with given the length). This function must not return null.
      */
-    public SetConverter(IntFunction<Set<?>> setFactory) {
+    public SetConverter(
+            Converter<?> rootConverter,
+            IntFunction<Set<?>> setFactory
+    ) {
+        this.rootConverter = requireNonNull(rootConverter, "rootConverter");
         this.setFactory = requireNonNull(setFactory, "setFactory");
+    }
+
+    /**
+     * The {@link ConverterProvider} for {@link SetConverter}.
+     * 
+     * @return The {@link ConverterProvider} for {@link SetConverter}.
+     */
+    public static ConverterProvider<SetConverter> provider() {
+        return (externalizedProperties, rootConverter) -> 
+            new SetConverter(rootConverter);
+    }
+
+    /**
+     * The {@link ConverterProvider} for {@link SetConverter}.
+     * 
+     * @param setFactory The set factory. This must return a set instance
+     * (optionally with given the length). This function must not return null.
+     * @return The {@link ConverterProvider} for {@link SetConverter}.
+     */
+    public static ConverterProvider<SetConverter> provider(
+            IntFunction<Set<?>> setFactory
+    ) {
+        requireNonNull(setFactory, "setFactory");
+        return (externalizedProperties, rootConverter) -> 
+            new SetConverter(rootConverter, setFactory);
     }
 
     /** {@inheritDoc} */
@@ -59,10 +93,12 @@ public class SetConverter implements Converter<Set<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<? extends Set<?>> convert(ConversionContext context) {
-        requireNonNull(context, "context");
-        
-        Type[] genericTypeParams = context.targetTypeGenericTypeParameters();
+    public ConversionResult<? extends Set<?>> convert(
+            ProxyMethod proxyMethod,
+            String valueToConvert,
+            Type targetType
+    ) { 
+        Type[] genericTypeParams = TypeUtilities.getTypeParameters(targetType);
 
         // Assume initially as Set<String> when target type has no
         // generic type parameters.
@@ -72,12 +108,11 @@ public class SetConverter implements Converter<Set<?>> {
             targetSetType = throwIfTypeVariable(genericTypeParams[0]);
         }
 
-        String propertyValue = context.value();
-        if (propertyValue.isEmpty()) {
+        if (valueToConvert.isEmpty()) {
             return ConversionResult.of(newSet(0));
         }
 
-        final String[] values = tokenizer.tokenizeValue(context);
+        final String[] values = tokenizer.tokenizeValue(proxyMethod, valueToConvert);
         
         Class<?> rawTargetSetType = TypeUtilities.getRawType(targetSetType);
 
@@ -89,7 +124,7 @@ public class SetConverter implements Converter<Set<?>> {
 
         return ConversionResult.of(
             convertValuesToSetType(
-                context,
+                proxyMethod,
                 values,
                 targetSetType
             )
@@ -97,15 +132,17 @@ public class SetConverter implements Converter<Set<?>> {
     }
 
     private Set<?> convertValuesToSetType(
-            ConversionContext context,
+            ProxyMethod proxyMethod,
             String[] values,
             Type setType
     ) {
         Set<Object> convertedSet = newSet(values.length);
-
+        
         for (int i = 0; i < values.length; i++) {
-            ConversionResult<?> converted = context.converter().convert(
-                context.with(values[i], setType)
+            ConversionResult<?> converted = rootConverter.convert(
+                proxyMethod,
+                values[i], 
+                setType
             );
             convertedSet.add(converted.value());
         }

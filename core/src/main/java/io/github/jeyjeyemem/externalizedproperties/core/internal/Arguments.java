@@ -1,5 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.Collection;
 
 /**
@@ -17,7 +19,7 @@ public class Arguments {
      * {@link IllegalArgumentException} message if the argument failed validation.
      * @return The argument.
      */
-    public static <T> T requireNonNull(T arg, String argName) {
+    public static <T> T requireNonNull(@Nullable T arg, String argName) {
         if (arg == null) {
             throw new IllegalArgumentException(argName + " must not be null.");
         }
@@ -32,8 +34,8 @@ public class Arguments {
      * {@link IllegalArgumentException} message if the argument failed validation.
      * @return The {@link String} argument.
      */
-    public static String requireNonNullOrEmptyString(String arg, String argName) {
-        if (isNullOrEmpty(arg)) {
+    public static String requireNonNullOrEmptyString(@Nullable String arg, String argName) {
+        if (arg == null || "".equals(arg)) {
             throw new IllegalArgumentException(argName + " must not be null or empty.");
         }
         return arg;
@@ -49,7 +51,7 @@ public class Arguments {
      * @return The {@link Collection} argument.
      */
     public static <T> Collection<T> requireNonNullOrEmptyCollection(
-            Collection<T> arg, 
+            @Nullable Collection<T> arg, 
             String argName
     ) {
         if (arg == null || arg.isEmpty()) {
@@ -68,16 +70,12 @@ public class Arguments {
      * @return The {@link Collection} argument.
      */
     public static <T> T[] requireNonNullOrEmptyArray(
-            T[] arg, 
+            @Nullable T[] arg, 
             String argName
     ) {
         if (arg == null || arg.length == 0) {
             throw new IllegalArgumentException(argName + " must not be null or empty.");
         }
         return arg;
-    }
-
-    private static boolean isNullOrEmpty(String string) {
-        return string == null || "".equals(string);
     }
 }

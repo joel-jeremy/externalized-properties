@@ -1,14 +1,14 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.converters;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionResult;
-import io.github.jeyjeyemem.externalizedproperties.core.Converter;
+import io.github.jeyjeyemem.externalizedproperties.core.ConverterProvider;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.SetProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.ProxyMethodUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ public class SetConverterTests {
     class Constructor {
         @Test
         @DisplayName("should throw when set factory argument is null.")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> new SetConverter(null)
@@ -44,10 +44,80 @@ public class SetConverterTests {
     }
 
     @Nested
+    class ProviderMethod {
+        @Test
+        @DisplayName("should not return null.")
+        public void test1() {
+            ConverterProvider<SetConverter> provider = 
+                SetConverter.provider();
+
+            assertNotNull(provider);
+        }
+
+        @Test
+        @DisplayName("should return an instance on get.")
+        public void test2() {
+            ConverterProvider<SetConverter> provider = 
+                SetConverter.provider();
+            
+            ExternalizedProperties externalizedProperties = 
+                ExternalizedProperties.builder().withDefaults().build();
+            
+            assertNotNull(
+                provider.get(
+                    ExternalizedProperties.builder().withDefaults().build(),
+                    new RootConverter(externalizedProperties, provider)
+                )
+            );
+        }
+    }
+    
+    @Nested
+    class ProviderMethodWithSetFactoryOverload {
+        @Test
+        @DisplayName("should throw when list factory argument is null.")
+        public void test1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> SetConverter.provider(null)
+            );
+        }
+
+        @Test
+        @DisplayName("should not return null.")
+        public void test2() {
+            ConverterProvider<SetConverter> provider = 
+                SetConverter.provider(LinkedHashSet::new);
+
+            assertNotNull(provider);
+        }
+
+        @Test
+        @DisplayName("should return an instance on get.")
+        public void test3() {
+            ConverterProvider<SetConverter> provider = 
+                SetConverter.provider(LinkedHashSet::new);
+            
+            ExternalizedProperties externalizedProperties = 
+                ExternalizedProperties.builder()
+                    .withDefaultResolvers()
+                    .converters(provider)
+                    .build();
+            
+            assertNotNull(
+                provider.get(
+                    externalizedProperties,
+                    new RootConverter(externalizedProperties, provider)
+                )
+            );
+        }
+    }
+
+    @Nested
     class CanConvertToMethod {
         @Test
         @DisplayName("should return false when target type is null.")
-        public void test1() {
+        void test1() {
             SetConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(null);
             assertFalse(canConvert);
@@ -55,7 +125,7 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should return true when target type is a Set class.")
-        public void test2() {
+        void test2() {
             SetConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Set.class);
             assertTrue(canConvert);
@@ -63,7 +133,7 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should return false when target type is not a Set class.")
-        public void test4() {
+        void test4() {
             SetConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(String.class);
             assertFalse(canConvert);
@@ -73,15 +143,8 @@ public class SetConverterTests {
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should throw when context is null.")
-        public void test1() {
-            SetConverter converter = converterToTest();
-            assertThrows(IllegalArgumentException.class, () -> converter.convert(null));
-        }
-
-        @Test
         @DisplayName("should convert value to a Set.")
-        public void test2() {
+        void test1() {
             SetConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
@@ -89,16 +152,11 @@ public class SetConverterTests {
                     SetProxyInterface.class,
                     "setProperty"
                 );
-            
-            Converter<?> rootConverter = new RootConverter(converter);
 
-            ConversionContext context = new ConversionContext(
-                rootConverter,
+            ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
                 "value1,value2,value3"
             );
-
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Set<?> set = result.value();
@@ -117,7 +175,7 @@ public class SetConverterTests {
             "should convert to Set<String> when target type has no " + 
             "type parameters i.e. Set.class"
         )
-        public void test3() {
+        void test2() {
             SetConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
@@ -125,19 +183,14 @@ public class SetConverterTests {
                     SetProxyInterface.class,
                     "setInteger"
                 );
-            
-            Converter<?> rootConverter = new RootConverter(converter);
-
-            ConversionContext context = new ConversionContext(
-                rootConverter,
+                
+            ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
                 "1,2,3",
                 // Override proxy method return type with a raw Set
                 // No generic type parameter
                 Set.class
             );
-                
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
 
             assertNotNull(result);
             Set<?> set = result.value();
@@ -154,7 +207,7 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should convert value to a Set using custom delimiter.")
-        public void test4() {
+        void test3() {
             SetConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
@@ -162,16 +215,11 @@ public class SetConverterTests {
                     SetProxyInterface.class,
                     "setCustomDelimiter"
                 );
-            
-            Converter<?> rootConverter = new RootConverter(converter);
-            
-            ConversionContext context = new ConversionContext(
-                rootConverter,
+
+            ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
                 "value1#value2#value3"
             );
-
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
 
             assertNotNull(result);
             Set<?> set = result.value();
@@ -188,8 +236,8 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should convert value according to the Set's generic type parameter.")
-        public void test5() {
-            SetConverter converter = converterToTest();
+        void test4() {
+            SetConverter converter = converterToTest(PrimitiveConverter.provider());
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
@@ -197,18 +245,10 @@ public class SetConverterTests {
                     "setInteger"
                 );
             
-            Converter<?> rootConverter = new RootConverter(
-                converter,
-                new PrimitiveConverter()
-            );
-
-            ConversionContext context = new ConversionContext(
-                rootConverter,
+            ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
                 "1,2,3"
             );
-            
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Set<?> set = result.value();
@@ -227,7 +267,7 @@ public class SetConverterTests {
         @DisplayName(
             "should return String values when Set's generic type parameter is a wildcard."
         )
-        public void test6() {
+        void test5() {
             SetConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
@@ -235,16 +275,11 @@ public class SetConverterTests {
                     SetProxyInterface.class,
                     "setPropertyWildcard"
                 );
-            
-            Converter<?> rootConverter = new RootConverter(converter);
 
-            ConversionContext context = new ConversionContext(
-                rootConverter,
+            ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
                 "value1,value2,value3"
             );
-
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Set<?> set = result.value();
@@ -261,7 +296,7 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should return String values when Set's generic type parameter is Object.")
-        public void test7() {
+        void test6() {
             SetConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
@@ -269,17 +304,11 @@ public class SetConverterTests {
                     SetProxyInterface.class,
                     "setPropertyObject"
                 );
-            
-            Converter<?> rootConverter = new RootConverter(converter);
 
-            ConversionContext context = 
-                new ConversionContext(
-                    rootConverter,
-                    proxyMethod,
-                    "value1,value2,value3"
-                );
-
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
+            ConversionResult<? extends Set<?>> result = converter.convert(
+                proxyMethod,
+                "value1,value2,value3"
+            );
         
             assertNotNull(result);
             Set<?> set = result.value();
@@ -296,7 +325,7 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should return empty Set when property value is empty.")
-        public void test8() {
+        void test7() {
             SetConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
@@ -304,16 +333,11 @@ public class SetConverterTests {
                     SetProxyInterface.class,
                     "setProperty"
                 );
-            
-            Converter<?> rootConverter = new RootConverter(converter);
 
-            ConversionContext context = new ConversionContext(
-                rootConverter,
+            ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
                 "" // Empty value.
             );
-
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Set<?> set = result.value();
@@ -324,25 +348,22 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should retain empty values from property value.")
-        public void test9() {
-            SetConverter converter = converterToTest();
+        void test8() {
+            // Use LinkedHashSet for easy assertion later on this test case.
+            SetConverter converter = converterToTest(
+                i -> new LinkedHashSet<>(i)
+            );
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
                     SetProxyInterface.class,
                     "setProperty"
                 );
-            
-            Converter<?> rootConverter = new RootConverter(converter);
 
-            ConversionContext context = 
-                new ConversionContext(
-                    rootConverter,
-                    proxyMethod,
-                    "value1,value2,value3,,value5" // Has empty values.
-                );
-
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
+            ConversionResult<? extends Set<?>> result = converter.convert(
+                proxyMethod,
+                "value1,value2,value3,,value5" // Has empty values.
+            );
         
             assertNotNull(result);
             Set<?> set = result.value();
@@ -351,7 +372,9 @@ public class SetConverterTests {
             assertEquals(5, set.size());
             assertTrue(set.stream().allMatch(v -> v instanceof String));
             assertIterableEquals(
-                new HashSet<>(Arrays.asList("value1", "value2", "value3", "", "value5")), 
+                new LinkedHashSet<>(
+                    Arrays.asList("value1", "value2", "value3", "", "value5")
+                ), 
                 set
             );
 
@@ -359,24 +382,22 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should strip empty values when annotated with @StripEmptyValues.")
-        public void test10() {
-            SetConverter converter = converterToTest();
+        void test9() {
+            // Use LinkedHashSet for easy assertion later on this test case.
+            SetConverter converter = converterToTest(
+                i -> new LinkedHashSet<>(i)
+            );
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
                     SetProxyInterface.class,
                     "setPropertyStripEmpty"
                 );
-            
-            Converter<?> rootConverter = new RootConverter(converter);
 
-            ConversionContext context = new ConversionContext(
-                rootConverter,
+            ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
                 "value1,,value3,,value5" // Has empty values.
             );
-
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Set<?> set = result.value();
@@ -385,7 +406,7 @@ public class SetConverterTests {
             assertEquals(3, set.size());
             assertTrue(set.stream().allMatch(v -> v instanceof String));
             assertIterableEquals(
-                new HashSet<>(Arrays.asList("value1", "value3", "value5")), 
+                new LinkedHashSet<>(Arrays.asList("value1", "value3", "value5")), 
                 set
             );
         }
@@ -395,7 +416,7 @@ public class SetConverterTests {
             "should throw when no rootConverter is registered that can handle " + 
             "the Set's generic type parameter."
         )
-        public void test11() {
+        void test10() {
             SetConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
@@ -404,18 +425,11 @@ public class SetConverterTests {
                     "setInteger"
                 );
             
-            Converter<?> rootConverter = new RootConverter(converter);
-            
             // No registered rootConverter for Integer.
-            assertThrows(ExternalizedPropertiesException.class, () -> {
-                converter.convert(
-                    new ConversionContext(
-                        rootConverter,
-                        proxyMethod,
-                        "1,2,3,4,5"
-                    )
-                );
-            });
+            assertThrows(
+                ExternalizedPropertiesException.class,
+                () -> converter.convert(proxyMethod, "1,2,3,4,5")
+            );
         }
 
         @Test
@@ -423,27 +437,23 @@ public class SetConverterTests {
             "should convert value according to the Set's generic type parameter. " + 
             "Generic type parameter is also a parameterized type e.g. Set<Optional<String>>."
         )
-        public void test12() {
-            SetConverter converter = converterToTest();
+        void test11() {
+            // Use LinkedHashSet for easy assertion later on this test case.
+            SetConverter converter = converterToTest(
+                i -> new LinkedHashSet<>(i),
+                OptionalConverter.provider()
+            );
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
                     SetProxyInterface.class,
                     "setPropertyNestedGenerics" // Returns a Set<Optional<String>>.
                 );
-            
-            Converter<?> rootConverter = new RootConverter(
-                converter,
-                new OptionalConverter() // Register additional Optional converter.
-            );
 
-            ConversionContext context = new ConversionContext(
-                rootConverter,
+            ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
                 "value1,value2,value3"
             );
-
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Set<?> set = result.value();
@@ -452,7 +462,7 @@ public class SetConverterTests {
             assertEquals(3, set.size());
             assertTrue(set.stream().allMatch(v -> v instanceof Optional<?>));
             assertIterableEquals(
-                new HashSet<>(Arrays.asList(
+                new LinkedHashSet<>(Arrays.asList(
                     Optional.of("value1"), 
                     Optional.of("value2"), 
                     Optional.of("value3")
@@ -466,29 +476,24 @@ public class SetConverterTests {
             "should convert value according to the Set's generic type parameter. " + 
             "Generic type parameter is generic array e.g. Set<Optional<String>[]>."
         )
-        public void test13() {
+        void test12() {
             // Use LinkedHashSet for easy assertion later on this test case.
-            SetConverter converter = converterToTest(LinkedHashSet::new);
+            SetConverter converter = converterToTest(
+                i -> new LinkedHashSet<>(i),
+                OptionalConverter.provider(),
+                ArrayConverter.provider()
+            );
 
             ProxyMethod proxyMethod = 
                 ProxyMethodUtils.fromMethod(
                     SetProxyInterface.class,
                     "setPropertyNestedGenericsArray" // Returns a Set<Optional<String>[]>.
                 );
-            
-            Converter<?> rootConverter = new RootConverter(
-                converter,
-                new ArrayConverter(), // Register additional array converter.
-                new OptionalConverter() // Register additional Optional converter.
-            );
 
-            ConversionContext context = new ConversionContext(
-                rootConverter,
+            ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
                 "value1,value2,value3"
             );
-
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Set<?> set = result.value();
@@ -522,7 +527,7 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should throw when target type has a type variable e.g. Set<T>.")
-        public void test14() {
+        void test13() {
             SetConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
@@ -530,18 +535,10 @@ public class SetConverterTests {
                     SetProxyInterface.class,
                     "setPropertyT"
                 );
-            
-            Converter<?> rootConverter = new RootConverter(converter);
-
-            ConversionContext context = new ConversionContext(
-                rootConverter,
-                proxyMethod,
-                "value"
-            );
                 
             assertThrows(
                 ConversionException.class, 
-                () -> converter.convert(context)
+                () -> converter.convert(proxyMethod, "value")
             );
         }
 
@@ -549,7 +546,7 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should discard duplicate values.")
-        public void test15() {
+        void test14() {
             SetConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = 
@@ -557,17 +554,11 @@ public class SetConverterTests {
                     SetProxyInterface.class,
                     "setProperty"
                 );
-            
-            Converter<?> rootConverter = new RootConverter(converter);
 
-            ConversionContext context = 
-                new ConversionContext(
-                    rootConverter,
-                    proxyMethod,
-                    "value1,value1,value1,value1,value5" // There are 4 value1
-                );
-
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
+            ConversionResult<? extends Set<?>> result = converter.convert(
+                proxyMethod,
+                "value1,value1,value1,value1,value5" // There are 4 value1
+            );
         
             assertNotNull(result);
             Set<?> set = result.value();
@@ -590,7 +581,7 @@ public class SetConverterTests {
         @DisplayName(
             "should use provided set factory to construct sets."
         )
-        public void setFactoryTest1() {
+        void setFactoryTest1() {
             SetConverter converter = converterToTest(
                 // Uses linked set.
                 length -> new LinkedHashSet<>()
@@ -601,16 +592,11 @@ public class SetConverterTests {
                     SetProxyInterface.class,
                     "setProperty"
                 );
-            
-            Converter<?> rootConverter = new RootConverter(converter);
-            
-            ConversionContext context = new ConversionContext(
-                rootConverter,
+
+            ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
                 "value1,value2,value3,value4,value5"
             );
-
-            ConversionResult<? extends Set<?>> result = converter.convert(context);
             
             assertNotNull(result);
             Set<?> set = result.value();
@@ -631,7 +617,7 @@ public class SetConverterTests {
         @DisplayName(
             "should throw when provided set factory returns null."
         )
-        public void setFactoryTest2() {
+        void setFactoryTest2() {
             SetConverter converter = converterToTest(
                 // Returns null.
                 length -> null
@@ -642,28 +628,46 @@ public class SetConverterTests {
                     SetProxyInterface.class,
                     "setProperty"
                 );
-            
-            Converter<?> rootConverter = new RootConverter(converter);
-            
-            ConversionContext context = new ConversionContext(
-                rootConverter,
-                proxyMethod,
-                "value1,,value3,,value5"
-            );
 
             // Throws IllegalStateException if set factory returned null.
             assertThrows(
                 IllegalStateException.class, 
-                () -> converter.convert(context)
+                () -> converter.convert(proxyMethod, "value1,,value3,,value5")
             );
         }
     }
 
-    private SetConverter converterToTest() {
-        return new SetConverter();
+    private SetConverter converterToTest(ConverterProvider<?>... additionalConverters) {
+        return converterToTest(SetConverter.provider(), additionalConverters);
     }
 
-    private SetConverter converterToTest(IntFunction<Set<?>> setFactory) {
-        return new SetConverter(setFactory);
+    private SetConverter converterToTest(
+            IntFunction<Set<?>> setFactory,
+            ConverterProvider<?>... additionalConverters
+    ) { 
+        return converterToTest(SetConverter.provider(setFactory), additionalConverters);
+    }
+
+    private SetConverter converterToTest(
+            ConverterProvider<SetConverter> converterToTestProvider,
+            ConverterProvider<?>... additionalConverters
+    ) { 
+        List<ConverterProvider<?>> allProviders = new ArrayList<>(
+            Arrays.asList(additionalConverters)
+        );
+        allProviders.add(converterToTestProvider);
+        
+        ExternalizedProperties externalizedProperties = 
+            ExternalizedProperties.builder()
+                .withDefaultResolvers()
+                .converters(allProviders)
+                .build();
+
+        RootConverter rootConverter = new RootConverter(
+            externalizedProperties, 
+            allProviders
+        );
+        
+        return converterToTestProvider.get(externalizedProperties, rootConverter);
     }
 }

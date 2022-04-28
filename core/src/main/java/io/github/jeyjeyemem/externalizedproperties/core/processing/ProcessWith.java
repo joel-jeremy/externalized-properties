@@ -2,6 +2,7 @@ package io.github.jeyjeyemem.externalizedproperties.core.processing;
 
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.Processor;
+import io.github.jeyjeyemem.externalizedproperties.core.ProcessorProvider;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,7 +13,7 @@ import java.lang.annotation.Target;
  * Annotation types annotated with this will be processed using the specified processor class. 
  * 
  * @apiNote Processor classes defined in this annotation should be registered via 
- * {@link ExternalizedProperties.Builder#processors(Processor...)} or 
+ * {@link ExternalizedProperties.Builder#processors(ProcessorProvider...)} or 
  * {@link ExternalizedProperties.Builder#processors(java.util.Collection)} in
  * order for processing to take place. Otherwise, {@link ExternalizedProperties} 
  * will not be able to find an instance for the processor class will throw an 

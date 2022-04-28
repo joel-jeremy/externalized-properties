@@ -1,29 +1,12 @@
 plugins {
-    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
-    id 'com.github.kt3k.coveralls' version '2.12.0'
-    id 'me.champeau.jmh' version '0.6.6' apply false
+    id 'io.github.gradle-nexus.publish-plugin'
+    id 'com.github.kt3k.coveralls'
+    id 'me.champeau.jmh' apply false
+    id 'net.ltgt.errorprone' apply false
+    id 'net.ltgt.nullaway' apply false
 }
 
-apply plugin: 'test-report-aggregation'
-apply plugin: 'jacoco-report-aggregation'
-
-reporting {
-    reports {
-        testAggregateTestReport(AggregateTestReport) { 
-            testType = TestSuiteType.UNIT_TEST
-        }
-        testCodeCoverageReport(JacocoCoverageReport) { 
-            testType = TestSuiteType.UNIT_TEST
-        }
-    }
-}
-
-def javaProjects = subprojects.findAll { new File(it.projectDir, "src").exists() }
-
-dependencies {
-    testReportAggregation javaProjects
-    jacocoAggregation javaProjects
-}
+apply from: "${rootDir}/gradle/reporting.gradle"
 
 allprojects {
     group = 'io.github.jeyjeyemem.externalizedproperties'
@@ -37,11 +20,15 @@ allprojects {
     }
 }
 
+def javaProjects = subprojects.findAll { new File(it.projectDir, "src").exists() }
+
 configure(javaProjects) {
     apply plugin: 'java-library'
-    apply plugin: 'maven-publish'
-    apply plugin: 'signing'
-    apply plugin: 'jacoco'
+    apply plugin: 'java-test-fixtures'
+
+    apply from: "${rootDir}/gradle/dependencies.gradle"
+    apply from: "${rootDir}/gradle/code-quality.gradle"
+    apply from: "${rootDir}/gradle/publishing.gradle"
 
     testing {
         suites { 
@@ -70,9 +57,6 @@ configure(javaProjects) {
         toolchain {
             languageVersion = JavaLanguageVersion.of(11)
         }
-
-        withJavadocJar()
-        withSourcesJar()
     }
 
     compileJava {
@@ -88,81 +72,10 @@ configure(javaProjects) {
             )
         }
     }
-
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                from components.java
-
-                pom {
-                    name = jar.archiveBaseName
-                    description = project.description
-                    packaging = 'jar'
-                    url = 'https://github.com/jeyjeyemem/externalized-properties'
-
-                    licenses {
-                        license {
-                            name = 'The Apache License, Version 2.0'
-                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id = 'jeyjeyemem'
-                            name = 'Joel Jeremy M. Marquez'
-                            email = 'joeljeremy.marquez@gmail.com'
-                        }
-                    }
-
-                    scm {
-                        connection = 'scm:git:https://github.com/jeyjeyemem/externalized-properties.git'
-                        developerConnection = 'scm:git:https://github.com/jeyjeyemem/externalized-properties.git'
-                        url = 'https://github.com/jeyjeyemem/externalized-properties'
-                    }
-                }
-            }
-        }
-
-        if (project.hasProperty('github-packages')) {
-            repositories {
-                maven {
-                    url = 'https://maven.pkg.github.com/jeyjeyemem/externalized-properties'
-                    name = 'github-packages'
-                    credentials {
-                        username = System.getenv('GITHUB_ACTOR') ?: property('githubActor')
-                        password = System.getenv('GITHUB_TOKEN') ?: property('githubToken')
-                    }
-                }
-            }
-        }
-    }
-
-    if (project.hasProperty('release')) {
-        // If release property is set, do not allow publishing with SNAPSHOT dependencies.
-        Task checkSnapshotDependencies = project.tasks.create('checkSnapshotDependencies', {
-            doFirst {
-                def snapshots = project.configurations.findAll {
-                    it.canBeResolved
-                }.resolvedConfiguration.resolvedArtifacts.flatten().findAll {
-                    it.moduleVersion.id.version.endsWith('-SNAPSHOT')
-                }.unique()
-                if (!snapshots.isEmpty()) {
-                    throw new GradleException(
-                        "Cannot release with SNAPSHOT dependencies: $snapshots.moduleVersion"
-                    )
-                }
-            }
-        })
-        project.tasks.publish.dependsOn checkSnapshotDependencies
-    }
-
-    if (project.hasProperty('ossrh')) {
-        signing {
-            required rootProject.hasProperty('release')
-            sign publishing.publications.mavenJava
-        }
-    }
+    
+    // Do not publish test fixtures.
+    components.java.withVariantsFromConfiguration(configurations.testFixturesApiElements) { skip() }
+    components.java.withVariantsFromConfiguration(configurations.testFixturesRuntimeElements) { skip() }
 }
 
 if (project.hasProperty('ossrh')) {
@@ -176,17 +89,4 @@ if (project.hasProperty('ossrh')) {
             }
         }
     }
-}
-
-coveralls {
-    sourceDirs = javaProjects.sourceSets.main.allSource.srcDirs.flatten()
-    jacocoReportPath = "${buildDir}/reports/jacoco/testCodeCoveregeReport/testCodeCoveregeReport.xml"
-}
-
-tasks.named('coveralls').configure {
-    group = 'Coverage reports'
-    description = 'Uploads the aggregated coverage report to Coveralls'
-
-    dependsOn testCodeCoverageReport
-    onlyIf { System.getenv('CI') }
 }

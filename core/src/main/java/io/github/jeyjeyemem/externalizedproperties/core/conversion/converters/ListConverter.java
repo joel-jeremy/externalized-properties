@@ -1,13 +1,14 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.converters;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.Converter;
+import io.github.jeyjeyemem.externalizedproperties.core.ConverterProvider;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeUtilities;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionException;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.Delimiter;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.StripEmptyValues;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.Tokenizer;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -30,24 +31,57 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
 public class ListConverter implements Converter<List<?>> {
     private final IntFunction<List<?>> listFactory;
     private final Tokenizer tokenizer = new Tokenizer(",");
+    private final Converter<?> rootConverter;
 
     /**
      * Default constructor. 
      * Instances constructed via this constructor will use {@link ArrayList} 
      * as {@link List} or {@link Collection} implementation.
+     * 
+     * @param rootConverter The root converter.
      */
-    public ListConverter() {
-        this(ArrayList::new);
+    public ListConverter(Converter<?> rootConverter) {
+        this(rootConverter, ArrayList::new);
     }
 
     /**
      * Constructor.
      * 
+     * @param rootConverter The root converter.
      * @param listFactory The list factory. This must return a list instance
      * (optionally with given the length). This function must not return null.
      */
-    public ListConverter(IntFunction<List<?>> listFactory) {
+    public ListConverter(
+            Converter<?> rootConverter,
+            IntFunction<List<?>> listFactory
+    ) {
+        this.rootConverter = requireNonNull(rootConverter, "rootConverter");
         this.listFactory = requireNonNull(listFactory, "listFactory");
+    }
+
+    /**
+     * The {@link ConverterProvider} for {@link ListConverter}.
+     * 
+     * @return The {@link ConverterProvider} for {@link ListConverter}.
+     */
+    public static ConverterProvider<ListConverter> provider() {
+        return (externalizedProperties, rootConverter) -> 
+            new ListConverter(rootConverter);
+    }
+
+    /**
+     * The {@link ConverterProvider} for {@link ListConverter}.
+     * 
+     * @param listFactory The list factory. This must return a list instance
+     * (optionally with given the length). This function must not return null.
+     * @return The {@link ConverterProvider} for {@link ListConverter}.
+     */
+    public static ConverterProvider<ListConverter> provider(
+            IntFunction<List<?>> listFactory
+    ) {
+        requireNonNull(listFactory, "listFactory");
+        return (externalizedProperties, rootConverter) -> 
+            new ListConverter(rootConverter, listFactory);
     }
 
     /** {@inheritDoc} */
@@ -59,10 +93,12 @@ public class ListConverter implements Converter<List<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<? extends List<?>> convert(ConversionContext context) {
-        requireNonNull(context, "context");
-        
-        Type[] genericTypeParams = context.targetTypeGenericTypeParameters();
+    public ConversionResult<? extends List<?>> convert(
+            ProxyMethod proxyMethod,
+            String valueToConvert,
+            Type targetType
+    ) { 
+        Type[] genericTypeParams = TypeUtilities.getTypeParameters(targetType);
 
         // Assume initially as List<String> when target type has no
         // generic type parameters.
@@ -72,12 +108,11 @@ public class ListConverter implements Converter<List<?>> {
             targetListType = throwIfTypeVariable(genericTypeParams[0]);
         }
 
-        String propertyValue = context.value();
-        if (propertyValue.isEmpty()) {
+        if (valueToConvert.isEmpty()) {
             return ConversionResult.of(newList(0));
         }
 
-        final String[] values = tokenizer.tokenizeValue(context);
+        final String[] values = tokenizer.tokenizeValue(proxyMethod, valueToConvert);
         
         Class<?> rawTargetListType = TypeUtilities.getRawType(targetListType);
 
@@ -89,7 +124,7 @@ public class ListConverter implements Converter<List<?>> {
 
         return ConversionResult.of(
             convertValuesToListType(
-                context,
+                proxyMethod,
                 values,
                 targetListType
             )
@@ -97,15 +132,17 @@ public class ListConverter implements Converter<List<?>> {
     }
 
     private List<?> convertValuesToListType(
-            ConversionContext context,
+            ProxyMethod proxyMethod,
             String[] values,
             Type listType
     ) {
         List<Object> convertedList = newList(values.length);
-
+        
         for (int i = 0; i < values.length; i++) {
-            ConversionResult<?> converted = context.converter().convert(
-                context.with(values[i], listType)
+            ConversionResult<?> converted = rootConverter.convert(
+                proxyMethod,
+                values[i], 
+                listType
             );
             convertedList.add(converted.value());
         }

@@ -1,10 +1,11 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.converters;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.Converter;
+import io.github.jeyjeyemem.externalizedproperties.core.ConverterProvider;
 import io.github.jeyjeyemem.externalizedproperties.core.TypeUtilities;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionException;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
@@ -15,6 +16,27 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  * Supports conversion of values to an {@link Optional} instance.
  */
 public class OptionalConverter implements Converter<Optional<?>> {
+
+    private final Converter<?> rootConverter;
+
+    /**
+     * Constructor.
+     * 
+     * @param rootConverter The root converter.
+     */
+    public OptionalConverter(Converter<?> rootConverter) {
+        this.rootConverter = requireNonNull(rootConverter, "rootConverter");
+    }
+
+    /**
+     * The {@link ConverterProvider} for {@link OptionalConverter}.
+     * 
+     * @return The {@link ConverterProvider} for {@link OptionalConverter}.
+     */
+    public static ConverterProvider<OptionalConverter> provider() {
+        return (externalizedProperties, rootConverter) -> 
+            new OptionalConverter(rootConverter);
+    }
     
     /** {@inheritDoc} */
     @Override
@@ -24,10 +46,12 @@ public class OptionalConverter implements Converter<Optional<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<? extends Optional<?>> convert(ConversionContext context) {
-        requireNonNull(context, "context");
-
-        Type[] genericTypeParams = context.targetTypeGenericTypeParameters();
+    public ConversionResult<? extends Optional<?>> convert(
+            ProxyMethod proxyMethod,
+            String valueToConvert,
+            Type targetType
+    ) { 
+        Type[] genericTypeParams = TypeUtilities.getTypeParameters(targetType);
         
         // Assume initially as Optional of string type.
         Type targetOptionalType = String.class;
@@ -36,8 +60,7 @@ public class OptionalConverter implements Converter<Optional<?>> {
             targetOptionalType = throwIfTypeVariable(genericTypeParams[0]);
         }
 
-        String propertyValue = context.value();
-        if (propertyValue.isEmpty()) {
+        if (valueToConvert.isEmpty()) {
             return ConversionResult.of(Optional.empty());
         }
 
@@ -46,25 +69,27 @@ public class OptionalConverter implements Converter<Optional<?>> {
         // If Optional<String> or Optional<Object>, return String value.
         if (String.class.equals(rawTargetOptionalType) || 
                 Object.class.equals(rawTargetOptionalType)) {
-            return ConversionResult.of(Optional.of(propertyValue));
+            return ConversionResult.of(Optional.of(valueToConvert));
         }
 
         return ConversionResult.of(
             convertToOptionalType(
-                context,
-                propertyValue,
+                proxyMethod,
+                valueToConvert,
                 targetOptionalType
             )
         );
     }
 
     private Optional<?> convertToOptionalType(
-            ConversionContext context,
-            String value,
+            ProxyMethod proxyMethod,
+            String valueToConvert,
             Type optionalGenericTypeParameter
     ) {
-        ConversionResult<?> converted = context.converter().convert(
-            context.with(value, optionalGenericTypeParameter)
+        ConversionResult<?> converted = rootConverter.convert(
+            proxyMethod, 
+            valueToConvert, 
+            optionalGenericTypeParameter
         );
         // Convert property and wrap in Optional.
         return Optional.ofNullable(converted.value());

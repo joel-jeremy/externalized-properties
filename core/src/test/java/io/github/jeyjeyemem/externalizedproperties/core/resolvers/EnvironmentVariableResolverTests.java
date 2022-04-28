@@ -1,11 +1,13 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverProvider;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethods;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,12 +17,38 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EnvironmentVariableResolverTests {
     @Nested
+    class ProviderMethod {
+        @Test
+        @DisplayName("should not return null.")
+        public void test1() {
+            ResolverProvider<EnvironmentVariableResolver> provider = 
+                EnvironmentVariableResolver.provider();
+
+            assertNotNull(provider);
+        }
+
+        @Test
+        @DisplayName("should return an instance on get.")
+        public void test2() {
+            ResolverProvider<EnvironmentVariableResolver> provider = 
+                EnvironmentVariableResolver.provider();
+
+            assertNotNull(
+                provider.get(ExternalizedProperties.builder().withDefaults().build())
+            );
+        }
+    }
+    
+    @Nested
     class ResolveMethod {
         @Test
         @DisplayName("should resolve property value from environment variables.")
-        public void test1() {
+        void test1() {
             EnvironmentVariableResolver resolver = resolverToTest();
+            ProxyMethod proxyMethod = ProxyMethods.path();
+
             Optional<String> result = resolver.resolve(
+                proxyMethod,
                 "PATH"
             );
 
@@ -36,105 +64,46 @@ public class EnvironmentVariableResolverTests {
         @DisplayName(
             "should return empty Optional when environment variable is not found."
         )
-        public void test2() {
+        void test2() {
             EnvironmentVariableResolver resolver = resolverToTest();
+            ProxyMethod proxyMethod = ProxyMethods.property();
+
             Optional<String> result = resolver.resolve(
-                "NON_EXISTING_ENVVAR"
+                proxyMethod,
+                "property"
             );
 
             assertNotNull(result);
             assertFalse(result.isPresent());
         }
-    }
-
-    @Nested
-    class ResolveMethodWithVarArgsOverload {
-        @Test
-        @DisplayName("should resolve property values from environment variables.")
-        public void test1() {
-            EnvironmentVariableResolver resolver = resolverToTest();
-            ResolverResult result = resolver.resolve(
-                "PATH",
-                "HOME"
-            );
-
-            assertTrue(result.hasResolvedProperties());
-            assertFalse(result.hasUnresolvedProperties());
-
-            assertEquals(
-                System.getenv("PATH"), 
-                result.findRequiredProperty("PATH")
-            );
-
-            assertEquals(
-                System.getenv("HOME"), 
-                result.findRequiredProperty("HOME")
-            );
-        }
 
         @Test
         @DisplayName(
-            "should return result with unresolved properties when " + 
-            "environment variable is not found."
+            "should attempt to resolve environment variable by formatting " + 
+            "property name to environment variable format."
         )
-        public void test2() {
+        void test3() {
             EnvironmentVariableResolver resolver = resolverToTest();
-            ResolverResult result = resolver.resolve(
-                "NON_EXISTING_ENVVAR1",
-                "NON_EXISTING_ENVVAR2"
-            );
-            
-            assertTrue(result.hasUnresolvedProperties());
-            assertTrue(result.unresolvedPropertyNames().contains("NON_EXISTING_ENVVAR1"));
-            assertTrue(result.unresolvedPropertyNames().contains("NON_EXISTING_ENVVAR2"));
-        }
-    }
+            ProxyMethod proxyMethod = ProxyMethods.javaHome();
 
-    @Nested
-    class ResolveMethodWithCollectionOverload {
-        @Test
-        @DisplayName("should resolve property values from environment variables.")
-        public void test1() {
-            EnvironmentVariableResolver resolver = resolverToTest();
-            ResolverResult result = resolver.resolve(
-                Arrays.asList(
-                    "PATH",
-                    "HOME"
-                )
+            Optional<String> result1 = resolver.resolve(
+                proxyMethod,
+                // java.home should be converted to JAVA_HOME
+                "java.home"
             );
 
-            assertTrue(result.hasResolvedProperties());
-            assertFalse(result.hasUnresolvedProperties());
-
-            assertEquals(
-                System.getenv("PATH"), 
-                result.findRequiredProperty("PATH")
+            Optional<String> result2 = resolver.resolve(
+                proxyMethod,
+                // java-home should be converted to JAVA_HOME
+                "java-home"  
             );
 
-            assertEquals(
-                System.getenv("HOME"), 
-                result.findRequiredProperty("HOME")
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should return result with unresolved properties when " +
-            "environment variable is not found."
-        )
-        public void test2() {
-            EnvironmentVariableResolver resolver = resolverToTest();
-            ResolverResult result = resolver.resolve(
-                Arrays.asList(
-                    "NON_EXISTING_ENVVAR1",
-                    "NON_EXISTING_ENVVAR2"
-                )
-            );
-            
-            assertFalse(result.hasResolvedProperties());
-            assertTrue(result.hasUnresolvedProperties());
-            assertTrue(result.unresolvedPropertyNames().contains("NON_EXISTING_ENVVAR1"));
-            assertTrue(result.unresolvedPropertyNames().contains("NON_EXISTING_ENVVAR2"));
+            assertNotNull(result1);
+            assertNotNull(result2);
+            assertTrue(result1.isPresent());
+            assertTrue(result2.isPresent());
+            assertEquals(System.getenv("JAVA_HOME"), result1.get());
+            assertEquals(System.getenv("JAVA_HOME"), result2.get());
         }
     }
 

@@ -1,20 +1,15 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperty;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.RootConverter;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.processing.RootProcessor;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.DefaultResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubCacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubInvocationHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.DefaultValueProxyInterface;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.JavaPropertiesProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.SystemPropertiesProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.NoAnnotationProxyInterface;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.NoEagerLoadingProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.StubCacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.StubInvocationHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,10 +38,7 @@ public class EagerLoadingInvocationHandlerTests {
                 () -> EagerLoadingInvocationHandler.eagerLoad(
                     null,  
                     new StubCacheStrategy<>(),
-                    new DefaultResolver(),
-                    new RootConverter(),
-                    new RootProcessor(),
-                    JavaPropertiesProxyInterface.class
+                    SystemPropertiesProxyInterface.class
                 )
             );
         }
@@ -59,73 +51,19 @@ public class EagerLoadingInvocationHandlerTests {
                 () -> EagerLoadingInvocationHandler.eagerLoad(
                     new StubInvocationHandler(), 
                     null,
-                    new StubResolver(),
-                    new RootConverter(),
-                    new RootProcessor(),
-                    JavaPropertiesProxyInterface.class
-                )
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when resolver argument is null")
-        void test3() {
-            assertThrows(
-                IllegalArgumentException.class,
-                () -> EagerLoadingInvocationHandler.eagerLoad(
-                    new StubInvocationHandler(), 
-                    new StubCacheStrategy<>(), 
-                    null,
-                    new RootConverter(),
-                    new RootProcessor(),
-                    JavaPropertiesProxyInterface.class
-                )
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when converter argument is null")
-        void test4() {
-            assertThrows(
-                IllegalArgumentException.class,
-                () -> EagerLoadingInvocationHandler.eagerLoad(
-                    new StubInvocationHandler(), 
-                    new StubCacheStrategy<>(), 
-                    new StubResolver(),
-                    null,
-                    new RootProcessor(),
-                    JavaPropertiesProxyInterface.class
-                )
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when converter argument is null")
-        void test5() {
-            assertThrows(
-                IllegalArgumentException.class,
-                () -> EagerLoadingInvocationHandler.eagerLoad(
-                    new StubInvocationHandler(), 
-                    new StubCacheStrategy<>(), 
-                    new StubResolver(),
-                    new RootConverter(),
-                    null,
-                    JavaPropertiesProxyInterface.class
+                    SystemPropertiesProxyInterface.class
                 )
             );
         }
 
         @Test
         @DisplayName("should throw when proxy interface argument is null")
-        void test6() {
+        void test5() {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> EagerLoadingInvocationHandler.eagerLoad(
                     new StubInvocationHandler(), 
-                    new StubCacheStrategy<>(), 
-                    new StubResolver(),
-                    new RootConverter(),
-                    new RootProcessor(),
+                    new StubCacheStrategy<>(),
                     null
                 )
             );
@@ -136,20 +74,17 @@ public class EagerLoadingInvocationHandlerTests {
             "should eager load properties whose proxy interface methods " +
             "are annotated with @ExternalizedProperty and have no arguments"
         )
-        void test7() {
+        void test6() {
             CacheStrategy<Method, Object> cacheStrategy = 
                 new StubCacheStrategy<>();
 
             // Eager loads properties.
-            Class<JavaPropertiesProxyInterface> proxyInterface = 
-                JavaPropertiesProxyInterface.class;
+            Class<SystemPropertiesProxyInterface> proxyInterface = 
+                SystemPropertiesProxyInterface.class;
             
             EagerLoadingInvocationHandler.eagerLoad(
                 new StubInvocationHandler(),
                 cacheStrategy,
-                new StubResolver(),
-                new RootConverter(),
-                new RootProcessor(),
                 proxyInterface
             );
 
@@ -168,7 +103,7 @@ public class EagerLoadingInvocationHandlerTests {
             "should eager load properties whose proxy interface methods " +
             "are not annotated with @ExternalizedProperty but are default interface methods"
         )
-        void test8() {
+        void test7() {
             CacheStrategy<Method, Object> cacheStrategy = 
                 new StubCacheStrategy<>();
 
@@ -178,9 +113,6 @@ public class EagerLoadingInvocationHandlerTests {
             EagerLoadingInvocationHandler.eagerLoad(
                 new StubInvocationHandler(),
                 cacheStrategy,
-                new StubResolver(),
-                new RootConverter(),
-                new RootProcessor(),
                 proxyInterface
             );
 
@@ -197,7 +129,7 @@ public class EagerLoadingInvocationHandlerTests {
             "should not eager load properties whose proxy interface methods " + 
             "have no @ExternalizedProperty annotation"
         )
-        void test9() {
+        void test8() {
             CacheStrategy<Method, Object> cacheStrategy = 
                 new StubCacheStrategy<>();
 
@@ -208,9 +140,6 @@ public class EagerLoadingInvocationHandlerTests {
             EagerLoadingInvocationHandler.eagerLoad(
                 new StubInvocationHandler(),
                 cacheStrategy,
-                new StubResolver(),
-                new RootConverter(),
-                new RootProcessor(),
                 proxyInterface
             );
 
@@ -227,7 +156,7 @@ public class EagerLoadingInvocationHandlerTests {
         @DisplayName(
             "should not eager load properties whose proxy interface methods have arguments"
         )
-        void test10() {
+        void test9() {
             CacheStrategy<Method, Object> cacheStrategy = 
                 new StubCacheStrategy<>();
 
@@ -238,9 +167,6 @@ public class EagerLoadingInvocationHandlerTests {
             EagerLoadingInvocationHandler.eagerLoad(
                 new StubInvocationHandler(),
                 cacheStrategy,
-                new StubResolver(),
-                new RootConverter(),
-                new RootProcessor(),
                 proxyInterface
             );
 
@@ -256,22 +182,26 @@ public class EagerLoadingInvocationHandlerTests {
 
         @Test
         @DisplayName(
-            "should throw when a property cannot be eagerly loaded"
+            "should thrown when decorated invocation handler throws during eager loading"
         )
-        void test11() {
-            StubResolver nullResolver = new StubResolver(
-                StubResolver.NULL_VALUE_RESOLVER
+        void test10() throws Throwable {
+            Class<DefaultValueProxyInterface> proxyInterface = 
+                DefaultValueProxyInterface.class;
+
+            // Always return null.
+            StubInvocationHandler decorated = new StubInvocationHandler(
+                StubInvocationHandler.THROWING_HANDLER
             );
 
+            // No cached results.
+            CacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
+            
             assertThrows(
                 ExternalizedPropertiesException.class, 
                 () -> EagerLoadingInvocationHandler.eagerLoad(
-                    new StubInvocationHandler(),
-                    new StubCacheStrategy<>(),
-                    nullResolver,
-                    new RootConverter(),
-                    new RootProcessor(),
-                    JavaPropertiesProxyInterface.class
+                    decorated,
+                    cacheStrategy,
+                    proxyInterface
                 )
             );
         }
@@ -282,8 +212,8 @@ public class EagerLoadingInvocationHandlerTests {
         @Test
         @DisplayName("should return eagerly loaded property values")
         void test1() throws Throwable {
-            Class<JavaPropertiesProxyInterface> proxyInterface = 
-                JavaPropertiesProxyInterface.class;
+            Class<SystemPropertiesProxyInterface> proxyInterface = 
+                SystemPropertiesProxyInterface.class;
 
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
@@ -294,27 +224,16 @@ public class EagerLoadingInvocationHandlerTests {
             // Add to cache.
             cacheStrategy.cache(proxyMethod, "cached-value");
 
-            StubResolver resolver = new StubResolver();
-
-            ExternalizedProperties externalizedProperties = 
-                ExternalizedProperties.builder()
-                    .resolvers(resolver)
-                    .build();
-
             // Always return the same string for any invoked proxy method.
             StubInvocationHandler decorated = new StubInvocationHandler(
                 i -> "value-from-decorated-handler"
             );
 
-
             // Eager loads properties.
             EagerLoadingInvocationHandler invocationHandler = 
                 EagerLoadingInvocationHandler.eagerLoad(
                     decorated, 
-                    cacheStrategy, 
-                    externalizedProperties.resolver(),
-                    externalizedProperties.converter(),
-                    externalizedProperties.processor(),
+                    cacheStrategy,
                     proxyInterface
                 );
             
@@ -352,13 +271,6 @@ public class EagerLoadingInvocationHandlerTests {
             // No cached results.
             CacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
 
-            StubResolver resolver = new StubResolver();
-
-            ExternalizedProperties externalizedProperties = 
-                ExternalizedProperties.builder()
-                    .resolvers(resolver)
-                    .build();
-
             // Always return the same string for any invoked proxy method.
             StubInvocationHandler decorated = new StubInvocationHandler(
                 i -> "value-from-decorated-handler"
@@ -368,9 +280,6 @@ public class EagerLoadingInvocationHandlerTests {
                 EagerLoadingInvocationHandler.eagerLoad(
                     decorated,
                     cacheStrategy,
-                    externalizedProperties.resolver(),
-                    externalizedProperties.converter(),
-                    externalizedProperties.processor(),
                     proxyInterface
                 );
             
@@ -389,7 +298,7 @@ public class EagerLoadingInvocationHandlerTests {
 
         @Test
         @DisplayName(
-            "should return null" + 
+            "should return null " + 
             "when property could not be resolved from decorated invocation handler"
         )
         void test3() throws Throwable {
@@ -412,22 +321,10 @@ public class EagerLoadingInvocationHandlerTests {
             // No cached results.
             CacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
 
-            StubResolver resolver = new StubResolver(
-                StubResolver.NULL_VALUE_RESOLVER
-            );
-
-            ExternalizedProperties externalizedProperties = 
-                ExternalizedProperties.builder()
-                    .resolvers(resolver)
-                    .build();
-
             EagerLoadingInvocationHandler invocationHandler = 
                 EagerLoadingInvocationHandler.eagerLoad(
                     decorated,
                     cacheStrategy,
-                    externalizedProperties.resolver(),
-                    externalizedProperties.converter(),
-                    externalizedProperties.processor(),
                     proxyInterface
                 );
             

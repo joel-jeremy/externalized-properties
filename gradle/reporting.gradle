@@ -1,0 +1,36 @@
+apply plugin: 'test-report-aggregation'
+apply plugin: 'jacoco-report-aggregation'
+
+reporting {
+    reports {
+        testAggregateTestReport(AggregateTestReport) { 
+            testType = TestSuiteType.UNIT_TEST
+        }
+        testCodeCoverageReport(JacocoCoverageReport) { 
+            testType = TestSuiteType.UNIT_TEST
+        }
+    }
+}
+
+def javaProjects = subprojects.findAll { new File(it.projectDir, "src").exists() }
+configure(javaProjects) {
+    apply plugin: 'java-library'
+}
+
+dependencies {
+    testReportAggregation javaProjects
+    jacocoAggregation javaProjects
+}
+
+coveralls {
+    sourceDirs = javaProjects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "${buildDir}/reports/jacoco/testCodeCoveregeReport/testCodeCoveregeReport.xml"
+}
+
+tasks.named('coveralls').configure {
+    group = 'Coverage reports'
+    description = 'Uploads the aggregated coverage report to Coveralls'
+
+    dependsOn testCodeCoverageReport
+    onlyIf { System.getenv('CI') }
+}

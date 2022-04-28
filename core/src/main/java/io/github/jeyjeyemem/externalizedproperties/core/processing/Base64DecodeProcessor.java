@@ -1,7 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.processing;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ProcessingContext;
 import io.github.jeyjeyemem.externalizedproperties.core.Processor;
+import io.github.jeyjeyemem.externalizedproperties.core.ProcessorProvider;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.nio.charset.Charset;
 import java.util.Base64;
@@ -31,35 +32,42 @@ public class Base64DecodeProcessor implements Processor {
         this.defaultDecoder = requireNonNull(defaultDecoder, "defaultDecoder");
     }
 
+    /**
+     * The {@link ProcessorProvider} for {@link Base64DecodeProcessor}.
+     * 
+     * @return The {@link ProcessorProvider} for {@link Base64DecodeProcessor}.
+     */
+    public static ProcessorProvider<Base64DecodeProcessor> provider() {
+        return externalizedProperties -> new Base64DecodeProcessor();
+    }
+
     /** {@inheritDoc} */
     @Override
-    public String process(ProcessingContext context) {
-        requireNonNull(context, "context");
-
+    public String process(ProxyMethod proxyMethod, String valueToProcess) {
         try {
-            byte[] bytes = context.value().getBytes();
-            Base64.Decoder decoderToUse = determineDecoder(context);
-            Charset charset = determineCharset(context);
+            byte[] bytes = valueToProcess.getBytes(Charset.defaultCharset());
+            Base64.Decoder decoderToUse = determineDecoder(proxyMethod);
+            Charset charset = determineCharset(proxyMethod);
             byte[] decoded = decoderToUse.decode(bytes);
             return new String(decoded, charset);
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             throw new ProcessingException(
                 "Exception occurred while attempting to decode value using Base64: " +
-                context.value(),
+                valueToProcess,
                 ex
             );
         }
     }
 
-    private Charset determineCharset(ProcessingContext context) {
-        return context.proxyMethod().findAnnotation(Base64Decode.class)
+    private Charset determineCharset(ProxyMethod proxyMethod) {
+        return proxyMethod.findAnnotation(Base64Decode.class)
             .filter(b64 -> !b64.charset().isEmpty())
             .map(b64 -> Charset.forName(b64.charset()))
             .orElse(Charset.defaultCharset());
     }
 
-    private Base64.Decoder determineDecoder(ProcessingContext context) {
-        String encoding = context.proxyMethod().findAnnotation(Base64Decode.class)
+    private Base64.Decoder determineDecoder(ProxyMethod proxyMethod) {
+        String encoding = proxyMethod.findAnnotation(Base64Decode.class)
             .map(b64 -> b64.encoding())
             .orElse("");
 

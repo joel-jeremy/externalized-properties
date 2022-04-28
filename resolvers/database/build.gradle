@@ -2,6 +2,7 @@ description = 'Externalized Properties database property resolver.'
 
 dependencies {
     implementation project(':core')
+    testImplementation(testFixtures(project(":core")))
     testImplementation 'com.h2database:h2:2.1.210'
 }
 
@@ -19,6 +20,7 @@ testing {
             dependencies {
                 implementation project
                 implementation project(':core')
+                implementation(project.dependencies.testFixtures(project))
                 // implementation platform('org.testcontainers:testcontainers-bom:1.16.3')
                 implementation 'org.testcontainers:junit-jupiter:1.16.3'
                 implementation 'org.testcontainers:postgresql:1.16.3'

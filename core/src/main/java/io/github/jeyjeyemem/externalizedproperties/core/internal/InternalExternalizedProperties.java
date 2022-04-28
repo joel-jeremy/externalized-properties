@@ -1,17 +1,14 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal;
 
-import io.github.jeyjeyemem.externalizedproperties.core.Converter;
 import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
-import io.github.jeyjeyemem.externalizedproperties.core.Processor;
-import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
-import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperty;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverProvider;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.RootConverter;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.resolvers.RootResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.InvocationHandlerFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -20,36 +17,28 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  */
 public class InternalExternalizedProperties implements ExternalizedProperties {
 
-    private final Resolver resolver;
-    private final Processor processor;
-    private final Converter<?> converter;
-    private final VariableExpander variableExpander;
-    private final InvocationHandlerFactory invocationHandlerFactory;
+    private final ResolverProvider<RootResolver> rootResolverProvider;
+    private final RootConverter.Provider rootConverterProvider;
+    private final InvocationHandlerFactory<?> invocationHandlerFactory;
 
     /**
      * Constructor.
      * 
-     * @param resolver The resolver.
-     * @param processor The processor.
-     * @param converter The converter.
-     * @param variableExpander The variable expander.
+     * @param rootResolverProvider The root resolver provider.
+     * @param rootConverterProvider The root converter provider.
      * @param invocationHandlerFactory The invocation handler factory.
      */
     public InternalExternalizedProperties(
-            Resolver resolver,
-            Processor processor,
-            Converter<?> converter,
-            VariableExpander variableExpander,
-            InvocationHandlerFactory invocationHandlerFactory
+            ResolverProvider<RootResolver> rootResolverProvider,
+            RootConverter.Provider rootConverterProvider,
+            InvocationHandlerFactory<?> invocationHandlerFactory
     ) {
-        this.resolver = requireNonNull(resolver, "resolver");
-        this.converter = requireNonNull(converter, "converter");
-        this.processor = requireNonNull(processor, "processor");
-        this.variableExpander = requireNonNull(variableExpander, "variableExpander");
-        this.invocationHandlerFactory = requireNonNull(
-            invocationHandlerFactory, 
-            "invocationHandlerFactory"
-        );
+        requireNonNull(rootResolverProvider, "rootResolverProvider");
+        requireNonNull(rootConverterProvider, "rootConverterProvider");
+        requireNonNull(invocationHandlerFactory, "invocationHandlerFactory");
+        this.rootResolverProvider = ResolverProvider.memoize(rootResolverProvider);
+        this.rootConverterProvider = RootConverter.Provider.memoize(rootConverterProvider);
+        this.invocationHandlerFactory = invocationHandlerFactory;
     }
 
     /** {@inheritDoc} */
@@ -66,53 +55,58 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         requireNonNull(proxyInterface, "proxyInterface");
         requireNonNull(classLoader, "classLoader");
 
+        // Validate everything at init time so we can safely skip checks
+        // later at resolve time for performance.
         validate(proxyInterface);
         
-        return (T) Proxy.newProxyInstance(
+        return (T)Proxy.newProxyInstance(
             classLoader, 
             new Class<?>[] { proxyInterface },
-            invocationHandlerFactory.createInvocationHandler(this, proxyInterface)
+            invocationHandlerFactory.create(
+                rootResolverProvider.get(this), 
+                rootConverterProvider.get(this), 
+                proxyInterface
+            )
         );
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Resolver resolver() {
-        return resolver;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Processor processor() {
-        return processor;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Converter<?> converter() {
-        return converter;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public VariableExpander variableExpander() {
-        return variableExpander;
-    }
-
     private <T> void validate(Class<T> proxyInterface) {
-        requireNoVoidReturningMethods(proxyInterface);
+        for (Method proxyMethod : proxyInterface.getMethods()) {
+            throwIfVoidReturnType(proxyMethod);
+            throwIfInvalidMethodSignature(proxyMethod);
+        }
     }
 
-    private <T> void requireNoVoidReturningMethods(Class<T> proxyInterface) {
-        List<String> voidReturningMethods = Arrays.stream(proxyInterface.getMethods())
-            .filter(m -> m.getReturnType().equals(Void.TYPE))
-            .map(Method::toGenericString)
-            .collect(Collectors.toList());
-
-        if (!voidReturningMethods.isEmpty()) {
+    private <T> void throwIfVoidReturnType(Method proxyMethod) {
+        if (proxyMethod.getReturnType().equals(Void.TYPE) || 
+            proxyMethod.getReturnType().equals(Void.class)
+        ) {
             throw new IllegalArgumentException(
-                "Proxy interface methods must not return void. " +
-                "Invalid Methods: " + voidReturningMethods
+                "Proxy methods must not have void return type."
+            );
+        }
+    }
+
+    private <T> void throwIfInvalidMethodSignature(Method proxyMethod) {
+        ExternalizedProperty externalizedProperty = 
+            proxyMethod.getAnnotation(ExternalizedProperty.class);
+        // No need to validate method signature if method is not annotated with 
+        // @ExternalizedProperty or ExternalizedProperty.value() is specified.
+        if (externalizedProperty == null || !"".equals(externalizedProperty.value())) {
+            return;
+        }
+
+        Class<?>[] parameterTypes = proxyMethod.getParameterTypes();
+        if (parameterTypes.length != 1) {
+            throw new IllegalArgumentException(
+                "Proxy method must have a single parameter."
+            );
+        }
+
+        Class<?> parameterType = parameterTypes[0];
+        if (!String.class.equals(parameterType)) {
+            throw new IllegalArgumentException(
+                "Proxy method must have a single String parameter."
             );
         }
     }

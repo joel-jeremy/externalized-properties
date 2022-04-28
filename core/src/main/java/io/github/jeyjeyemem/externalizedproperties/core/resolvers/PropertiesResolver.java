@@ -1,12 +1,12 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
-import io.github.jeyjeyemem.externalizedproperties.core.ResolverResult;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverProvider;
 
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -48,8 +48,7 @@ public class PropertiesResolver extends MapResolver {
      * @param properties The source properties instance to build from.
      * @param unresolvedPropertyHandler Any properties not found in the source properties will tried 
      * to be resolved via this handler. This should accept a property name and return the property value 
-     * for the given property name. {@code null} return values are allowed but will be discarded when 
-     * building the {@link ResolverResult}.
+     * for the given property name. {@code null} return values are allowed but will be discarded.
      */
     public PropertiesResolver(
             Properties properties, 
@@ -61,7 +60,55 @@ public class PropertiesResolver extends MapResolver {
         );
     }
 
-    private static ConcurrentMap<String, String> ignoreNonStringProperties(
+    /**
+     * The {@link ResolverProvider} for {@link PropertiesResolver}.
+     * 
+     * @implNote Only properties with keys or values that are of type {@link String}
+     * are supported. Properties that do not meet this criteria will be ignored.
+     * 
+     * @implNote The {@link Properties} keys and values will be copied over to an internal 
+     * {@link ConcurrentHashMap} for thread safety and to avoid the performance penalty of 
+     * {@link Properties}/{@link Hashtable} synchronization.
+     * 
+     * @param properties The source properties instance to build from.
+     * @return The {@link ResolverProvider} for {@link PropertiesResolver}.
+     */
+    public static ResolverProvider<PropertiesResolver> provider(
+            Properties properties 
+    ) {
+        requireNonNull(properties, "properties");
+        return externalizedProperties -> new PropertiesResolver(properties);
+    }
+
+    /**
+     * The {@link ResolverProvider} for {@link PropertiesResolver}.
+     * 
+     * @implNote Only properties with keys or values that are of type {@link String}
+     * are supported. Properties that do not meet this criteria will be ignored.
+     * 
+     * @implNote The {@link Properties} keys and values will be copied over to an internal 
+     * {@link ConcurrentHashMap} for thread safety and to avoid the performance penalty of 
+     * {@link Properties}/{@link Hashtable} synchronization.
+     * 
+     * @param properties The source properties instance to build from.
+     * @param unresolvedPropertyHandler Any properties not found in the source properties will tried 
+     * to be resolved via this handler. This should accept a property name and return the property value 
+     * for the given property name. {@code null} return values are allowed but will be discarded.
+     * @return The {@link ResolverProvider} for {@link MapResolver}.
+     */
+    public static ResolverProvider<PropertiesResolver> provider(
+            Properties properties, 
+            Function<String, String> unresolvedPropertyHandler
+    ) {
+        requireNonNull(properties, "properties");
+        requireNonNull(unresolvedPropertyHandler, "unresolvedPropertyHandler");
+        return externalizedProperties -> new PropertiesResolver(
+            properties,
+            unresolvedPropertyHandler
+        );
+    }
+
+    private static Map<String, String> ignoreNonStringProperties(
             Properties properties
     ) {
         return properties.entrySet()
@@ -70,7 +117,7 @@ public class PropertiesResolver extends MapResolver {
                 e.getKey() instanceof String &&
                 e.getValue() instanceof String
             )
-            .collect(Collectors.toConcurrentMap(
+            .collect(Collectors.toMap(
                 e -> (String)e.getKey(), 
                 e -> (String)e.getValue()
             ));

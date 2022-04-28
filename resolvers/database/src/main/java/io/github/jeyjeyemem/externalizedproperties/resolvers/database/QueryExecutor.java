@@ -3,7 +3,7 @@ package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 
 /**
  * Runs the query to retrieve the specified properties from database.
@@ -18,10 +18,10 @@ public interface QueryExecutor {
      * 
      * @param connection The JDBC connection.
      * @param propertyNamesToResolve The names of the properties to resolve.
-     * @return The list of {@link DatabaseProperty}.
+     * @return The map of resolved database properties.
      * @throws SQLException if a database-related exception occurred.
      */
-    List<DatabaseProperty> queryProperties(
+    Map<String, String> queryProperties(
         Connection connection, 
         Collection<String> propertyNamesToResolve
     ) throws SQLException;

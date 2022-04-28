@@ -1,9 +1,10 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.proxy;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubCacheStrategy;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.StubInvocationHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedPropertiesException;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.StubCacheStrategy;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.StubInvocationHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,8 @@ public class CachingInvocationHandlerTests {
                 IllegalArgumentException.class, 
                 () -> new CachingInvocationHandler(
                     null,
-                    new StubCacheStrategy<>()
+                    new StubCacheStrategy<>(),
+                    StubProxyInterface.class
                 )
             );
         }
@@ -41,6 +43,20 @@ public class CachingInvocationHandlerTests {
                 IllegalArgumentException.class, 
                 () -> new CachingInvocationHandler(
                     new StubInvocationHandler(),
+                    null,
+                    StubProxyInterface.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when proxy interface argument is null")
+        public void test3() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> new CachingInvocationHandler(
+                    new StubInvocationHandler(),
+                    new StubCacheStrategy<>(),
                     null
                 )
             );
@@ -66,7 +82,8 @@ public class CachingInvocationHandlerTests {
             CachingInvocationHandler cachingInvocationHandler = 
                 new CachingInvocationHandler(
                     decorated,
-                    cacheStrategy
+                    cacheStrategy,
+                    StubProxyInterface.class
                 );
             
             Object result = cachingInvocationHandler.invoke(
@@ -102,7 +119,8 @@ public class CachingInvocationHandlerTests {
             CachingInvocationHandler cachingInvocationHandler = 
                 new CachingInvocationHandler(
                     decorated,
-                    cacheStrategy
+                    cacheStrategy,
+                    StubProxyInterface.class
                 );
             
             Object result = cachingInvocationHandler.invoke(
@@ -137,7 +155,8 @@ public class CachingInvocationHandlerTests {
             CachingInvocationHandler cachingInvocationHandler = 
                 new CachingInvocationHandler(
                     decorated,
-                    cacheStrategy
+                    cacheStrategy,
+                    StubProxyInterface.class
                 );
             
             Object result = cachingInvocationHandler.invoke(
@@ -150,24 +169,50 @@ public class CachingInvocationHandlerTests {
             // Not cached.
             assertFalse(cacheStrategy.get(stubMethod).isPresent());
         }
+        @Test
+        @DisplayName("should throw when decorated invocation handler throws")
+        public void test4() throws Throwable {
+            Method stubMethod = stubMethod();
 
-        private StubProxyInterface stubProxy(StubInvocationHandler decorated) {
-            return (StubProxyInterface)Proxy.newProxyInstance(
-                StubProxyInterface.class.getClassLoader(), 
-                new Class<?>[] { StubProxyInterface.class }, 
-                decorated
+            // Always return the same string for any invoked proxy method.
+            StubInvocationHandler decorated = new StubInvocationHandler(
+                StubInvocationHandler.THROWING_HANDLER
             );
-        }
 
-        private Method stubMethod() {
-            return ProxyMethodUtils.getMethod(
-                StubProxyInterface.class, 
-                "methodName"
+            CachingInvocationHandler cachingInvocationHandler = 
+                new CachingInvocationHandler(
+                    decorated,
+                    new StubCacheStrategy<>(),
+                    StubProxyInterface.class
+                );
+            
+            assertThrows(
+            ExternalizedPropertiesException.class, 
+                () ->cachingInvocationHandler.invoke(
+                    stubProxy(decorated), 
+                    stubMethod, 
+                    new Object[0]
+                )
             );
         }
     }
 
-    private static interface StubProxyInterface {
+    private StubProxyInterface stubProxy(StubInvocationHandler decorated) {
+        return (StubProxyInterface)Proxy.newProxyInstance(
+            StubProxyInterface.class.getClassLoader(), 
+            new Class<?>[] { StubProxyInterface.class }, 
+            decorated
+        );
+    }
+
+    private Method stubMethod() {
+        return ProxyMethodUtils.getMethod(
+            StubProxyInterface.class, 
+            "methodName"
+        );
+    }
+
+    static interface StubProxyInterface {
         String methodName();
     }
 }

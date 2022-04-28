@@ -1,7 +1,8 @@
 package io.github.jeyjeyemem.externalizedproperties.core.processing;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ProcessingContext;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
+import io.github.jeyjeyemem.externalizedproperties.core.ProcessorProvider;
 import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.ProcessorProxyInterface;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -11,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class Base64DecodeProcessorTests {
@@ -27,29 +29,43 @@ public class Base64DecodeProcessorTests {
     }
 
     @Nested
-    class ProcessPropertyMethod {
+    class ProviderMethod {
         @Test
-        @DisplayName("should throw when property argument is null")
+        @DisplayName("should not return null")
         void test1() {
-            Base64DecodeProcessor base64Decode = new Base64DecodeProcessor();
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> base64Decode.process(null)
-            );
+            ProcessorProvider<Base64DecodeProcessor> provider = 
+                Base64DecodeProcessor.provider();
+
+            assertNotNull(provider);
         }
 
         @Test
-        @DisplayName("should apply base 64 decoding to property")
+        @DisplayName("should not return null on get")
         void test2() {
+            ProcessorProvider<Base64DecodeProcessor> provider = 
+                Base64DecodeProcessor.provider();
+
+            assertNotNull(
+                provider.get(ExternalizedProperties.builder().withDefaults().build())
+            );
+        }
+    }
+
+    @Nested
+    class ProcessPropertyMethod {
+        @Test
+        @DisplayName("should apply base 64 decoding to property")
+        void test1() {
             String property = "test";
             String base64Property = base64Encode(property, Base64.getEncoder());
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor();
             String decoded = base64Decode.process(
-                new ProcessingContext(
-                    ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64Decode"), 
-                    base64Property
-                )
+                ProxyMethodUtils.fromMethod(
+                    ProcessorProxyInterface.class, 
+                    "base64Decode"
+                ), 
+                base64Property
             );
 
             assertEquals(property, decoded);
@@ -57,7 +73,7 @@ public class Base64DecodeProcessorTests {
 
         @Test
         @DisplayName("should apply base 64 decoding to property using configured default decoder")
-        void test3() {
+        void test2() {
             String property = "test";
             Base64.Decoder decoder = Base64.getUrlDecoder();
             
@@ -65,10 +81,11 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor(decoder);
             String decoded = base64Decode.process(
-                new ProcessingContext(
-                    ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64Decode"), 
-                    base64Property
-                )
+                ProxyMethodUtils.fromMethod(
+                    ProcessorProxyInterface.class, 
+                    "base64Decode"
+                ), 
+                base64Property
             );
 
             assertEquals(property, decoded);
@@ -76,7 +93,7 @@ public class Base64DecodeProcessorTests {
 
         @Test
         @DisplayName("should wrap exceptions in ProcessingException and propagate.")
-        void test4() {
+        void test3() {
             Base64.Decoder decoder = Base64.getDecoder();
             
             String invalidBase64 = "%%%";
@@ -86,10 +103,11 @@ public class Base64DecodeProcessorTests {
             assertThrows(
                 ProcessingException.class, 
                 () -> base64Decode.process(
-                    new ProcessingContext(
-                        ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64Decode"), 
-                        invalidBase64
-                    )
+                    ProxyMethodUtils.fromMethod(
+                        ProcessorProxyInterface.class, 
+                        "base64Decode"
+                    ), 
+                    invalidBase64
                 )
             );
         }
@@ -103,10 +121,11 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor();
             String decoded = base64Decode.process(
-                new ProcessingContext(
-                    ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64DecodeUrl"), 
-                    base64Property
-                )
+                ProxyMethodUtils.fromMethod(
+                    ProcessorProxyInterface.class, 
+                    "base64DecodeUrl"
+                ), 
+                base64Property
             );
 
             assertEquals(property, decoded);
@@ -121,10 +140,11 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor();
             String decoded = base64Decode.process(
-                new ProcessingContext(
-                    ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64DecodeMime"), 
-                    base64Property
-                )
+                ProxyMethodUtils.fromMethod(
+                    ProcessorProxyInterface.class, 
+                    "base64DecodeMime"
+                ), 
+                base64Property
             );
 
             assertEquals(property, decoded);
@@ -139,10 +159,11 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor();
             String decoded = base64Decode.process(
-                new ProcessingContext(
-                    ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64DecodeBasic"), 
-                    base64Property
-                )
+                ProxyMethodUtils.fromMethod(
+                    ProcessorProxyInterface.class, 
+                    "base64DecodeBasic"
+                ), 
+                base64Property
             );
 
             assertEquals(property, decoded);
@@ -160,10 +181,11 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor(Base64.getDecoder());
             String decoded = base64Decode.process(
-                new ProcessingContext(
-                    ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64Decode"), 
-                    base64Property
-                )
+                ProxyMethodUtils.fromMethod(
+                    ProcessorProxyInterface.class, 
+                    "base64Decode"
+                ), 
+                base64Property
             );
 
             assertEquals(property, decoded);
@@ -180,10 +202,11 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor(Base64.getDecoder());
             String decoded = base64Decode.process(
-                new ProcessingContext(
-                    ProxyMethodUtils.fromMethod(ProcessorProxyInterface.class, "base64DecodeUtf16"), 
-                    base64Property
-                )
+                ProxyMethodUtils.fromMethod(
+                    ProcessorProxyInterface.class, 
+                    "base64DecodeUtf16"
+                ), 
+                base64Property
             );
 
             // Convert string to UTF-16.

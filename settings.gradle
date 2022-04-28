@@ -1,3 +1,13 @@
+pluginManagement {
+    plugins {
+        id 'io.github.gradle-nexus.publish-plugin' version "${nexusPublishPluginVersion}"
+        id 'com.github.kt3k.coveralls' version "${coverallsPluginVersion}"
+        id 'me.champeau.jmh' version "${jmhPluginVersion}"
+        id 'net.ltgt.errorprone' version "${errorPronePluginVersion}"
+        id 'net.ltgt.nullaway' version "${nullawayPluginVersion}"
+    }
+}
+
 rootProject.name = 'externalized-properties'
 
 include 'core'

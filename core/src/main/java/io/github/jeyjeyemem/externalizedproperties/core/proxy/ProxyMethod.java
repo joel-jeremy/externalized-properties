@@ -14,21 +14,17 @@ import java.util.Optional;
  * Information about methods that go through Externalized Properties proxying.
  */
 public interface ProxyMethod {
-    /**
-     * The {@link ExternalizedProperty} annotation, if proxy method is annotated.
-     * 
-     * @return The externalized property annotation.
-     * Otherwise, an empty {@link Optional}.
-     */
-    Optional<ExternalizedProperty> externalizedPropertyAnnotation();
 
     /**
-     * The externalized property name, if proxy method is annotated with 
-     * {@link ExternalizedProperty}. The property name is derived from
-     * {@link ExternalizedProperty#value()}.
+     * The externalized property name. It will be derived from {@link ExternalizedProperty#value()},
+     * if specified. Otherwise, if {@link ExternalizedProperty#value()}
+     * is not specified, the property name will be derived from the proxy method's
+     * arguments. Specifically, the first argument of the proxy method (the method must only have one 
+     * String argument e.g. {@code String resolve(String propertyName)}).
      * 
-     * @return The externalized property name as specified in 
-     * {@link ExternalizedProperty#value()}. Otherwise, an empty {@link Optional}.
+     * @return The externalized property name derived from {@link ExternalizedProperty#value()}, 
+     * or from proxy method arguments if {@link ExternalizedProperty#value()}
+     * is not specified. Otherwise, an empty {@link Optional}.
      */
     Optional<String> externalizedPropertyName();
 
@@ -73,32 +69,36 @@ public interface ProxyMethod {
     String name();
 
     /**
-     * The proxy method's return type.
+     * The proxy method's raw return type. This does not contain
+     * generic type information.
      * 
-     * @return The proxy method's return type.
+     * @return The proxy method's raw return type.
      */
-    Class<?> returnType();
+    Class<?> rawReturnType();
 
     /**
-     * The proxy method's generic return type.
+     * The proxy method's generic return type. This does contain
+     * generic type information.
      * 
      * @return The proxy method's generic return type.
      */
-    Type genericReturnType();
+    Type returnType();
 
     /**
-     * The proxy method's parameter types.
+     * The proxy method's parameter types. These do not contain
+     * generic type information.
      * 
      * @return The proxy method's parameter types.
      */
-    Class<?>[] parameterTypes();
+    Class<?>[] rawParameterTypes();
 
     /**
-     * The proxy method's generic parameter types.
+     * The proxy method's generic parameter types. These do contain
+     * generic type information.
      * 
      * @return The proxy method's generic parameter types.
      */
-    Type[] genericParameterTypes();
+    Type[] parameterTypes();
 
     /**
      * Check if the proxy method's return type matches the given type. 
@@ -122,15 +122,15 @@ public interface ProxyMethod {
      * <p>The proxy method return type's generic type parameters, 
      * if the return type is a generic parameterized type e.g. {@code List<String>}. 
      * 
-     * <p>For example, if {@link #genericReturnType()} returns a parameterized type 
+     * <p>For example, if {@link #returnType()} returns a parameterized type 
      * e.g. {@code List<String>}, this method shall return an array containing a 
      * {@code String} type/class.
      * 
-     * <p>Another example is if {@link #genericReturnType()} returns an array type with a 
+     * <p>Another example is if {@link #returnType()} returns an array type with a 
      * generic component type e.g. {@code Optional<Integer>[]}, this method shall return an 
      * array containing an {@code Integer} type/class.
      * 
-     * <p>It is also possible to have {@link #genericReturnType()} return a parameterized type 
+     * <p>It is also possible to have {@link #returnType()} return a parameterized type 
      * which contains another parameterized type parameter e.g. {@code Optional<List<String>>}, 
      * in this case, this method shall return an array containing a {@code List<String>} 
      * parameterized type.
@@ -142,7 +142,7 @@ public interface ProxyMethod {
      * @see WildcardType
      * @see TypeVariable
      */
-    Type[] returnTypeGenericTypeParameters();
+    Type[] typeParametersOfReturnType();
 
     /**
      * <p>The proxy method return type's generic type parameter on the given index, 
@@ -155,7 +155,7 @@ public interface ProxyMethod {
      * @return The generic return type parameter, if the return type is a generic type 
      * e.g. {@code Optional<String>}.
      */
-    Optional<Type> returnTypeGenericTypeParameter(int typeParameterIndex);
+    Optional<Type> typeParameterOfReturnTypeAt(int typeParameterIndex);
     
     /**
      * Check whether the proxy method is a default interface method.

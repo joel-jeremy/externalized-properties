@@ -1,10 +1,14 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.conversion;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.Converter;
+import io.github.jeyjeyemem.externalizedproperties.core.ConverterProvider;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
+import io.github.jeyjeyemem.externalizedproperties.core.TypeUtilities;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionException;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,37 +17,44 @@ import java.util.List;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * The root {@link Converter} implementation.
- * This delegates to a configured collection of {@link Converter}s.
+ * The root {@link Converter}. All requests to convert properties are routed through this converter
+ * and delegated to the registered {@link Converter}s.
  */
 public class RootConverter implements Converter<Object> {
-
-    private final ClassValue<List<Converter<?>>> convertersByTargetType;
+    private final ConvertersByTargetType convertersByTargetType;
     
     /**
      * Constructor.
      * 
-     * @param converters The collection of {@link Converter}s
-     * to handle the actual conversion.
+     * @param externalizedProperties The {@link ExternalizedProperties} instance.
+     * @param converterProviders The collection of {@link ConverterProvider}s
+     * to provide converters that handle the actual conversion.
      */
-    public RootConverter(Converter<?>... converters) {
-        this(Arrays.asList(
-            requireNonNull(
-                converters,
-                "converters"
-            )
-        ));
+    public RootConverter(
+            ExternalizedProperties externalizedProperties, 
+            ConverterProvider<?>... converterProviders
+    ) {
+        this(
+            externalizedProperties,
+            Arrays.asList(requireNonNull(converterProviders, "converterProviders"))
+        );
     }
 
     /**
      * Constructor.
      * 
-     * @param converters The collection of {@link Converter}s
-     * to handle the actual conversion.
+     * @param externalizedProperties The {@link ExternalizedProperties} instance.
+     * @param converterProviders The collection of {@link ConverterProvider}s
+     * to provide converters that handle the actual conversion.
      */
-    public RootConverter(Collection<Converter<?>> converters) {
+    public RootConverter(
+            ExternalizedProperties externalizedProperties,
+            Collection<ConverterProvider<?>> converterProviders
+    ) {
         this.convertersByTargetType = new ConvertersByTargetType(
-            requireNonNull(converters, "converters")
+            this,
+            requireNonNull(externalizedProperties, "externalizedProperties"),
+            requireNonNull(converterProviders, "converterProviders")
         );
     }
 
@@ -55,13 +66,19 @@ public class RootConverter implements Converter<Object> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<?> convert(ConversionContext context) {
-        requireNonNull(context, "context");
+    public ConversionResult<?> convert(
+            ProxyMethod proxyMethod,
+            String valueToConvert,
+            Type targetType
+    ) {
+        requireNonNull(proxyMethod, "proxyMethod");
+        requireNonNull(valueToConvert, "valueToConvert");
+        requireNonNull(targetType, "targetType");
 
         // No conversion needed since target type is string.
-        Class<?> rawTargetType = context.rawTargetType();
+        Class<?> rawTargetType = TypeUtilities.getRawType(targetType);
         if (String.class.equals(rawTargetType)) {
-            return ConversionResult.of(context.value());
+            return ConversionResult.of(valueToConvert);
         }
         
         List<Converter<?>> converters = 
@@ -69,32 +86,74 @@ public class RootConverter implements Converter<Object> {
 
         try {
             for (Converter<?> converter : converters) {
-                ConversionResult<?> result = converter.convert(context);
+                ConversionResult<?> result = converter.convert(
+                    proxyMethod,
+                    valueToConvert,
+                    targetType
+                );
+
                 if (skipped(result)) {
                     continue;
                 }
+
                 return ConversionResult.of(result.value());
             }
 
             throw new ConversionException(String.format(
-                "No converter found to convert value to target type: %s.",
+                "Conversion to target type not supported: %s. " + 
+                "Please make sure a converter which supports conversion " + 
+                "to the target type is registered when building ExternalizedProperties.",
                 rawTargetType.getName()
             ));
         }
         catch (ConversionException cex) {
             throw cex;
         } 
-        catch (Exception ex) {
+        catch (RuntimeException ex) {
             throw new ConversionException(
                 String.format(
                     "Exception occurred while converting value to target type: %s. " + 
                     "Value: %s",
                     rawTargetType.getName(),
-                    context.value()
+                    valueToConvert
                 ),
                 ex
             );
         }
+    }
+
+    /**
+     * The {@link ConverterProvider} for {@link RootConverter}.
+     * 
+     * @param converterProviders The registered {@link ConverterProvider}s which provide 
+     * {@link Converter} instances.
+     * @return The {@link ConverterProvider} for {@link RootConverter}.
+     */
+    public static RootConverter.Provider provider(
+            ConverterProvider<?>... converterProviders
+    ) {
+        requireNonNull(converterProviders, "converterProviders");
+        return externalizedProperties -> new RootConverter(
+            externalizedProperties, 
+            converterProviders
+        );
+    }
+
+    /**
+     * The {@link ConverterProvider} for {@link RootConverter}.
+     * 
+     * @param converterProviders The registered {@link ConverterProvider}s which provide 
+     * {@link Converter} instances.
+     * @return The {@link ConverterProvider} for {@link RootConverter}.
+     */
+    public static RootConverter.Provider provider(
+            Collection<ConverterProvider<?>> converterProviders
+    ) {
+        requireNonNull(converterProviders, "converterProviders");
+        return externalizedProperties -> new RootConverter(
+            externalizedProperties, 
+            converterProviders
+        );
     }
 
     // Skip conversion result is a singleton, cache it here to avoid internal casting.
@@ -103,17 +162,28 @@ public class RootConverter implements Converter<Object> {
         return result == SKIP_RESULT;
     }
 
+    /**
+     * Maps target type to converter instances which supports the target type.
+     */
     private static class ConvertersByTargetType extends ClassValue<List<Converter<?>>> {
 
-        private final Collection<Converter<?>> registeredConverters;
+        private final RootConverter rootConverter;
+        private final ExternalizedProperties externalizedProperties;
+        private final Collection<ConverterProvider<?>> converterProviders;
 
         /**
          * Constructor.
          * 
-         * @param registeredConverters The registered {@link Converter} instances.
+         * @param converterProviders The registered {@link Converter} instances.
          */
-        public ConvertersByTargetType(Collection<Converter<?>> registeredConverters) {
-            this.registeredConverters = registeredConverters;
+        ConvertersByTargetType(
+                RootConverter rootConverter,
+                ExternalizedProperties externalizedProperties,
+                Collection<ConverterProvider<?>> converterProviders
+        ) {
+            this.rootConverter = rootConverter;
+            this.externalizedProperties = externalizedProperties;
+            this.converterProviders = converterProviders;
         }
 
         /**
@@ -125,14 +195,72 @@ public class RootConverter implements Converter<Object> {
          */
         @Override
         protected List<Converter<?>> computeValue(Class<?> targetType) {
+            // We should not throw here because result of this method is
+            // used in canConvertTo(...) to determine supported target types.
+
             List<Converter<?>> supportsTargetType = new ArrayList<>();
-            for (Converter<?> converter : registeredConverters) {
+            for (ConverterProvider<?> converterProvider : converterProviders) {
+                Converter<?> converter = converterProvider.get(
+                    externalizedProperties,
+                    rootConverter
+                );
                 if (converter.canConvertTo(targetType)) {
                     supportsTargetType.add(converter);
                 }
             }
             return supportsTargetType;
         }
+    }
 
+    /**
+     * Provider of {@link RootConverter} instance.
+     */
+    public static interface Provider extends ConverterProvider<RootConverter> {
+        /**
+         * Get an instance of {@link RootConverter}.
+         * 
+         * @param externalizedProperties The {@link ExternalizedProperties} instance.
+         * @param rootConverter This argument is ignored. No root converter is available 
+         * as this method is intended to build the {@link RootConverter} itself. Pass in 
+         * {@link NoOpConverter#INSTANCE} here or just use the {@link #get(ExternalizedProperties)}
+         * method overload instead.
+         * @return An instance of {@link Converter}.
+         */
+        @Override
+        default RootConverter get(
+            ExternalizedProperties externalizedProperties, 
+            Converter<?> rootConverter
+        ) {
+            // Ignore rootConverter in provider argument as 
+            // we are building the root converter itself here...
+            return get(externalizedProperties);
+        }
+
+        /**
+         * Get an instance of the {@link RootConverter}.
+         * 
+         * @param externalizedProperties The {@link ExternalizedProperties} instance.
+         * @return An instance of {@link RootConverter}.
+         */        
+        RootConverter get(ExternalizedProperties externalizedProperties);
+
+        /**
+         * Create a {@link Provider} which memoizes the result of another
+         * {@link Provider}.
+         * 
+         * @param toMemoize The {@link Provider} whose result will be memoized.
+         * @return A {@link Provider} which memoizes the result of another
+         * {@link Provider}.
+         */
+        static Provider memoize(Provider toMemoize) {
+            ConverterProvider<RootConverter> memoized = ConverterProvider.memoize(toMemoize);
+            
+            // Pass in NoOpConverter as rootConverter argument in provider argument as 
+            // we are building the root converter itself here...
+            return externalizedProperties -> memoized.get(
+                externalizedProperties,
+                NoOpConverter.INSTANCE
+            );
+        }
     }
 }

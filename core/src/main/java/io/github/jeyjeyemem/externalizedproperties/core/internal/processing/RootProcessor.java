@@ -1,9 +1,12 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.processing;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ProcessingContext;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.Processor;
+import io.github.jeyjeyemem.externalizedproperties.core.ProcessorProvider;
 import io.github.jeyjeyemem.externalizedproperties.core.processing.ProcessWith;
 import io.github.jeyjeyemem.externalizedproperties.core.processing.ProcessingException;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -13,8 +16,8 @@ import java.util.Objects;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * The root {@link Processor} implementation.
- * This delegates to a configured collection of {@link Processor}s.
+ * The root {@link Processor}. All requests to process properties are routed through this processor
+ * and delegated to the registered {@link Processor}s
  */
 public class RootProcessor implements Processor {
 
@@ -23,58 +26,110 @@ public class RootProcessor implements Processor {
     /**
      * Constructor.
      * 
-     * @param processors The collection of {@link Processor}s
-     * to handle the actual processing.
+     * @param externalizedProperties The {@link ExternalizedProperties} instance.
+     * @param processorProviders The collection of {@link ProcessorProvider}s
+     * to provide processors that handle the actual processing.
      */
-    public RootProcessor(Processor... processors) {
-        this(Arrays.asList(
-            requireNonNull(processors, "processors")
-        ));
+    public RootProcessor(
+            ExternalizedProperties externalizedProperties,
+            ProcessorProvider<?>... processorProviders
+    ) {
+        this(
+            externalizedProperties,
+            Arrays.asList(requireNonNull(processorProviders, "processorProviders"))
+        );
     }
 
     /**
      * Constructor.
      * 
-     * @param processors The collection of {@link Processor}s
-     * to handle the actual processing.
+     * @param externalizedProperties The {@link ExternalizedProperties} instance.
+     * @param processorProviders The collection of {@link ProcessorProvider}s
+     * to provide processors that handle the actual processing.
      */
-    public RootProcessor(Collection<Processor> processors) {
+    public RootProcessor(
+            ExternalizedProperties externalizedProperties,
+            Collection<ProcessorProvider<?>> processorProviders
+    ) {
         this.processorByAnnotationType = new ProcessorByAnnotationType(
-            requireNonNull(processors, "processors")
+            requireNonNull(externalizedProperties, "externalizedProperties"),
+            requireNonNull(processorProviders, "processorProviders")
+        );
+    }
+
+    /**
+     * The {@link ProcessorProvider} for {@link RootProcessor}.
+     * 
+     * @param processorProviders The registered {@link ProcessorProvider}s which provide 
+     * {@link Processor} instances.
+     * @return The {@link ProcessorProvider} for {@link RootProcessor}.
+     */
+    public static ProcessorProvider<RootProcessor> provider(
+            ProcessorProvider<?>... processorProviders
+    ) {
+        requireNonNull(processorProviders, "processorProviders");
+        return externalizedProperties -> new RootProcessor(
+            externalizedProperties, 
+            processorProviders
+        );
+    }
+
+    /**
+     * The {@link ProcessorProvider} for {@link RootProcessor}.
+     * 
+     * @param processorProviders The registered {@link ProcessorProvider}s which provide 
+     * {@link Processor} instances.
+     * @return The {@link ProcessorProvider} for {@link RootProcessor}.
+     */
+    public static ProcessorProvider<RootProcessor> provider(
+            Collection<ProcessorProvider<?>> processorProviders
+    ) {
+        requireNonNull(processorProviders, "processorProviders");
+        return externalizedProperties -> new RootProcessor(
+            externalizedProperties, 
+            processorProviders
         );
     }
 
     /** {@inheritDoc} */
     @Override
-    public String process(ProcessingContext context) {
-        requireNonNull(context, "context");
+    public String process(ProxyMethod proxyMethod, String valueToProcess) {
+        requireNonNull(proxyMethod, "proxyMethod");
+        requireNonNull(valueToProcess, "valueToProcess");
 
-        Annotation[] proxyMethodAnnotations = context.proxyMethod().annotations();
-        for (Annotation annotation : proxyMethodAnnotations) {
+        String value = valueToProcess;
+        for (Annotation annotation : proxyMethod.annotations()) {
             Processor processor = processorByAnnotationType.get(annotation.annotationType());
             if (processor == null) {
                 // Annotation is not a processor annotation i.e. 
                 // not annotated with @ProcessWith.
                 continue;
             }
-            String value = processor.process(context);
-            context = context.with(value, processor.getClass());
+            value = processor.process(proxyMethod, value);
         }
-        
-        return context.value();
+        return value;
     }
 
-    private static class ProcessorByAnnotationType extends ClassValue<Processor> {
-
-        private final Collection<Processor> registeredProcessors;
+    /**
+     * Maps annotation type with processor instance based on the {@link ProcessWith}
+     * meta annotation.
+     */
+    private static class ProcessorByAnnotationType extends ClassValue<Processor> {        
+        private final ExternalizedProperties externalizedProperties;
+        private final Collection<ProcessorProvider<?>> registeredProcessorProviders;
 
         /**
          * Constructor.
          * 
-         * @param registeredProcessors The registered {@link Processor} instances.
+         * @param externalizedProperties The {@link ExternalizedProperties} instance.
+         * @param registeredProcessorProviders The registered {@link Processor} instances.
          */
-        public ProcessorByAnnotationType(Collection<Processor> registeredProcessors) {
-            this.registeredProcessors = registeredProcessors;
+        ProcessorByAnnotationType(
+                ExternalizedProperties externalizedProperties,
+                Collection<ProcessorProvider<?>> registeredProcessorProviders
+        ) {
+            this.externalizedProperties = externalizedProperties;
+            this.registeredProcessorProviders = registeredProcessorProviders;
         }
 
         /**
@@ -90,7 +145,7 @@ public class RootProcessor implements Processor {
          * type can be found.
          */
         @Override
-        protected Processor computeValue(Class<?> annotationType) {
+        protected @Nullable Processor computeValue(Class<?> annotationType) {
             ProcessWith processWith = annotationType.getAnnotation(ProcessWith.class);
             if (processWith == null) {
                 // Null if annotation type is not a processor annotation
@@ -98,16 +153,19 @@ public class RootProcessor implements Processor {
                 return null;
             }
                 
-            for (Processor processor : registeredProcessors) {
+            for (ProcessorProvider<?> processorProvider : registeredProcessorProviders) {
+                Processor processor = processorProvider.get(externalizedProperties);
                 if (Objects.equals(processor.getClass(), processWith.value())) {
                     return processor;
                 }
             }
-            throw new ProcessingException(
-                "No processor registered for processor class: " + 
-                processWith.value().getName() + ". Please make sure processor is " + 
-                "registered while building ExternalizedProperties." 
-            );
+
+            throw new ProcessingException(String.format(
+                "No processor registered for processor class: %s. " +
+                "Please make sure the processor is registered when " + 
+                "building ExternalizedProperties.",
+                processWith.value().getName()
+            ));
         }
     }
 }

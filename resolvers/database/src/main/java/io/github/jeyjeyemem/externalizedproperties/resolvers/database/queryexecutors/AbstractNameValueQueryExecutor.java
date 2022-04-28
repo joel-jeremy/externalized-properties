@@ -1,8 +1,5 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors;
 
-import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.DatabaseProperty;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.QueryExecutor;
 
@@ -10,10 +7,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -22,25 +18,9 @@ import java.util.stream.Collectors;
  * the specified table name and it's property name and value column mappings.
  */
 public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
-    private static final String DEFAULT_QUERY_TEMPLATE = 
-        "SELECT t.${propertyNameColumn}, t.${propertyValueColumn} " + 
-        "FROM ${table} t WHERE t.${propertyNameColumn} " + 
-        "IN (${propertyNamesStatementParameter})";
-    
-    private static final String DEFAULT_QUERY_TEMPLATE_WITH_SCHEMA = 
-        "SELECT t.${propertyNameColumn}, t.${propertyValueColumn} " + 
-        "FROM ${schema}.${table} t WHERE t.${propertyNameColumn} " + 
-        "IN (${propertyNamesStatementParameter})";
-
-    /**
-     * Query properties from the database.
-     * 
-     * @param connection The JDBC connection.
-     * @param propertyNamesToResolve The names of the properties to resolve from database.
-     * @throws SQLException if a database-related error has occurred.
-     */
+    /** {@inheritDoc} */
     @Override
-    public List<DatabaseProperty> queryProperties(
+    public Map<String, String> queryProperties(
             Connection connection,
             Collection<String> propertyNamesToResolve
     ) throws SQLException {
@@ -86,19 +66,20 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
      * Run the query.
      * 
      * @param preparedStatement The prepared statement.
-     * @return The list of properties resolved from the database.
+     * @return The map of properties resolved from the database.
      * @throws SQLException if a database-related error has occurred.
      */
-    protected List<DatabaseProperty> runQuery(
+    protected Map<String, String> runQuery(
             PreparedStatement preparedStatement
     ) throws SQLException {
-        List<DatabaseProperty> resolvedProperties = new ArrayList<>();
+        Map<String, String> resolved = new HashMap<>();
         try (ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
-                resolvedProperties.add(mapResult(resultSet));
+                DatabaseProperty prop = mapResult(resultSet);
+                resolved.put(prop.name(), prop.value());
             }
         }
-        return resolvedProperties;
+        return Collections.unmodifiableMap(resolved);
     }
 
     /**
@@ -146,23 +127,39 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
      * @return The SQL query to use in querying the properties from database.
      */
     protected String generateSqlQuery(Collection<String> propertyNamesToResolve) {
-        String template = DEFAULT_QUERY_TEMPLATE;
         String schema = schemaOrThrow();
         if (!schema.trim().isEmpty()) {
-            template = DEFAULT_QUERY_TEMPLATE_WITH_SCHEMA;
+            // The order of format arguments:
+            // 1. propertyNameColumn
+            // 2. propertyValueColumn
+            // 3. schema
+            // 4. table
+            // 5. propertyNameColumn
+            // 6. propertyNamesStatementParameter
+            return String.format(
+                "SELECT t.%s, t.%s FROM %s.%s t WHERE t.%s IN (%s)", 
+                /** SELECT */ propertyNameColumnOrThrow(),
+                propertyValueColumnOrThrow(),
+                /** FROM */ schema,
+                tableOrThrow(),
+                /** WHERE */ propertyNameColumnOrThrow(),
+                /** IN */ buildInClause(propertyNamesToResolve)
+            );
         }
-
-        Map<String, String> props = new HashMap<>();
-        props.put("propertyNameColumn", propertyNameColumnOrThrow());
-        props.put("propertyValueColumn", propertyValueColumnOrThrow());
-        props.put("schema", schema);
-        props.put("table", tableOrThrow());
-        props.put("propertyNamesStatementParameter", buildInClause(propertyNamesToResolve));
-
-        VariableExpander variableExpander = 
-            new SimpleVariableExpander(new MapResolver(props));
-
-        return variableExpander.expandVariables(template);
+        // The order of format arguments:
+        // 1. propertyNameColumn
+        // 2. propertyValueColumn
+        // 3. table
+        // 4. propertyNameColumn
+        // 5. propertyNamesStatementParameter
+        return String.format(
+            "SELECT t.%s, t.%s FROM %s t WHERE t.%s IN (%s)", 
+            /** SELECT */ propertyNameColumnOrThrow(),
+            propertyValueColumnOrThrow(),
+            /** FROM */ tableOrThrow(),
+            /** WHERE */ propertyNameColumnOrThrow(),
+            /** IN */ buildInClause(propertyNamesToResolve)
+        );
     }
 
     /**
@@ -176,8 +173,8 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
      * @throws SQLException if a database-related error has occurred.
      */
     protected void configureStatementParameters(
-        PreparedStatement preparedStatement, 
-        Collection<String> propertyNamesToResolve
+            PreparedStatement preparedStatement, 
+            Collection<String> propertyNamesToResolve
     ) throws SQLException {
         int i = 1;
         for (String propertyName : propertyNamesToResolve) {

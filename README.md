@@ -39,7 +39,6 @@ implementation 'io.github.jeyjeyemem.externalizedproperties:core:1.0.0-SNAPSHOT'
 Externalized Properties jars are published with Automatic-Module-Name manifest attribute:
 
 - Core - `io.github.jeyjeyemem.externalizedproperties.core`
-- AWS SSM Resolver - `io.github.jeyjeyemem.externalizedproperties.resolvers.awsssm`
 - Database Resolver - `io.github.jeyjeyemem.externalizedproperties.resolvers.database`
 
 Module authors can use above module names in their module-info.java:
@@ -47,7 +46,6 @@ Module authors can use above module names in their module-info.java:
 ```java
 module foo.bar {
     requires io.github.jeyjeyemem.externalizedproperties.core;
-    requires io.github.jeyjeyemem.externalizedproperties.resolvers.awsssm;
     requires io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 }
 ```
@@ -58,7 +56,7 @@ Sample projects can be found in: <https://github.com/jeyjeyemem/externalized-pro
 
 ## Features
 
-Externalized Properties makes the best of of Java's strong typing by proxying an interface and using that as a facade to resolve properties.
+Externalized Properties makes the best use of Java's strong typing by proxying an interface and using that as a facade to resolve properties.
 
 ### Interface Proxying
 
@@ -66,9 +64,9 @@ Given an interface:
 
 ```java
 public interface ApplicationProperties {
-    @ExternalizedProperty("DATABASE_URL")
+    @ExternalizedProperty("database.url")
     String databaseUrl();
-    @ExternalizedProperty("DATABASE_DRIVER")
+    @ExternalizedProperty("database.driver")
     String databaseDriver();
 }
 ```
@@ -93,37 +91,19 @@ public static void main(String[] args) {
 private ExternalizedProperties buildExternalizedProperties() {
     // Create the ExternalizedProperties instance with default and additional resolvers.
     // Default resolvers include system properties and environment variable resolvers.
-    // AWS SSM Resolver and Database Resolver are not part of the core module. They 
-    // are part of a separate resolver-aws-ssm and resolver-database modules.
+    // DatabaseResolver is not part of the core module. It is part of a separate 
+    // resolver-database module. CustomAwsSsmResolver is an example custom resolver
+    // implementation which resolves properties from AWS SSM.
 
     ExternalizedProperties externalizedProperties = ExternalizedPropertiesBuilder.newBuilder()
         .withDefaultResolvers() 
-        .resolvers( 
-            new AwsSsmResolver(getAwsSsmClient()),
-            new DatabaseResolver(getEntityManagerFactory())
+        .resolvers(
+            DatabaseResolver.provider(new JdbcConnectionProvider(getDataSource())),
+            externalizedProperties -> new CustomAwsSsmResolver(buildAwsSsmClient())
         ) 
         .build();
     
     return externalizedProperties;
-}
-```
-
-### Direct Property Resolution
-
-Another option is to resolve properties directly from the `ExternalizedProperties` instance if you want to avoid overhead of using proxies:
-
-```java
-public static void main(String[] args) {
-    ExternalizedProperties externalizedProperties = buildExternalizedProperties();
-
-    // Direct resolution via ExternalizedProperties API.
-    Resolver resolver = externalizedProperties.resolver();
-    Optional<String> databaseUrl = resolver.resolveProperty("DATABASE_URL");
-    Optional<String> databaseDriver = resolver.resolveProperty("DATABASE_DRIVER");
-
-    // Use property:
-    System.out.println("Database URL: " + databaseUrl.get());
-    System.out.println("Database Driver: " + databaseDriver.get());
 }
 ```
 
@@ -137,9 +117,9 @@ To register converters to the library, it must be done through the builder:
 private ExternalizedProperties buildExternalizedProperties() {
     ExternalizedProperties externalizedProperties = ExternalizedPropertiesBuilder.newBuilder()
         .withDefaultResolvers()
+        .withDefaultConverters()
         .converters(
-            new PrimitiveConverter(),
-            new CustomConverter()
+            new CustomTypeConverter()
         )
         .build();
 
@@ -151,8 +131,8 @@ To convert a property via the proxy interface, just set the method return type t
 
 ```java
 public interface ApplicationProperties {
-    @ExternalizedProperty("thread-count")
-    int numberOfThreads();
+    @ExternalizedProperty("timeout.millis")
+    int timeoutInMilliseconds();
 }
 
 public static void main(String[] args) {
@@ -162,15 +142,15 @@ public static void main(String[] args) {
     ApplicationProperties props = externalizedProperties.proxy(ApplicationProperties.class);
 
     // Use properties.
-    int numberOfThreads = props.numberOfThreads();
+    int timeoutInMilliseconds = props.timeoutInMilliseconds();
 
-    System.out.println("Number of threads: " + numberOfThreads);
+    System.out.println("Timeout in milliseconds: " + timeoutInMilliseconds);
 }
 ```
 
 ### Conversion to Generic Types
 
-Externalized Properties has powerful support for generic types. Given the proxy interface:
+Externalized Properties has support for generic types. Given the proxy interface:
 
 ```java
 public interface ApplicationProperties {
@@ -179,7 +159,7 @@ public interface ApplicationProperties {
 }
 ```
 
-Externalized Properties is capable of converting each item from the `list-of-numbers` property to an integer (provided a converter is registered to convert to an integer).
+Externalized Properties is capable of converting each item from the `list-of-numbers` property to an Integer (provided a converter is registered to convert to an Integer).
 
 An arbitraty generic type parameter depth is supported. For example,
 

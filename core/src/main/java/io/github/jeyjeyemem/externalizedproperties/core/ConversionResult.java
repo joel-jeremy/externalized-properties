@@ -1,5 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
@@ -20,7 +22,7 @@ public class ConversionResult<T> {
      */
     private static final ConversionResult<?> SKIP = new ConversionResult<>();
 
-    private final T value;
+    private final @Nullable T value;
     
     /** For {@link ConversionResult#SKIP}. */
     private ConversionResult() {
@@ -72,20 +74,18 @@ public class ConversionResult<T> {
     }
 
     /**
-     * Returns a singleton instance of {@link ConversionResult} which indicates that
-     * the converter is unsuccessful in handling conversion to the 
-     * target type and that the converter should skip/move to the next registered 
-     * converter in the conversion pipeline.
+     * Returns an instance of {@link ConversionResult} which indicates that
+     * the converter cannot handle conversion to the target type and that the converter 
+     * should skip/move to the next registered converter in the conversion pipeline.
      * 
-     * @implSpec This always return the same object reference which means that
+     * @implSpec This always returns the same object reference which means that
      * {@code ConversionResult.skip() == ConversionResult.skip()} should evaluate to
      * {@code true}.
      * 
      * @param <T> The type of the result value.
-     * @return A singleton instance of {@link ConversionResult} which indicates that
-     * the converter is unsuccessful in handling conversion to the target 
-     * type and that the converter should skip/move to the next registered 
-     * converter in the conversion pipeline.
+     * @return An instance of {@link ConversionResult} which indicates that
+     * the converter cannot handle conversion to the target type and that the converter 
+     * should skip/move to the next registered converter in the conversion pipeline.
      */
     public static <T> ConversionResult<T> skip() {
         @SuppressWarnings("unchecked")

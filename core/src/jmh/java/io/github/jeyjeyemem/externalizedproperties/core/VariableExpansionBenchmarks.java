@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.MapResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.PatternVariableExpander;
 import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -21,22 +22,36 @@ import java.util.concurrent.TimeUnit;
 /**
  * Benchmark {@link ExternalizedProperties}' variable expansion API.
  */
-@Warmup(iterations = 2, time = 5, timeUnit = TimeUnit.SECONDS)
+@Warmup(time = 5, timeUnit = TimeUnit.SECONDS)
 @Measurement(time = 5, timeUnit = TimeUnit.SECONDS)
-@Fork(1)
+@Fork(3)
 public abstract class VariableExpansionBenchmarks {
     @State(Scope.Benchmark)
     public static class BenchmarkState {
-        private VariableExpander variableExpander;
+        private VariableExpansionProxyInterface proxyWithSimpleVariableExpander;
+        private VariableExpansionProxyInterface proxyWithPatternVariableExpander;
 
         @Setup
         public void setup() {
             Map<String, String> propertySource = Collections.singletonMap("test", "test");
     
-            /**
-             * Basic setup. No caching.
-             */
-            variableExpander = new SimpleVariableExpander(new MapResolver(propertySource));
+            ExternalizedProperties withSimpleVariableExpander = 
+                ExternalizedProperties.builder()
+                    .resolvers(MapResolver.provider(propertySource))
+                    .variableExpander(SimpleVariableExpander.provider())
+                    .build();
+
+            proxyWithSimpleVariableExpander = 
+                withSimpleVariableExpander.proxy(VariableExpansionProxyInterface.class);
+
+            ExternalizedProperties withPatternVariableExpander = 
+                ExternalizedProperties.builder()
+                    .resolvers(MapResolver.provider(propertySource))
+                    .variableExpander(PatternVariableExpander.provider())
+                    .build();
+
+            proxyWithPatternVariableExpander = 
+                withPatternVariableExpander.proxy(VariableExpansionProxyInterface.class);
         }
     }
 
@@ -73,13 +88,24 @@ public abstract class VariableExpansionBenchmarks {
         extends VariableExpansionBenchmarks {}
 
     /**
-     * Benchmark variable expansion.
+     * Benchmark simple variable expander.
      * 
      * @param state The benchmark state.
      * @return For you, blackhole.
      */
     @Benchmark
-    public String variableExpansion(BenchmarkState state) {
-        return state.variableExpander.expandVariables("${test}");
+    public String simple(BenchmarkState state) {
+        return state.proxyWithSimpleVariableExpander.test();
+    }
+
+    /**
+     * Benchmark pattern variable expander.
+     * 
+     * @param state The benchmark state.
+     * @return For you, blackhole.
+     */
+    @Benchmark
+    public String pattern(BenchmarkState state) {
+        return state.proxyWithPatternVariableExpander.test();
     }
 }

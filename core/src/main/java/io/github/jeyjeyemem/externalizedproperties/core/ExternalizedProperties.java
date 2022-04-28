@@ -1,26 +1,26 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.converters.DefaultConverter;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.CachingExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.InternalExternalizedProperties;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.ExpiringCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.jeyjeyemem.externalizedproperties.core.internal.processing.RootProcessor;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.CachingInvocationHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.EagerLoadingInvocationHandler;
-import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.ExternalizedPropertyInvocationHandler;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.CachingInvocationHandlerFactory;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.EagerLoadingInvocationHandlerFactory;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.proxy.ExternalizedPropertiesInvocationHandlerFactory;
+import io.github.jeyjeyemem.externalizedproperties.core.internal.resolvers.RootResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.InvocationHandlerFactory;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CachingResolver;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.CompositeResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.resolvers.DefaultResolver;
 import io.github.jeyjeyemem.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 
+import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -56,39 +56,6 @@ public interface ExternalizedProperties {
     <T> T proxy(Class<T> proxyInterface, ClassLoader classLoader);
 
     /**
-     * The configured {@link Resolver} for this {@link ExternalizedProperties} instance.
-     * 
-     * @return The configured {@link Resolver} for this {@link ExternalizedProperties} 
-     * instance.
-     */
-    Resolver resolver();
-
-    /**
-     * The configured {@link Converter} for this {@link ExternalizedProperties} instance.
-     * 
-     * @return The configured {@link Converter} for this {@link ExternalizedProperties} 
-     * instance.
-     */
-    Converter<?> converter();
-
-    /**
-     * The configured {@link VariableExpander} for this {@link ExternalizedProperties} 
-     * instance.
-     * 
-     * @return The configured {@link VariableExpander} for this 
-     * {@link ExternalizedProperties} instance.
-     */
-    VariableExpander variableExpander();
-
-    /**
-     * The configured {@link Processor} for this {@link ExternalizedProperties} instance.
-     * 
-     * @return The configured {@link Processor} for this {@link ExternalizedProperties} 
-     * instance.
-     */
-    Processor processor();
-
-    /**
      * Create a new {@link Builder} to facilitate building of an
      * {@link ExternalizedProperties} instance.
      * 
@@ -102,16 +69,16 @@ public interface ExternalizedProperties {
      * Builder for {@link ExternalizedProperties}.
      */
     public static class Builder {
-        private List<Resolver> resolvers = new ArrayList<>();
-        private List<Converter<?>> converters = new ArrayList<>();
-        private List<Processor> processingHandlers = new ArrayList<>();
-        private Function<Resolver, VariableExpander> variableExpanderFactory =
-            SimpleVariableExpander::new;
+        private final List<ResolverProvider<?>> resolverProviders = new ArrayList<>();
+        private final List<ConverterProvider<?>> converterProviders = new ArrayList<>();
+        private final List<ProcessorProvider<?>> processorProviders = new ArrayList<>();
+        private VariableExpanderProvider<?> variableExpanderProvider = 
+            SimpleVariableExpander.provider();
         
         // Caching settings.
         private Duration cacheDuration = getDefaultCacheDuration();
-        private boolean withResolverCaching = false;
         private boolean withProxyEagerLoading = false;
+        private boolean withProxyCaching = false;
         private boolean withProxyInvocationCaching = false;
 
         // Default settings.
@@ -119,17 +86,14 @@ public interface ExternalizedProperties {
         private boolean withDefaultConverters = false;
 
         /**
-         * Enable default configurations. This will enable default {@link Resolver}s 
-         * via the {@link #withDefaultResolvers()} and {@link Converter}s via the
-         * {@link #withDefaultConverters()} methods. This will also enable caching via 
-         * {@link #withResolverCaching()} and {@link #withProxyInvocationCaching()} methods.
+         * Enable default configurations.
          * 
          * @return This builder.
          */
         public Builder withDefaults() {
             return withDefaultResolvers()
                 .withDefaultConverters()
-                .withResolverCaching()
+                .withProxyCaching()
                 .withProxyInvocationCaching();
         }
 
@@ -154,12 +118,12 @@ public interface ExternalizedProperties {
         }
 
         /**
-         * Enable caching of properties resolved via {@link Resolver}s.
+         * Enable caching of proxy instances (per proxy interface).
          * 
          * @return This builder.
          */
-        public Builder withResolverCaching() {
-            this.withResolverCaching = true;
+        public Builder withProxyCaching() {
+            this.withProxyCaching = true;
             return this;
         }
 
@@ -196,96 +160,95 @@ public interface ExternalizedProperties {
         }
 
         /**
-         * The array of {@link Resolver}s to resolve properties from.
+         * The array of {@link ResolverProvider}s to provide resolver instances
+         * to resolve properties from.
          * 
-         * @param resolvers The resolvers.
+         * @param resolverProviders The resolver providers.
          * @return This builder.
          */
-        public Builder resolvers(Resolver... resolvers) {
-            requireNonNull(resolvers, "resolvers");
-            return resolvers(Arrays.asList(resolvers));
+        public Builder resolvers(ResolverProvider<?>... resolverProviders) {
+            requireNonNull(resolverProviders, "resolverProviders");
+            return resolvers(Arrays.asList(resolverProviders));
         }
 
         /**
-         * The collection of {@link Resolver}s to resolve properties from.
+         * The collection of {@link ResolverProvider}s to provide resolver instances
+         * to resolve properties from.
          * 
-         * @param resolvers The resolvers.
+         * @param resolverProviders The resolver providers.
          * @return This builder.
          */
-        public Builder resolvers(Collection<Resolver> resolvers) {
-            requireNonNull(resolvers, "resolvers");
-            this.resolvers.addAll(resolvers);
+        public Builder resolvers(Collection<ResolverProvider<?>> resolverProviders) {
+            requireNonNull(resolverProviders, "resolverProviders");
+            this.resolverProviders.addAll(resolverProviders);
             return this;
         }
 
         /**
-         * The array of {@link Converter}s to convert properties
-         * to various types.
+         * The array of {@link ConverterProvider}s to provide converters.
          * 
-         * @param converters The converters.
+         * @param converterProviders The converter providers.
          * @return This builder.
          */
         public Builder converters(
-                Converter<?>... converters
+                ConverterProvider<?>... converterProviders
         ) {
-            requireNonNull(converters, "converters");
-            return converters(Arrays.asList(converters));
+            requireNonNull(converterProviders, "converterProviders");
+            return converters(Arrays.asList(converterProviders));
         }
 
         /**
-         * The collection of {@link Converter}s to convert properties
-         * to various types.
+         * The collection of {@link ConverterProvider}s to provide converters.
          * 
-         * @param converters The converters.
+         * @param converterProviders The converter providers.
          * @return This builder.
          */
         public Builder converters(
-                Collection<Converter<?>> converters
+                Collection<ConverterProvider<?>> converterProviders
         ) {
-            requireNonNull(converters, "converters");
-            this.converters.addAll(converters);
+            requireNonNull(converterProviders, "converterProviders");
+            this.converterProviders.addAll(converterProviders);
             return this;
         }
 
         /**
-         * The array of {@link Processor}s to register.
+         * The array of {@link ProcessorProvider}s to register.
          * 
-         * @param processors The processors to register.
+         * @param processorProviders The processor providers to register.
          * @return This builder.
          */
         public Builder processors(
-                Processor... processors
+                ProcessorProvider<?>... processorProviders
         ) {
-            requireNonNull(processors, "processors");
-            return processors(Arrays.asList(processors));
+            requireNonNull(processorProviders, "processorProviders");
+            return processors(Arrays.asList(processorProviders));
         }
 
         /**
-         * The collection of {@link Processor}s to register.
+         * The collection of {@link ProcessorProvider}s to register.
          * 
-         * @param processors The processors to register.
+         * @param processorProviders The processors to register.
          * @return This builder.
          */
         public Builder processors(
-                Collection<Processor> processors
+                Collection<ProcessorProvider<?>> processorProviders
         ) {
-            requireNonNull(processors, "processors");
-            this.processingHandlers.addAll(processors);
+            requireNonNull(processorProviders, "processorProviders");
+            this.processorProviders.addAll(processorProviders);
             return this;
         }
 
         /**
-         * The factory for creating the {@link VariableExpander}.
+         * The {@link VariableExpanderProvider} to register.
          * 
-         * @param variableExpanderFactory The factory for creating the 
-         * {@link VariableExpander}.
+         * @param variableExpanderProvider The variable expander provider to register.
          * @return This builder.
          */
         public Builder variableExpander(
-                Function<Resolver, VariableExpander> variableExpanderFactory
+                VariableExpanderProvider<?> variableExpanderProvider
         ) {
-            requireNonNull(variableExpanderFactory, "variableExpanderFactory");
-            this.variableExpanderFactory = variableExpanderFactory;
+            requireNonNull(variableExpanderProvider, "variableExpanderProvider");
+            this.variableExpanderProvider = variableExpanderProvider;
             return this;
         }
 
@@ -295,124 +258,103 @@ public interface ExternalizedProperties {
          * @return The built {@link InternalExternalizedProperties} instance.
          */
         public ExternalizedProperties build() {
-            Resolver resolver = buildResolver();
-            Converter<?> converter = buildConverter();
-            Processor processor = buildProcessor();
-            VariableExpander variableExpander = buildVariableExpander(resolver);
-            InvocationHandlerFactory invocationHandlerFactory = buildInvocationHandlerFactory();
+            ResolverProvider<RootResolver> rootResolverProvider = buildRootResolverProvider();
+            RootConverter.Provider rootConverterProvider = buildRootConverterProvider();
+            InvocationHandlerFactory<?> invocationHandlerFactory = buildInvocationHandlerFactory();
 
             ExternalizedProperties externalizedProperties = new InternalExternalizedProperties(
-                resolver, 
-                processor,
-                converter,
-                variableExpander,
+                rootResolverProvider, 
+                rootConverterProvider,
                 invocationHandlerFactory
             );
 
-            // if (withCaching) {
-            //     return new CachingExternalizedProperties(
-            //         externalizedProperties,
-            //         new ExpiringCacheStrategy<>(
-            //             new ConcurrentHashMapCacheStrategy<>(),
-            //             cacheDuration
-            //         ),
-            //         new ExpiringCacheStrategy<>(
-            //             new ConcurrentHashMapCacheStrategy<>(),
-            //             cacheDuration
-            //         )
-            //     );
-            // }
+            if (withProxyCaching) {
+                return new CachingExternalizedProperties(
+                    externalizedProperties,
+                    new ExpiringCacheStrategy<>(
+                        new WeakConcurrentHashMapCacheStrategy<>(),
+                        cacheDuration   
+                    )
+                );
+            }
 
             return externalizedProperties;
         }
 
-        private InvocationHandlerFactory buildInvocationHandlerFactory() {
+        private InvocationHandlerFactory<?> buildInvocationHandlerFactory() {
             // Default invocation handler factory.
-            InvocationHandlerFactory factory = (externalizedProperties, proxyInterface) -> 
-                new ExternalizedPropertyInvocationHandler(
-                    externalizedProperties
+            InvocationHandlerFactory<?> base = 
+                new ExternalizedPropertiesInvocationHandlerFactory();
+
+            InvocationHandlerFactory<?> factory = base;
+
+            // Shared cache strategy.
+            CacheStrategy<Method, Object> propertiesByMethodCache =
+                new WeakConcurrentHashMapCacheStrategy<>();
+            
+            if (withProxyEagerLoading) {
+                // Decorate with EagerLoadingInvocationHandler.
+                factory = new EagerLoadingInvocationHandlerFactory(
+                    factory, 
+                    new ExpiringCacheStrategy<>(
+                        propertiesByMethodCache,
+                        cacheDuration
+                    )
                 );
+            }
 
             if (withProxyInvocationCaching) {
                 // Decorate with CachingInvocationHandler.
-                factory = factory.compose((baseFactory, externalizedProperties, proxyInterface) -> 
-                    new CachingInvocationHandler(
-                        baseFactory.createInvocationHandler(externalizedProperties, proxyInterface),
-                        new ExpiringCacheStrategy<>(
-                            new WeakConcurrentHashMapCacheStrategy<>(),
-                            cacheDuration
-                        )
-                    ));
-            }
-                
-            if (withProxyEagerLoading) {
-                // Decorate with EagerLoadingInvocationHandler.
-                factory = factory.compose((baseFactory, externalizedProperties, proxyInterface) -> 
-                    EagerLoadingInvocationHandler.eagerLoad(
-                        baseFactory.createInvocationHandler(externalizedProperties, proxyInterface),
-                        new ExpiringCacheStrategy<>(
-                            new WeakConcurrentHashMapCacheStrategy<>(),
-                            cacheDuration
-                        ),
-                        externalizedProperties.resolver(),
-                        externalizedProperties.converter(),
-                        externalizedProperties.processor(),
-                        proxyInterface
-                    ));
+                factory = new CachingInvocationHandlerFactory(
+                    factory, 
+                    new ExpiringCacheStrategy<>(
+                        propertiesByMethodCache,
+                        cacheDuration
+                    )
+                );
             }
 
             return factory;
         }
 
-        private Resolver buildResolver() {
+        private ResolverProvider<RootResolver> buildRootResolverProvider() {
             // Add default resolvers last.
             // Custom resolvers always take precedence.
             if (withDefaultResolvers) {
-                resolvers(new DefaultResolver());
+                resolvers(DefaultResolver.provider());
             }
 
-            if (resolvers.isEmpty()) {
-                throw new IllegalStateException(
-                    "At least one resolver is required."
-                );
+            if (resolverProviders.isEmpty()) {
+                throw new IllegalStateException("At least one resolver is required.");
             }
 
-            Resolver resolver = CompositeResolver.flatten(resolvers);
-            if (withResolverCaching) {
-                resolver = new CachingResolver(
-                    resolver, 
-                    new ExpiringCacheStrategy<>(
-                        new WeakConcurrentHashMapCacheStrategy<>(),
-                        cacheDuration
-                    )
-                );
-            }
-            return resolver;
+            return RootResolver.provider(
+                resolverProviders, 
+                buildRootProcessorProvider(), 
+                variableExpanderProvider
+            );
         }
 
-        private Converter<?> buildConverter() {
+        private RootConverter.Provider buildRootConverterProvider() {
             // Add default converters last.
             // Custom converters always take precedence.
             if (withDefaultConverters) {
-                converters(new DefaultConverter());
+                converters(DefaultConverter.provider());
             }
             
-            return new RootConverter(converters);
+            return RootConverter.provider(converterProviders);
         }
 
-        private Processor buildProcessor() {
-            return new RootProcessor(processingHandlers);
-        }
-
-        private VariableExpander buildVariableExpander(
-                Resolver resolver
-        ) {
-            return variableExpanderFactory.apply(resolver);
+        private ProcessorProvider<RootProcessor> buildRootProcessorProvider() {
+            return RootProcessor.provider(processorProviders);
         }
 
         private Duration getDefaultCacheDuration() {
             return Duration.ofMinutes(Integer.parseInt(
-                System.getProperty("externalizedproperties.defaultCacheDuration", "30")
+                System.getProperty(
+                    ExternalizedProperties.class.getName() + ".default-cache-duration", 
+                    "30"
+                )
             ));
         }
     }

@@ -1,7 +1,10 @@
 package io.github.jeyjeyemem.externalizedproperties.core.variableexpansion;
 
-import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperty;
 import io.github.jeyjeyemem.externalizedproperties.core.VariableExpander;
+import io.github.jeyjeyemem.externalizedproperties.core.VariableExpanderProvider;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
@@ -13,11 +16,10 @@ import static io.github.jeyjeyemem.externalizedproperties.core.internal.Argument
  * @implNote By default, this will match the basic pattern: ${variable}
  */
 public class SimpleVariableExpander implements VariableExpander {
-
     private static final String DEFAULT_VARIABLE_PREFIX = "${";
     private static final String DEFAULT_VARIABLE_END_SUFFIX = "}";
 
-    private final Resolver resolver;
+    private final ResolverProxy resolverProxy;
     private final String variablePrefix;
     private final String variableSuffix;
 
@@ -25,11 +27,11 @@ public class SimpleVariableExpander implements VariableExpander {
      * Construct a string variable expander which looks up variable values
      * from the resolver.
      * 
-     * @param resolver The resolver to lookup variable values from.
+     * @param externalizedProperties The {@link ExternalizedProperties} instance.
      */
-    public SimpleVariableExpander(Resolver resolver) {
+    public SimpleVariableExpander(ExternalizedProperties externalizedProperties) {
         this(
-            resolver, 
+            externalizedProperties,
             DEFAULT_VARIABLE_PREFIX, 
             DEFAULT_VARIABLE_END_SUFFIX
         );
@@ -39,27 +41,61 @@ public class SimpleVariableExpander implements VariableExpander {
      * Construct a string variable expander which uses a custom variable prefix and suffix 
      * and looks up variable values from the resolver.
      * 
-     * @param resolver The resolver to lookup variable values from.
+     * @param externalizedProperties The {@link ExternalizedProperties} instance.
      * @param variablePrefix The variable prefix to look for when expanding variables.
      * @param variableSuffix The variable suffix to look for when expanding variables.
      */
     public SimpleVariableExpander(
-            Resolver resolver,
+            ExternalizedProperties externalizedProperties,
             String variablePrefix,
             String variableSuffix
     ) {
-        this.resolver = requireNonNull(resolver, "resolver");
+        requireNonNull(externalizedProperties, "externalizedProperties");
+        this.resolverProxy = 
+            externalizedProperties.proxy(ResolverProxy.class);
         this.variablePrefix = requireNonNullOrEmptyString(variablePrefix, "variablePrefix");
         this.variableSuffix = requireNonNullOrEmptyString(variableSuffix, "variableSuffix");
     }
 
+    /**
+     * The {@link VariableExpanderProvider} for {@link SimpleVariableExpander}.
+     * 
+     * @return The {@link VariableExpanderProvider} for {@link SimpleVariableExpander}.
+     */
+    public static VariableExpanderProvider<SimpleVariableExpander> provider() {
+        return externalizedProperties -> new SimpleVariableExpander(externalizedProperties);
+    }
+
+    /**
+     * The {@link VariableExpanderProvider} for {@link SimpleVariableExpander}.
+     * 
+     * @param variablePrefix The variable prefix to look for when expanding variables.
+     * @param variableSuffix The variable suffix to look for when expanding variables.
+     * @return The {@link VariableExpanderProvider} for {@link SimpleVariableExpander}.
+     */
+    public static VariableExpanderProvider<SimpleVariableExpander> provider(
+            String variablePrefix,
+            String variableSuffix
+    ) {
+        requireNonNullOrEmptyString(variablePrefix, "variablePrefix");
+        requireNonNullOrEmptyString(variableSuffix, "variableSuffix");
+        return externalizedProperties -> new SimpleVariableExpander(
+            externalizedProperties,
+            variablePrefix,
+            variableSuffix
+        );
+    }
+
     /** {@inheritDoc} */
     @Override
-    public String expandVariables(String value) {
-        requireNonNull(value, "value");
+    public String expandVariables(ProxyMethod proxyMethod, String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+
         try {
             return expandVariables(new StringBuilder(value)).toString();
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             throw new VariableExpansionException(
                 "Exception occurred while trying to expand value: " + value,
                 ex
@@ -74,28 +110,37 @@ public class SimpleVariableExpander implements VariableExpander {
         }
 
         int variableNameStartIndex = startIndex + variablePrefix.length();
-
-        int endIndex = builder.indexOf(variableSuffix, variableNameStartIndex);
-        if (endIndex == -1 || variableNameStartIndex == endIndex) {
+        int variableNameEndIndex = builder.indexOf(variableSuffix, variableNameStartIndex);
+        if (variableNameEndIndex == -1 || variableNameStartIndex == variableNameEndIndex) {
             // No end tag or no variable name in between start and end tags.
             // e.g. "${test" or "${}"
             return builder;
         }
 
-        String variableName = builder.substring(variableNameStartIndex, endIndex);
+        String variableName = builder.substring(variableNameStartIndex, variableNameEndIndex);
 
         String variableValue = resolvePropertyValueOrThrow(variableName);
 
-        builder.replace(startIndex, endIndex + 1, variableValue);
+        builder.replace(startIndex, variableNameEndIndex + 1, variableValue);
 
         return expandVariables(builder);
     }
 
     private String resolvePropertyValueOrThrow(String variableName) {
-        return resolver.resolve(variableName)
-            .orElseThrow(() -> new VariableExpansionException(
+        try {
+            // Should throw if cannot be resolved.
+            return resolverProxy.resolve(variableName);
+        } catch (RuntimeException e) {
+            throw new VariableExpansionException(
                 "Failed to expand \"" + variableName + "\" variable. " +
-                "Variable value cannot be resolved from the resolver."
-            ));
+                "Variable value cannot be resolved from the resolver.",
+                e
+            );
+        }
+    }
+
+    static interface ResolverProxy {
+        @ExternalizedProperty
+        public String resolve(String propertyName);
     }
 }

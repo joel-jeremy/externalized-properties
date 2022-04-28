@@ -1,5 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverProvider;
+
 import java.util.Arrays;
 
 /**
@@ -23,5 +25,14 @@ public class DefaultResolver extends CompositeResolver {
             new SystemPropertyResolver(),
             new EnvironmentVariableResolver()
         ));
+    }
+
+    /**
+     * The {@link ResolverProvider} for {@link DefaultResolver}.
+     * 
+     * @return The {@link ResolverProvider} for {@link DefaultResolver}.
+     */
+    public static ResolverProvider<DefaultResolver> provider() {
+        return externalizedProperties -> new DefaultResolver();
     }
 }

@@ -1,16 +1,27 @@
 package io.github.jeyjeyemem.externalizedproperties.core.conversion.converters;
 
-import io.github.jeyjeyemem.externalizedproperties.core.ConversionContext;
 import io.github.jeyjeyemem.externalizedproperties.core.ConversionResult;
 import io.github.jeyjeyemem.externalizedproperties.core.Converter;
+import io.github.jeyjeyemem.externalizedproperties.core.ConverterProvider;
+import io.github.jeyjeyemem.externalizedproperties.core.TypeUtilities;
 import io.github.jeyjeyemem.externalizedproperties.core.conversion.ConversionException;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
 
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
+import java.lang.reflect.Type;
 
 /**
  * Supports conversion of values to enums.
  */
 public class EnumConverter implements Converter<Enum<?>> {
+    /**
+     * The {@link ConverterProvider} for {@link EnumConverter}.
+     * 
+     * @return The {@link ConverterProvider} for {@link EnumConverter}.
+     */
+    public static ConverterProvider<EnumConverter> provider() {
+        return (externalizedProperties, rootConverter) -> new EnumConverter();
+    }
+
     /** {@inheritDoc} */
     @Override
     public boolean canConvertTo(Class<?> targetType) {
@@ -19,10 +30,12 @@ public class EnumConverter implements Converter<Enum<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<? extends Enum<?>> convert(ConversionContext context) {
-        requireNonNull(context, "context");
-        
-        Class<?> enumClass = context.rawTargetType();
+    public ConversionResult<? extends Enum<?>> convert(
+            ProxyMethod proxyMethod,
+            String valueToConvert,
+            Type targetType
+    ) { 
+        Class<?> enumClass = TypeUtilities.getRawType(targetType);
         
         Object[] enumConstants = enumClass.getEnumConstants();
         if (enumConstants == null) {
@@ -32,7 +45,7 @@ public class EnumConverter implements Converter<Enum<?>> {
 
         for (Object enumConstant : enumConstants) {
             Enum<?> enumValue = (Enum<?>)enumConstant;
-            if (enumValue.name().equals(context.value())) {
+            if (enumValue.name().equals(valueToConvert)) {
                 return ConversionResult.of(enumValue);
             }
         }
@@ -40,7 +53,7 @@ public class EnumConverter implements Converter<Enum<?>> {
         throw new ConversionException(String.format(
             "Invalid (%s) enum value: %s",
             enumClass.getName(),
-            context.value()
+            valueToConvert
         ));
     }
 }

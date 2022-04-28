@@ -10,7 +10,18 @@ jar {
     }
 }
 
+dependencies {
+    // For testing different resource formats in ResourceResolver.
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2'
+    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.2'
+    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.2'
+}
+
 jmh {
+    jmhVersion = '1.35'
+    // includes = ['ResolutionBenchmarks', 'ConversionBenchmarks', 'VariableExpansionBenchmarks']
+    humanOutputFile = project.file("${project.buildDir}/reports/jmh/human.txt")
     resultsFile = project.file("${project.buildDir}/reports/jmh/results.json")
     resultFormat = 'JSON'
+    jvmArgs = [ '-Xmx2G' ]
 }

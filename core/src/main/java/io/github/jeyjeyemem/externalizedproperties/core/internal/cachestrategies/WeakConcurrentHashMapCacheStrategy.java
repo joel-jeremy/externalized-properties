@@ -1,6 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core.internal.cachestrategies;
 
 import io.github.jeyjeyemem.externalizedproperties.core.CacheStrategy;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -81,20 +82,20 @@ public class WeakConcurrentHashMapCacheStrategy<K, V> implements CacheStrategy<K
          * Constructor.
          * 
          * @param referent The referent.
-         * @param referenceQueue The reference queue.
          */
-        public WeakKey(K referent, ReferenceQueue<? super K> referenceQueue) {
-            super(referent, referenceQueue);
-            hashCode = referent.hashCode();
+        WeakKey(K referent) {
+            this(referent, null);
         }
 
         /**
          * Constructor.
          * 
          * @param referent The referent.
+         * @param referenceQueue The reference queue.
          */
-        public WeakKey(K referent) {
-            this(referent, null);
+        WeakKey(K referent, @Nullable ReferenceQueue<? super K> referenceQueue) {
+            super(referent, referenceQueue);
+            hashCode = referent.hashCode();
         }
 
         /** {@inheritDoc} */

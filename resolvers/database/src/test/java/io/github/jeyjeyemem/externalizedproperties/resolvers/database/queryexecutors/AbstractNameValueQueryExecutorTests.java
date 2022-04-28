@@ -1,7 +1,6 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database.queryexecutors;
 
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.ConnectionProvider;
-import io.github.jeyjeyemem.externalizedproperties.resolvers.database.DatabaseProperty;
 import io.github.jeyjeyemem.externalizedproperties.resolvers.database.testentities.H2Utils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +11,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -292,7 +292,7 @@ public class AbstractNameValueQueryExecutorTests {
                 "test.property.2"
             );
             
-            List<DatabaseProperty> resolved = queryExecutor.queryProperties(
+            Map<String, String> resolved = queryExecutor.queryProperties(
                 CONNECTION_PROVIDER.getConnection(),
                 propertiesToQuery
             );
@@ -301,20 +301,12 @@ public class AbstractNameValueQueryExecutorTests {
             
             assertEquals(
                 "test/property/value/1", 
-                resolved.stream()
-                    .filter(rp -> rp.name().equals("test.property.1"))
-                    .map(DatabaseProperty::value)
-                    .findFirst()
-                    .orElse(null)
+                resolved.get("test.property.1")
             );
 
             assertEquals(
                 "test/property/value/2", 
-                resolved.stream()
-                    .filter(rp -> rp.name().equals("test.property.2"))
-                    .map(DatabaseProperty::value)
-                    .findFirst()
-                    .orElse(null)
+                resolved.get("test.property.2")
             );
         }
 
@@ -351,7 +343,7 @@ public class AbstractNameValueQueryExecutorTests {
                 "test.property.2"
             );
             
-            List<DatabaseProperty> resolved = queryExecutor.queryProperties(
+            Map<String, String> resolved = queryExecutor.queryProperties(
                 CONNECTION_PROVIDER.getConnection(),
                 propertiesToQuery
             );
@@ -360,20 +352,12 @@ public class AbstractNameValueQueryExecutorTests {
             
             assertEquals(
                 "test/property/value/1", 
-                resolved.stream()
-                    .filter(rp -> rp.name().equals("test.property.1"))
-                    .map(DatabaseProperty::value)
-                    .findFirst()
-                    .orElse(null)
+                resolved.get("test.property.1")
             );
 
             assertEquals(
                 "test/property/value/2", 
-                resolved.stream()
-                    .filter(rp -> rp.name().equals("test.property.2"))
-                    .map(DatabaseProperty::value)
-                    .findFirst()
-                    .orElse(null)
+                resolved.get("test.property.2")
             );
         }
 

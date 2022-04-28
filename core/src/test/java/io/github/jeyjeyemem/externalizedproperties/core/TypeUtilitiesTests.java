@@ -1,7 +1,7 @@
 package io.github.jeyjeyemem.externalizedproperties.core;
 
 import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.jeyjeyemem.externalizedproperties.core.testentities.ProxyMethodUtils;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.ProxyMethodUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,10 +24,10 @@ public class TypeUtilitiesTests {
     @Nested
     class GetRawTypeMethod {
         @Test
-        @DisplayName("should return null when type argument is null.")
+        @DisplayName("should throw when type argument is null.")
         public void nullTest() {
             assertThrows(
-                IllegalArgumentException.class, 
+                IllegalArgumentException.class,
                 () -> TypeUtilities.getRawType(null)
             );
         }
@@ -50,7 +50,7 @@ public class TypeUtilitiesTests {
                     "parameterizedTypeReturnType"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
             assertEquals(
@@ -71,7 +71,7 @@ public class TypeUtilitiesTests {
                     "genericArrayTypeReturnTypeWithTypeVariable"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertTrue(genericReturnType instanceof GenericArrayType);
             assertEquals(
@@ -92,7 +92,7 @@ public class TypeUtilitiesTests {
                     "genericArrayTypeReturnTypeWithTypeVariableExtends"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertTrue(genericReturnType instanceof GenericArrayType);
             assertEquals(
@@ -113,7 +113,7 @@ public class TypeUtilitiesTests {
                     "typeVariableReturnType"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertTrue(genericReturnType instanceof TypeVariable<?>);
             assertEquals(
@@ -134,7 +134,7 @@ public class TypeUtilitiesTests {
                     "typeVariableReturnTypeExtends"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertTrue(genericReturnType instanceof TypeVariable<?>);
             assertEquals(
@@ -157,7 +157,7 @@ public class TypeUtilitiesTests {
                 
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
 
@@ -185,7 +185,7 @@ public class TypeUtilitiesTests {
                 
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
 
@@ -213,7 +213,7 @@ public class TypeUtilitiesTests {
                 
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
 
@@ -237,18 +237,14 @@ public class TypeUtilitiesTests {
             );
         }
 
-
-
         @Test
         @DisplayName("should throw when type argument is an unrecognized type")
         public void unrecognizedGenericArrayComponentTypeTest() {
             GenericArrayType genericArrayType = new GenericArrayType() {
                 @Override
                 public Type getGenericComponentType() {
-                    // For any generic component type returns null.
-                    return null;
+                    return new UnsupportedType();
                 }
-        
             };
             assertThrows(
                 IllegalArgumentException.class, 
@@ -268,7 +264,7 @@ public class TypeUtilitiesTests {
                     "parameterizedTypeReturnType"
                 );
             
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertArrayEquals(
                 new Type[] { String.class },
@@ -285,7 +281,7 @@ public class TypeUtilitiesTests {
                     "nonParameterizedTypeReturnType"
                 );
             
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertTrue(TypeUtilities.getTypeParameters(genericReturnType).length == 0);
         }
@@ -310,7 +306,7 @@ public class TypeUtilitiesTests {
                     "parameterizedTypeReturnType"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertFalse(genericReturnType instanceof Class<?>);
             assertFalse(TypeUtilities.isClass(genericReturnType));
@@ -328,7 +324,7 @@ public class TypeUtilitiesTests {
                     "parameterizedTypeReturnType"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof ParameterizedType);
             assertTrue(TypeUtilities.isParameterizedType(genericReturnType));
         }
@@ -353,7 +349,7 @@ public class TypeUtilitiesTests {
                     "genericArrayTypeReturnTypeWithTypeVariable"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof GenericArrayType);
             assertTrue(TypeUtilities.isGenericArrayType(genericReturnType));
         }
@@ -378,7 +374,7 @@ public class TypeUtilitiesTests {
                     "typeVariableReturnType"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof TypeVariable<?>);
             assertTrue(TypeUtilities.isTypeVariable(genericReturnType));
         }
@@ -405,7 +401,7 @@ public class TypeUtilitiesTests {
             
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
 
@@ -447,7 +443,7 @@ public class TypeUtilitiesTests {
                     "parameterizedTypeReturnType"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof ParameterizedType);
             assertNull(TypeUtilities.asClass(genericReturnType));
         }
@@ -464,7 +460,7 @@ public class TypeUtilitiesTests {
                     "parameterizedTypeReturnType"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof ParameterizedType);
             assertEquals(
                 genericReturnType,
@@ -492,7 +488,7 @@ public class TypeUtilitiesTests {
                     "genericArrayTypeReturnTypeWithTypeVariable"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof GenericArrayType);
             assertEquals(
                 genericReturnType,
@@ -520,7 +516,7 @@ public class TypeUtilitiesTests {
                     "typeVariableReturnType"
                 );
                 
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof TypeVariable<?>);
             assertEquals(
                 genericReturnType,
@@ -550,7 +546,7 @@ public class TypeUtilitiesTests {
             
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = proxyMethod.genericReturnType();
+            Type genericReturnType = proxyMethod.returnType();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
 
@@ -574,7 +570,6 @@ public class TypeUtilitiesTests {
     }
 
     public static interface TypesInterface {
-
         String nonParameterizedTypeReturnType();
         List<String> parameterizedTypeReturnType();
         

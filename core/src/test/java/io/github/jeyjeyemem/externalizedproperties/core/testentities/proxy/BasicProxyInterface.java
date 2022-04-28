@@ -6,26 +6,12 @@ public interface BasicProxyInterface {
     @ExternalizedProperty("property")
     String property();
 
-    // @ExternalizedProperty("property.with.default.value")
-    // default String propertyWithDefaultValue() {
-    //     return "default.value";
-    // }
+    @ExternalizedProperty("property.1")
+    String property1();
 
-    // @ExternalizedProperty("property.with.default.value")
-    // default String propertyWithDefaultValueParameter(String defaultValue) {
-    //     return defaultValue;
-    // }
+    @ExternalizedProperty("property.2")
+    String property2();
 
-    // // No annotation with constant default value.
-    // default String propertyWithNoAnnotationButWithDefaultValue() {
-    //     return "default.value";
-    // }
-
-    // // No annotation but with default value parameter.
-    // default String propertyWithNoAnnotationButWithDefaultValueParameter(String defaultValue) {
-    //     return defaultValue;
-    // }
-
-    // // No annotation and no default value.
-    // String propertyWithNoAnnotationAndNoDefaultValue();
+    @ExternalizedProperty("property.3")
+    String property3();
 }

@@ -1,12 +1,11 @@
 package io.github.jeyjeyemem.externalizedproperties.core.resolvers;
 
 import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
+import io.github.jeyjeyemem.externalizedproperties.core.ResolverProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
-
-import static io.github.jeyjeyemem.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
  * A {@link Resolver} implementation which resolves requested properties 
@@ -18,16 +17,16 @@ public class ServiceLoaderResolver extends CompositeResolver {
      * {@link ServiceLoader#load(Class)}.
      */
     public ServiceLoaderResolver() {
-        this(ServiceLoader.load(Resolver.class));
+        super(toList(ServiceLoader.load(Resolver.class)));
     }
 
     /**
-     * Constructor.
+     * The {@link ResolverProvider} for {@link ServiceLoaderResolver}.
      * 
-     * @param resolvers The service loader for {@link Resolver} implementations.
+     * @return The {@link ResolverProvider} for {@link ServiceLoaderResolver}.
      */
-    public ServiceLoaderResolver(ServiceLoader<Resolver> resolvers) {
-        super(toList(requireNonNull(resolvers, "resolvers")));
+    public static ResolverProvider<ServiceLoaderResolver> provider() {
+        return externalizedProperties -> new ServiceLoaderResolver();
     }
     
     private static List<Resolver> toList(ServiceLoader<Resolver> resolvers) {

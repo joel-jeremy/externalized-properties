@@ -1,10 +1,13 @@
 package io.github.jeyjeyemem.externalizedproperties.resolvers.database;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import javax.sql.DataSource;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * An implementation which gets connections from JDBC.
@@ -20,7 +23,7 @@ public class JdbcConnectionProvider implements ConnectionProvider {
      */
     public JdbcConnectionProvider(DataSource dataSource) {
         if (dataSource == null) {
-            throw new IllegalArgumentException("dataSource must not be null");
+            throw new IllegalArgumentException("dataSource must not be null.");
         }
         this.adapter = dataSource::getConnection;
     }
@@ -50,11 +53,11 @@ public class JdbcConnectionProvider implements ConnectionProvider {
      */
     public JdbcConnectionProvider(
             DataSource dataSource,
-            String username,
-            String password
+            @Nullable String username,
+            @Nullable String password
     ) {
         if (dataSource == null) {
-            throw new IllegalArgumentException("dataSource must not be null");
+            throw new IllegalArgumentException("dataSource must not be null.");
         }
         this.adapter = () -> dataSource.getConnection(username, password);
     }
@@ -62,21 +65,21 @@ public class JdbcConnectionProvider implements ConnectionProvider {
     /**
      * Constructor.
      * 
-     * @param jdbcConnectionUrl The JDBC connection URL.
+     * @param jdbcConnectionString The JDBC connection URL to use when requesting 
+     * connections via {@link DriverManager#getConnection(String)}.
      */
-    public JdbcConnectionProvider(
-            String jdbcConnectionUrl
-    ) {
-        if (jdbcConnectionUrl == null) {
-            throw new IllegalArgumentException("jdbcConnectionUrl must not be null");
+    public JdbcConnectionProvider(String jdbcConnectionString) {
+        if (jdbcConnectionString == null) {
+            throw new IllegalArgumentException("jdbcConnectionString must not be null.");
         }
-        this.adapter = () -> DriverManager.getConnection(jdbcConnectionUrl);
+        this.adapter = () -> DriverManager.getConnection(jdbcConnectionString);
     }
 
     /**
      * Constructor.
      * 
-     * @param jdbcConnectionString The JDBC connection string.
+     * @param jdbcConnectionString The JDBC connection URL to use when requesting 
+     * connections via {@link DriverManager#getConnection(String, String, String)}.
      * @param username The username to use when requesting for connections 
      * from {@link DriverManager}.
      */
@@ -90,7 +93,8 @@ public class JdbcConnectionProvider implements ConnectionProvider {
     /**
      * Constructor.
      * 
-     * @param jdbcConnectionString The JDBC connection string.
+     * @param jdbcConnectionString The JDBC connection URL to use when requesting 
+     * connections via {@link DriverManager#getConnection(String, String, String)}.
      * @param username The username to use when requesting for connections 
      * from {@link DriverManager}.
      * @param password The password to use when requesting for connections 
@@ -98,16 +102,40 @@ public class JdbcConnectionProvider implements ConnectionProvider {
      */
     public JdbcConnectionProvider(
             String jdbcConnectionString,
-            String username,
-            String password
+            @Nullable String username,
+            @Nullable String password
     ) {
         if (jdbcConnectionString == null) {
-            throw new IllegalArgumentException("jdbcConnectionString must not be null");
+            throw new IllegalArgumentException("jdbcConnectionString must not be null.");
         }
         this.adapter = () -> DriverManager.getConnection(
             jdbcConnectionString,
             username,
             password
+        );
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param jdbcConnectionString The JDBC connection URL to use when requesting 
+     * connections via {@link DriverManager#getConnection(String, Properties)}.
+     * @param properties The properties to use when requesting for connections 
+     * from {@link DriverManager}.
+     */
+    public JdbcConnectionProvider(
+            String jdbcConnectionString,
+            Properties properties
+    ) {
+        if (jdbcConnectionString == null) {
+            throw new IllegalArgumentException("jdbcConnectionString must not be null.");
+        }
+        if (properties == null) {
+            throw new IllegalArgumentException("properties must not be null.");
+        }
+        this.adapter = () -> DriverManager.getConnection(
+            jdbcConnectionString,
+            properties
         );
     }
 

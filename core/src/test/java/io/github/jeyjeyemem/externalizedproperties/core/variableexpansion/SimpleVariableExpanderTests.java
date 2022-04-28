@@ -1,42 +1,65 @@
 package io.github.jeyjeyemem.externalizedproperties.core.variableexpansion;
 
-import io.github.jeyjeyemem.externalizedproperties.core.Resolver;
-import io.github.jeyjeyemem.externalizedproperties.core.resolvers.SystemPropertyResolver;
+import io.github.jeyjeyemem.externalizedproperties.core.ExternalizedProperties;
+import io.github.jeyjeyemem.externalizedproperties.core.VariableExpanderProvider;
+import io.github.jeyjeyemem.externalizedproperties.core.proxy.ProxyMethod;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.NoPropertyNameProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testentities.proxy.VariableProxyInterface;
+import io.github.jeyjeyemem.externalizedproperties.core.testfixtures.ProxyMethodUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SimpleVariableExpanderTests {
+
+    static ExternalizedProperties EXTERNALIZED_PROPERTIES = 
+        ExternalizedProperties.builder().withDefaultResolvers().build();
+
+    static final ProxyMethod STUB_PROXY_METHOD = ProxyMethodUtils.fromMethod(
+        VariableProxyInterface.class, 
+        "variableProperty"
+    );
+
     @Nested
     class Constructor {
         @Test
-        @DisplayName("should throw when resolvers argument is null")
+        @DisplayName("should throw when externalized properties argument is null")
         public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new SimpleVariableExpander(null)
+                () -> new SimpleVariableExpander(
+                    null,
+                    "${",
+                    "}"
+                )
             );
         }
 
         @Test
-        @DisplayName("should throw when variable prefix argument is null or empty")
+        @DisplayName("should throw when variable prefix argument is null")
         public void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
-                    new SystemPropertyResolver(),
+                    EXTERNALIZED_PROPERTIES,
                     null,
                     "}"
                 )
             );
+        }
 
+        @Test
+        @DisplayName("should throw when variable prefix argument is empty")
+        public void test3() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
-                    new SystemPropertyResolver(),
+                    EXTERNALIZED_PROPERTIES,
                     "",
                     "}"
                 )
@@ -44,21 +67,25 @@ public class SimpleVariableExpanderTests {
         }
 
         @Test
-        @DisplayName("should throw when variable suffix argument is null or empty")
-        public void test3() {
+        @DisplayName("should throw when variable suffix argument is null")
+        public void test4() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
-                    new SystemPropertyResolver(),
+                    EXTERNALIZED_PROPERTIES,
                     "${",
                     null
                 )
             );
+        }
 
+        @Test
+        @DisplayName("should throw when variable suffix argument is empty")
+        public void test5() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
-                    new SystemPropertyResolver(),
+                    EXTERNALIZED_PROPERTIES,
                     "${",
                     ""
                 )
@@ -67,31 +94,120 @@ public class SimpleVariableExpanderTests {
     }
 
     @Nested
-    class ExpandVariablesMethod {
+    class ProviderMethod {
         @Test
-        @DisplayName("should throw when value argument is null")
-        public void validationTest1() {
-            SimpleVariableExpander variableExpander =  variableExpander(
-                new SystemPropertyResolver()
-            );
+        @DisplayName("should not return null.")
+        public void test1() {
+            VariableExpanderProvider<SimpleVariableExpander> provider = 
+                SimpleVariableExpander.provider();
 
+            assertNotNull(provider);
+        }
+
+        @Test
+        @DisplayName("should return an instance on get.")
+        public void test2() {
+            VariableExpanderProvider<SimpleVariableExpander> provider = 
+                SimpleVariableExpander.provider();
+
+            assertNotNull(
+                provider.get(
+                    ExternalizedProperties.builder()
+                        .withDefaultResolvers()
+                        .variableExpander(provider)
+                        .build()
+                )
+            );
+        }
+    }
+
+    @Nested
+    class ProviderMethodWithVariablePrefixAndSuffixOverload {
+        @Test
+        @DisplayName("should throw when variable prefix is null or empty.")
+        public void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> variableExpander.expandVariables(null)
+                () -> SimpleVariableExpander.provider(null, "}")
+            );
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> SimpleVariableExpander.provider("", "}")
             );
         }
 
         @Test
-        @DisplayName("should expand variable with value from resolver")
+        @DisplayName("should throw when variable suffix is null or empty.")
+        public void test2() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> SimpleVariableExpander.provider("${", null)
+            );
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> SimpleVariableExpander.provider("${", "")
+            );
+        }
+        @Test
+        @DisplayName("should not return null.")
+        public void test3() {
+            VariableExpanderProvider<SimpleVariableExpander> provider = 
+                SimpleVariableExpander.provider("${", "}");
+
+            assertNotNull(provider);
+        }
+
+        @Test
+        @DisplayName("should return an instance on get.")
+        public void test4() {
+            VariableExpanderProvider<SimpleVariableExpander> provider = 
+                SimpleVariableExpander.provider("${", "}");
+
+            assertNotNull(
+                provider.get(
+                    ExternalizedProperties.builder()
+                        .withDefaultResolvers()
+                        .variableExpander(provider)
+                        .build()
+                )
+            );
+        }
+    }
+
+    @Nested
+    class ExpandVariablesMethod {
+        @Test
+        @DisplayName("should return value when value is null or empty")
         public void test1() {
-            SystemPropertyResolver resolver = new SystemPropertyResolver();
-            SimpleVariableExpander variableExpander = variableExpander(
-                resolver
+            SimpleVariableExpander variableExpander = variableExpander();
+
+            String nullResult = variableExpander.expandVariables(
+                STUB_PROXY_METHOD, 
+                null
+            );
+            String emptyResult = variableExpander.expandVariables(
+                STUB_PROXY_METHOD, 
+                ""
             );
 
-            String result = variableExpander.expandVariables("property-${java.version}");
+            assertNull(nullResult);
+            assertEquals("", emptyResult);
+        }
 
-            String propertyValue = resolver.resolve("java.version").orElse(null);
+        @Test
+        @DisplayName("should expand variable with value from resolver")
+        public void test2() {
+            SimpleVariableExpander variableExpander = variableExpander();
+
+            String result = variableExpander.expandVariables(
+                STUB_PROXY_METHOD, 
+                "property-${java.version}"
+            );
+
+            NoPropertyNameProxyInterface resolverProxy = 
+                EXTERNALIZED_PROPERTIES.proxy(NoPropertyNameProxyInterface.class);
+            
+            String propertyValue = resolverProxy.resolve("java.version");
 
             assertEquals(
                 "property-" + propertyValue, 
@@ -101,33 +217,35 @@ public class SimpleVariableExpanderTests {
 
         @Test
         @DisplayName("should expand multiple variables with values from resolvers")
-        public void test2() {
-            SystemPropertyResolver resolver = new SystemPropertyResolver();
-            SimpleVariableExpander variableExpander = variableExpander(
-                resolver
-            );
+        public void test3() {
+            SimpleVariableExpander variableExpander = variableExpander();
 
             String result = variableExpander.expandVariables(
+                STUB_PROXY_METHOD,
                 "property-${java.version}-home-${java.home}"
             );
 
-            String javaVersionProeprty = resolver.resolve("java.version").orElse(null);
-            String javaHomeProperty = resolver.resolve("java.home").orElse(null);
+            NoPropertyNameProxyInterface resolverProxy = 
+                EXTERNALIZED_PROPERTIES.proxy(NoPropertyNameProxyInterface.class);
+            
+            String javaVersionProperty = resolverProxy.resolve("java.version");
+            String javaHomeProperty = resolverProxy.resolve("java.home");
 
             assertEquals(
-                "property-" + javaVersionProeprty + "-home-" + javaHomeProperty, 
+                "property-" + javaVersionProperty + "-home-" + javaHomeProperty, 
                 result
             );
         }
 
         @Test
         @DisplayName("should return original string when there are no variables")
-        public void test3() {
-            SimpleVariableExpander variableExpander =  variableExpander(
-                new SystemPropertyResolver()
-            );
+        public void test4() {
+            SimpleVariableExpander variableExpander = variableExpander();
 
-            String result = variableExpander.expandVariables("property-no-variables");
+            String result = variableExpander.expandVariables(
+                STUB_PROXY_METHOD,
+                "property-no-variables"
+            );
 
             assertEquals(
                 "property-no-variables", 
@@ -136,26 +254,17 @@ public class SimpleVariableExpanderTests {
         }
 
         @Test
-        @DisplayName("should throw when variable cannot be resolver from any resolvers")
-        public void test4() {
-            SimpleVariableExpander variableExpander = variableExpander(
-                new SystemPropertyResolver()
-            );
+        @DisplayName("should throw when variable cannot be resolved from any resolvers")
+        public void test5() {
+            SimpleVariableExpander variableExpander = variableExpander();
 
             assertThrows(
                 VariableExpansionException.class, 
-                () -> variableExpander.expandVariables("property-${nonexistent}")
+                () -> variableExpander.expandVariables(
+                    STUB_PROXY_METHOD,
+                    "property-${nonexistent}"
+                )
             );
-        }
-
-        @Test
-        @DisplayName("should return empty when value is empty")
-        public void test5() {
-            SimpleVariableExpander variableExpander = variableExpander(
-                new SystemPropertyResolver()
-            );
-
-            assertEquals("", variableExpander.expandVariables(""));
         }
 
         @Test
@@ -164,11 +273,12 @@ public class SimpleVariableExpanderTests {
             "variable prefix and variable suffix"
         )
         public void test6() {
-            SimpleVariableExpander variableExpander =  variableExpander(
-                new SystemPropertyResolver()
-            );
+            SimpleVariableExpander variableExpander = variableExpander();
 
-            String result = variableExpander.expandVariables("test-${}");
+            String result = variableExpander.expandVariables(
+                STUB_PROXY_METHOD, 
+                "test-${}"
+            );
 
             assertEquals("test-${}", result);
         }
@@ -179,11 +289,12 @@ public class SimpleVariableExpanderTests {
             "when there is there is a variable prefix detected but no variable suffix"
         )
         public void test7() {
-            SimpleVariableExpander variableExpander = variableExpander(
-                new SystemPropertyResolver()
-            );
+            SimpleVariableExpander variableExpander = variableExpander();
 
-            String result = variableExpander.expandVariables("test-${variable");
+            String result = variableExpander.expandVariables(
+                STUB_PROXY_METHOD, 
+                "test-${variable"
+            );
 
             assertEquals("test-${variable", result);
         }
@@ -193,16 +304,20 @@ public class SimpleVariableExpanderTests {
             "should expand variable with value from resolver using custom prefix and suffix"
         )
         public void test8() {
-            SystemPropertyResolver resolver = new SystemPropertyResolver();
             SimpleVariableExpander variableExpander = variableExpander(
-                resolver,
-                "#",
-                "^"
+                "#[",
+                "]"
             );
 
-            String result = variableExpander.expandVariables("property-#java.version^");
+            String result = variableExpander.expandVariables(
+                STUB_PROXY_METHOD,
+                "property-#[java.version]"
+            );
 
-            String propertyValue = resolver.resolve("java.version").orElse(null);
+            NoPropertyNameProxyInterface resolverProxy = 
+                EXTERNALIZED_PROPERTIES.proxy(NoPropertyNameProxyInterface.class);
+            
+            String propertyValue = resolverProxy.resolve("java.version");
 
             assertEquals(
                 "property-" + propertyValue, 
@@ -211,19 +326,32 @@ public class SimpleVariableExpanderTests {
         }
     }
 
-    private SimpleVariableExpander variableExpander(Resolver resolver) {
-        return new SimpleVariableExpander(resolver);
+    private SimpleVariableExpander variableExpander() {
+        VariableExpanderProvider<SimpleVariableExpander> provider = 
+            SimpleVariableExpander.provider();
+
+        ExternalizedProperties externalizedProperties =
+            ExternalizedProperties.builder()
+                .withDefaultResolvers()
+                .variableExpander(provider)
+                .build();
+
+        return provider.get(externalizedProperties);
     }
 
     private SimpleVariableExpander variableExpander(
-            Resolver resolver,
             String variablePrefix,
             String variableSuffix
     ) {
-        return new SimpleVariableExpander(
-            resolver,
-            variablePrefix,
-            variableSuffix
-        );
+        VariableExpanderProvider<SimpleVariableExpander> provider = 
+            SimpleVariableExpander.provider(variablePrefix, variableSuffix);
+
+        ExternalizedProperties externalizedProperties =
+            ExternalizedProperties.builder()
+                .withDefaultResolvers()
+                .variableExpander(provider)
+                .build();
+
+        return provider.get(externalizedProperties);
     }
 }
