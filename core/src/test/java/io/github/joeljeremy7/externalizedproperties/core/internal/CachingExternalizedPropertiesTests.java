@@ -1,7 +1,7 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubCacheStrategy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -59,8 +59,8 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            BasicProxyInterface proxy = cachingExternalizedProperties.proxy(
-                BasicProxyInterface.class
+            ProxyInterface proxy = cachingExternalizedProperties.proxy(
+                ProxyInterface.class
             );
 
             assertNotNull(proxy);
@@ -82,11 +82,11 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            BasicProxyInterface proxy1 = cachingExternalizedProperties.proxy(
-                BasicProxyInterface.class
+            ProxyInterface proxy1 = cachingExternalizedProperties.proxy(
+                ProxyInterface.class
             );
-            BasicProxyInterface proxy2 = cachingExternalizedProperties.proxy(
-                BasicProxyInterface.class
+            ProxyInterface proxy2 = cachingExternalizedProperties.proxy(
+                ProxyInterface.class
             );
 
             assertSame(proxy1, proxy2);
@@ -109,9 +109,9 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            BasicProxyInterface proxy = cachingExternalizedProperties.proxy(
-                BasicProxyInterface.class,
-                BasicProxyInterface.class.getClassLoader()
+            ProxyInterface proxy = cachingExternalizedProperties.proxy(
+                ProxyInterface.class,
+                ProxyInterface.class.getClassLoader()
             );
 
             assertNotNull(proxy);
@@ -133,17 +133,22 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            BasicProxyInterface proxy1 = cachingExternalizedProperties.proxy(
-                BasicProxyInterface.class,
-                BasicProxyInterface.class.getClassLoader()
+            ProxyInterface proxy1 = cachingExternalizedProperties.proxy(
+                ProxyInterface.class,
+                ProxyInterface.class.getClassLoader()
             );
             
-            BasicProxyInterface proxy2 = cachingExternalizedProperties.proxy(
-                BasicProxyInterface.class,
-                BasicProxyInterface.class.getClassLoader()
+            ProxyInterface proxy2 = cachingExternalizedProperties.proxy(
+                ProxyInterface.class,
+                ProxyInterface.class.getClassLoader()
             );
 
             assertSame(proxy1, proxy2);
         }
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property")
+        String property();
     }
 }

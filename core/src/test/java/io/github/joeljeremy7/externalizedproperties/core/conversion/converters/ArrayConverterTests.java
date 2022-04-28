@@ -3,12 +3,13 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.ArrayProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ArrayConverterTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY = 
+        new ProxyMethodFactory<>(ProxyInterface.class);
+
     @Nested
     class ProviderMethod {
         @Test
@@ -93,9 +97,8 @@ public class ArrayConverterTests {
             ArrayConverter converter = converterToTest();
 
             // Method return type is an int and not an array e.g. String[]
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                PrimitiveProxyInterface.class,
-                "intPrimitiveProperty"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::notSupportedNotAnArray
             );
 
             ConversionResult<?> result = converter.convert(
@@ -112,9 +115,8 @@ public class ArrayConverterTests {
         void test2() {
             ArrayConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                ArrayProxyInterface.class,
-                "arrayProperty"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::arrayProperty
             );
 
             ConversionResult<? extends Object[]> result = 
@@ -140,9 +142,8 @@ public class ArrayConverterTests {
         void test3() {
             ArrayConverter converter = converterToTest(PrimitiveConverter.provider());
 
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                ArrayProxyInterface.class,
-                "arrayIntegerWrapper"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::arrayIntegerWrapper
             );
             
             ConversionResult<? extends Object[]> result = converter.convert(
@@ -167,9 +168,8 @@ public class ArrayConverterTests {
         void test4() {
             ArrayConverter converter = converterToTest();
             
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                ArrayProxyInterface.class,
-                "arrayProperty"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::arrayProperty
             );
             
             ConversionResult<? extends Object[]> result = converter.convert(
@@ -188,9 +188,8 @@ public class ArrayConverterTests {
         void test5() {
             ArrayConverter converter = converterToTest();
             
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                ArrayProxyInterface.class,
-                "arrayProperty"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::arrayProperty
             );
             
             ConversionResult<? extends Object[]> result = converter.convert(
@@ -215,9 +214,8 @@ public class ArrayConverterTests {
         void test6() {
             ArrayConverter converter = converterToTest();
             
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                ArrayProxyInterface.class,
-                "arrayPropertyStripEmpty"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::arrayPropertyStripEmpty
             );
             
             ConversionResult<? extends Object[]> result = converter.convert(
@@ -242,9 +240,8 @@ public class ArrayConverterTests {
         void test7() {
             ArrayConverter converter = converterToTest();
             
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                ArrayProxyInterface.class,
-                "arrayPropertyObject"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::arrayPropertyObject
             );
             
             ConversionResult<? extends Object[]> result = converter.convert(
@@ -273,9 +270,8 @@ public class ArrayConverterTests {
             // No registered converter for Integer.
             ArrayConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                ArrayProxyInterface.class,
-                "arrayIntegerWrapper"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::arrayIntegerWrapper
             );
             
             assertThrows(ConversionException.class, () -> {
@@ -291,9 +287,8 @@ public class ArrayConverterTests {
         void test9() {
             ArrayConverter converter = converterToTest();
             
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                ArrayProxyInterface.class,
-                "arrayCustomDelimiter"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::arrayCustomDelimiter
             );
             
             ConversionResult<? extends Object[]> result = converter.convert(
@@ -320,9 +315,8 @@ public class ArrayConverterTests {
         void test10() {
             ArrayConverter converter = converterToTest(OptionalConverter.provider());
             
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                ArrayProxyInterface.class,
-                "arrayPropertyGeneric" // Returns a generic type array Optional<String>[]
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::arrayPropertyGeneric // Returns a generic type array Optional<String>[]
             );
             
             ConversionResult<? extends Object[]> result = converter.convert(
@@ -353,9 +347,8 @@ public class ArrayConverterTests {
         void test11() {
             ArrayConverter converter = converterToTest(OptionalConverter.provider());
             
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                ArrayProxyInterface.class,
-                "arrayPropertyGenericWildcard" // Returns a generic type array Optional<?>[]
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::arrayPropertyGenericWildcard // Returns a generic type array Optional<?>[]
             );
             
             ConversionResult<? extends Object[]> result = converter.convert(
@@ -384,9 +377,8 @@ public class ArrayConverterTests {
         void test12() {
             ArrayConverter converter = converterToTest();
             
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                ArrayProxyInterface.class,
-                "arrayPropertyT" // Returns a generic type array <T> T[]
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::arrayPropertyT // Returns a generic type array <T> T[]
             );
             
             assertThrows(
@@ -418,5 +410,42 @@ public class ArrayConverterTests {
             allProviders
         );
         return provider.get(externalizedProperties, rootConverter);
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property.array")
+        String[] arrayProperty();
+
+        @ExternalizedProperty("property.array.object")
+        Object[] arrayPropertyObject();
+
+        @ExternalizedProperty("property.array.custom.delimiter")
+        @Delimiter("|")
+        String[] arrayCustomDelimiter();
+
+        @ExternalizedProperty("property.array.stripempty")
+        @StripEmptyValues
+        String[] arrayPropertyStripEmpty();
+
+        @ExternalizedProperty("property.array.integer.wrapper")
+        Integer[] arrayIntegerWrapper();
+
+        @ExternalizedProperty("property.array.integer.primitive")
+        int[] arrayIntegerPrimitive();
+
+        @ExternalizedProperty("property.array.generic")
+        Optional<String>[] arrayPropertyGeneric();
+
+        @ExternalizedProperty("property.array.generic.nested")
+        Optional<Optional<String>>[] arrayPropertyNestedGeneric();
+
+        @ExternalizedProperty("property.array.generic.wildcard")
+        Optional<?>[] arrayPropertyGenericWildcard();
+
+        @ExternalizedProperty("property.array.T")
+        <T> T[] arrayPropertyT();
+
+        @ExternalizedProperty("property.not.supported")
+        int notSupportedNotAnArray();
     }
 }

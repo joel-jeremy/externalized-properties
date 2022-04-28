@@ -1,12 +1,13 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.ResourceResolver.PropertiesReader;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.ResourceResolver.ResourceReader;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.ProxyMethods;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.resolvers.JsonReader;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.resolvers.XmlReader;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.resolvers.YamlReader;
+import io.github.joeljeremy7.externalizedproperties.core.resolvers.resourcereaders.JsonReader;
+import io.github.joeljeremy7.externalizedproperties.core.resolvers.resourcereaders.XmlReader;
+import io.github.joeljeremy7.externalizedproperties.core.resolvers.resourcereaders.YamlReader;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ResourceResolverTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+    
     @Nested
     class FromUrlFactoryMethod {
         @Test
@@ -213,7 +217,9 @@ public class ResourceResolverTests {
                 getClass().getResource("/test.properties")
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property");
 
@@ -231,7 +237,9 @@ public class ResourceResolverTests {
                 getClass().getResource("/test.properties")
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "non.existent.property");
 
@@ -246,7 +254,9 @@ public class ResourceResolverTests {
                 new JsonReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property");
 
@@ -263,7 +273,9 @@ public class ResourceResolverTests {
                 new YamlReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property");
 
@@ -280,7 +292,9 @@ public class ResourceResolverTests {
                 new XmlReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property");
 
@@ -295,7 +309,9 @@ public class ResourceResolverTests {
             URL resourceUrl = getClass().getResource("/test.properties");
             ResourceResolver resolver = resolverToTest(resourceUrl);
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, resourceUrl.toString());
 
@@ -312,7 +328,9 @@ public class ResourceResolverTests {
                 new JsonReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property.nested.awesome");
 
@@ -329,7 +347,9 @@ public class ResourceResolverTests {
                 new YamlReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property.nested.awesome");
 
@@ -346,7 +366,9 @@ public class ResourceResolverTests {
                 new XmlReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property.nested.awesome");
 
@@ -363,7 +385,9 @@ public class ResourceResolverTests {
                 new JsonReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result1 = 
                 resolver.resolve(proxyMethod, "property.nested.array[0]");
             Optional<String> result2 = 
@@ -388,7 +412,9 @@ public class ResourceResolverTests {
                 new YamlReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result1 = 
                 resolver.resolve(proxyMethod, "property.nested.array[0]");
             Optional<String> result2 = 
@@ -413,7 +439,9 @@ public class ResourceResolverTests {
                 new XmlReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result1 = 
                 resolver.resolve(proxyMethod, "property.nested.array.value[0]");
             Optional<String> result2 = 
@@ -438,7 +466,9 @@ public class ResourceResolverTests {
                 new JsonReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property.nested.empty-array");
 
@@ -456,7 +486,9 @@ public class ResourceResolverTests {
                 new YamlReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property.nested.empty-array");
 
@@ -474,7 +506,9 @@ public class ResourceResolverTests {
                 new XmlReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property.nested.empty-array");
 
@@ -492,7 +526,9 @@ public class ResourceResolverTests {
                 new JsonReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property.null");
 
@@ -510,7 +546,9 @@ public class ResourceResolverTests {
                 new YamlReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property.null");
 
@@ -528,7 +566,9 @@ public class ResourceResolverTests {
                 new XmlReader()
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property.null");
 
@@ -555,5 +595,10 @@ public class ResourceResolverTests {
             output.write(buffer, 0, bufferLength);
         }
         return output.toString(StandardCharsets.UTF_8.name());
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property")
+        String property();
     }
 }

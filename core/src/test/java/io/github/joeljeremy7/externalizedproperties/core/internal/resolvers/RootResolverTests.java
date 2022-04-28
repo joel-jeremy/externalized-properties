@@ -1,16 +1,16 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.ProcessorProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
+import io.github.joeljeremy7.externalizedproperties.core.processing.Base64Decode;
 import io.github.joeljeremy7.externalizedproperties.core.processing.Base64DecodeProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.DefaultResolver;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.ProxyMethods;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.ProcessorProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,6 +29,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RootResolverTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+    
     @Nested
     class Constructor {
         @Test
@@ -174,7 +177,9 @@ public class RootResolverTests {
         @Test
         @DisplayName("should throw when property name is null")
         public void test2() {
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             RootResolver resolver = rootResolver(
                 DefaultResolver.provider()
             );
@@ -194,7 +199,9 @@ public class RootResolverTests {
             RootResolver resolver = rootResolver(
                 MapResolver.provider(propertySource)
             );
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property");
@@ -217,7 +224,9 @@ public class RootResolverTests {
             RootResolver resolver = rootResolver(
                 MapResolver.provider(propertySource)
             );
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::propertyVariable
+            );
             
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "${property}");
@@ -245,9 +254,8 @@ public class RootResolverTests {
                     Base64DecodeProcessor.provider()
                 )
             );
-            ProxyMethod proxyMethod = ProxyMethodUtils.fromMethod(
-                ProcessorProxyInterface.class, 
-                "base64Decode"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::base64Decode
             );
             
             Optional<String> result = 
@@ -281,5 +289,17 @@ public class RootResolverTests {
             rootProcessorProvider, 
             SimpleVariableExpander.provider()
         );
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property")
+        String property();
+
+        @ExternalizedProperty("${property}")
+        String propertyVariable();
+
+        @ExternalizedProperty("test.base64Decode")
+        @Base64Decode
+        String base64Decode();
     }
 }

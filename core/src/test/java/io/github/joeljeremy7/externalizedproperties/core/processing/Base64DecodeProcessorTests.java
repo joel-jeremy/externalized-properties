@@ -1,9 +1,9 @@
 package io.github.joeljeremy7.externalizedproperties.core.processing;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.ProcessorProvider;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.ProcessorProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,6 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class Base64DecodeProcessorTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+    
     @Nested
     class Constructor {
         @Test
@@ -61,9 +64,8 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor();
             String decoded = base64Decode.process(
-                ProxyMethodUtils.fromMethod(
-                    ProcessorProxyInterface.class, 
-                    "base64Decode"
+                PROXY_METHOD_FACTORY.fromMethodReference( 
+                    ProxyInterface::base64Decode
                 ), 
                 base64Property
             );
@@ -81,9 +83,8 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor(decoder);
             String decoded = base64Decode.process(
-                ProxyMethodUtils.fromMethod(
-                    ProcessorProxyInterface.class, 
-                    "base64Decode"
+                PROXY_METHOD_FACTORY.fromMethodReference( 
+                    ProxyInterface::base64Decode
                 ), 
                 base64Property
             );
@@ -103,9 +104,8 @@ public class Base64DecodeProcessorTests {
             assertThrows(
                 ProcessingException.class, 
                 () -> base64Decode.process(
-                    ProxyMethodUtils.fromMethod(
-                        ProcessorProxyInterface.class, 
-                        "base64Decode"
+                    PROXY_METHOD_FACTORY.fromMethodReference(
+                        ProxyInterface::base64Decode
                     ), 
                     invalidBase64
                 )
@@ -121,9 +121,8 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor();
             String decoded = base64Decode.process(
-                ProxyMethodUtils.fromMethod(
-                    ProcessorProxyInterface.class, 
-                    "base64DecodeUrl"
+                PROXY_METHOD_FACTORY.fromMethodReference( 
+                    ProxyInterface::base64DecodeUrl
                 ), 
                 base64Property
             );
@@ -140,9 +139,8 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor();
             String decoded = base64Decode.process(
-                ProxyMethodUtils.fromMethod(
-                    ProcessorProxyInterface.class, 
-                    "base64DecodeMime"
+                PROXY_METHOD_FACTORY.fromMethodReference( 
+                    ProxyInterface::base64DecodeMime
                 ), 
                 base64Property
             );
@@ -159,9 +157,8 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor();
             String decoded = base64Decode.process(
-                ProxyMethodUtils.fromMethod(
-                    ProcessorProxyInterface.class, 
-                    "base64DecodeBasic"
+                PROXY_METHOD_FACTORY.fromMethodReference( 
+                    ProxyInterface::base64DecodeBasic
                 ), 
                 base64Property
             );
@@ -181,9 +178,8 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor(Base64.getDecoder());
             String decoded = base64Decode.process(
-                ProxyMethodUtils.fromMethod(
-                    ProcessorProxyInterface.class, 
-                    "base64Decode"
+                PROXY_METHOD_FACTORY.fromMethodReference( 
+                    ProxyInterface::base64Decode
                 ), 
                 base64Property
             );
@@ -202,9 +198,8 @@ public class Base64DecodeProcessorTests {
             
             Base64DecodeProcessor base64Decode = new Base64DecodeProcessor(Base64.getDecoder());
             String decoded = base64Decode.process(
-                ProxyMethodUtils.fromMethod(
-                    ProcessorProxyInterface.class, 
-                    "base64DecodeUtf16"
+                PROXY_METHOD_FACTORY.fromMethodReference( 
+                    ProxyInterface::base64DecodeUtf16
                 ), 
                 base64Property
             );
@@ -217,5 +212,32 @@ public class Base64DecodeProcessorTests {
         private String base64Encode(String property, Base64.Encoder encoder) {
             return new String(encoder.encode(property.getBytes()));
         }
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("test.base64Decode")
+        @Base64Decode
+        String base64Decode();
+
+        @ExternalizedProperty("test.base64Decode.int")
+        @Base64Decode
+        int base64DecodeInt();
+
+        @ExternalizedProperty("test.base64Decode.mime")
+        @Base64Decode(encoding = "mime")
+        String base64DecodeMime();
+
+
+        @ExternalizedProperty("test.base64Decode.url")
+        @Base64Decode(encoding = "url")
+        String base64DecodeUrl();
+
+        @ExternalizedProperty("test.base64Decode.basic")
+        @Base64Decode(encoding = "basic")
+        String base64DecodeBasic();
+
+        @ExternalizedProperty("test.base64Decode.mime")
+        @Base64Decode(charset = "UTF-16")
+        String base64DecodeUtf16();
     }
 }

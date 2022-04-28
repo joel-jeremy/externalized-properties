@@ -300,8 +300,8 @@ public class ResourceResolver extends MapResolver {
     }
 
     /**
-     * A {@link ResourceReader} implementation which loads an {@link InputStream} to a 
-     * {@link Properties}.
+     * A {@link ResourceReader} implementation which loads a {@code .properties} file resource 
+     * via {@link Properties}.
      */
     public static class PropertiesReader implements ResourceReader {
         /** {@inheritDoc} */

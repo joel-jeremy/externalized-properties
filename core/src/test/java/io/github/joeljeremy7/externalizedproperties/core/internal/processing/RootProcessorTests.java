@@ -1,13 +1,14 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal.processing;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
 import io.github.joeljeremy7.externalizedproperties.core.ProcessorProvider;
+import io.github.joeljeremy7.externalizedproperties.core.processing.Base64Decode;
 import io.github.joeljeremy7.externalizedproperties.core.processing.Base64DecodeProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.ProcessingException;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.ProcessorProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RootProcessorTests {
-    @Nested
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+    
     class Constructor {
         @Test
         @DisplayName("should throw when externalized properties argument is null")
@@ -147,11 +150,9 @@ public class RootProcessorTests {
                 Base64DecodeProcessor.provider()
             );
 
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    ProcessorProxyInterface.class, 
-                    "base64Decode"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::base64Decode
+            );
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -168,11 +169,9 @@ public class RootProcessorTests {
                 Base64DecodeProcessor.provider()
             );
 
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    ProcessorProxyInterface.class, 
-                    "base64Decode"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::base64Decode
+            );
 
             String plainText = "plain-text-value";
             String base64Encoded = 
@@ -203,10 +202,8 @@ public class RootProcessorTests {
                 // Base64Decode processor not configured.
             );
 
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    ProcessorProxyInterface.class, 
-                    "base64Decode"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::base64Decode
                 );
 
             String plainText = "plain-text-value";
@@ -229,5 +226,11 @@ public class RootProcessorTests {
                 .build(),
             processorProviders
         );
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("test.base64Decode")
+        @Base64Decode
+        String base64Decode();
     }
 }

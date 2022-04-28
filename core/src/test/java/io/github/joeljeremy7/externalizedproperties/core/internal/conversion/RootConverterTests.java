@@ -4,14 +4,12 @@ import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.PrimitiveConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.EnumProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.EnumProxyInterface.TestEnum;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,6 +29,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RootConverterTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+
     @Nested
     class Constructor {
         @Test
@@ -207,11 +208,9 @@ public class RootConverterTests {
             ConverterProvider<?> provider = (ep, rc) -> new PrimitiveConverter();
             RootConverter converter = rootConverter(provider);
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    PrimitiveProxyInterface.class, 
-                    "intPrimitiveProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::intProperty
+            );
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -227,11 +226,9 @@ public class RootConverterTests {
             ConverterProvider<?> provider = (ep, rc) -> new PrimitiveConverter();
             RootConverter converter = rootConverter(provider);
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    PrimitiveProxyInterface.class, 
-                    "intPrimitiveProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::intProperty
+            );
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -247,11 +244,9 @@ public class RootConverterTests {
             ConverterProvider<?> provider = (ep, rc) -> new PrimitiveConverter();
             RootConverter converter = rootConverter(provider);
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    PrimitiveProxyInterface.class, 
-                    "intPrimitiveProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::intProperty
+            );
 
             ConversionResult<?> result = converter.convert(
                 proxyMethod,
@@ -272,18 +267,16 @@ public class RootConverterTests {
             ConverterProvider<?> provider = (ep, rc) -> new PrimitiveConverter();
             RootConverter converter = rootConverter(provider);
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    EnumProxyInterface.class,
-                    "enumProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::noRegisteredConverter
+            );
 
-            // No handler registered to convert to TestEnum.
+            // No handler registered to convert to List.
             assertThrows(
                 ConversionException.class, 
                 () -> converter.convert(
                     proxyMethod, 
-                    TestEnum.ONE.name()
+                    "1,2,3"
                 )
             );
         }
@@ -294,32 +287,28 @@ public class RootConverterTests {
         )
         public void test6() {
             // Handler that can convert anything but always throws.
-            Converter<?> throwingHandler = 
-                new Converter<Object>() {
+            Converter<?> throwingHandler = new Converter<Object>() {
+                @Override
+                public boolean canConvertTo(Class<?> targetType) {
+                    return true;
+                }
 
-                    @Override
-                    public boolean canConvertTo(Class<?> targetType) {
-                        return true;
-                    }
-
-                    @Override
-                    public ConversionResult<Object> convert(
-                            ProxyMethod proxyMethod,
-                            String valueToConvert,
-                            Type targetType
-                    ) {
-                        throw new RuntimeException("Mr. Stark I don't feel so good...");
-                    }
-                };
+                @Override
+                public ConversionResult<Object> convert(
+                        ProxyMethod proxyMethod,
+                        String valueToConvert,
+                        Type targetType
+                ) {
+                    throw new RuntimeException("Mr. Stark I don't feel so good...");
+                }
+            };
             
             ConverterProvider<?> provider = (ep, rc) -> throwingHandler;
             RootConverter converter = rootConverter(provider);
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "intPrimitiveProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::intProperty
+            );
 
             assertThrows(
                 ConversionException.class, 
@@ -379,11 +368,9 @@ public class RootConverterTests {
                 provider2
             );
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "intPrimitiveProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::intProperty
+            );
 
             ConversionResult<?> result = converter.convert(
                 proxyMethod,
@@ -409,5 +396,13 @@ public class RootConverterTests {
                 .build(), 
             converterProviders
         );
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property.int")
+        int intProperty();
+
+        @ExternalizedProperty("no.registered.converter")
+        List<String> noRegisteredConverter();
     }
 }

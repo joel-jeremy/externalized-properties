@@ -3,11 +3,11 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,6 +26,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OptionalConverterTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+
     @Nested
     class ProviderMethod {
         @Test
@@ -92,11 +95,9 @@ public class OptionalConverterTests {
         void test1() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    OptionalProxyInterface.class,
-                    "optionalProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::optionalProperty
+            );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
                 proxyMethod,
@@ -119,10 +120,8 @@ public class OptionalConverterTests {
         void test2() {
             OptionalConverter converter = converterToTest(PrimitiveConverter.provider());
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    OptionalProxyInterface.class,
-                    "nonStringOptionalProperty"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::nonStringOptionalProperty
                 );
             
             ConversionResult<? extends Optional<?>> result = converter.convert(
@@ -147,10 +146,8 @@ public class OptionalConverterTests {
         void test3() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    OptionalProxyInterface.class,
-                    "nonStringOptionalProperty"
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::nonStringOptionalProperty
                 );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
@@ -176,11 +173,9 @@ public class OptionalConverterTests {
         void test4() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    OptionalProxyInterface.class,
-                    "optionalPropertyObject"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::optionalPropertyObject
+            );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
                 proxyMethod,
@@ -203,11 +198,9 @@ public class OptionalConverterTests {
         void test5() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    OptionalProxyInterface.class,
-                    "optionalPropertyWildcard"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::optionalPropertyWildcard
+            );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
                 proxyMethod,
@@ -228,11 +221,9 @@ public class OptionalConverterTests {
         void test6() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    OptionalProxyInterface.class,
-                    "optionalPropertyT"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::optionalPropertyT
+            );
                 
             assertThrows(
                 ConversionException.class, 
@@ -248,11 +239,9 @@ public class OptionalConverterTests {
         void test7() {
             OptionalConverter converter = converterToTest(ListConverter.provider());
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    OptionalProxyInterface.class,
-                    "optionalPropertyNestedGenerics"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::optionalPropertyNestedGenerics
+            );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
                 proxyMethod,
@@ -279,11 +268,9 @@ public class OptionalConverterTests {
         void test8() {
             OptionalConverter converter = converterToTest(ArrayConverter.provider());
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    OptionalProxyInterface.class,
-                    "optionalPropertyNestedGenericsArray"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::optionalPropertyNestedGenericsArray
+            );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
                 proxyMethod,
@@ -314,11 +301,9 @@ public class OptionalConverterTests {
         void test9() {
             OptionalConverter converter = converterToTest();
             
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    OptionalProxyInterface.class,
-                    "optionalProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::optionalProperty
+            );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
                 proxyMethod,
@@ -354,5 +339,54 @@ public class OptionalConverterTests {
             allProviders
         );
         return provider.get(externalizedProperties, rootConverter);
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property.optional")
+        Optional<String> optionalProperty();
+
+        @ExternalizedProperty("property.optional.with.default.value")
+        default Optional<String> optionalPropertyWithDefaultValue() {
+            return Optional.of("default.value");
+        }
+
+        @ExternalizedProperty("property.optional.with.default.value")
+        default Optional<String> optionalPropertyWithDefaultValueParameter(String defaultValue) {
+            return Optional.ofNullable(defaultValue);
+        }
+
+        // No annotation with default value.
+        default Optional<String> optionalPropertyWithNoAnnotationAndWithDefaultValue() {
+            return Optional.of("default.value");
+        }
+
+        // No annotation with provided default value.
+        default Optional<String> optionalPropertyWithNoAnnotationAndWithDefaultValueParameter(String defaultValue) {
+            return Optional.ofNullable(defaultValue);
+        }
+
+        // No annotation ano no default value.
+        Optional<String> optionalPropertyWithNoAnnotationAndNoDefaultValue();
+
+        @ExternalizedProperty("property.optional.nonstring")
+        Optional<Integer> nonStringOptionalProperty();
+
+        @ExternalizedProperty("property.optional.object")
+        Optional<Object> optionalPropertyObject();
+
+        @ExternalizedProperty("property.optional.wildcard")
+        Optional<?> optionalPropertyWildcard();
+
+        @ExternalizedProperty("property.optional.nested.generics")
+        Optional<List<String>> optionalPropertyNestedGenerics();
+
+        @ExternalizedProperty("property.optional.nested.generics.array")
+        Optional<Optional<String>[]> optionalPropertyNestedGenericsArray();
+
+        @ExternalizedProperty("property.optional.array")
+        Optional<String[]> optionalPropertyArray();
+
+        @ExternalizedProperty("property.optional.T")
+        <T> Optional<T> optionalPropertyT();
     }
 }

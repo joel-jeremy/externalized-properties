@@ -2,10 +2,11 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.ProxyMethods;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubResolver;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CachingResolverTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+    
     @Nested
     class Constructor {
         @Test
@@ -131,7 +135,9 @@ public class CachingResolverTests {
 
             CachingResolver resolver = resolverToTest(decorated);
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = resolver.resolve(proxyMethod, propertyName);
             
             assertNotNull(result);
@@ -151,7 +157,9 @@ public class CachingResolverTests {
             CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver()
             );
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             // Not in system properties.
             Optional<String> result = resolver.resolve(proxyMethod, "property");
             
@@ -171,7 +179,9 @@ public class CachingResolverTests {
                 cacheStrategy
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             Optional<String> result = resolver.resolve(proxyMethod, propertyName);
             
             assertNotNull(result);
@@ -194,7 +204,9 @@ public class CachingResolverTests {
                 cacheStrategy
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             // Property is not in system properties.
             Optional<String> result = resolver.resolve(
                 proxyMethod,
@@ -223,7 +235,9 @@ public class CachingResolverTests {
                 cacheStrategy
             );
 
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
             // property.cache is not in system properties but is in the strategy cache.
             Optional<String> result = resolver.resolve(proxyMethod, propertyName);
             
@@ -254,5 +268,10 @@ public class CachingResolverTests {
             decorated, 
             cacheStrategy
         );
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property")
+        String property();
     }
 }

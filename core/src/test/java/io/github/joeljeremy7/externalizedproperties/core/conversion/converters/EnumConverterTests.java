@@ -3,13 +3,11 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.EnumProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.EnumProxyInterface.TestEnum;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +19,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EnumConverterTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+    
     @Nested
     class ProviderMethod {
         @Test
@@ -91,11 +92,9 @@ public class EnumConverterTests {
         void test1() {
             EnumConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    EnumProxyInterface.class,
-                    "enumProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::enumProperty
+            );
 
             ConversionResult<? extends Enum<?>> result = converter.convert(
                 proxyMethod,
@@ -112,11 +111,9 @@ public class EnumConverterTests {
         void test2() {
             EnumConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    EnumProxyInterface.class,
-                    "enumProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::enumProperty
+            );
 
             assertThrows(ConversionException.class, () -> {
                 converter.convert(
@@ -131,11 +128,9 @@ public class EnumConverterTests {
         void test3() {
             EnumConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    PrimitiveProxyInterface.class,
-                    "intPrimitiveProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::notSupportedNotAnEnum
+            );
             
             ConversionResult<?> result = converter.convert(
                 proxyMethod,
@@ -147,5 +142,20 @@ public class EnumConverterTests {
 
     private EnumConverter converterToTest() {
         return new EnumConverter();
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property.enum")
+        TestEnum enumProperty();
+
+        @ExternalizedProperty("property.not.supported")
+        int notSupportedNotAnEnum();
+    }
+
+    static enum TestEnum {
+        NONE,
+        ONE,
+        TWO,
+        THREE
     }
 }

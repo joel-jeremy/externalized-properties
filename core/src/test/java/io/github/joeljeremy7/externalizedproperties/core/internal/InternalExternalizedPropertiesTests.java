@@ -7,8 +7,6 @@ import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.Roo
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.ExternalizedPropertiesInvocationHandler;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.VoidReturnTypeProxyInterface;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubResolver;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 import org.junit.jupiter.api.DisplayName;
@@ -53,7 +51,7 @@ public class InternalExternalizedPropertiesTests {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(provider);
 
-            BasicProxyInterface proxy = externalizedProperties.proxy(BasicProxyInterface.class);
+            ProxyInterface proxy = externalizedProperties.proxy(ProxyInterface.class);
 
             assertNotNull(proxy);
             assertTrue(proxy instanceof Proxy);
@@ -82,7 +80,7 @@ public class InternalExternalizedPropertiesTests {
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> externalizedProperties.proxy(BasicProxyInterface.class, null)
+                () -> externalizedProperties.proxy(ProxyInterface.class, null)
             );
         }
 
@@ -172,9 +170,9 @@ public class InternalExternalizedPropertiesTests {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(provider);
 
-            BasicProxyInterface proxy = externalizedProperties.proxy(
-                BasicProxyInterface.class,
-                BasicProxyInterface.class.getClassLoader()
+            ProxyInterface proxy = externalizedProperties.proxy(
+                ProxyInterface.class,
+                ProxyInterface.class.getClassLoader()
             );
 
             assertNotNull(proxy);
@@ -219,5 +217,19 @@ public class InternalExternalizedPropertiesTests {
         // Invalid: Must be a single String argument
         @ExternalizedProperty
         String resolve(int invalidMustBeString);
+    }
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property")
+        String property();
+    }
+
+    static interface VoidReturnTypeProxyInterface {
+        // Invalid: Void return types not allowed.
+        @ExternalizedProperty("test.invalid.method.void")
+        void invalidVoidMethod();
+    
+        // Invalid: Void return types not allowed.
+        @ExternalizedProperty("test.invalid.method.void")
+        Void invalidVoidClassMethod();
     }
 }

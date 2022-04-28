@@ -3,6 +3,7 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.UnresolvedPropertiesException;
@@ -14,13 +15,7 @@ import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.Roo
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.DefaultValueProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.NoAnnotationProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.PrimitiveProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.SystemPropertiesProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.VariableProxyInterface;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodReference;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.VariableExpansionException;
@@ -51,60 +46,18 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             Map<String, String> map = new HashMap<>();
             map.put("property", "test.value.1");
 
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(map);
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+            ResolverProvider<?> resolverProvider = MapResolver.provider(map);
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
-            Method proxyMethod = ProxyMethodUtils.getMethod(
-                BasicProxyInterface.class,
-                "property"
-            );
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
-            ExternalizedPropertiesInvocationHandler handler = 
-                new ExternalizedPropertiesInvocationHandler(
-                    rootResolver(
-                        externalizedProperties,
-                        resolverProvider
-                    ),
-                    rootConverter(
-                        externalizedProperties,
-                        converterProvider
-                    )
-                );
-
-            Object result = handler.invoke(
-                externalizedProperties.proxy(BasicProxyInterface.class), 
-                proxyMethod, 
-                new Object[0]
-            );
-
-            assertEquals("test.value.1", result);
-        }
-        
-        @Test
-        @DisplayName(
-            "should resolve property from map and not from default interface method value"
-        )
-        public void test2() throws Throwable {
-            Map<String, String> map = new HashMap<>();
-            map.put("property.with.default.value", "test.value");
-
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(map);
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
-            ExternalizedProperties externalizedProperties = externalizedProperties(
-                resolverProvider,
-                converterProvider
-            );
-
-            Class<DefaultValueProxyInterface> proxyInterface = 
-                DefaultValueProxyInterface.class;
-            
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "propertyWithDefaultValue"
+                ProxyInterface::property
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -122,7 +75,50 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             Object result = handler.invoke(
                 externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
-                new Object[0]
+                null
+            );
+
+            assertEquals("test.value.1", result);
+        }
+        
+        @Test
+        @DisplayName(
+            "should resolve property from map and not from default interface method value"
+        )
+        public void test2() throws Throwable {
+            Map<String, String> map = new HashMap<>();
+            map.put("property.with.default.value", "test.value");
+
+            ResolverProvider<?> resolverProvider = MapResolver.provider(map);
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
+            ExternalizedProperties externalizedProperties = externalizedProperties(
+                resolverProvider,
+                converterProvider
+            );
+
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+            
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
+                ProxyInterface::propertyWithDefaultValue
+            );
+
+            ExternalizedPropertiesInvocationHandler handler = 
+                new ExternalizedPropertiesInvocationHandler(
+                    rootResolver(
+                        externalizedProperties,
+                        resolverProvider
+                    ),
+                    rootConverter(
+                        externalizedProperties,
+                        converterProvider
+                    )
+                );
+
+            Object result = handler.invoke(
+                externalizedProperties.proxy(proxyInterface), 
+                proxyMethod, 
+                null
             );
 
             assertEquals("test.value", result);
@@ -136,20 +132,18 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             Map<String, String> map = new HashMap<>();
             map.put("property.with.default.value", "test.value");
 
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(map);
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+            ResolverProvider<?> resolverProvider = MapResolver.provider(map);
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
-            Class<DefaultValueProxyInterface> proxyInterface = 
-                DefaultValueProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "propertyWithDefaultValueParameter",
-                String.class
+                ProxyInterface::propertyWithDefaultValueParameter
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -177,19 +171,18 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @Test
         @DisplayName("should resolve default value from default interface method")
         public void test4() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
-            Class<DefaultValueProxyInterface> proxyInterface = 
-                DefaultValueProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "propertyWithDefaultValue"
+                ProxyInterface::propertyWithDefaultValue
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -207,7 +200,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             Object result = handler.invoke(
                 externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
-                new Object[0]
+                null
             );
 
             assertEquals("default.value", result);
@@ -216,20 +209,18 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @Test
         @DisplayName("should resolve default value from default interface method parameter")
         public void test5() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
-            Class<DefaultValueProxyInterface> proxyInterface = 
-                DefaultValueProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "propertyWithDefaultValueParameter",
-                String.class
+                ProxyInterface::propertyWithDefaultValueParameter
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -260,19 +251,18 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             "should always return default value from default interface method when not annotated"
         )
         public void test6() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
-            Class<NoAnnotationProxyInterface> proxyInterface = 
-                NoAnnotationProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "propertyWithNoAnnotationButWithDefaultValue"
+                ProxyInterface::propertyWithNoAnnotationButWithDefaultValue
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -290,7 +280,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             Object result = handler.invoke(
                 externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
-                new Object[0]
+                null
             );
 
             assertEquals("default.value", result);
@@ -302,20 +292,18 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             "when not annotated"
         )
         public void test7() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
-            Class<NoAnnotationProxyInterface> proxyInterface = 
-                NoAnnotationProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "propertyWithNoAnnotationButWithDefaultValueParameter",
-                String.class
+                ProxyInterface::propertyWithNoAnnotationButWithDefaultValueParameter
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -344,16 +332,18 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @Test
         @DisplayName("should throw when an annotated non-Optional property cannot be resolved.")
         public void test8() {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                BasicProxyInterface.class,
-                "property"
+                proxyInterface,
+                ProxyInterface::property
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -370,9 +360,9 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
             assertThrows(UnresolvedPropertiesException.class, () -> {
                 handler.invoke(
-                    externalizedProperties.proxy(BasicProxyInterface.class), 
+                    externalizedProperties.proxy(proxyInterface), 
                     proxyMethod, 
-                    new Object[0]
+                    null
                 );
             });
         }
@@ -380,16 +370,18 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @Test
         @DisplayName("should throw when an unannotated non-Optional property cannot be resolved.")
         public void test9() {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                NoAnnotationProxyInterface.class,
-                "propertyWithNoAnnotationAndNoDefaultValue"
+                proxyInterface,
+                ProxyInterface::propertyWithNoAnnotationAndNoDefaultValue
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -406,38 +398,35 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
             assertThrows(UnresolvedPropertiesException.class, () -> {
                 handler.invoke(
-                    externalizedProperties.proxy(BasicProxyInterface.class), 
+                    externalizedProperties.proxy(proxyInterface), 
                     proxyMethod, 
-                    new Object[0]
+                    null
                 );
             });
         }
 
+        /**
+         * Conversion tests.
+         */
+
         @Test
         @DisplayName("should convert a non-String property via Converter.")
-        public void test10() throws Throwable {
+        public void conversionTest1() throws Throwable {
             Map<String, String> map = new HashMap<>();
-            map.put("property.integer.wrapper", "1");
-            map.put("property.integer.primitive", "2");
+            map.put("property.int", "1");
 
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(map);
+            ResolverProvider<?> resolverProvider = MapResolver.provider(map);
             ConverterProvider<?> converterProvider = (ep, rc) -> new PrimitiveConverter();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
-            PrimitiveProxyInterface proxy = 
-                externalizedProperties.proxy(PrimitiveProxyInterface.class);
-
-            Method intWrapperMethod = ProxyMethodUtils.getMethod(
-                PrimitiveProxyInterface.class,
-                "integerWrapperProperty"
-            );
-
-            Method intPrimitiveMethod = ProxyMethodUtils.getMethod(
-                PrimitiveProxyInterface.class,
-                "intPrimitiveProperty"
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+            
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
+                ProxyInterface::intProperty
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -452,46 +441,39 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                     )
                 );
 
-            Object intWrapperResult = handler.invoke(
-                proxy, 
-                intWrapperMethod,
-                new Object[0]
+            Object intResult = handler.invoke(
+                externalizedProperties.proxy(proxyInterface), 
+                proxyMethod,
+                null
             );
 
-            Object intPrimitiveResult = handler.invoke(
-                proxy, 
-                intPrimitiveMethod,
-                new Object[0]
-            );
-
-            assertEquals(1, (Integer)intWrapperResult);
-            // Support for primitive types.
-            assertEquals(2, (int)intPrimitiveResult);
+            assertEquals(1, (int)intResult);
         }
 
         /**
          * Variable expansion tests.
-         * @throws Throwable
          */
 
         @Test
         @DisplayName("should expand variable in property name.")
-        public void testVariableExpansion1() throws Throwable {
+        public void variableExpansionTest1() throws Throwable {
             Map<String, String> map = new HashMap<>();
             String customVariableValue = "custom-variable";
             map.put("custom.variable", customVariableValue);
             map.put("property-" + customVariableValue, "property.value");
 
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(map);
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+            ResolverProvider<?> resolverProvider = MapResolver.provider(map);
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                VariableProxyInterface.class,
-                "variableProperty"
+                proxyInterface,
+                ProxyInterface::variableProperty
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -507,9 +489,9 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 );
 
             Object result = handler.invoke(
-                externalizedProperties.proxy(VariableProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
-                new Object[0]
+                null
             );
 
             assertEquals("property.value", result);
@@ -517,20 +499,22 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should throw when variable value cannot be resolved.")
-        public void testVariableExpansion2() {
+        public void variableExpansionTest2() {
             Map<String, String> map = new HashMap<>();
             map.put("property-custom-variable", "property.value");
 
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(map);
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+            ResolverProvider<?> resolverProvider = MapResolver.provider(map);
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                VariableProxyInterface.class,
-                "variableProperty"
+                proxyInterface,
+                ProxyInterface::variableProperty
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -547,36 +531,38 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
             // There is no custom-variable-value property.
             // Property name of VariableProxyInterface.variableProperty() won't be able to be expanded.
-            assertThrows(VariableExpansionException.class, 
+            assertThrows(
+                VariableExpansionException.class, 
                 () -> handler.invoke(
-                    externalizedProperties.proxy(VariableProxyInterface.class), 
+                    externalizedProperties.proxy(proxyInterface), 
                     proxyMethod, 
-                    new Object[0]
+                    null
                 )
             );
         }
 
         /**
-         * Optional property test cases.
-         * @throws Throwable
+         * Optional property tests.
          */
 
         @Test
         @DisplayName("should resolve property")
-        public void testOptional1() throws Throwable {
+        public void optionalTest1() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional", "test.value");
 
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(map);
+            ResolverProvider<?> resolverProvider = MapResolver.provider(map);
             ConverterProvider<?> converterProvider = (ep, rc) -> new OptionalConverter(rc);
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                OptionalProxyInterface.class,
-                "optionalProperty"
+                proxyInterface,
+                ProxyInterface::optionalProperty
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -592,9 +578,9 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 );
 
             Object result = handler.invoke(
-                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
-                new Object[0]
+                null
             );
 
             assertTrue(result instanceof Optional<?>);
@@ -607,20 +593,22 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should resolve property from map and not from default interface method value")
-        public void testOptional2() throws Throwable {
+        public void optionalTest2() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional.with.default.value", "test.value");
 
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(map);
+            ResolverProvider<?> resolverProvider = MapResolver.provider(map);
             ConverterProvider<?> converterProvider = (ep, rc) -> new OptionalConverter(rc);
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
             
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                OptionalProxyInterface.class,
-                "optionalPropertyWithDefaultValue"
+                proxyInterface,
+                ProxyInterface::optionalPropertyWithDefaultValue
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -636,9 +624,9 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 );
 
             Object result = handler.invoke(
-                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
-                new Object[0]
+                null
             );
 
             assertTrue(result instanceof Optional<?>);
@@ -653,20 +641,22 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should resolve property from map and not from default interface method value parameter"
         )
-        public void testOptional3() throws Throwable {
+        public void optionalTest3() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional.with.default.value", "test.value");
 
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(map);
+            ResolverProvider<?> resolverProvider = MapResolver.provider(map);
             ConverterProvider<?> converterProvider = (ep, rc) -> new OptionalConverter(rc);
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
             
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                OptionalProxyInterface.class,
-                "optionalPropertyWithDefaultValue"
+                proxyInterface,
+                ProxyInterface::optionalPropertyWithDefaultValue
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -683,7 +673,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
             String providedDefaultValue = "provided.default.value";
             Object result = handler.invoke(
-                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
                 new Object[] { providedDefaultValue }
             );
@@ -698,17 +688,19 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should resolve default value from default interface method")
-        public void testOptional4() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+        public void optionalTest4() throws Throwable {
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                OptionalProxyInterface.class,
-                "optionalPropertyWithDefaultValue"
+                proxyInterface,
+                ProxyInterface::optionalPropertyWithDefaultValue
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -724,9 +716,9 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 );
 
             Object result = handler.invoke(
-                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
-                new Object[0]
+                null
             );
 
             assertTrue(result instanceof Optional<?>);
@@ -739,18 +731,19 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should resolve default value from default interface method parameter")
-        public void testOptional5() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+        public void optionalTest5() throws Throwable {
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                OptionalProxyInterface.class,
-                "optionalPropertyWithDefaultValueParameter",
-                String.class
+                proxyInterface,
+                ProxyInterface::optionalPropertyWithDefaultValueParameter
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -767,7 +760,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
             String providedDefaultValue = "provided.default.value";
             Object result = handler.invoke(
-                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
                 new Object[] { providedDefaultValue }
             );
@@ -784,17 +777,19 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should always return default value from default interface method when not annotated"
         )
-        public void testOptional6() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+        public void optionalTest6() throws Throwable {
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                OptionalProxyInterface.class,
-                "optionalPropertyWithNoAnnotationAndWithDefaultValue"
+                proxyInterface,
+                ProxyInterface::optionalPropertyWithNoAnnotationAndWithDefaultValue
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -810,9 +805,9 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 );
 
             Object result = handler.invoke(
-                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
-                new Object[0]
+                null
             );
 
             assertTrue(result instanceof Optional<?>);
@@ -828,18 +823,19 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             "should always return default value from default interface method parameter " + 
             "when not annotated"
         )
-        public void testOptional7() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+        public void optionalTest7() throws Throwable {
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                OptionalProxyInterface.class,
-                "optionalPropertyWithNoAnnotationAndWithDefaultValueParameter",
-                String.class
+                proxyInterface,
+                ProxyInterface::optionalPropertyWithNoAnnotationAndWithDefaultValueParameter
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -856,7 +852,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
             String providedDefaultValue = "provided.default.value";
             Object result = handler.invoke(
-                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
                 new Object[] { providedDefaultValue }
             );
@@ -873,17 +869,19 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should return empty Optional when an annotated Optional property cannot be resolved."
         )
-        public void testOptional8() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+        public void optionalTest8() throws Throwable {
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                OptionalProxyInterface.class,
-                "optionalProperty"
+                proxyInterface,
+                ProxyInterface::optionalProperty
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -899,9 +897,9 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 );
 
             Object result = handler.invoke(
-                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
-                new Object[0]
+                null
             );
 
             assertTrue(result instanceof Optional<?>);
@@ -915,17 +913,19 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should return empty Optional when an unannotated Optional property cannot be resolved."
         )
-        public void testOptional9() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+        public void optionalTest9() throws Throwable {
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                OptionalProxyInterface.class,
-                "optionalPropertyWithNoAnnotationAndNoDefaultValue"
+                proxyInterface,
+                ProxyInterface::optionalPropertyWithNoAnnotationAndNoDefaultValue
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -941,9 +941,9 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 );
 
             Object result = handler.invoke(
-                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
-                new Object[0]
+                null
             );
 
             assertTrue(result instanceof Optional<?>);
@@ -955,20 +955,22 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should convert a non-String Optional property via Converter.")
-        public void testOptional10() throws Throwable {
+        public void optionalTest10() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional.nonstring", "1");
 
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(map);
+            ResolverProvider<?> resolverProvider = MapResolver.provider(map);
             ConverterProvider<?> converterProvider = (ep, rc) -> new DefaultConverter(rc);
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
+
             Method proxyMethod = ProxyMethodUtils.getMethod(
-                OptionalProxyInterface.class,
-                "nonStringOptionalProperty"
+                proxyInterface,
+                ProxyInterface::nonStringOptionalProperty
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -984,9 +986,9 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 );
 
             Object result = handler.invoke(
-                externalizedProperties.proxy(OptionalProxyInterface.class), 
+                externalizedProperties.proxy(proxyInterface), 
                 proxyMethod, 
-                new Object[0]
+                null
             );
 
             assertTrue(result instanceof Optional<?>);
@@ -1000,23 +1002,21 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should return true when proxy object references are the same")
-        public void proxyEqualsMethod1() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+        public void proxyEqualsTest1() throws Throwable {
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
-            BasicProxyInterface proxy = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
-            Method objectEqualsMethod = 
-                ProxyMethodUtils.getMethod(
-                    Object.class,
-                    "equals",
-                    Object.class
-                );
+            Method objectEqualsMethod = ProxyMethodUtils.getMethod(
+                Object.class,
+                "equals",
+                Object.class
+            );
 
             ExternalizedPropertiesInvocationHandler handler = 
                 new ExternalizedPropertiesInvocationHandler(
@@ -1029,6 +1029,8 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                         converterProvider
                     )
                 );
+            
+            ProxyInterface proxy = externalizedProperties.proxy(proxyInterface);
 
             // proxy == proxy
             Object isEqual = handler.invoke(
@@ -1043,25 +1045,24 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should return false when proxy object references are not same")
-        public void proxyEqualsMethod2() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+        public void proxyEqualsTest2() throws Throwable {
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
-            BasicProxyInterface proxy1 = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
-            SystemPropertiesProxyInterface proxy2 = 
-                externalizedProperties.proxy(SystemPropertiesProxyInterface.class);
+            ProxyInterface proxy1 = 
+                externalizedProperties.proxy(ProxyInterface.class);
+            OtherProxyInterface proxy2 = 
+                externalizedProperties.proxy(OtherProxyInterface.class);
 
-            Method objectEqualsMethod = 
-                ProxyMethodUtils.getMethod(
-                    Object.class,
-                    "equals",
-                    Object.class
-                );
+            Method objectEqualsMethod = ProxyMethodUtils.getMethod(
+                Object.class,
+                "equals",
+                Object.class
+            );
 
             ExternalizedPropertiesInvocationHandler handler = 
                 new ExternalizedPropertiesInvocationHandler(
@@ -1090,22 +1091,24 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should treat equals method with different signature as a proxy method"
         )
-        public void proxyEqualsMethod3() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+        public void proxyEqualsTest3() throws Throwable {
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
-            EqualsProxyInterfaceTest proxy = 
-                externalizedProperties.proxy(EqualsProxyInterfaceTest.class);
-
-            Method objectEqualsMethod = 
-                ProxyMethodUtils.getMethod(
-                    EqualsProxyInterfaceTest.class,
-                    "equals"
+            ProxyInterfaceWithEqualsMethodOverload proxy = 
+                externalizedProperties.proxy(
+                    ProxyInterfaceWithEqualsMethodOverload.class
                 );
+
+            Method objectEqualsMethodOverload = ProxyMethodUtils.getMethod(
+                ProxyInterfaceWithEqualsMethodOverload.class,
+                (ProxyMethodReference<ProxyInterfaceWithEqualsMethodOverload, Boolean>)
+                ProxyInterfaceWithEqualsMethodOverload::equals
+            );
 
             ExternalizedPropertiesInvocationHandler handler = 
                 new ExternalizedPropertiesInvocationHandler(
@@ -1125,7 +1128,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 UnresolvedPropertiesException.class,
                 () -> handler.invoke(
                     proxy, 
-                    objectEqualsMethod, 
+                    objectEqualsMethodOverload, 
                     new Object[] { proxy }
                 )
             );
@@ -1133,22 +1136,21 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should return proxy's identity hash code")
-        public void proxyHashCodeMethod() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+        public void proxyHashCodeTest1() throws Throwable {
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
-            BasicProxyInterface proxy = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
+            ProxyInterface proxy = 
+                externalizedProperties.proxy(ProxyInterface.class);
 
-            Method objectHashCodeMethod = 
-                ProxyMethodUtils.getMethod(
-                    Object.class,
-                    "hashCode"
-                );
+            Method objectHashCodeMethod = ProxyMethodUtils.getMethod(
+                Object.class,
+                "hashCode"
+            );
 
             ExternalizedPropertiesInvocationHandler handler = 
                 new ExternalizedPropertiesInvocationHandler(
@@ -1165,7 +1167,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             Object hashCode = handler.invoke(
                 proxy, 
                 objectHashCodeMethod, 
-                new Object[0]
+                null
             );
 
             assertEquals(
@@ -1176,22 +1178,21 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should return standard Object.toString() format")
-        public void proxyToStringMethod() throws Throwable {
-            ResolverProvider<?> resolverProvider = ep -> new MapResolver(Collections.emptyMap());
-            ConverterProvider<?> converterProvider = (ep, rc) -> NoOpConverter.INSTANCE;
+        public void proxyToStringTest1() throws Throwable {
+            ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
+            ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
                 resolverProvider,
                 converterProvider
             );
 
-            BasicProxyInterface proxy = 
-                externalizedProperties.proxy(BasicProxyInterface.class);
+            ProxyInterface proxy = 
+                externalizedProperties.proxy(ProxyInterface.class);
 
-            Method objectToStringMethod = 
-                ProxyMethodUtils.getMethod(
-                    Object.class,
-                    "toString"
-                );
+            Method objectToStringMethod = ProxyMethodUtils.getMethod(
+                Object.class,
+                "toString"
+            );
 
             ExternalizedPropertiesInvocationHandler handler = 
                 new ExternalizedPropertiesInvocationHandler(
@@ -1208,7 +1209,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             Object toStringResult = handler.invoke(
                 proxy, 
                 objectToStringMethod, 
-                new Object[0]
+                null
             );
 
             assertEquals(
@@ -1216,10 +1217,6 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 toStringResult
             );
         }
-    }
-
-    private static interface EqualsProxyInterfaceTest {
-        public boolean equals();
     }
 
     private Resolver rootResolver(
@@ -1252,5 +1249,74 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             .resolvers(resolverProvider)
             .converters(converterProvider)
             .build();
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property")
+        String property();
+
+        @ExternalizedProperty("property.with.default.value")
+        default String propertyWithDefaultValueParameter(String defaultValue) {
+            return defaultValue;
+        }
+
+        @ExternalizedProperty("property.with.default.value")
+        default String propertyWithDefaultValue() {
+            return "default.value";
+        }
+
+        // No annotation with constant default value.
+        default String propertyWithNoAnnotationButWithDefaultValue() {
+            return "default.value";
+        }
+
+        // No annotation but with default value parameter.
+        default String propertyWithNoAnnotationButWithDefaultValueParameter(String defaultValue) {
+            return defaultValue;
+        }
+    
+        // No annotation and no default value.
+        String propertyWithNoAnnotationAndNoDefaultValue();
+
+        @ExternalizedProperty("property.int")
+        int intProperty();
+
+        @ExternalizedProperty("property-${custom.variable}")
+        String variableProperty();
+
+        @ExternalizedProperty("property.optional")
+        Optional<String> optionalProperty();
+        
+        @ExternalizedProperty("property.optional.with.default.value")
+        default Optional<String> optionalPropertyWithDefaultValue() {
+            return Optional.of("default.value");
+        }
+
+        @ExternalizedProperty("property.optional.with.default.value")
+        default Optional<String> optionalPropertyWithDefaultValueParameter(String defaultValue) {
+            return Optional.ofNullable(defaultValue);
+        }
+
+        // No annotation with default value.
+        default Optional<String> optionalPropertyWithNoAnnotationAndWithDefaultValue() {
+            return Optional.of("default.value");
+        }
+    
+        // No annotation with provided default value.
+        default Optional<String> optionalPropertyWithNoAnnotationAndWithDefaultValueParameter(String defaultValue) {
+            return Optional.ofNullable(defaultValue);
+        }
+    
+        // No annotation ano no default value.
+        Optional<String> optionalPropertyWithNoAnnotationAndNoDefaultValue();
+
+        @ExternalizedProperty("property.optional.nonstring")
+        Optional<Integer> nonStringOptionalProperty();
+    }
+
+    static interface OtherProxyInterface {}
+
+    static interface ProxyInterfaceWithEqualsMethodOverload {
+        boolean equals();
     }
 }

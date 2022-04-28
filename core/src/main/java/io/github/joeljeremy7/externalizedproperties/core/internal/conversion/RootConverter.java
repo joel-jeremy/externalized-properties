@@ -58,6 +58,40 @@ public class RootConverter implements Converter<Object> {
         );
     }
 
+    /**
+     * The {@link ConverterProvider} for {@link RootConverter}.
+     * 
+     * @param converterProviders The registered {@link ConverterProvider}s which provide 
+     * {@link Converter} instances.
+     * @return The {@link ConverterProvider} for {@link RootConverter}.
+     */
+    public static RootConverter.Provider provider(
+            ConverterProvider<?>... converterProviders
+    ) {
+        requireNonNull(converterProviders, "converterProviders");
+        return externalizedProperties -> new RootConverter(
+            externalizedProperties, 
+            converterProviders
+        );
+    }
+
+    /**
+     * The {@link ConverterProvider} for {@link RootConverter}.
+     * 
+     * @param converterProviders The registered {@link ConverterProvider}s which provide 
+     * {@link Converter} instances.
+     * @return The {@link ConverterProvider} for {@link RootConverter}.
+     */
+    public static RootConverter.Provider provider(
+            Collection<ConverterProvider<?>> converterProviders
+    ) {
+        requireNonNull(converterProviders, "converterProviders");
+        return externalizedProperties -> new RootConverter(
+            externalizedProperties, 
+            converterProviders
+        );
+    }
+
     /** {@inheritDoc} */
     @Override
     public boolean canConvertTo(Class<?> targetType) {
@@ -120,40 +154,6 @@ public class RootConverter implements Converter<Object> {
                 ex
             );
         }
-    }
-
-    /**
-     * The {@link ConverterProvider} for {@link RootConverter}.
-     * 
-     * @param converterProviders The registered {@link ConverterProvider}s which provide 
-     * {@link Converter} instances.
-     * @return The {@link ConverterProvider} for {@link RootConverter}.
-     */
-    public static RootConverter.Provider provider(
-            ConverterProvider<?>... converterProviders
-    ) {
-        requireNonNull(converterProviders, "converterProviders");
-        return externalizedProperties -> new RootConverter(
-            externalizedProperties, 
-            converterProviders
-        );
-    }
-
-    /**
-     * The {@link ConverterProvider} for {@link RootConverter}.
-     * 
-     * @param converterProviders The registered {@link ConverterProvider}s which provide 
-     * {@link Converter} instances.
-     * @return The {@link ConverterProvider} for {@link RootConverter}.
-     */
-    public static RootConverter.Provider provider(
-            Collection<ConverterProvider<?>> converterProviders
-    ) {
-        requireNonNull(converterProviders, "converterProviders");
-        return externalizedProperties -> new RootConverter(
-            externalizedProperties, 
-            converterProviders
-        );
     }
 
     // Skip conversion result is a singleton, cache it here to avoid internal casting.

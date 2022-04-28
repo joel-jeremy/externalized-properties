@@ -91,19 +91,24 @@ public static void main(String[] args) {
 private ExternalizedProperties buildExternalizedProperties() {
     // Create the ExternalizedProperties instance with default and additional resolvers.
     // Default resolvers include system properties and environment variable resolvers.
-    // DatabaseResolver is not part of the core module. It is part of a separate 
-    // resolver-database module. CustomAwsSsmResolver is an example custom resolver
-    // implementation which resolves properties from AWS SSM.
+    // DatabaseResolver is not part of the core module. It is part of a separate resolver-database module.
 
-    ExternalizedProperties externalizedProperties = ExternalizedPropertiesBuilder.newBuilder()
+    return ExternalizedPropertiesBuilder.newBuilder()
         .withDefaultResolvers() 
         .resolvers(
+            ResourceResolver.provider(getClass().getResource("/app.properties")),
+            ResourceResolver.provider(
+                getClass().getResource("/app.yaml"),
+                // There is no built-in YamlReader class.
+                // See: core/src/test/java/io/github/joeljeremy7/externalizedproperties/core/resolvers/resourcereaders
+                new YamlReader()
+            ),
             DatabaseResolver.provider(new JdbcConnectionProvider(getDataSource())),
+            // CustomAwsSsmResolver is an example custom resolver
+            // implementation which resolves properties from AWS SSM.
             ResolverProvider.of(new CustomAwsSsmResolver(buildAwsSsmClient()))
         ) 
         .build();
-    
-    return externalizedProperties;
 }
 ```
 

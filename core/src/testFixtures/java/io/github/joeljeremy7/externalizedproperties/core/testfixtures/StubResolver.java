@@ -13,8 +13,10 @@ import java.util.function.Function;
 
 /**
  * A stub {@link Resolver} implemenation that resolves properties based on 
- * a provider value resolver function. By default, it will defaul any property by returning the 
- * property name suffixed with "-value".
+ * a provided value resolver function. 
+ * 
+ * <p>By default, it will resolve all properties by 
+ * returning the property name suffixed with "-value".</p>
  */
 public class StubResolver implements Resolver {
 
@@ -34,9 +36,7 @@ public class StubResolver implements Resolver {
         this(DEFAULT_VALUE_RESOLVER);
     }
 
-    public StubResolver(
-            Function<String, String> valueResolver
-    ) {
+    public StubResolver(Function<String, String> valueResolver) {
         this.valueResolver = valueResolver;
     }
 
@@ -52,10 +52,6 @@ public class StubResolver implements Resolver {
 
     @Override
     public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
-        if (propertyName == null || propertyName.isEmpty()) {
-            throw new IllegalArgumentException("propertyName must not be null or empty.");
-        }
-
         String value = valueResolver.apply(propertyName);
         if (value != null) {
             // Add for tracking.
@@ -65,21 +61,6 @@ public class StubResolver implements Resolver {
         }
         return Optional.empty();
     }
-
-    // @Override
-    // public ResolverResult resolve(ProxyMethod proxyMethod, Collection<String> propertyNames) {
-    //     if (propertyNames == null || propertyNames.isEmpty()) {
-    //         throw new IllegalArgumentException("propertyNames must not be null or empty.");
-    //     }
-    //     ResolverResult result = ResolverResult.builder(propertyNames)
-    //         .map(valueResolver)
-    //         .build();
-
-    //     // Add for tracking.
-    //     trackedResolvedProperties.putAll(result.resolvedProperties());
-
-    //     return result;
-    // }
 
     public Map<String, String> resolvedProperties() {
         return Collections.unmodifiableMap(trackedResolvedProperties);

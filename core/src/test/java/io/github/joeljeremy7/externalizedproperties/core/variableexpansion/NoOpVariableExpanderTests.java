@@ -1,10 +1,10 @@
 package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,6 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class NoOpVariableExpanderTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+    
     @Nested
     class ProviderMethod {
         @Test
@@ -50,12 +53,18 @@ public class NoOpVariableExpanderTests {
         public void test1() {
             String value = "${test}";
             
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(BasicProxyInterface.class, "property");
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::variableProperty
+            );
             
             String result = NoOpVariableExpander.INSTANCE.expandVariables(proxyMethod, value);
 
             assertSame(value, result);
         }
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("${test}")
+        String variableProperty();
     }
 }

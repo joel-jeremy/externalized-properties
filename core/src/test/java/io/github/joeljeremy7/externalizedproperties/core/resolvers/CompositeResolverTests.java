@@ -1,10 +1,11 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.ProxyMethods;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CompositeResolverTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+
     @Nested
     class ProviderMethodWithVarArgsOverload {
         @Test
@@ -342,7 +346,9 @@ public class CompositeResolverTests {
             StubResolver resolver = new StubResolver();
             
             CompositeResolver compositeResolver = resolverToTest(resolver);
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
 
             Optional<String> result = compositeResolver.resolve(proxyMethod, "property");
 
@@ -373,7 +379,9 @@ public class CompositeResolverTests {
                 resolver1,
                 resolver2
             );
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
 
             Optional<String> result = compositeResolver.resolve(
                 proxyMethod,
@@ -413,7 +421,9 @@ public class CompositeResolverTests {
                 resolver2,
                 resolver3
             );
-            ProxyMethod proxyMethod = ProxyMethods.property2();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property2
+            );
 
             // Should resolve from resolver2.
             Optional<String> result = compositeResolver.resolve(proxyMethod, "property.2");
@@ -460,7 +470,9 @@ public class CompositeResolverTests {
                 resolver2,
                 resolver3
             );
-            ProxyMethod proxyMethod = ProxyMethods.property1();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property1
+            );
 
             Optional<String> result = compositeResolver.resolve(proxyMethod, "property.1");
 
@@ -499,5 +511,16 @@ public class CompositeResolverTests {
 
     private CompositeResolver resolverToTest(Resolver... resolvers) {
         return CompositeResolver.from(resolvers);
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property")
+        String property();
+
+        @ExternalizedProperty("property.1")
+        String property1();
+
+        @ExternalizedProperty("property.2")
+        String property2();
     }
 }

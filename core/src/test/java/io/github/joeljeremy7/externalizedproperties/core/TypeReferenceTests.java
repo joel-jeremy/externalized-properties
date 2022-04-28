@@ -1,7 +1,5 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.ArrayProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.ListProxyInterface;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,11 +37,10 @@ public class TypeReferenceTests {
 
             // Method returns a List<String>.
             // Used for comparison of generic type.
-            Method method = 
-                ProxyMethodUtils.getMethod(
-                    ListProxyInterface.class, 
-                    "listProperty"
-                );
+            Method method = ProxyMethodUtils.getMethod(
+                GenericTypes.class, 
+                GenericTypes::listProperty
+            );
 
             // Detects List<String>.
             assertTrue(listType.type() instanceof ParameterizedType);
@@ -67,11 +64,10 @@ public class TypeReferenceTests {
 
             // Method returns a Optional<Optional<String>>[].
             // Used for comparison of generic type.
-            Method method = 
-                ProxyMethodUtils.getMethod(
-                    ArrayProxyInterface.class, 
-                    "arrayPropertyNestedGeneric"
-                );
+            Method method = ProxyMethodUtils.getMethod(
+                GenericTypes.class, 
+                GenericTypes::arrayPropertyNestedGeneric
+            );
             
             assertTrue(listType.type() instanceof GenericArrayType);
             assertEquals(
@@ -193,5 +189,10 @@ public class TypeReferenceTests {
 
             assertTrue(listType.genericTypeParameters().length == 0);
         }
+    }
+
+    static interface GenericTypes {
+        List<String> listProperty();
+        Optional<Optional<String>>[] arrayPropertyNestedGeneric();
     }
 }

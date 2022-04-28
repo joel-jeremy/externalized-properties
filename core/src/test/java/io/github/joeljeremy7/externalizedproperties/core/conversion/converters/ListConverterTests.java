@@ -4,11 +4,13 @@ import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.ListProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ListConverterTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+
     @Nested
     class Constructor {
         @Test
@@ -159,11 +164,9 @@ public class ListConverterTests {
         void test1() {
             ListConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listProperty
+            );
 
             ConversionResult<? extends List<?>> result = converter.convert(
                 proxyMethod,
@@ -190,11 +193,9 @@ public class ListConverterTests {
         void test2() {
             ListConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listInteger"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listInteger
+            );
                 
             ConversionResult<? extends List<?>> result = converter.convert(
                 proxyMethod,
@@ -222,11 +223,9 @@ public class ListConverterTests {
         void test3() {
             ListConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listCustomDelimiter"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listCustomDelimiter
+            );
 
             ConversionResult<? extends List<?>> result = converter.convert(
                 proxyMethod,
@@ -253,11 +252,9 @@ public class ListConverterTests {
                 PrimitiveConverter.provider()
             );
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listInteger"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listInteger
+            );
             
             ConversionResult<? extends List<?>> result = converter.convert(
                 proxyMethod,
@@ -284,11 +281,9 @@ public class ListConverterTests {
         void test5() {
             ListConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listPropertyWildcard"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listPropertyWildcard
+            );
 
             ConversionResult<? extends List<?>> result = converter.convert(
                 proxyMethod,
@@ -313,11 +308,9 @@ public class ListConverterTests {
         void test6() {
             ListConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listPropertyObject"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listPropertyObject
+            );
 
             ConversionResult<? extends List<?>> result = converter.convert(
                 proxyMethod,
@@ -342,11 +335,9 @@ public class ListConverterTests {
         void test7() {
             ListConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listProperty
+            );
 
             ConversionResult<? extends List<?>> result = converter.convert(
                 proxyMethod,
@@ -365,11 +356,9 @@ public class ListConverterTests {
         void test8() {
             ListConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listProperty
+            );
 
             ConversionResult<? extends List<?>> result = converter.convert(
                 proxyMethod,
@@ -394,11 +383,9 @@ public class ListConverterTests {
         void test9() {
             ListConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listPropertyStripEmpty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listPropertyStripEmpty
+            );
 
             ConversionResult<? extends List<?>> result = converter.convert(
                 proxyMethod,
@@ -425,11 +412,9 @@ public class ListConverterTests {
         void test10() {
             ListConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listInteger"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listInteger
+            );
             
             // No registered rootConverter for Integer.
             assertThrows(
@@ -448,11 +433,9 @@ public class ListConverterTests {
                 OptionalConverter.provider()
             );
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listPropertyNestedGenerics" // Returns a List<Optional<String>>.
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listPropertyNestedGenerics // Returns a List<Optional<String>>.
+            );
 
             ConversionResult<? extends List<?>> result = converter.convert(
                 proxyMethod,
@@ -486,11 +469,9 @@ public class ListConverterTests {
                 ArrayConverter.provider()
             );
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listPropertyNestedGenericsArray" // Returns a List<Optional<String>[]>.
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listPropertyNestedGenericsArray // Returns a List<Optional<String>[]>.
+            );
 
             ConversionResult<? extends List<?>> result = converter.convert(
                 proxyMethod,
@@ -531,11 +512,9 @@ public class ListConverterTests {
         void test13() {
             ListConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listPropertyT"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listPropertyT
+            );
                 
             assertThrows(
                 ConversionException.class, 
@@ -557,11 +536,9 @@ public class ListConverterTests {
                 length -> new LinkedList<>()
             );
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listProperty
+            );
 
             ConversionResult<? extends List<?>> result = converter.convert(
                 proxyMethod,
@@ -593,11 +570,9 @@ public class ListConverterTests {
                 length -> null
             );
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    ListProxyInterface.class,
-                    "listProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listProperty
+            );
             
             // Throws IllegalStateException if list factory returned null.
             assertThrows(
@@ -644,5 +619,49 @@ public class ListConverterTests {
             allProviders
         );
         return converterToTestProvider.get(externalizedProperties, rootConverter);
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property.list")
+        List<String> listProperty();
+
+        @ExternalizedProperty("property.list.object")
+        List<Object> listPropertyObject();
+
+        @ExternalizedProperty("property.list.custom.delimiter")
+        @Delimiter("#")
+        List<String> listCustomDelimiter();
+
+        @ExternalizedProperty("property.list.integer")
+        List<Integer> listInteger();
+
+        @ExternalizedProperty("property.list.wildcard")
+        List<?> listPropertyWildcard();
+
+        @ExternalizedProperty("property.collection")
+        Collection<String> collectionProperty();
+
+        @ExternalizedProperty("property.collection.custom.delimiter")
+        @Delimiter("#")
+        Collection<String> collectionCustomDelimiter();
+
+        @ExternalizedProperty("property.collection.integer")
+        Collection<Integer> collectionInteger();
+
+        @ExternalizedProperty("property.collection.wildcard")
+        Collection<?> collectionPropertyWildcard();
+
+        @ExternalizedProperty("property.list.stripempty")
+        @StripEmptyValues
+        List<String> listPropertyStripEmpty();
+
+        @ExternalizedProperty("property.list.nested.generics")
+        List<Optional<String>> listPropertyNestedGenerics();
+
+        @ExternalizedProperty("property.list.nested.generics.array")
+        List<Optional<String>[]> listPropertyNestedGenericsArray();
+
+        @ExternalizedProperty("property.list.T")
+        <T> List<T> listPropertyT();
     }
 }

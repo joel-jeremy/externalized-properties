@@ -208,7 +208,7 @@ public class CachingInvocationHandlerTests {
     private Method stubMethod() {
         return ProxyMethodUtils.getMethod(
             StubProxyInterface.class, 
-            "methodName"
+            StubProxyInterface::methodName
         );
     }
 

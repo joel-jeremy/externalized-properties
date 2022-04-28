@@ -1,11 +1,10 @@
 package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.NoPropertyNameProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.VariableProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,14 +15,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SimpleVariableExpanderTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
 
     static ExternalizedProperties EXTERNALIZED_PROPERTIES = 
         ExternalizedProperties.builder().withDefaultResolvers().build();
-
-    static final ProxyMethod STUB_PROXY_METHOD = ProxyMethodUtils.fromMethod(
-        VariableProxyInterface.class, 
-        "variableProperty"
-    );
 
     @Nested
     class Constructor {
@@ -181,12 +177,16 @@ public class SimpleVariableExpanderTests {
         public void test1() {
             SimpleVariableExpander variableExpander = variableExpander();
 
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::propertyJavaVersion
+            );
+
             String nullResult = variableExpander.expandVariables(
-                STUB_PROXY_METHOD, 
+                proxyMethod, 
                 null
             );
             String emptyResult = variableExpander.expandVariables(
-                STUB_PROXY_METHOD, 
+                proxyMethod, 
                 ""
             );
 
@@ -199,13 +199,17 @@ public class SimpleVariableExpanderTests {
         public void test2() {
             SimpleVariableExpander variableExpander = variableExpander();
 
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::propertyJavaVersion
+            );
+
             String result = variableExpander.expandVariables(
-                STUB_PROXY_METHOD, 
+                proxyMethod, 
                 "property-${java.version}"
             );
 
-            NoPropertyNameProxyInterface resolverProxy = 
-                EXTERNALIZED_PROPERTIES.proxy(NoPropertyNameProxyInterface.class);
+            ResolverProxy resolverProxy = 
+                EXTERNALIZED_PROPERTIES.proxy(ResolverProxy.class);
             
             String propertyValue = resolverProxy.resolve("java.version");
 
@@ -220,13 +224,17 @@ public class SimpleVariableExpanderTests {
         public void test3() {
             SimpleVariableExpander variableExpander = variableExpander();
 
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::propertyMultipleVariables
+            );
+
             String result = variableExpander.expandVariables(
-                STUB_PROXY_METHOD,
+                proxyMethod,
                 "property-${java.version}-home-${java.home}"
             );
 
-            NoPropertyNameProxyInterface resolverProxy = 
-                EXTERNALIZED_PROPERTIES.proxy(NoPropertyNameProxyInterface.class);
+            ResolverProxy resolverProxy = 
+                EXTERNALIZED_PROPERTIES.proxy(ResolverProxy.class);
             
             String javaVersionProperty = resolverProxy.resolve("java.version");
             String javaHomeProperty = resolverProxy.resolve("java.home");
@@ -241,9 +249,13 @@ public class SimpleVariableExpanderTests {
         @DisplayName("should return original string when there are no variables")
         public void test4() {
             SimpleVariableExpander variableExpander = variableExpander();
+            
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::propertyNoVariables
+            );
 
             String result = variableExpander.expandVariables(
-                STUB_PROXY_METHOD,
+                proxyMethod,
                 "property-no-variables"
             );
 
@@ -258,10 +270,14 @@ public class SimpleVariableExpanderTests {
         public void test5() {
             SimpleVariableExpander variableExpander = variableExpander();
 
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::propertyNonExistent
+            );
+
             assertThrows(
                 VariableExpansionException.class, 
                 () -> variableExpander.expandVariables(
-                    STUB_PROXY_METHOD,
+                    proxyMethod,
                     "property-${nonexistent}"
                 )
             );
@@ -274,9 +290,13 @@ public class SimpleVariableExpanderTests {
         )
         public void test6() {
             SimpleVariableExpander variableExpander = variableExpander();
+            
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::propertyNoVariableName
+            );
 
             String result = variableExpander.expandVariables(
-                STUB_PROXY_METHOD, 
+                proxyMethod, 
                 "test-${}"
             );
 
@@ -291,8 +311,12 @@ public class SimpleVariableExpanderTests {
         public void test7() {
             SimpleVariableExpander variableExpander = variableExpander();
 
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::propertyNoVariableSuffix
+            );
+
             String result = variableExpander.expandVariables(
-                STUB_PROXY_METHOD, 
+                proxyMethod, 
                 "test-${variable"
             );
 
@@ -308,14 +332,18 @@ public class SimpleVariableExpanderTests {
                 "#[",
                 "]"
             );
+            
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::customPrefixSuffix
+            );
 
             String result = variableExpander.expandVariables(
-                STUB_PROXY_METHOD,
+                proxyMethod,
                 "property-#[java.version]"
             );
 
-            NoPropertyNameProxyInterface resolverProxy = 
-                EXTERNALIZED_PROPERTIES.proxy(NoPropertyNameProxyInterface.class);
+            ResolverProxy resolverProxy = 
+                EXTERNALIZED_PROPERTIES.proxy(ResolverProxy.class);
             
             String propertyValue = resolverProxy.resolve("java.version");
 
@@ -353,5 +381,33 @@ public class SimpleVariableExpanderTests {
                 .build();
 
         return provider.get(externalizedProperties);
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property-${java.version}")
+        String propertyJavaVersion();
+
+        @ExternalizedProperty("property-${java.version}-home-${java.home}")
+        String propertyMultipleVariables();
+
+        @ExternalizedProperty("property-no-variables")
+        String propertyNoVariables();
+
+        @ExternalizedProperty("property-${nonexistent}")
+        String propertyNonExistent();
+
+        @ExternalizedProperty("property-#[java.version]")
+        String customPrefixSuffix();
+
+        @ExternalizedProperty("test-${}")
+        String propertyNoVariableName();
+
+        @ExternalizedProperty("test-${variable")
+        String propertyNoVariableSuffix();
+    }
+
+    static interface ResolverProxy {
+        @ExternalizedProperty
+        String resolve(String propertyName);
     }
 }

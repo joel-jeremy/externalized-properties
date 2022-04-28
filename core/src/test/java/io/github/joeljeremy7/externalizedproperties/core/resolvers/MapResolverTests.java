@@ -1,9 +1,10 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.ProxyMethods;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MapResolverTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+    
     @Nested
     class Constructor {
         @Test
@@ -131,7 +135,9 @@ public class MapResolverTests {
             map.put("property", "property.value");
             
             MapResolver resolver = resolverToTest(map);
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
 
             Optional<String> result = resolver.resolve(
                 proxyMethod, 
@@ -153,7 +159,9 @@ public class MapResolverTests {
         )
         void test2() {
             MapResolver resolver = resolverToTest(Collections.emptyMap());
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
 
             Optional<String> result = resolver.resolve(
                 proxyMethod, 
@@ -182,7 +190,9 @@ public class MapResolverTests {
                 Collections.emptyMap(),
                 unresolvedPropertyHandler
             );
-            ProxyMethod proxyMethod = ProxyMethods.property();
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::property
+            );
 
             Optional<String> result = 
                 resolver.resolve(proxyMethod, "property");
@@ -205,5 +215,10 @@ public class MapResolverTests {
             Function<String, String> unresolverPropertyHandler
     ) {
         return new MapResolver(map, unresolverPropertyHandler);
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property")
+        String property();
     }
 }

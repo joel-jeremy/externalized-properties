@@ -1,7 +1,7 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TypeUtilitiesTests {
+    private static final ProxyMethodFactory<TypesInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(TypesInterface.class);
+    
     @Nested
     class GetRawTypeMethod {
         @Test
@@ -44,11 +47,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return raw type when type is a parameterized type.")
         public void parameterizedTest1() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "parameterizedTypeReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::parameterizedTypeReturnType
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
 
@@ -65,11 +66,9 @@ public class TypeUtilitiesTests {
             "with type variable that has no extends declaration."
         )
         public void genericArrayTypeTest1() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "genericArrayTypeReturnTypeWithTypeVariable"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::genericArrayTypeReturnTypeWithTypeVariable
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
 
@@ -86,11 +85,9 @@ public class TypeUtilitiesTests {
             "with type variable that has an extends declaration."
         )
         public void genericArrayTypeTest2() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "genericArrayTypeReturnTypeWithTypeVariableExtends"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::genericArrayTypeReturnTypeWithTypeVariableExtends
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
 
@@ -107,11 +104,9 @@ public class TypeUtilitiesTests {
             "that has no extends declaration."
         )
         public void typeVariableTest1() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "typeVariableReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::typeVariableReturnType
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
 
@@ -128,11 +123,9 @@ public class TypeUtilitiesTests {
             "that has an extends declaration."
         )
         public void typeVariableTest2() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "typeVariableReturnTypeExtends"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::typeVariableReturnTypeExtends
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
 
@@ -149,11 +142,9 @@ public class TypeUtilitiesTests {
             "that has no extends declaration."
         )
         public void wildcardTypeTest1() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "wildcardTypeReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::wildcardTypeReturnType
+            );
                 
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
@@ -177,11 +168,9 @@ public class TypeUtilitiesTests {
             "that has an extends declaration e.g. <? extends String>."
         )
         public void wildcardTypeTest2() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "wildcardTypeReturnTypeExtends"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::wildcardTypeReturnTypeExtends
+            );
                 
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
@@ -205,11 +194,9 @@ public class TypeUtilitiesTests {
             "that has a super declaration e.g. <? super String>."
         )
         public void wildcardTypeTest3() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "wildcardTypeReturnTypeSuper"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::wildcardTypeReturnTypeSuper
+            );
                 
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
@@ -258,11 +245,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return generic type parameter.")
         public void test1() {
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "parameterizedTypeReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::parameterizedTypeReturnType
+            );
             
             Type genericReturnType = proxyMethod.returnType();
 
@@ -275,11 +260,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return empty array when type is not a parameterized type.")
         public void test2() {
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "nonParameterizedTypeReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::nonParameterizedTypeReturnType
+            );
             
             Type genericReturnType = proxyMethod.returnType();
 
@@ -300,11 +283,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return false when type is not a class.")
         public void test2() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "parameterizedTypeReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::parameterizedTypeReturnType
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
 
@@ -318,11 +299,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return true when type is a parameterized type.")
         public void test1() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "parameterizedTypeReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::parameterizedTypeReturnType
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof ParameterizedType);
@@ -343,11 +322,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return true when type is a generic array type.")
         public void test1() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "genericArrayTypeReturnTypeWithTypeVariable"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::genericArrayTypeReturnTypeWithTypeVariable
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof GenericArrayType);
@@ -368,11 +345,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return true when type is a type variable.")
         public void test1() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "typeVariableReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::typeVariableReturnType
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof TypeVariable<?>);
@@ -393,11 +368,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return true when type is a wildcard type.")
         public void test1() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "wildcardTypeReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::wildcardTypeReturnType
+            );
             
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
@@ -437,11 +410,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return null when type is not a class.")
         public void test2() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "parameterizedTypeReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::parameterizedTypeReturnType
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof ParameterizedType);
@@ -454,11 +425,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return a parameterized type when type is a parameterized type.")
         public void test1() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "parameterizedTypeReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::parameterizedTypeReturnType
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof ParameterizedType);
@@ -482,11 +451,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return a generic array type when type is a generic array type.")
         public void test1() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "genericArrayTypeReturnTypeWithTypeVariable"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::genericArrayTypeReturnTypeWithTypeVariable
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof GenericArrayType);
@@ -510,11 +477,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return a type variable when type is a type variable.")
         public void test1() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "typeVariableReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::typeVariableReturnType
+            );
                 
             Type genericReturnType = proxyMethod.returnType();
             assertTrue(genericReturnType instanceof TypeVariable<?>);
@@ -538,11 +503,9 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return a wildcard type when type is a wildcard type.")
         public void test1() {
-            ProxyMethod proxyMethod =
-                ProxyMethodUtils.fromMethod(
-                    TypesInterface.class,
-                    "wildcardTypeReturnType"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                TypesInterface::wildcardTypeReturnType
+            );
             
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.

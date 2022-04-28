@@ -4,6 +4,7 @@ import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.UnresolvedPropertiesException;
@@ -14,12 +15,6 @@ import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.Roo
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.DefaultResolver;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.BasicProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.DefaultValueProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.NoAnnotationProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.OptionalProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.SystemPropertiesProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.ThrowingProxyInterface;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 import org.junit.jupiter.api.DisplayName;
@@ -34,11 +29,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ProxyMethodHandlerTests {
-    private final ResolverProvider<?> resolverProvider = ep -> new DefaultResolver();
+    private final ResolverProvider<?> resolverProvider = DefaultResolver.provider();
     private final ConverterProvider<?> converterProvider = 
-        (ep, rootConverter) -> new DefaultConverter(rootConverter);
+        DefaultConverter.provider();
     private final VariableExpanderProvider<?> variableExpanderProvider = 
-        ep -> new SimpleVariableExpander(ep);
+        SimpleVariableExpander.provider();
     private final ExternalizedProperties externalizedProperties = 
         ExternalizedProperties.builder()
             .resolvers(resolverProvider)
@@ -92,11 +87,13 @@ public class ProxyMethodHandlerTests {
         @Test
         @DisplayName("should invoke default interface method.")
         public void test1() {
-            Class<DefaultValueProxyInterface> proxyInterface = 
-                DefaultValueProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface);    
-            Method method = getProxyInterfaceMethod(proxyInterface, "propertyWithDefaultValue");
+            Method method = ProxyMethodUtils.getMethod(
+                proxyInterface, 
+                ProxyInterface::propertyWithDefaultValue
+            );
             ProxyMethodHandler proxyMethodHandler = proxyMethodHandler();
 
             Object value = proxyMethodHandler.invokeDefaultInterfaceMethod(
@@ -112,11 +109,13 @@ public class ProxyMethodHandlerTests {
         @Test
         @DisplayName("should throw when method is not a default interface method.")
         public void test2() {
-            Class<BasicProxyInterface> proxyInterface = 
-                BasicProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
-            Method method = getProxyInterfaceMethod(proxyInterface, "property");
+            Method method = ProxyMethodUtils.getMethod(
+                proxyInterface, 
+                ProxyInterface::notFound
+            );
 
             ProxyMethodHandler proxyMethodHandler = proxyMethodHandler();
 
@@ -131,11 +130,13 @@ public class ProxyMethodHandlerTests {
             "should rethrow same runtime exception when default interface method throws an exception."
         )
         public void test3() {
-            Class<ThrowingProxyInterface> proxyInterface = 
-                ThrowingProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
-            Method method = getProxyInterfaceMethod(proxyInterface, "throwRuntimeException");
+            Method method = ProxyMethodUtils.getMethod(
+                proxyInterface, 
+                ProxyInterface::throwRuntimeException
+            );
             ProxyMethodHandler proxyMethodHandler = proxyMethodHandler();
 
             assertThrows(
@@ -153,11 +154,14 @@ public class ProxyMethodHandlerTests {
             "should wrap non-runtime exception thrown by default interface method."
         )
         public void test4() {
-            Class<ThrowingProxyInterface> proxyInterface = 
-                ThrowingProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
-            Method method = getProxyInterfaceMethod(proxyInterface, "throwException");
+            // Can't use method ref here because of checked exception
+            Method method = ProxyMethodUtils.getMethod(
+                proxyInterface, 
+                "throwException"
+            );
             ProxyMethodHandler proxyMethod = proxyMethodHandler();
 
             assertThrows(
@@ -173,14 +177,12 @@ public class ProxyMethodHandlerTests {
         @Test
         @DisplayName("should receive method arguments.")
         public void test5() {
-            Class<DefaultValueProxyInterface> proxyInterface = 
-                DefaultValueProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
-            Method method = getProxyInterfaceMethod(
+            Method method = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "propertyWithDefaultValueParameter",
-                String.class // Method has one string parameter.
+                ProxyInterface::propertyWithDefaultValueParameter
             );
             ProxyMethodHandler proxyMethodHandler = proxyMethodHandler();
 
@@ -202,13 +204,12 @@ public class ProxyMethodHandlerTests {
             "when method is a default interface method."
         )
         public void test1() {
-            Class<DefaultValueProxyInterface> proxyInterface = 
-                DefaultValueProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
-            Method method = getProxyInterfaceMethod(
+            Method method = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "propertyWithDefaultValue"
+                ProxyInterface::propertyWithDefaultValue
             );
             ProxyMethodHandler proxyMethodHandler = proxyMethodHandler();
 
@@ -227,13 +228,12 @@ public class ProxyMethodHandlerTests {
             "should return an empty Optional when method has an Optional method return type."
         )
         public void test2() {
-            Class<OptionalProxyInterface> proxyInterface = 
-                OptionalProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
-            Method method = getProxyInterfaceMethod(
+            Method method = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "optionalProperty"
+                ProxyInterface::optionalProperty
             );
             ProxyMethodHandler proxyMethodHandler = proxyMethodHandler();
 
@@ -252,13 +252,12 @@ public class ProxyMethodHandlerTests {
             "and does not have an Optional method return type."
         )
         public void test3() {
-            Class<BasicProxyInterface> proxyInterface = 
-                BasicProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
-            Method method = getProxyInterfaceMethod(
+            Method method = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "property"
+                ProxyInterface::notFound
             );
             ProxyMethodHandler proxyMethodHandler = proxyMethodHandler();
 
@@ -278,13 +277,12 @@ public class ProxyMethodHandlerTests {
         @Test
         @DisplayName("should return value from resolver.")
         public void test1() {
-            Class<SystemPropertiesProxyInterface> proxyInterface = 
-                SystemPropertiesProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
-            Method method = getProxyInterfaceMethod(
+            Method method = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "javaVersion"
+                ProxyInterface::javaVersion
             );
             ProxyMethodHandler proxyMethod = proxyMethodHandler();
 
@@ -305,13 +303,12 @@ public class ProxyMethodHandlerTests {
             "when method is not annotated with @ExternalizedProperty."
         )
         public void test2() {
-            Class<NoAnnotationProxyInterface> proxyInterface = 
-                NoAnnotationProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
-            Method method = getProxyInterfaceMethod(
+            Method method = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "propertyWithNoAnnotationButWithDefaultValue"
+                ProxyInterface::propertyWithNoAnnotationButWithDefaultValue
             );
             ProxyMethodHandler proxyMethodHandler = proxyMethodHandler();
 
@@ -337,13 +334,12 @@ public class ProxyMethodHandlerTests {
             "but property cannot be resolved via the resolver."
         )
         public void test3() {
-            Class<DefaultValueProxyInterface> proxyInterface = 
-                DefaultValueProxyInterface.class;
+            Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
-            Method method = getProxyInterfaceMethod(
+            Method method = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                "propertyWithDefaultValue"
+                ProxyInterface::propertyWithDefaultValue
             );
             ProxyMethodHandler proxyMethodHandler = proxyMethodHandler();
 
@@ -376,18 +372,6 @@ public class ProxyMethodHandlerTests {
         return externalizedProperties.proxy(proxyInterface);
     }
 
-    private static Method getProxyInterfaceMethod(
-            Class<?> proxyInterface, 
-            String name, 
-            Class<?>... parameterTypes
-    ) {
-        try {
-            return ProxyMethodUtils.getMethod(proxyInterface, name, parameterTypes);
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to find property method.", e);
-        }
-    }
-
     private Resolver rootResolver() {
         return new RootResolver(
             externalizedProperties,
@@ -399,5 +383,40 @@ public class ProxyMethodHandlerTests {
 
     private Converter<?> rootConverter() {
         return new RootConverter(externalizedProperties, converterProvider);
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("java.version")
+        String javaVersion();
+
+        @ExternalizedProperty("optional.property")
+        Optional<String> optionalProperty();
+
+        @ExternalizedProperty("property.with.default.value")
+        default String propertyWithDefaultValue() {
+            return "default.value";
+        }
+
+        @ExternalizedProperty("property.with.default.value")
+        default String propertyWithDefaultValueParameter(String defaultValue) {
+            return defaultValue;
+        }
+
+        default String propertyWithNoAnnotationButWithDefaultValue() {
+            return "default.value";
+        }
+
+        @ExternalizedProperty("not.found")
+        String notFound();
+
+        @ExternalizedProperty("this.will.throw")
+        default String throwRuntimeException() {
+            throw new RuntimeException("Oops!");
+        }
+
+        @ExternalizedProperty("this.will.throw")
+        default String throwException() throws Exception {
+            throw new Exception("Oops!");
+        }
     }
 }

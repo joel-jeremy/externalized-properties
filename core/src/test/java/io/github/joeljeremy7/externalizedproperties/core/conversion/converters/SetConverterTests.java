@@ -4,11 +4,13 @@ import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testentities.proxy.SetProxyInterface;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SetConverterTests {
+    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new ProxyMethodFactory<>(ProxyInterface.class);
+    
     @Nested
     class Constructor {
         @Test
@@ -147,11 +152,9 @@ public class SetConverterTests {
         void test1() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setProperty
+            );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -178,11 +181,9 @@ public class SetConverterTests {
         void test2() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setInteger"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setInteger
+            );
                 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -210,11 +211,9 @@ public class SetConverterTests {
         void test3() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setCustomDelimiter"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setCustomDelimiter
+            );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -239,11 +238,9 @@ public class SetConverterTests {
         void test4() {
             SetConverter converter = converterToTest(PrimitiveConverter.provider());
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setInteger"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setInteger
+            );
             
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -270,11 +267,9 @@ public class SetConverterTests {
         void test5() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setPropertyWildcard"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setPropertyWildcard
+            );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -299,11 +294,9 @@ public class SetConverterTests {
         void test6() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setPropertyObject"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setPropertyObject
+            );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -328,11 +321,9 @@ public class SetConverterTests {
         void test7() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setProperty
+            );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -354,11 +345,9 @@ public class SetConverterTests {
                 i -> new LinkedHashSet<>(i)
             );
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setProperty
+            );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -388,11 +377,9 @@ public class SetConverterTests {
                 i -> new LinkedHashSet<>(i)
             );
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setPropertyStripEmpty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setPropertyStripEmpty
+            );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -419,11 +406,9 @@ public class SetConverterTests {
         void test10() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setInteger"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setInteger
+            );
             
             // No registered rootConverter for Integer.
             assertThrows(
@@ -444,11 +429,9 @@ public class SetConverterTests {
                 OptionalConverter.provider()
             );
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setPropertyNestedGenerics" // Returns a Set<Optional<String>>.
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setPropertyNestedGenerics // Returns a Set<Optional<String>>.
+            );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -484,11 +467,9 @@ public class SetConverterTests {
                 ArrayConverter.provider()
             );
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setPropertyNestedGenericsArray" // Returns a Set<Optional<String>[]>.
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setPropertyNestedGenericsArray // Returns a Set<Optional<String>[]>.
+            );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -530,11 +511,9 @@ public class SetConverterTests {
         void test13() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setPropertyT"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setPropertyT
+            );
                 
             assertThrows(
                 ConversionException.class, 
@@ -549,11 +528,9 @@ public class SetConverterTests {
         void test14() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setProperty
+            );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -587,11 +564,9 @@ public class SetConverterTests {
                 length -> new LinkedHashSet<>()
             );
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setProperty
+            );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 proxyMethod,
@@ -623,11 +598,9 @@ public class SetConverterTests {
                 length -> null
             );
 
-            ProxyMethod proxyMethod = 
-                ProxyMethodUtils.fromMethod(
-                    SetProxyInterface.class,
-                    "setProperty"
-                );
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setProperty
+            );
 
             // Throws IllegalStateException if set factory returned null.
             assertThrows(
@@ -669,5 +642,36 @@ public class SetConverterTests {
         );
         
         return converterToTestProvider.get(externalizedProperties, rootConverter);
+    }
+
+    public static interface ProxyInterface {
+        @ExternalizedProperty("property.set")
+        Set<String> setProperty();
+    
+        @ExternalizedProperty("property.set.object")
+        Set<Object> setPropertyObject();
+    
+        @ExternalizedProperty("property.set.custom.delimiter")
+        @Delimiter("#")
+        Set<String> setCustomDelimiter();
+    
+        @ExternalizedProperty("property.set.integer")
+        Set<Integer> setInteger();
+    
+        @ExternalizedProperty("property.set.wildcard")
+        Set<?> setPropertyWildcard();
+    
+        @ExternalizedProperty("property.set.stripempty")
+        @StripEmptyValues
+        Set<String> setPropertyStripEmpty();
+    
+        @ExternalizedProperty("property.set.nested.generics")
+        Set<Optional<String>> setPropertyNestedGenerics();
+    
+        @ExternalizedProperty("property.set.nested.generics.array")
+        Set<Optional<String>[]> setPropertyNestedGenericsArray();
+    
+        @ExternalizedProperty("property.set.T")
+        <T> Set<T> setPropertyT();
     }
 }
