@@ -91,9 +91,8 @@ public static void main(String[] args) {
 private ExternalizedProperties buildExternalizedProperties() {
     // Create the ExternalizedProperties instance with default and additional resolvers.
     // Default resolvers include system properties and environment variable resolvers.
-    // DatabaseResolver is not part of the core module. It is part of a separate resolver-database module.
 
-    return ExternalizedPropertiesBuilder.newBuilder()
+    return ExternalizedProperties.builder()
         .withDefaultResolvers() 
         .resolvers(
             ResourceResolver.provider(getClass().getResource("/app.properties")),
@@ -103,9 +102,9 @@ private ExternalizedProperties buildExternalizedProperties() {
                 // See: core/src/test/java/io/github/joeljeremy7/externalizedproperties/core/resolvers/resourcereaders
                 new YamlReader()
             ),
+            // DatabaseResolver is not part of the core module. It is part of a separate resolver-database module.
             DatabaseResolver.provider(new JdbcConnectionProvider(getDataSource())),
-            // CustomAwsSsmResolver is an example custom resolver
-            // implementation which resolves properties from AWS SSM.
+            // CustomAwsSsmResolver is an example custom resolver implementation which resolves properties from AWS SSM.
             ResolverProvider.of(new CustomAwsSsmResolver(buildAwsSsmClient()))
         ) 
         .build();
@@ -120,15 +119,13 @@ To register converters to the library, it must be done through the builder:
 
 ```java
 private ExternalizedProperties buildExternalizedProperties() {
-    ExternalizedProperties externalizedProperties = ExternalizedPropertiesBuilder.newBuilder()
+    return ExternalizedProperties.builder()
         .withDefaultResolvers()
         .withDefaultConverters()
         .converters(
             ConverterProvider.of(new CustomTypeConverter())
         )
         .build();
-
-    return externalizedProperties;
 }
 ```
 
