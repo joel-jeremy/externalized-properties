@@ -18,6 +18,20 @@ public interface ResolverProvider<T extends Resolver> {
     T get(ExternalizedProperties externalizedProperties);
 
     /**
+     * Create a {@link ResolverProvider} which always returns the provided 
+     * {@link Resolver} instance.
+     * 
+     * @param <T> The type of resolver.
+     * @param resolver The {@link Resolver} instance to be returned by the resulting
+     * {@link ResolverProvider}.
+     * @return A {@link ResolverProvider} which always returns the provided 
+     * {@link Resolver} instance.
+     */
+    static <T extends Resolver> ResolverProvider<T> of(T resolver) {
+        return externalizedProperties -> resolver;
+    }
+
+    /**
      * Create a {@link ResolverProvider} which memoizes the result of another
      * {@link ResolverProvider}.
      * 

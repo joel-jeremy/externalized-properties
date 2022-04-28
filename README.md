@@ -99,7 +99,7 @@ private ExternalizedProperties buildExternalizedProperties() {
         .withDefaultResolvers() 
         .resolvers(
             DatabaseResolver.provider(new JdbcConnectionProvider(getDataSource())),
-            externalizedProperties -> new CustomAwsSsmResolver(buildAwsSsmClient())
+            ResolverProvider.of(new CustomAwsSsmResolver(buildAwsSsmClient()))
         ) 
         .build();
     
@@ -119,7 +119,7 @@ private ExternalizedProperties buildExternalizedProperties() {
         .withDefaultResolvers()
         .withDefaultConverters()
         .converters(
-            new CustomTypeConverter()
+            ConverterProvider.of(new CustomTypeConverter())
         )
         .build();
 

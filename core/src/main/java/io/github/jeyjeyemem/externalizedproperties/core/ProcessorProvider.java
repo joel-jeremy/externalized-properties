@@ -18,6 +18,20 @@ public interface ProcessorProvider<T extends Processor> {
     T get(ExternalizedProperties externalizedProperties);
 
     /**
+     * Create a {@link ProcessorProvider} which always returns the provided 
+     * {@link Processor} instance.
+     * 
+     * @param <T> The type of processor.
+     * @param processor The {@link Processor} instance to be returned by the resulting
+     * {@link ProcessorProvider}.
+     * @return A {@link ProcessorProvider} which always returns the provided 
+     * {@link Processor} instance.
+     */
+    static <T extends Processor> ProcessorProvider<T> of(T processor) {
+        return externalizedProperties -> processor;
+    }
+
+    /**
      * Create a {@link ProcessorProvider} which memoizes the result of another
      * {@link ProcessorProvider}.
      * 

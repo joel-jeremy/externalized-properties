@@ -17,6 +17,20 @@ public interface VariableExpanderProvider<T extends VariableExpander> {
     T get(ExternalizedProperties externalizedProperties);
 
     /**
+     * Create a {@link VariableExpanderProvider} which always returns the provided 
+     * {@link VariableExpander} instance.
+     * 
+     * @param <T> The type of variable expander.
+     * @param variableExpander The {@link VariableExpander} instance to be returned by the 
+     * resulting {@link VariableExpanderProvider}.
+     * @return A {@link VariableExpanderProvider} which always returns the provided 
+     * {@link VariableExpander} instance.
+     */
+    static <T extends VariableExpander> VariableExpanderProvider<T> of(T variableExpander) {
+        return externalizedProperties -> variableExpander;
+    }
+
+    /**
      * Create a {@link VariableExpanderProvider} which memoizes the result of another
      * {@link VariableExpanderProvider}.
      * 

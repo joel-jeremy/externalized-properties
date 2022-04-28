@@ -14,13 +14,29 @@ public interface ConverterProvider<T extends Converter<?>> {
      * 
      * @param externalizedProperties The {@link ExternalizedProperties} instance.
      * @param rootConverter The root {@link Converter} instance. The root converter
-     * which contains all registered converters and delegates accordingly.
+     * which contains all registered converters and delegates accordingly. 
+     * If converter implementation requires conversion of values to other types,
+     * it may do so by requesting conversion via the root converter. 
      * @return An instance of {@link Converter}.
      */
     T get(
         ExternalizedProperties externalizedProperties,
         Converter<?> rootConverter
     );
+
+    /**
+     * Create a {@link ConverterProvider} which always returns the provided 
+     * {@link Converter} instance.
+     * 
+     * @param <T> The type of converter.
+     * @param converter The {@link Converter} instance to be returned by the resulting
+     * {@link ConverterProvider}.
+     * @return A {@link ConverterProvider} which always returns the provided
+     * {@link Converter} instance.
+     */
+    static <T extends Converter<?>> ConverterProvider<T> of(T converter) {
+        return (externalizedProperties, rootConverter) -> converter;
+    }
 
     /**
      * Create a {@link ConverterProvider} which memoizes the result of another
