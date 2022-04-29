@@ -48,7 +48,7 @@ public class ProcessorProviderTests {
     class MemoizeMethod {
         @Test
         @DisplayName("should throw when the provider to memoize argument is null")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> ProcessorProvider.memoize(null)
@@ -57,7 +57,7 @@ public class ProcessorProviderTests {
 
         @Test
         @DisplayName("should throw when memoized provider returns null")
-        public void test2() {
+        void test2() {
             ProcessorProvider<?> provider = e -> null;
             ProcessorProvider<?> memoized = ProcessorProvider.memoize(provider);
             ExternalizedProperties externalizedProperties = 
@@ -74,7 +74,7 @@ public class ProcessorProviderTests {
 
         @Test
         @DisplayName("should memoize result of the provider to memoize argument")
-        public void test3() {
+        void test3() {
             ProcessorProvider<Base64DecodeProcessor> provider = 
                 Base64DecodeProcessor.provider();
             ExternalizedProperties externalizedProperties = 
@@ -97,7 +97,7 @@ public class ProcessorProviderTests {
             "should memoize result of the provider to memoize argument " + 
             "in multithreaded environment"
         )
-        public void test4() throws InterruptedException {
+        void test4() throws InterruptedException {
             ProcessorProvider<?> provider = Base64DecodeProcessor.provider();
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()
@@ -134,7 +134,7 @@ public class ProcessorProviderTests {
 
         @Test
         @DisplayName("should return different instance for each memoized provider")
-        public void test5() {
+        void test5() {
             ProcessorProvider<Base64DecodeProcessor> provider = 
                 Base64DecodeProcessor.provider();
             ExternalizedProperties externalizedProperties = 
@@ -152,6 +152,23 @@ public class ProcessorProviderTests {
             Base64DecodeProcessor instance2 = memoized2.get(externalizedProperties);
 
             assertNotSame(instance1, instance2);
+        }
+
+        @Test
+        @DisplayName(
+            "should return same provider instance when provider was already memoized"
+        )
+        void test6() {
+            ProcessorProvider<Base64DecodeProcessor> provider = 
+                Base64DecodeProcessor.provider();
+            
+            ProcessorProvider<Base64DecodeProcessor> memoized1 = 
+                ProcessorProvider.memoize(provider);
+
+            ProcessorProvider<Base64DecodeProcessor> sameAsMemoized1 = 
+                ProcessorProvider.memoize(memoized1);
+
+            assertSame(memoized1, sameAsMemoized1);
         }
     } 
 }

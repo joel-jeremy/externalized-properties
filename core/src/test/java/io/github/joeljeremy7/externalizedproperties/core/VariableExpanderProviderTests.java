@@ -49,7 +49,7 @@ public class VariableExpanderProviderTests {
     class MemoizeMethod {
         @Test
         @DisplayName("should throw when the provider to memoize argument is null")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> VariableExpanderProvider.memoize(null)
@@ -58,7 +58,7 @@ public class VariableExpanderProviderTests {
 
         @Test
         @DisplayName("should throw when memoized provider returns null")
-        public void test2() {
+        void test2() {
             VariableExpanderProvider<?> provider = e -> null;
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()
@@ -75,7 +75,7 @@ public class VariableExpanderProviderTests {
 
         @Test
         @DisplayName("should memoize result of the provider to memoize argument")
-        public void test3() {
+        void test3() {
             VariableExpanderProvider<DummyVariableExpander> provider = 
                 DummyVariableExpander.provider();
             ExternalizedProperties externalizedProperties = 
@@ -98,7 +98,7 @@ public class VariableExpanderProviderTests {
             "should memoize result of the provider to memoize argument " +
             "in multithreaded environment"
         )
-        public void test4() throws InterruptedException {
+        void test4() throws InterruptedException {
             // Use dummy variable expander to avoid calling proxy(...)
             // in constructor of SimpleVariableExpander.
             VariableExpanderProvider<?> provider = DummyVariableExpander.provider();
@@ -137,7 +137,7 @@ public class VariableExpanderProviderTests {
 
         @Test
         @DisplayName("should return different instance for each memoized provider")
-        public void test5() {
+        void test5() {
             VariableExpanderProvider<DummyVariableExpander> provider = 
                 DummyVariableExpander.provider();
             ExternalizedProperties externalizedProperties = 
@@ -155,6 +155,23 @@ public class VariableExpanderProviderTests {
             DummyVariableExpander instance2 = memoized2.get(externalizedProperties);
 
             assertNotSame(instance1, instance2);
+        }
+
+        @Test
+        @DisplayName(
+            "should return same provider instance when provider was already memoized"
+        )
+        void test6() {
+            VariableExpanderProvider<DummyVariableExpander> provider = 
+                DummyVariableExpander.provider();
+            
+            VariableExpanderProvider<DummyVariableExpander> memoized1 = 
+                VariableExpanderProvider.memoize(provider);
+
+            VariableExpanderProvider<DummyVariableExpander> sameAsMemoized1 = 
+                VariableExpanderProvider.memoize(memoized1);
+
+            assertSame(memoized1, sameAsMemoized1);
         }
     } 
 

@@ -149,5 +149,21 @@ public class ResolverProviderTests {
 
             assertNotSame(instance1, instance2);
         }
+
+        @Test
+        @DisplayName(
+            "should return same provider instance when provider was already memoized"
+        )
+        void test6() {
+            ResolverProvider<DefaultResolver> provider = DefaultResolver.provider();
+            
+            ResolverProvider<DefaultResolver> memoized1 = 
+                ResolverProvider.memoize(provider);
+
+            ResolverProvider<DefaultResolver> sameAsMemoized1 = 
+                ResolverProvider.memoize(memoized1);
+
+            assertSame(memoized1, sameAsMemoized1);
+        }
     }
 }

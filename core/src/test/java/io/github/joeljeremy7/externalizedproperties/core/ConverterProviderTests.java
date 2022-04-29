@@ -55,7 +55,7 @@ public class ConverterProviderTests {
     class MemoizeMethod {
         @Test
         @DisplayName("should throw when the provider to memoize argument is null")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> ConverterProvider.memoize(null)
@@ -64,7 +64,7 @@ public class ConverterProviderTests {
 
         @Test
         @DisplayName("should throw when memoized provider returns null")
-        public void test2() {
+        void test2() {
             ConverterProvider<?> provider = (e, rc) -> null;
             ConverterProvider<?> memoized = ConverterProvider.memoize(provider);
             ExternalizedProperties externalizedProperties = 
@@ -84,7 +84,7 @@ public class ConverterProviderTests {
 
         @Test
         @DisplayName("should memoize result of the provider to memoize argument")
-        public void test3() {
+        void test3() {
             ConverterProvider<DefaultConverter> provider = DefaultConverter.provider();
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()
@@ -116,7 +116,7 @@ public class ConverterProviderTests {
             "should memoize result of the provider to memoize argument " +
             "in multithreaded environment"
         )
-        public void test4() throws InterruptedException {
+        void test4() throws InterruptedException {
             ConverterProvider<?> provider = DefaultConverter.provider();
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()
@@ -159,7 +159,7 @@ public class ConverterProviderTests {
 
         @Test
         @DisplayName("should return different instance for each memoized provider")
-        public void test5() {
+        void test5() {
             ConverterProvider<DefaultConverter> provider = DefaultConverter.provider();
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()
@@ -186,6 +186,22 @@ public class ConverterProviderTests {
             );
 
             assertNotSame(instance1, instance2);
+        }
+
+        @Test
+        @DisplayName(
+            "should return same provider instance when provider was already memoized"
+        )
+        void test6() {
+            ConverterProvider<DefaultConverter> provider = DefaultConverter.provider();
+            
+            ConverterProvider<DefaultConverter> memoized1 = 
+                ConverterProvider.memoize(provider);
+
+            ConverterProvider<DefaultConverter> sameAsMemoized1 = 
+                ConverterProvider.memoize(memoized1);
+
+            assertSame(memoized1, sameAsMemoized1);
         }
     } 
 }
