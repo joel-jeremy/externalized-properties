@@ -14,7 +14,6 @@ import io.github.joeljeremy7.externalizedproperties.core.resolvers.CompositeReso
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
@@ -116,10 +115,6 @@ public class RootResolver implements Resolver {
     private static ResolverProvider<?> initializeResolverProvider(
             Collection<ResolverProvider<?>> resolverProviders
     ) {
-        return e -> CompositeResolver.flatten(
-            resolverProviders.stream()
-                .map(p -> p.get(e))
-                .collect(Collectors.toList())
-        );
+        return CompositeResolver.flattenedProvider(resolverProviders);
     }
 }

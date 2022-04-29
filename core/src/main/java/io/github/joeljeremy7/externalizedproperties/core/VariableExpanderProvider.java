@@ -43,10 +43,28 @@ public interface VariableExpanderProvider<T extends VariableExpander> {
     static <T extends VariableExpander> VariableExpanderProvider<T> memoize(
             VariableExpanderProvider<T> provider
     ) {
-        requireNonNull(provider, "provider");
+        if (provider instanceof Memoized) {
+            return provider;
+        }
+        return new Memoized<>(provider);
+    }
 
-        final AtomicReference<T> memoized = new AtomicReference<>(null);
-        return externalizedProperties -> {
+    /**
+     * A {@link VariableExpanderProvider} which memoizes the result of another
+     * {@link VariableExpanderProvider}.
+     */
+    static final class Memoized<T extends VariableExpander> implements VariableExpanderProvider<T> {
+
+        private final VariableExpanderProvider<T> provider;
+        private final AtomicReference<T> memoized = new AtomicReference<>(null);
+
+        private Memoized(VariableExpanderProvider<T> provider) {
+            this.provider = requireNonNull(provider, "provider");
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public T get(ExternalizedProperties externalizedProperties) {
             T result = memoized.get();
             if (result == null) {
                 result = provider.get(externalizedProperties);
@@ -57,6 +75,6 @@ public interface VariableExpanderProvider<T extends VariableExpander> {
                 }
             }
             return result;
-        };
+        }
     }
 }

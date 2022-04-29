@@ -44,10 +44,28 @@ public interface ProcessorProvider<T extends Processor> {
     static <T extends Processor> ProcessorProvider<T> memoize(
             ProcessorProvider<T> provider
     ) {
-        requireNonNull(provider, "provider");
+        if (provider instanceof Memoized) {
+            return provider;
+        }
+        return new Memoized<>(provider);
+    }
 
-        final AtomicReference<T> memoized = new AtomicReference<>(null);
-        return externalizedProperties -> {
+    /**
+     * A {@link ProcessorProvider} which memoizes the result of another
+     * {@link ProcessorProvider}.
+     */
+    static final class Memoized<T extends Processor> implements ProcessorProvider<T> {
+
+        private final ProcessorProvider<T> provider;
+        private final AtomicReference<T> memoized = new AtomicReference<>(null);
+
+        private Memoized(ProcessorProvider<T> provider) {
+            this.provider = requireNonNull(provider, "provider");
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public T get(ExternalizedProperties externalizedProperties) {
             T result = memoized.get();
             if (result == null) {
                 result = provider.get(externalizedProperties);
@@ -58,6 +76,6 @@ public interface ProcessorProvider<T extends Processor> {
                 }
             }
             return result;
-        };
+        }
     }
 }

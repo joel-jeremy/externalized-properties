@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -169,21 +170,21 @@ public class RootConverter implements Converter<Object> {
 
         private final RootConverter rootConverter;
         private final ExternalizedProperties externalizedProperties;
-        private final Collection<ConverterProvider<?>> converterProviders;
+        private final List<ConverterProvider<?>> registeredConverterProviders;
 
         /**
          * Constructor.
          * 
-         * @param converterProviders The registered {@link Converter} instances.
+         * @param registeredConverterProviders The registered {@link ConverterProvider} instances.
          */
         ConvertersByTargetType(
                 RootConverter rootConverter,
                 ExternalizedProperties externalizedProperties,
-                Collection<ConverterProvider<?>> converterProviders
+                Collection<ConverterProvider<?>> registeredConverterProviders
         ) {
             this.rootConverter = rootConverter;
             this.externalizedProperties = externalizedProperties;
-            this.converterProviders = converterProviders;
+            this.registeredConverterProviders = memoizeAll(registeredConverterProviders);
         }
 
         /**
@@ -199,7 +200,7 @@ public class RootConverter implements Converter<Object> {
             // used in canConvertTo(...) to determine supported target types.
 
             List<Converter<?>> supportsTargetType = new ArrayList<>();
-            for (ConverterProvider<?> converterProvider : converterProviders) {
+            for (ConverterProvider<?> converterProvider : registeredConverterProviders) {
                 Converter<?> converter = converterProvider.get(
                     externalizedProperties,
                     rootConverter
@@ -209,6 +210,14 @@ public class RootConverter implements Converter<Object> {
                 }
             }
             return supportsTargetType;
+        }
+
+        private static List<ConverterProvider<?>> memoizeAll(
+                Collection<ConverterProvider<?>> converterProviders
+        ) {
+            return converterProviders.stream()
+                .map(ConverterProvider::memoize)
+                .collect(Collectors.toList());
         }
     }
 

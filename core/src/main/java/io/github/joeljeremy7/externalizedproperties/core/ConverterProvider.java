@@ -51,10 +51,31 @@ public interface ConverterProvider<T extends Converter<?>> {
     static <T extends Converter<?>> ConverterProvider<T> memoize(
             ConverterProvider<T> provider
     ) {
-        requireNonNull(provider, "provider");
+        if (provider instanceof Memoized) {
+            return provider;
+        }
+        return new Memoized<>(provider);
+    }
 
-        final AtomicReference<T> memoized = new AtomicReference<>(null);
-        return (externalizedProperties, rootConverter) -> {
+    /**
+     * A {@link ConverterProvider} which memoizes the result of another
+     * {@link ConverterProvider}.
+     */
+    static final class Memoized<T extends Converter<?>> implements ConverterProvider<T> {
+
+        private final ConverterProvider<T> provider;
+        private final AtomicReference<T> memoized = new AtomicReference<>(null);
+
+        private Memoized(ConverterProvider<T> provider) {
+            this.provider = requireNonNull(provider, "provider");
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public T get(
+                ExternalizedProperties externalizedProperties,
+                Converter<?> rootConverter
+        ) {
             T result = memoized.get();
             if (result == null) {
                 result = provider.get(externalizedProperties, rootConverter);
@@ -65,6 +86,6 @@ public interface ConverterProvider<T extends Converter<?>> {
                 }
             }
             return result;
-        };
+        }
     }
 }

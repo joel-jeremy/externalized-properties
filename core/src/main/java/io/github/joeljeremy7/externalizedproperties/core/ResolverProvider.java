@@ -44,10 +44,28 @@ public interface ResolverProvider<T extends Resolver> {
     static <T extends Resolver> ResolverProvider<T> memoize(
             ResolverProvider<T> provider
     ) {
-        requireNonNull(provider, "provider");
-        
-        final AtomicReference<T> memoized = new AtomicReference<>(null);
-        return externalizedProperties -> {
+        if (provider instanceof Memoized) {
+            return provider;
+        }
+        return new Memoized<>(provider);
+    }
+
+    /**
+     * A {@link ResolverProvider} which memoizes the result of another
+     * {@link ResolverProvider}.
+     */
+    static final class Memoized<T extends Resolver> implements ResolverProvider<T> {
+
+        private final ResolverProvider<T> provider;
+        private final AtomicReference<T> memoized = new AtomicReference<>(null);
+
+        private Memoized(ResolverProvider<T> provider) {
+            this.provider = requireNonNull(provider, "provider");
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public T get(ExternalizedProperties externalizedProperties) {
             T result = memoized.get();
             if (result == null) {
                 result = provider.get(externalizedProperties);
@@ -58,6 +76,6 @@ public interface ResolverProvider<T extends Resolver> {
                 }
             }
             return result;
-        };
+        }
     }
 }

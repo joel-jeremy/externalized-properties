@@ -11,7 +11,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -116,20 +118,20 @@ public class RootProcessor implements Processor {
      */
     private static class ProcessorByAnnotationType extends ClassValue<Processor> {        
         private final ExternalizedProperties externalizedProperties;
-        private final Collection<ProcessorProvider<?>> registeredProcessorProviders;
+        private final List<ProcessorProvider<?>> registeredProcessorProviders;
 
         /**
          * Constructor.
          * 
          * @param externalizedProperties The {@link ExternalizedProperties} instance.
-         * @param registeredProcessorProviders The registered {@link Processor} instances.
+         * @param registeredProcessorProviders The registered {@link ProcessorProvider} instances.
          */
         ProcessorByAnnotationType(
                 ExternalizedProperties externalizedProperties,
                 Collection<ProcessorProvider<?>> registeredProcessorProviders
         ) {
             this.externalizedProperties = externalizedProperties;
-            this.registeredProcessorProviders = registeredProcessorProviders;
+            this.registeredProcessorProviders = memoizeAll(registeredProcessorProviders);
         }
 
         /**
@@ -166,6 +168,14 @@ public class RootProcessor implements Processor {
                 "building ExternalizedProperties.",
                 processWith.value().getName()
             ));
+        }
+
+        private static List<ProcessorProvider<?>> memoizeAll(
+                Collection<ProcessorProvider<?>> processorProviders
+        ) {
+            return processorProviders.stream()
+                .map(ProcessorProvider::memoize)
+                .collect(Collectors.toList());
         }
     }
 }
