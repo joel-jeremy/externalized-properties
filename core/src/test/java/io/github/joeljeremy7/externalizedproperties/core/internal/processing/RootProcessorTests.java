@@ -4,17 +4,24 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
 import io.github.joeljeremy7.externalizedproperties.core.ProcessorProvider;
-import io.github.joeljeremy7.externalizedproperties.core.processing.Base64Decode;
-import io.github.joeljeremy7.externalizedproperties.core.processing.Base64DecodeProcessor;
+import io.github.joeljeremy7.externalizedproperties.core.processing.Decrypt;
 import io.github.joeljeremy7.externalizedproperties.core.processing.ProcessingException;
+import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor;
+import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.Decryptor;
+import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.JceDecryptor;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
+import io.github.joeljeremy7.externalizedproperties.core.testentities.EncryptionUtils;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,6 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class RootProcessorTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
+
+    private static final String AES_ALGORITHM = "AES";
+    private static final SecretKey AES_SECRET_KEY = EncryptionUtils.generateAesSecretKey();
     
     class Constructor {
         @Test
@@ -33,7 +43,7 @@ public class RootProcessorTests {
                 IllegalArgumentException.class, 
                 () -> new RootProcessor(
                     null,
-                    ep -> new Base64DecodeProcessor()
+                    ep -> new DecryptProcessor(createAesDecryptor())
                 )
             );
         }
@@ -78,7 +88,7 @@ public class RootProcessorTests {
         @DisplayName("should not return null")
         void test2() {
             ProcessorProvider<RootProcessor> provider = 
-                RootProcessor.provider(Base64DecodeProcessor.provider());
+                RootProcessor.provider(DecryptProcessor.provider(createAesDecryptor()));
 
             assertNotNull(provider);
         }
@@ -87,7 +97,7 @@ public class RootProcessorTests {
         @DisplayName("should not return null on get")
         void test3() {
             ProcessorProvider<RootProcessor> provider = 
-                RootProcessor.provider(Base64DecodeProcessor.provider());
+                RootProcessor.provider(DecryptProcessor.provider(createAesDecryptor()));
 
             assertNotNull(
                 provider.get(ExternalizedProperties.builder().withDefaults().build())
@@ -111,7 +121,7 @@ public class RootProcessorTests {
         void test2() {
             ProcessorProvider<RootProcessor> provider = 
                 RootProcessor.provider(
-                    Arrays.asList(Base64DecodeProcessor.provider())
+                    Arrays.asList(DecryptProcessor.provider(createAesDecryptor()))
                 );
 
             assertNotNull(provider);
@@ -122,7 +132,7 @@ public class RootProcessorTests {
         void test3() {
             ProcessorProvider<RootProcessor> provider = 
                 RootProcessor.provider(
-                    Arrays.asList(Base64DecodeProcessor.provider())
+                    Arrays.asList(DecryptProcessor.provider(createAesDecryptor()))
                 );
 
             assertNotNull(
@@ -147,11 +157,11 @@ public class RootProcessorTests {
         @DisplayName("should throw when context argument is null")
         void test2() {
             RootProcessor processor = rootProcessor(
-                Base64DecodeProcessor.provider()
+                DecryptProcessor.provider(createAesDecryptor())
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::base64Decode
+                ProxyInterface::decrypt
             );
 
             assertThrows(
@@ -166,20 +176,20 @@ public class RootProcessorTests {
         )
         void test3() {
             RootProcessor processor = rootProcessor(
-                Base64DecodeProcessor.provider()
+                DecryptProcessor.provider(createAesDecryptor())
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::base64Decode
+                ProxyInterface::decrypt
             );
 
             String plainText = "plain-text-value";
-            String base64Encoded = 
-                Base64.getEncoder().encodeToString(plainText.getBytes());
+            String encryptedBase64Encoded = 
+                EncryptionUtils.encryptAesBase64(plainText, AES_ALGORITHM, AES_SECRET_KEY);
 
             String result = processor.process(
                 proxyMethod, 
-                base64Encoded
+                encryptedBase64Encoded
             );
 
             assertEquals(plainText, result);
@@ -203,19 +213,20 @@ public class RootProcessorTests {
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::base64Decode
-                );
+                ProxyInterface::decrypt
+            );
 
             String plainText = "plain-text-value";
-            String base64Encoded = 
-                Base64.getEncoder().encodeToString(plainText.getBytes());
+            String encryptedBase64Encoded = 
+                EncryptionUtils.encryptAesBase64(plainText, AES_ALGORITHM, AES_SECRET_KEY);
 
             assertThrows(
                 ProcessingException.class, 
-                () -> processor.process(proxyMethod, base64Encoded))
+                () -> processor.process(proxyMethod, encryptedBase64Encoded))
             ;
         }
     }
+
     private RootProcessor rootProcessor(
             ProcessorProvider<?>... processorProviders
     ) {
@@ -228,9 +239,17 @@ public class RootProcessorTests {
         );
     }
 
+    private static Decryptor createAesDecryptor() {
+        try {
+            return JceDecryptor.factory().symmetric(AES_ALGORITHM, AES_SECRET_KEY);
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+            throw new IllegalStateException("Cannot instantiate decryptor.", e);
+        }
+    }
+
     public static interface ProxyInterface {
-        @ExternalizedProperty("test.base64Decode")
-        @Base64Decode
-        String base64Decode();
+        @ExternalizedProperty("test.decrypt")
+        @Decrypt(AES_ALGORITHM)
+        String decrypt();
     }
 }

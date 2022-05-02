@@ -5,19 +5,26 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.ProcessorProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
-import io.github.joeljeremy7.externalizedproperties.core.processing.Base64Decode;
-import io.github.joeljeremy7.externalizedproperties.core.processing.Base64DecodeProcessor;
+import io.github.joeljeremy7.externalizedproperties.core.processing.Decrypt;
+import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor;
+import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.Decryptor;
+import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.JceDecryptor;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.DefaultResolver;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver;
+import io.github.joeljeremy7.externalizedproperties.core.testentities.EncryptionUtils;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RootResolverTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
+    
+    private static final String AES_ALGORITHM = "AES";
+    private static final SecretKey AES_SECRET_KEY = EncryptionUtils.generateAesSecretKey();
     
     @Nested
     class Constructor {
@@ -243,23 +253,26 @@ public class RootResolverTests {
         @DisplayName("should process resolved properties via registered processors")
         public void test5() {
             String originalPropertyValue = "property-value";
-            String base64EncodedPropertyValue = 
-                Base64.getEncoder().encodeToString(originalPropertyValue.getBytes());
+            String base64EncodedPropertyValue = EncryptionUtils.encryptAesBase64(
+                originalPropertyValue, 
+                AES_ALGORITHM, 
+                AES_SECRET_KEY
+            );
             Map<String, String> propertySource = new HashMap<>();
-            propertySource.put("test.base64Decode", base64EncodedPropertyValue);
+            propertySource.put("test.decrypt", base64EncodedPropertyValue);
             
             RootResolver resolver = rootResolver(
                 Arrays.asList(MapResolver.provider(propertySource)),
                 RootProcessor.provider(
-                    Base64DecodeProcessor.provider()
+                    DecryptProcessor.provider(getAesDecryptor())
                 )
             );
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::base64Decode
+                ProxyInterface::propertyDecrypt
             );
             
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "test.base64Decode");
+                resolver.resolve(proxyMethod, "test.decrypt");
 
             assertNotNull(result);
             assertTrue(result.isPresent());
@@ -291,6 +304,14 @@ public class RootResolverTests {
         );
     }
 
+    private static Decryptor getAesDecryptor() {
+        try {
+            return JceDecryptor.factory().symmetric(AES_ALGORITHM, AES_SECRET_KEY);
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+            throw new IllegalStateException("Cannot instantiate decryptor.", e);
+        }
+    }
+
     public static interface ProxyInterface {
         @ExternalizedProperty("property")
         String property();
@@ -298,8 +319,8 @@ public class RootResolverTests {
         @ExternalizedProperty("${property}")
         String propertyVariable();
 
-        @ExternalizedProperty("test.base64Decode")
-        @Base64Decode
-        String base64Decode();
+        @ExternalizedProperty("test.decrypt")
+        @Decrypt(AES_ALGORITHM)
+        String propertyDecrypt();
     }
 }

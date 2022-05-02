@@ -131,14 +131,15 @@ public class RootConverter implements Converter<Object> {
                     continue;
                 }
 
-                return ConversionResult.of(result.value());
+                return result;
             }
 
             throw new ConversionException(String.format(
                 "Conversion to target type not supported: %s. " + 
                 "Please make sure a converter which supports conversion " + 
-                "to the target type is registered when building ExternalizedProperties.",
-                rawTargetType.getName()
+                "to the target type is registered when building %s.",
+                rawTargetType.getName(),
+                ExternalizedProperties.class.getSimpleName()
             ));
         }
         catch (ConversionException cex) {

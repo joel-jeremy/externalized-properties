@@ -1,10 +1,18 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
-import io.github.joeljeremy7.externalizedproperties.core.processing.Base64DecodeProcessor;
+import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor;
+import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.Decryptor;
+import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.JceDecryptor;
+import io.github.joeljeremy7.externalizedproperties.core.testentities.EncryptionUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -18,6 +26,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ProcessorProviderTests {
+    private static final String AES_ALGORITHM = "AES";
+    private static final SecretKey AES_SECRET_KEY = EncryptionUtils.generateAesSecretKey();
+
     @Nested
     class OfMethod {
         @Test
@@ -32,7 +43,7 @@ public class ProcessorProviderTests {
         @Test
         @DisplayName("should always return the provided processor instance")
         void test2() {
-            Base64DecodeProcessor processor = new Base64DecodeProcessor();
+            DecryptProcessor processor = new DecryptProcessor(createAesDecryptor());
             ProcessorProvider<?> provider = ProcessorProvider.of(processor);
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()
@@ -75,19 +86,19 @@ public class ProcessorProviderTests {
         @Test
         @DisplayName("should memoize result of the provider to memoize argument")
         void test3() {
-            ProcessorProvider<Base64DecodeProcessor> provider = 
-                Base64DecodeProcessor.provider();
+            ProcessorProvider<DecryptProcessor> provider = 
+                DecryptProcessor.provider(createAesDecryptor());
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()
                     .withDefaultResolvers()
                     .processors(provider)
                     .build();
             
-            ProcessorProvider<Base64DecodeProcessor> memoized = 
+            ProcessorProvider<DecryptProcessor> memoized = 
                 ProcessorProvider.memoize(provider);
 
-            Base64DecodeProcessor instance1 = memoized.get(externalizedProperties);
-            Base64DecodeProcessor instance2 = memoized.get(externalizedProperties);
+            DecryptProcessor instance1 = memoized.get(externalizedProperties);
+            DecryptProcessor instance2 = memoized.get(externalizedProperties);
 
             assertSame(instance1, instance2);
         }
@@ -98,7 +109,7 @@ public class ProcessorProviderTests {
             "in multithreaded environment"
         )
         void test4() throws InterruptedException {
-            ProcessorProvider<?> provider = Base64DecodeProcessor.provider();
+            ProcessorProvider<?> provider = DecryptProcessor.provider(createAesDecryptor());
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()
                     .withDefaultResolvers()
@@ -135,21 +146,21 @@ public class ProcessorProviderTests {
         @Test
         @DisplayName("should return different instance for each memoized provider")
         void test5() {
-            ProcessorProvider<Base64DecodeProcessor> provider = 
-                Base64DecodeProcessor.provider();
+            ProcessorProvider<DecryptProcessor> provider = 
+                DecryptProcessor.provider(createAesDecryptor());
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()
                     .withDefaultResolvers()
                     .processors(provider)
                     .build();
             
-            ProcessorProvider<Base64DecodeProcessor> memoized1 = 
+            ProcessorProvider<DecryptProcessor> memoized1 = 
                 ProcessorProvider.memoize(provider);
-            ProcessorProvider<Base64DecodeProcessor> memoized2 = 
+            ProcessorProvider<DecryptProcessor> memoized2 = 
                 ProcessorProvider.memoize(provider);
 
-            Base64DecodeProcessor instance1 = memoized1.get(externalizedProperties);
-            Base64DecodeProcessor instance2 = memoized2.get(externalizedProperties);
+            DecryptProcessor instance1 = memoized1.get(externalizedProperties);
+            DecryptProcessor instance2 = memoized2.get(externalizedProperties);
 
             assertNotSame(instance1, instance2);
         }
@@ -159,16 +170,24 @@ public class ProcessorProviderTests {
             "should return same provider instance when provider was already memoized"
         )
         void test6() {
-            ProcessorProvider<Base64DecodeProcessor> provider = 
-                Base64DecodeProcessor.provider();
+            ProcessorProvider<DecryptProcessor> provider = 
+                DecryptProcessor.provider(createAesDecryptor());
             
-            ProcessorProvider<Base64DecodeProcessor> memoized1 = 
+            ProcessorProvider<DecryptProcessor> memoized1 = 
                 ProcessorProvider.memoize(provider);
 
-            ProcessorProvider<Base64DecodeProcessor> sameAsMemoized1 = 
+            ProcessorProvider<DecryptProcessor> sameAsMemoized1 = 
                 ProcessorProvider.memoize(memoized1);
 
             assertSame(memoized1, sameAsMemoized1);
         }
     } 
+
+    private static Decryptor createAesDecryptor() {
+        try {
+            return JceDecryptor.factory().symmetric(AES_ALGORITHM, AES_SECRET_KEY);
+        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+            throw new IllegalStateException("Cannot instantiate decryptor.", e);
+        }
+    }
 }
