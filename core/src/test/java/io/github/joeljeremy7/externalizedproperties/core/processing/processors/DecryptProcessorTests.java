@@ -228,11 +228,23 @@ public class DecryptProcessorTests {
                 () -> processor.process(proxyMethod, notInBase64Format)
             );
         }
+        
+        @Test
+        @DisplayName("should throw when decryptor with the same names are registered")
+        void test5() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> processorToTest(RSA_DECRYPTOR, RSA_DECRYPTOR)
+            );
+        }
 
         @Test
         @DisplayName("should decrypt property using specified decryptor")
         void aesTest1() {
-            DecryptProcessor processor = processorToTest(AES_GCM_DECRYPTOR);
+            DecryptProcessor processor = processorToTest(
+                AES_GCM_DECRYPTOR,
+                RSA_DECRYPTOR
+            );
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 ProxyInterface::decryptAesGcm
             );
@@ -252,7 +264,10 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should decrypt property using specified decryptor")
         void rsaTest1() {
-            DecryptProcessor processor = processorToTest(RSA_DECRYPTOR);
+            DecryptProcessor processor = processorToTest(
+                AES_GCM_DECRYPTOR,
+                RSA_DECRYPTOR
+            );
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 ProxyInterface::decryptRsa
             );
@@ -277,14 +292,8 @@ public class DecryptProcessorTests {
             }
 
             @Test
-            @DisplayName("should never return null")
-            void withProviderStringOverloadTest1() {
-                assertNotNull(JceDecryptor.factory("SunJCE"));
-            }
-
-            @Test
             @DisplayName("should throw when provider argument is null")
-            void withProviderStringOverloadTest2() {
+            void withProviderStringOverloadTest1() {
                 assertThrows(
                     IllegalArgumentException.class, 
                     () -> JceDecryptor.factory((String)null)
@@ -293,17 +302,23 @@ public class DecryptProcessorTests {
 
             @Test
             @DisplayName("should never return null")
-            void withProviderOverloadTest1() {
-                assertNotNull(JceDecryptor.factory(Security.getProvider("SunJCE")));
+            void withProviderStringOverloadTest2() {
+                assertNotNull(JceDecryptor.factory("SunJCE"));
             }
 
             @Test
             @DisplayName("should throw when provider argument is null")
-            void withProviderOverloadTest2() {
+            void withProviderOverloadTest1() {
                 assertThrows(
                     IllegalArgumentException.class, 
                     () -> JceDecryptor.factory((Provider)null)
                 );
+            }
+
+            @Test
+            @DisplayName("should never return null")
+            void withProviderOverloadTest2() {
+                assertNotNull(JceDecryptor.factory(Security.getProvider("SunJCE")));
             }
         }
 

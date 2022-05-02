@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
@@ -58,7 +59,11 @@ public class DecryptProcessor implements Processor {
     public DecryptProcessor(Collection<Decryptor> decryptors) {
         requireNonNullOrEmptyCollection(decryptors, "decryptors");
         this.decryptorsByName = decryptors.stream().collect(
-            Collectors.toMap(Decryptor::name, decryptor -> decryptor)
+            Collectors.toMap(
+                Decryptor::name, 
+                Function.identity(), 
+                DecryptProcessor::throwOnDuplicateDecryptors
+            )
         );
     }
 
@@ -135,6 +140,15 @@ public class DecryptProcessor implements Processor {
             );
         }
         return decryptor;
+    }
+    private static Decryptor throwOnDuplicateDecryptors(
+            Decryptor existing,
+            Decryptor toMerge
+    ) {
+        throw new IllegalArgumentException(String.format(
+            "Duplicate decryptors (Names: %s).",
+            existing.name()
+        ));
     }
 
     /**
