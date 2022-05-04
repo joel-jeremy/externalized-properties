@@ -551,7 +551,8 @@ public class SetConverterTests {
         void setFactoryTest1() {
             SetConverter converter = converterToTest(
                 // Uses CopyOnWriteArraySet.
-                capacity -> new CopyOnWriteArraySet<>());
+                capacity -> new CopyOnWriteArraySet<>()
+            );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 ProxyInterface::setProperty
@@ -572,7 +573,7 @@ public class SetConverterTests {
             assertEquals(5, set.size());
             assertTrue(set.stream().allMatch(v -> v instanceof String));
             assertIterableEquals(
-                new LinkedHashSet<>(Arrays.asList("value1", "value2", "value3", "value4", "value5")), 
+                new CopyOnWriteArraySet<>(Arrays.asList("value1", "value2", "value3", "value4", "value5")), 
                 set
             );
         }
