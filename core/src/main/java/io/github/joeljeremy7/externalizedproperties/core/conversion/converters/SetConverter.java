@@ -4,12 +4,11 @@ import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
-import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
-import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.Tokenizer;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,8 +28,8 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  */
 public class SetConverter implements Converter<Set<?>> {
     private final IntFunction<Set<?>> setFactory;
-    private final Tokenizer tokenizer = new Tokenizer(",");
-    private final Converter<?> rootConverter;
+    /** Internal array converter. */
+    private final ArrayConverter arrayConverter;
 
     /**
      * Default constructor. 
@@ -56,7 +55,9 @@ public class SetConverter implements Converter<Set<?>> {
             Converter<?> rootConverter,
             IntFunction<Set<?>> setFactory
     ) {
-        this.rootConverter = requireNonNull(rootConverter, "rootConverter");
+        this.arrayConverter = new ArrayConverter(
+            requireNonNull(rootConverter, "rootConverter")
+        );
         this.setFactory = requireNonNull(setFactory, "setFactory");
     }
 
@@ -98,56 +99,19 @@ public class SetConverter implements Converter<Set<?>> {
             String valueToConvert,
             Type targetType
     ) { 
-        Type[] genericTypeParams = TypeUtilities.getTypeParameters(targetType);
-
-        // Assume initially as Set<String> when target type has no
-        // generic type parameters.
-        Type targetSetType = String.class;
-        if (genericTypeParams.length > 0) {
-            // Do not allow Set<T>, Set<T extends ...>, etc.
-            targetSetType = throwIfTypeVariable(genericTypeParams[0]);
-        }
-
         if (valueToConvert.isEmpty()) {
             return ConversionResult.of(newSet(0));
         }
 
-        final String[] values = tokenizer.tokenizeValue(proxyMethod, valueToConvert);
-        
-        Class<?> rawTargetSetType = TypeUtilities.getRawType(targetSetType);
+        GenericArrayType targetArrayType = toTargetArrayType(targetType);
 
-        // If Set<String> or Set<Object>, return String values.
-        if (String.class.equals(rawTargetSetType) || 
-                Object.class.equals(rawTargetSetType)) {
-            return ConversionResult.of(newSet(values));
-        }
+        Object[] array = arrayConverter.convert(
+            proxyMethod, 
+            valueToConvert,
+            targetArrayType
+        ).value();
 
-        return ConversionResult.of(
-            convertValuesToSetType(
-                proxyMethod,
-                values,
-                targetSetType
-            )
-        );
-    }
-
-    private Set<?> convertValuesToSetType(
-            ProxyMethod proxyMethod,
-            String[] values,
-            Type setType
-    ) {
-        Set<Object> convertedSet = newSet(values.length);
-        
-        for (int i = 0; i < values.length; i++) {
-            ConversionResult<?> converted = rootConverter.convert(
-                proxyMethod,
-                values[i], 
-                setType
-            );
-            convertedSet.add(converted.value());
-        }
-
-        return convertedSet;
+        return ConversionResult.of(newSet(array));
     }
 
     private Set<Object> newSet(int length) {
@@ -169,12 +133,23 @@ public class SetConverter implements Converter<Set<?>> {
         return set;
     }
 
-    private Type throwIfTypeVariable(Type setGenericTypeParameter) {
-        if (TypeUtilities.isTypeVariable(setGenericTypeParameter)) {
-            throw new ConversionException(
-                "Type variables e.g. Set<T> are not supported."
-            );
+    private static GenericArrayType toTargetArrayType(Type targetType) {
+        Type[] genericTypeParams = TypeUtilities.getTypeParameters(targetType);
+
+        // Assume initially as Set<String> when target type has no
+        // generic type parameters.
+        final Type targetSetType;
+        if (genericTypeParams.length > 0) {
+            targetSetType = genericTypeParams[0];
+        } else {
+            targetSetType = String.class;
         }
-        return setGenericTypeParameter;
+
+        return new GenericArrayType() {
+            @Override
+            public Type getGenericComponentType() {
+                return targetSetType;
+            }
+        };
     }
 }

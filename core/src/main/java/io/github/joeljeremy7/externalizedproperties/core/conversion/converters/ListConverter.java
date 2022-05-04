@@ -4,12 +4,11 @@ import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
-import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
-import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.Tokenizer;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,8 +29,8 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  */
 public class ListConverter implements Converter<List<?>> {
     private final IntFunction<List<?>> listFactory;
-    private final Tokenizer tokenizer = new Tokenizer(",");
-    private final Converter<?> rootConverter;
+    /** Internal array converter. */
+    private final ArrayConverter arrayConverter;
 
     /**
      * Default constructor. 
@@ -55,7 +54,7 @@ public class ListConverter implements Converter<List<?>> {
             Converter<?> rootConverter,
             IntFunction<List<?>> listFactory
     ) {
-        this.rootConverter = requireNonNull(rootConverter, "rootConverter");
+        this.arrayConverter = new ArrayConverter(rootConverter);
         this.listFactory = requireNonNull(listFactory, "listFactory");
     }
 
@@ -98,56 +97,19 @@ public class ListConverter implements Converter<List<?>> {
             String valueToConvert,
             Type targetType
     ) { 
-        Type[] genericTypeParams = TypeUtilities.getTypeParameters(targetType);
-
-        // Assume initially as List<String> when target type has no
-        // generic type parameters.
-        Type targetListType = String.class;
-        if (genericTypeParams.length > 0) {
-            // Do not allow List<T>, List<T extends ...>, etc.
-            targetListType = throwIfTypeVariable(genericTypeParams[0]);
-        }
-
         if (valueToConvert.isEmpty()) {
             return ConversionResult.of(newList(0));
         }
-
-        final String[] values = tokenizer.tokenizeValue(proxyMethod, valueToConvert);
         
-        Class<?> rawTargetListType = TypeUtilities.getRawType(targetListType);
-
-        // If List<String> or List<Object>, return String values.
-        if (String.class.equals(rawTargetListType) || 
-                Object.class.equals(rawTargetListType)) {
-            return ConversionResult.of(newList(values));
-        }
-
-        return ConversionResult.of(
-            convertValuesToListType(
-                proxyMethod,
-                values,
-                targetListType
-            )
-        );
-    }
-
-    private List<?> convertValuesToListType(
-            ProxyMethod proxyMethod,
-            String[] values,
-            Type listType
-    ) {
-        List<Object> convertedList = newList(values.length);
+        GenericArrayType targetArrayType = toTargetArrayType(targetType);
         
-        for (int i = 0; i < values.length; i++) {
-            ConversionResult<?> converted = rootConverter.convert(
-                proxyMethod,
-                values[i], 
-                listType
-            );
-            convertedList.add(converted.value());
-        }
+        Object[] array = arrayConverter.convert(
+            proxyMethod,
+            valueToConvert,
+            targetArrayType
+        ).value();
 
-        return convertedList;
+        return ConversionResult.of(newList(array));
     }
 
     private List<Object> newList(int length) {
@@ -169,12 +131,23 @@ public class ListConverter implements Converter<List<?>> {
         return list;
     }
 
-    private Type throwIfTypeVariable(Type listGenericTypeParameter) {
-        if (TypeUtilities.isTypeVariable(listGenericTypeParameter)) {
-            throw new ConversionException(
-                "Type variables e.g. List<T> are not supported."
-            );
+    private static GenericArrayType toTargetArrayType(Type targetType) {
+        Type[] genericTypeParams = TypeUtilities.getTypeParameters(targetType);
+        
+        // Assume initially as List<String> when target type has no
+        // generic type parameters.
+        final Type targetListType;
+        if (genericTypeParams.length > 0) {
+            targetListType = genericTypeParams[0];
+        } else {
+            targetListType = String.class;
         }
-        return listGenericTypeParameter;
+
+        return new GenericArrayType() {
+            @Override
+            public Type getGenericComponentType() {
+                return targetListType;
+            }
+        };
     }
 }
