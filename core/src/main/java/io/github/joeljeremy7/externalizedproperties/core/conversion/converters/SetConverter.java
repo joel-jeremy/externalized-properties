@@ -133,11 +133,22 @@ public class SetConverter implements Converter<Set<?>> {
         return set;
     }
 
+    /**
+     * Convert target type to an array type such that:
+     * <ul>
+     *  <li>{@code Set<String>} becomes {@code String[]}</li>
+     *  <li>{@code Set<Integer>} becomes {@code Integer[]}</li>
+     *  <li>{@code Set<Optional<Integer>>} becomes {@code Optional<Integer>[]}</li>
+     * </ul>
+     * 
+     * @param targetType The target type.
+     * @return The array target type to pass to {@link ArrayConverter} when requesting 
+     * to convert to an array.
+     */
     private static GenericArrayType toTargetArrayType(Type targetType) {
         Type[] genericTypeParams = TypeUtilities.getTypeParameters(targetType);
 
-        // Assume initially as Set<String> when target type has no
-        // generic type parameters.
+        // Assume as Set<String> when target type has no generic type parameters.
         final Type targetSetType;
         if (genericTypeParams.length > 0) {
             targetSetType = genericTypeParams[0];

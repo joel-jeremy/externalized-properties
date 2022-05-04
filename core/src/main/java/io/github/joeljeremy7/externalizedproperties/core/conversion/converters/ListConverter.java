@@ -131,11 +131,22 @@ public class ListConverter implements Converter<List<?>> {
         return list;
     }
 
+    /**
+     * Convert target type to an array type such that:
+     * <ul>
+     *  <li>{@code List<String>} becomes {@code String[]}</li>
+     *  <li>{@code List<Integer>} becomes {@code Integer[]}</li>
+     *  <li>{@code List<Optional<Integer>>} becomes {@code Optional<Integer>[]}</li>
+     * </ul>
+     * 
+     * @param targetType The target type.
+     * @return The array target type to pass to {@link ArrayConverter} when requesting 
+     * to convert to an array.
+     */
     private static GenericArrayType toTargetArrayType(Type targetType) {
         Type[] genericTypeParams = TypeUtilities.getTypeParameters(targetType);
         
-        // Assume initially as List<String> when target type has no
-        // generic type parameters.
+        // Assume as List<String> when target type has no generic type parameters.
         final Type targetListType;
         if (genericTypeParams.length > 0) {
             targetListType = genericTypeParams[0];
