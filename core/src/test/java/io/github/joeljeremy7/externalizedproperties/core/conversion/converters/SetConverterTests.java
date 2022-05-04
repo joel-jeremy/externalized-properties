@@ -8,6 +8,7 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.SetConverter.SetFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
@@ -17,12 +18,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.IntFunction;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -168,7 +168,7 @@ public class SetConverterTests {
             assertEquals(3, set.size());
             assertTrue(set.stream().allMatch(v -> v instanceof String));
             assertIterableEquals(
-                new HashSet<>(Arrays.asList("value1", "value2", "value3")), 
+                new LinkedHashSet<>(Arrays.asList("value1", "value2", "value3")), 
                 set
             );
         }
@@ -227,7 +227,7 @@ public class SetConverterTests {
             assertEquals(3, set.size());
             assertTrue(set.stream().allMatch(v -> v instanceof String));
             assertIterableEquals(
-                new HashSet<>(Arrays.asList("value1", "value2", "value3")), 
+                new LinkedHashSet<>(Arrays.asList("value1", "value2", "value3")), 
                 set
             );
 
@@ -283,7 +283,7 @@ public class SetConverterTests {
             assertEquals(3, set.size());
             assertTrue(set.stream().allMatch(v -> v instanceof String));
             assertIterableEquals(
-                new HashSet<>(Arrays.asList("value1", "value2", "value3")), 
+                new LinkedHashSet<>(Arrays.asList("value1", "value2", "value3")), 
                 set
             );
 
@@ -310,7 +310,7 @@ public class SetConverterTests {
             assertEquals(3, set.size());
             assertTrue(set.stream().allMatch(v -> v instanceof String));
             assertIterableEquals(
-                new HashSet<>(Arrays.asList("value1", "value2", "value3")), 
+                new LinkedHashSet<>(Arrays.asList("value1", "value2", "value3")), 
                 set
             );
 
@@ -340,10 +340,7 @@ public class SetConverterTests {
         @Test
         @DisplayName("should retain empty values from property value.")
         void test8() {
-            // Use LinkedHashSet for easy assertion later on this test case.
-            SetConverter converter = converterToTest(
-                i -> new LinkedHashSet<>(i)
-            );
+            SetConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 ProxyInterface::setProperty
@@ -372,10 +369,7 @@ public class SetConverterTests {
         @Test
         @DisplayName("should strip empty values when annotated with @StripEmptyValues.")
         void test9() {
-            // Use LinkedHashSet for easy assertion later on this test case.
-            SetConverter converter = converterToTest(
-                i -> new LinkedHashSet<>(i)
-            );
+            SetConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 ProxyInterface::setPropertyStripEmpty
@@ -423,9 +417,7 @@ public class SetConverterTests {
             "Generic type parameter is also a parameterized type e.g. Set<Optional<String>>."
         )
         void test11() {
-            // Use LinkedHashSet for easy assertion later on this test case.
             SetConverter converter = converterToTest(
-                i -> new LinkedHashSet<>(i),
                 OptionalConverter.provider()
             );
 
@@ -460,9 +452,7 @@ public class SetConverterTests {
             "Generic type parameter is generic array e.g. Set<Optional<String>[]>."
         )
         void test12() {
-            // Use LinkedHashSet for easy assertion later on this test case.
             SetConverter converter = converterToTest(
-                i -> new LinkedHashSet<>(i),
                 OptionalConverter.provider(),
                 ArrayConverter.provider()
             );
@@ -544,7 +534,7 @@ public class SetConverterTests {
             assertEquals(2, set.size());
             assertTrue(set.stream().allMatch(v -> v instanceof String));
             assertIterableEquals(
-                new HashSet<>(Arrays.asList("value1", "value5")), 
+                new LinkedHashSet<>(Arrays.asList("value1", "value5")), 
                 set
             );
 
@@ -560,9 +550,8 @@ public class SetConverterTests {
         )
         void setFactoryTest1() {
             SetConverter converter = converterToTest(
-                // Uses linked set.
-                length -> new LinkedHashSet<>()
-            );
+                // Uses CopyOnWriteArraySet.
+                capacity -> new CopyOnWriteArraySet<>());
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 ProxyInterface::setProperty
@@ -579,7 +568,7 @@ public class SetConverterTests {
             // Default: Should use ',' as delimiter and will not strip empty values.
             // This will strip trailing empty values though.
             assertNotNull(set);
-            assertTrue(set instanceof LinkedHashSet);
+            assertTrue(set instanceof CopyOnWriteArraySet);
             assertEquals(5, set.size());
             assertTrue(set.stream().allMatch(v -> v instanceof String));
             assertIterableEquals(
@@ -595,7 +584,7 @@ public class SetConverterTests {
         void setFactoryTest2() {
             SetConverter converter = converterToTest(
                 // Returns null.
-                length -> null
+                capacity -> null
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -615,7 +604,7 @@ public class SetConverterTests {
     }
 
     private SetConverter converterToTest(
-            IntFunction<Set<?>> setFactory,
+            SetFactory setFactory,
             ConverterProvider<?>... additionalConverters
     ) { 
         return converterToTest(SetConverter.provider(setFactory), additionalConverters);

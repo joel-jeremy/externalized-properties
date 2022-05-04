@@ -10,9 +10,8 @@ import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.function.IntFunction;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -27,13 +26,13 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  * the proxy interface method can be annotated with the {@link StripEmptyValues} annotation.  
  */
 public class SetConverter implements Converter<Set<?>> {
-    private final IntFunction<Set<?>> setFactory;
+    private final SetFactory setFactory;
     /** Internal array converter. */
     private final ArrayConverter arrayConverter;
 
     /**
      * Default constructor. 
-     * Instances constructed via this constructor will use {@link HashSet} 
+     * Instances constructed via this constructor will use {@link LinkedHashSet} 
      * as {@link Set} implementation.
      * 
      * @param rootConverter The root converter.
@@ -41,19 +40,19 @@ public class SetConverter implements Converter<Set<?>> {
     public SetConverter(Converter<?> rootConverter) {
         // Prevent hashmap resizing.
         // 0.75 is HashMap's default load factor.
-        this(rootConverter, size -> new HashSet<>((int) (size/0.75f) + 1));
+        this(rootConverter, size -> new LinkedHashSet<>((int) (size/0.75f) + 1));
     }
 
     /**
      * Constructor.
      * 
      * @param rootConverter The root converter.
-     * @param setFactory The set factory. This must return a set instance
-     * (optionally with given the length). This function must not return null.
+     * @param setFactory The {@link Set} factory. This must return a mutable {@link Set} 
+     * instance (optionally with given the capacity). This function must not return null.
      */
     public SetConverter(
             Converter<?> rootConverter,
-            IntFunction<Set<?>> setFactory
+            SetFactory setFactory
     ) {
         this.arrayConverter = new ArrayConverter(
             requireNonNull(rootConverter, "rootConverter")
@@ -74,12 +73,13 @@ public class SetConverter implements Converter<Set<?>> {
     /**
      * The {@link ConverterProvider} for {@link SetConverter}.
      * 
-     * @param setFactory The set factory. This must return a set instance
-     * (optionally with given the length). This function must not return null.
+     * @param setFactory The {@link Set} factory. This must return a mutable {@link Set} 
+     * instance (optionally with given the capacity). This function must not return null.
+     * 
      * @return The {@link ConverterProvider} for {@link SetConverter}.
      */
     public static ConverterProvider<SetConverter> provider(
-            IntFunction<Set<?>> setFactory
+            SetFactory setFactory
     ) {
         requireNonNull(setFactory, "setFactory");
         return (externalizedProperties, rootConverter) -> 
@@ -114,9 +114,9 @@ public class SetConverter implements Converter<Set<?>> {
         return ConversionResult.of(newSet(array));
     }
 
-    private Set<Object> newSet(int length) {
+    private Set<Object> newSet(int capacity) {
         @SuppressWarnings("unchecked")
-        Set<Object> set = (Set<Object>)setFactory.apply(length);
+        Set<Object> set = (Set<Object>)setFactory.newSet(capacity);
         if (set == null) {
             throw new IllegalStateException(
                 "Set factory implementation must not return null."
@@ -151,5 +151,19 @@ public class SetConverter implements Converter<Set<?>> {
                 return targetSetType;
             }
         };
+    }
+
+    /**
+     * Set factory.
+     */
+    public static interface SetFactory {
+        /**
+         * Create a new mutable {@link Set} instance (optionally with given the capacity). 
+         * This function must not return null.
+         * 
+         * @param capacity The requested capacity of the {@link Set}.
+         * @return A new mutable {@link Set} instance (optionally with given the capacity).
+         */
+        Set<?> newSet(int capacity);
     }
 }

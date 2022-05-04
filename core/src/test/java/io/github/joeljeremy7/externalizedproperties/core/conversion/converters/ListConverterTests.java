@@ -8,6 +8,7 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.ListConverter.ListFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
@@ -18,10 +19,9 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.IntFunction;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -532,8 +532,8 @@ public class ListConverterTests {
         )
         void listFactoryTest1() {
             ListConverter converter = converterToTest(
-                // Uses linked list.
-                length -> new LinkedList<>()
+                // Uses CopyOnWriteArrayList.
+                capacity -> new CopyOnWriteArrayList<>()
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -551,7 +551,7 @@ public class ListConverterTests {
             // Default: Should use ',' as delimiter and will not strip empty values.
             // This will strip trailing empty values though.
             assertNotNull(list);
-            assertTrue(list instanceof LinkedList);
+            assertTrue(list instanceof CopyOnWriteArrayList);
             assertEquals(5, list.size());
             assertTrue(list.stream().allMatch(v -> v instanceof String));
             assertIterableEquals(
@@ -567,7 +567,7 @@ public class ListConverterTests {
         void listFactoryTest2() {
             ListConverter converter = converterToTest(
                 // Returns null.
-                length -> null
+                capacity -> null
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -590,7 +590,7 @@ public class ListConverterTests {
     }
 
     private ListConverter converterToTest(
-            IntFunction<List<?>> listFactory,
+            ListFactory listFactory,
             ConverterProvider<?>... additionalConverters
     ) {
         return converterToTest(

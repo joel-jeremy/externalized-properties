@@ -13,7 +13,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.IntFunction;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -28,7 +27,7 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  * the proxy interface method can be annotated with the {@link StripEmptyValues} annotation.  
  */
 public class ListConverter implements Converter<List<?>> {
-    private final IntFunction<List<?>> listFactory;
+    private final ListFactory listFactory;
     /** Internal array converter. */
     private final ArrayConverter arrayConverter;
 
@@ -47,12 +46,12 @@ public class ListConverter implements Converter<List<?>> {
      * Constructor.
      * 
      * @param rootConverter The root converter.
-     * @param listFactory The list factory. This must return a list instance
-     * (optionally with given the length). This function must not return null.
+     * @param listFactory The {@link List} factory. This must return a {@link List} 
+     * instance (optionally with given the capacity). This function must not return null.
      */
     public ListConverter(
             Converter<?> rootConverter,
-            IntFunction<List<?>> listFactory
+            ListFactory listFactory
     ) {
         this.arrayConverter = new ArrayConverter(rootConverter);
         this.listFactory = requireNonNull(listFactory, "listFactory");
@@ -71,12 +70,13 @@ public class ListConverter implements Converter<List<?>> {
     /**
      * The {@link ConverterProvider} for {@link ListConverter}.
      * 
-     * @param listFactory The list factory. This must return a list instance
-     * (optionally with given the length). This function must not return null.
+     * @param listFactory The {@link List} factory. This must return a mutable {@link List} 
+     * instance (optionally with given the capacity). This function must not return null.
+     * 
      * @return The {@link ConverterProvider} for {@link ListConverter}.
      */
     public static ConverterProvider<ListConverter> provider(
-            IntFunction<List<?>> listFactory
+            ListFactory listFactory
     ) {
         requireNonNull(listFactory, "listFactory");
         return (externalizedProperties, rootConverter) -> 
@@ -112,9 +112,9 @@ public class ListConverter implements Converter<List<?>> {
         return ConversionResult.of(newList(array));
     }
 
-    private List<Object> newList(int length) {
+    private List<Object> newList(int capacity) {
         @SuppressWarnings("unchecked")
-        List<Object> list = (List<Object>)listFactory.apply(length);
+        List<Object> list = (List<Object>)listFactory.newList(capacity);
         if (list == null) {
             throw new IllegalStateException(
                 "List factory implementation must not return null."
@@ -149,5 +149,19 @@ public class ListConverter implements Converter<List<?>> {
                 return targetListType;
             }
         };
+    }
+
+    /**
+     * List factory.
+     */
+    public static interface ListFactory {
+        /**
+         * Create a new mutable {@link List} instance (optionally with given the capacity). 
+         * This function must not return null.
+         * 
+         * @param capacity The requested capacity of the {@link List}.
+         * @return A new mutable {@link List} instance (optionally with given the capacity).
+         */
+        List<?> newList(int capacity);
     }
 }
