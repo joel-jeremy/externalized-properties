@@ -133,13 +133,13 @@ public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
         .withDefaultResolvers()
         .processors(
-            DecryptProcessor.of(JceDecryptor.factory().symmetric(
+            DecryptProcessor.provider(JceDecryptor.factory().symmetric(
                 "MyAESDecryptor",
                 "AES/GCM/NoPadding", 
                 getSecretKey(),
                 getGcmParameterSpec()
             )),
-            DecryptProcessor.of(JceDecryptor.factory().asymmetric(
+            DecryptProcessor.provider(JceDecryptor.factory().asymmetric(
                 "MyRSADecryptor",
                 "RSA", 
                 getPrivateKey()
