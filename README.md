@@ -136,7 +136,8 @@ public static void main(String[] args) {
             DecryptProcessor.of(JceDecryptor.factory().symmetric(
                 "MyAESDecryptor",
                 "AES/GCM/NoPadding", 
-                getSecretKey()
+                getSecretKey(),
+                getGcmParameterSpec()
             )),
             DecryptProcessor.of(JceDecryptor.factory().asymmetric(
                 "MyRSADecryptor",
