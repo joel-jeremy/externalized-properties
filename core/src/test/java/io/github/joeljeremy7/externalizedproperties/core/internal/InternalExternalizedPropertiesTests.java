@@ -109,11 +109,23 @@ public class InternalExternalizedPropertiesTests {
         }
 
         @Test
+        @DisplayName("should throw when proxy interface contains Void-returning methods")
+        public void test5() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(StubResolver.provider());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.proxy(VoidClassReturnTypeProxyInterface.class)
+            );
+        }
+
+        @Test
         @DisplayName(
             "should throw when proxy interface @ResolverMethod does not have " +
             "a single String argument"
         )
-        public void test5() {
+        public void test6() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(StubResolver.provider());
 
@@ -130,7 +142,7 @@ public class InternalExternalizedPropertiesTests {
             "should throw when proxy interface @ResolverMethod have " +
             "multiple arguments"
         )
-        public void test6() {
+        public void test7() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(StubResolver.provider());
 
@@ -147,7 +159,7 @@ public class InternalExternalizedPropertiesTests {
             "should throw when proxy interface @ResolverMethod have " +
             "non-String argument"
         )
-        public void test7() {
+        public void test8() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(StubResolver.provider());
 
@@ -161,7 +173,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should create a proxy")
-        public void test8() {
+        public void test9() {
             // Do not resolve any property.
             ResolverProvider<?> provider = StubResolver.provider(
                 StubResolver.NULL_VALUE_RESOLVER
@@ -227,7 +239,9 @@ public class InternalExternalizedPropertiesTests {
         // Invalid: Void return types not allowed.
         @ExternalizedProperty("test.invalid.method.void")
         void invalidVoidMethod();
-    
+    }
+
+    static interface VoidClassReturnTypeProxyInterface {
         // Invalid: Void return types not allowed.
         @ExternalizedProperty("test.invalid.method.void")
         Void invalidVoidClassMethod();

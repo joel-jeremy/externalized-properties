@@ -235,7 +235,7 @@ public class EagerLoadingInvocationHandlerTests {
             Object result = invocationHandler.invoke(
                 stubProxy(proxyInterface, decorated), 
                 proxyMethod, 
-                new Object[0]
+                null
             );
 
             assertNotNull(result);
@@ -280,7 +280,7 @@ public class EagerLoadingInvocationHandlerTests {
             Object result = invocationHandler.invoke(
                 stubProxy(proxyInterface, decorated), 
                 proxyMethod, 
-                new Object[0]
+                new Object[] { "will not eager load" }
             );
 
             assertNotNull(result);
@@ -296,14 +296,14 @@ public class EagerLoadingInvocationHandlerTests {
             "when property could not be resolved from decorated invocation handler"
         )
         void test3() throws Throwable {
-            Class<NoEagerLoadingProxyInterface> proxyInterface = 
-                NoEagerLoadingProxyInterface.class;
+            Class<EagerLoadingProxyInterface> proxyInterface = 
+                EagerLoadingProxyInterface.class;
             
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
                 // This property method will not be eagerly loaded
                 // because it has a parameter.
-                NoEagerLoadingProxyInterface::withParameters
+                EagerLoadingProxyInterface::javaVersion
             );
 
             // Always return null.
@@ -324,7 +324,7 @@ public class EagerLoadingInvocationHandlerTests {
             Object result = invocationHandler.invoke(
                 stubProxy(proxyInterface, decorated), 
                 proxyMethod, 
-                new Object[0]
+                null
             );
 
             assertNull(result);

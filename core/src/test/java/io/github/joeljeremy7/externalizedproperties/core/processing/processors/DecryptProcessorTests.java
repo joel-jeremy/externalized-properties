@@ -16,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
@@ -57,6 +58,8 @@ public class DecryptProcessorTests {
     private static final KeyPair RSA_KEY_PAIR = EncryptionUtils.generateRsaKeyPair();
     private static final Decryptor RSA_DECRYPTOR = createAsymmetricDecryptor();
 
+    private static final String BOUNCY_CASTLE_PROVIDER_NAME = "BC";
+
     @BeforeAll
     static void setup() {
         // Add custom JCE provider.
@@ -91,8 +94,6 @@ public class DecryptProcessorTests {
                 () -> new DecryptProcessor((Collection<Decryptor>)null)
             );
         }
-
-
 
         @Test
         @DisplayName("should throw when decryptors argument is empty")
@@ -283,6 +284,62 @@ public class DecryptProcessorTests {
 
     @Nested
     class JceDecryptorTests {
+
+        @Nested
+        class Constructor {
+            @Test
+            @DisplayName("should throw when cipher argument is null")
+            void cipherOverloadTest1() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> new JceDecryptor(null)  
+                );
+            }
+
+            @Test
+            @DisplayName("should use cipher argument's algorithm as decryptor name")
+            void cipherOverloadTest2() throws NoSuchAlgorithmException, 
+                    NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+                Cipher cipher = Cipher.getInstance(AES_GCM_ALGORITHM);
+                cipher.init(Cipher.DECRYPT_MODE, AES_SECRET_KEY, GCM_PARAMETER_SPEC);
+                JceDecryptor decryptor = new JceDecryptor(cipher);
+                assertEquals(cipher.getAlgorithm(), decryptor.name());
+            }
+
+            @Test
+            @DisplayName("should throw when name argument is null")
+            void nameAndCipherOverloadTest1() throws NoSuchAlgorithmException, 
+                    NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+                Cipher cipher = Cipher.getInstance(AES_GCM_ALGORITHM);
+                cipher.init(Cipher.DECRYPT_MODE, AES_SECRET_KEY, GCM_PARAMETER_SPEC);
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> new JceDecryptor(null, cipher)  
+                );
+            } 
+
+            @Test
+            @DisplayName("should throw when cipher argument is null")
+            void nameAndCipherOverloadTest2() throws NoSuchAlgorithmException, 
+                    NoSuchPaddingException, InvalidKeyException {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> new JceDecryptor("MyDecryptor", null)  
+                );
+            } 
+
+            @Test
+            @DisplayName("should use specified name as decryptor name")
+            void nameAndCipherOverloadTest3() throws NoSuchAlgorithmException, 
+                    NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+                String decryptorName = "MyDecryptor";
+                Cipher cipher = Cipher.getInstance(AES_GCM_ALGORITHM);
+                cipher.init(Cipher.DECRYPT_MODE, AES_SECRET_KEY, GCM_PARAMETER_SPEC);
+                JceDecryptor decryptor = new JceDecryptor(decryptorName, cipher);
+                assertEquals(decryptorName, decryptor.name());
+            } 
+        }
+
         @Nested
         class FactoryMethod {
             @Test
@@ -325,7 +382,7 @@ public class DecryptProcessorTests {
         @Nested
         class FactoryTests {
             @Nested
-            class AsymmetricMethodWithAlgorithmAndPrivateKeyOverload {
+            class AsymmetricMethodWithAlgorithmPrivateKeyOverload {
                 @Test
                 @DisplayName("should throw when algorithm argument is null")
                 void validationTest1() {
@@ -358,7 +415,7 @@ public class DecryptProcessorTests {
                 @Test
                 @DisplayName("should create a JCE decryptor from the security provider")
                 void test2() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
-                    JceDecryptor.Factory factory = JceDecryptor.factory("BC");
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
                     JceDecryptor decryptor = factory.asymmetric(
                         RSA_ALGORITHM, 
                         RSA_KEY_PAIR.getPrivate()
@@ -377,6 +434,87 @@ public class DecryptProcessorTests {
                         RSA_KEY_PAIR.getPrivate()
                     );
                     assertNotNull(decryptor);
+                }
+            }
+
+            @Nested
+            class AsymmetricMethodWithNameAndAlgorithmAndPrivateKeyOverload {
+                @Test
+                @DisplayName("should throw when name argument is null")
+                void validationTest1() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.asymmetric(null, RSA_ALGORITHM, RSA_KEY_PAIR.getPrivate())
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when algorithm argument is null")
+                void validationTest2() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.asymmetric("CustomName", null, RSA_KEY_PAIR.getPrivate())
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when private key argument is null")
+                void validationTest3() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.asymmetric("CustomName", RSA_ALGORITHM, null)
+                    );
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor")
+                void test1() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = 
+                        factory.asymmetric("CustomName", RSA_ALGORITHM, RSA_KEY_PAIR.getPrivate());
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test2() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
+                    JceDecryptor decryptor = factory.asymmetric(
+                        "CustomName",
+                        RSA_ALGORITHM, 
+                        RSA_KEY_PAIR.getPrivate()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test3() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(
+                        new BouncyCastleProvider()
+                    );
+                    JceDecryptor decryptor = factory.asymmetric(
+                        "CustomName",
+                        RSA_ALGORITHM, 
+                        RSA_KEY_PAIR.getPrivate()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor with the specified name")
+                void test4() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = factory.asymmetric(
+                        "CustomName",
+                        RSA_ALGORITHM, 
+                        RSA_KEY_PAIR.getPrivate()
+                    );
+                    assertNotNull(decryptor);
+                    assertEquals("CustomName", decryptor.name());
                 }
             }
 
@@ -425,7 +563,7 @@ public class DecryptProcessorTests {
                 @Test
                 @DisplayName("should create a JCE decryptor from the security provider")
                 void test2() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
-                    JceDecryptor.Factory factory = JceDecryptor.factory("BC");
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
                     JceDecryptor decryptor = factory.asymmetric(
                         RSA_ALGORITHM, 
                         RSA_KEY_PAIR.getPrivate(),
@@ -446,6 +584,109 @@ public class DecryptProcessorTests {
                         SecureRandom.getInstanceStrong()
                     );
                     assertNotNull(decryptor);
+                }
+            }
+
+            @Nested
+            class AsymmetricMethodWithNameAndAlgorithmAndPrivateKeyAndSecureRandomOverload {
+                @Test
+                @DisplayName("should throw when name argument is null")
+                void validationTest1() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.asymmetric(
+                            null, 
+                            RSA_ALGORITHM,
+                            RSA_KEY_PAIR.getPrivate(),
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when algorithm argument is null")
+                void validationTest2() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.asymmetric(
+                            "CustomName",
+                            null, 
+                            RSA_KEY_PAIR.getPrivate(),
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when private key argument is null")
+                void validationTest3() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.asymmetric(
+                            "CustomName",
+                            RSA_ALGORITHM, 
+                            null,
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor")
+                void test1() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = factory.asymmetric(
+                        "CustomName",
+                        RSA_ALGORITHM, 
+                        RSA_KEY_PAIR.getPrivate(),
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test2() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
+                    JceDecryptor decryptor = factory.asymmetric(
+                        "CustomName",
+                        RSA_ALGORITHM, 
+                        RSA_KEY_PAIR.getPrivate(),
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test3() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(
+                        new BouncyCastleProvider()
+                    );
+                    JceDecryptor decryptor = factory.asymmetric(
+                        "CustomName",
+                        RSA_ALGORITHM, 
+                        RSA_KEY_PAIR.getPrivate(),
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor with the specified name")
+                void test4() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = factory.asymmetric(
+                        "CustomName",
+                        RSA_ALGORITHM, 
+                        RSA_KEY_PAIR.getPrivate(),
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                    assertEquals("CustomName", decryptor.name());
                 }
             }
 
@@ -494,7 +735,7 @@ public class DecryptProcessorTests {
                 @Test
                 @DisplayName("should create a JCE decryptor from the security provider")
                 void test2() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
-                    JceDecryptor.Factory factory = JceDecryptor.factory("BC");
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
                     JceDecryptor decryptor = factory.symmetric(
                         AES_ALGORITHM, 
                         AES_SECRET_KEY
@@ -513,6 +754,107 @@ public class DecryptProcessorTests {
                         AES_SECRET_KEY
                     );
                     assertNotNull(decryptor);
+                }
+            }
+
+            @Nested
+            class SymmetricMethodWithNameAndAlgorithmAndSecretKeyOverload {
+                @Test
+                @DisplayName("should throw when name argument is null")
+                void validationTest1() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            null,
+                            AES_ALGORITHM, 
+                            AES_SECRET_KEY
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when algorithm argument is null")
+                void validationTest2() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            null, 
+                            AES_SECRET_KEY
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when secret key argument is null")
+                void validationTest3() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            AES_ALGORITHM, 
+                            null
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor")
+                void test1() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_ALGORITHM, 
+                        AES_SECRET_KEY
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test2() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_ALGORITHM, 
+                        AES_SECRET_KEY
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test3() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(
+                        new BouncyCastleProvider()
+                    );
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_ALGORITHM, 
+                        AES_SECRET_KEY
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor with the specified name")
+                void test4() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(
+                        new BouncyCastleProvider()
+                    );
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_ALGORITHM, 
+                        AES_SECRET_KEY
+                    );
+                    assertNotNull(decryptor);
+                    assertEquals("CustomName", decryptor.name());
                 }
             }
 
@@ -564,7 +906,7 @@ public class DecryptProcessorTests {
                 @Test
                 @DisplayName("should create a JCE decryptor from the security provider")
                 void test2() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
-                    JceDecryptor.Factory factory = JceDecryptor.factory("BC");
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
                     JceDecryptor decryptor = factory.symmetric(
                         AES_ALGORITHM, 
                         AES_SECRET_KEY,
@@ -585,6 +927,112 @@ public class DecryptProcessorTests {
                         SecureRandom.getInstanceStrong()
                     );
                     assertNotNull(decryptor);
+                }
+            }
+
+            @Nested
+            class SymmetricMethodWithNameAndAlgorithmAndSecretKeyAndSecureRandomOverload {
+                @Test
+                @DisplayName("should throw when name argument is null")
+                void validationTest1() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            null,
+                            AES_ALGORITHM, 
+                            AES_SECRET_KEY,
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when algorithm argument is null")
+                void validationTest2() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            null, 
+                            AES_SECRET_KEY,
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when secret key argument is null")
+                void validationTest3() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            AES_ALGORITHM, 
+                            null,
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor")
+                void test1() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test2() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test3() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(
+                        new BouncyCastleProvider()
+                    );
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor with the specified name")
+                void test4() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                    assertEquals("CustomName", decryptor.name());
                 }
             }
 
@@ -653,7 +1101,7 @@ public class DecryptProcessorTests {
                         NoSuchAlgorithmException, 
                         NoSuchPaddingException, 
                         InvalidAlgorithmParameterException {
-                    JceDecryptor.Factory factory = JceDecryptor.factory("BC");
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
                     JceDecryptor decryptor = factory.symmetric(
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
@@ -677,6 +1125,136 @@ public class DecryptProcessorTests {
                         GCM_PARAMETER_SPEC
                     );
                     assertNotNull(decryptor);
+                }
+            }
+
+            @Nested
+            class SymmetricMethodWithNameAndAlgorithmAndSecretKeyAndAlgorithmParameterSpecOverload {
+                @Test
+                @DisplayName("should throw when name argument is null")
+                void validationTest1() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            null,
+                            AES_ALGORITHM,
+                            AES_SECRET_KEY,
+                            GCM_PARAMETER_SPEC
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when algorithm argument is null")
+                void validationTest2() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            null, 
+                            AES_SECRET_KEY,
+                            GCM_PARAMETER_SPEC
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when secret key argument is null")
+                void validationTest3() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            AES_GCM_ALGORITHM, 
+                            null,
+                            GCM_PARAMETER_SPEC
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when algorithm parameter spec argument is null")
+                void validationTest4() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            AES_GCM_ALGORITHM, 
+                            AES_SECRET_KEY,
+                            (AlgorithmParameterSpec)null
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor")
+                void test1() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETER_SPEC
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test2() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETER_SPEC
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test3() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(
+                        new BouncyCastleProvider()
+                    );
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETER_SPEC
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor with specified name")
+                void test4() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETER_SPEC
+                    );
+                    assertNotNull(decryptor);
+                    assertEquals("CustomName", decryptor.name());
                 }
             }
 
@@ -764,7 +1342,7 @@ public class DecryptProcessorTests {
                         NoSuchAlgorithmException, 
                         NoSuchPaddingException, 
                         InvalidAlgorithmParameterException {
-                    JceDecryptor.Factory factory = JceDecryptor.factory("BC");
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
                     JceDecryptor decryptor = factory.symmetric(
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
@@ -790,6 +1368,161 @@ public class DecryptProcessorTests {
                         SecureRandom.getInstanceStrong()
                     );
                     assertNotNull(decryptor);
+                }
+            }
+            @Nested
+            class SymmetricMethodWithNameAndAlgorithmAndSecretKeyAndAlgorithmParameterSpecAndSecureRandomOverload {
+                @Test
+                @DisplayName("should throw when name argument is null")
+                void validationTest1() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            null,
+                            AES_ALGORITHM, 
+                            AES_SECRET_KEY,
+                            GCM_PARAMETER_SPEC,
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when algorithm argument is null")
+                void validationTest2() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            null, 
+                            AES_SECRET_KEY,
+                            GCM_PARAMETER_SPEC,
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when secret key argument is null")
+                void validationTest3() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            AES_GCM_ALGORITHM, 
+                            null,
+                            GCM_PARAMETER_SPEC,
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when algorithm parameter spec argument is null")
+                void validationTest4() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            AES_GCM_ALGORITHM, 
+                            AES_SECRET_KEY,
+                            (AlgorithmParameterSpec)null,
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when secure random argument is null")
+                void validationTest5() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            AES_GCM_ALGORITHM,
+                            AES_SECRET_KEY,
+                            GCM_PARAMETER_SPEC,
+                            null
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor")
+                void test1() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETER_SPEC,
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test2() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETER_SPEC,
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test3() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(
+                        new BouncyCastleProvider()
+                    );
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETER_SPEC,
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor with the specified name")
+                void test4() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(
+                        new BouncyCastleProvider()
+                    );
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETER_SPEC,
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                    assertEquals("CustomName", decryptor.name());
                 }
             }
 
@@ -860,7 +1593,7 @@ public class DecryptProcessorTests {
                         NoSuchPaddingException, 
                         InvalidAlgorithmParameterException, 
                         InvalidParameterSpecException {
-                    JceDecryptor.Factory factory = JceDecryptor.factory("BC");
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
                     JceDecryptor decryptor = factory.symmetric(
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
@@ -885,6 +1618,139 @@ public class DecryptProcessorTests {
                         GCM_PARAMETERS
                     );
                     assertNotNull(decryptor);
+                }
+            }
+            @Nested
+            class SymmetricMethodWithNameAndAlgorithmAndSecretKeyAndAlgorithmParameterOverload {
+                @Test
+                @DisplayName("should throw when name argument is null")
+                void validationTest1() throws NoSuchAlgorithmException, InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            null,
+                            AES_ALGORITHM, 
+                            AES_SECRET_KEY,
+                            GCM_PARAMETERS
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when algorithm argument is null")
+                void validationTest2() throws NoSuchAlgorithmException, InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            null, 
+                            AES_SECRET_KEY,
+                            GCM_PARAMETERS
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when secret key argument is null")
+                void validationTest3() throws NoSuchAlgorithmException, InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            AES_GCM_ALGORITHM, 
+                            null,
+                            GCM_PARAMETERS
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when algorithm parameter spec argument is null")
+                void validationTest4() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            AES_GCM_ALGORITHM, 
+                            AES_SECRET_KEY,
+                            (AlgorithmParameters)null
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor")
+                void test1() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException, 
+                        InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETERS
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test2() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException, 
+                        InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETERS
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test3() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException,
+                        InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(
+                        new BouncyCastleProvider()
+                    );
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETERS
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor with the specified name")
+                void test4() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException,
+                        InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETERS
+                    );
+                    assertNotNull(decryptor);
+                    assertEquals("CustomName", decryptor.name());
                 }
             }
 
@@ -974,7 +1840,7 @@ public class DecryptProcessorTests {
                         NoSuchPaddingException, 
                         InvalidAlgorithmParameterException, 
                         InvalidParameterSpecException {
-                    JceDecryptor.Factory factory = JceDecryptor.factory("BC");
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
                     JceDecryptor decryptor = factory.symmetric(
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
@@ -1002,6 +1868,165 @@ public class DecryptProcessorTests {
                         SecureRandom.getInstanceStrong()
                     );
                     assertNotNull(decryptor);
+                }
+            }
+            @Nested
+            class SymmetricMethodWithNameAndAlgorithmAndSecretKeyAndAlgorithmParameterAndSecureRandomOverload {
+                @Test
+                @DisplayName("should throw when name argument is null")
+                void validationTest1() throws NoSuchAlgorithmException, InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            null,
+                            AES_ALGORITHM, 
+                            AES_SECRET_KEY,
+                            GCM_PARAMETERS,
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+                
+                @Test
+                @DisplayName("should throw when algorithm argument is null")
+                void validationTest2() throws NoSuchAlgorithmException, InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            null, 
+                            AES_SECRET_KEY,
+                            GCM_PARAMETERS,
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when secret key argument is null")
+                void validationTest3() throws NoSuchAlgorithmException, InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            AES_GCM_ALGORITHM, 
+                            null,
+                            GCM_PARAMETERS,
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when algorithm parameters argument is null")
+                void validationTest4() {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            AES_GCM_ALGORITHM, 
+                            AES_SECRET_KEY,
+                            (AlgorithmParameters)null,
+                            SecureRandom.getInstanceStrong()
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should throw when secure random argument is null")
+                void validationTest5() throws NoSuchAlgorithmException, InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    assertThrows(
+                        IllegalArgumentException.class, 
+                        () -> factory.symmetric(
+                            "CustomName",
+                            AES_GCM_ALGORITHM,
+                            AES_SECRET_KEY,
+                            GCM_PARAMETERS,
+                            null
+                        )
+                    );
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor")
+                void test1() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException, 
+                        InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETERS,
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test2() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException, 
+                        InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETERS,
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor from the security provider")
+                void test3() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException,
+                        InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory(
+                        new BouncyCastleProvider()
+                    );
+                    
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETERS,
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                }
+
+                @Test
+                @DisplayName("should create a JCE decryptor with the specified name")
+                void test4() throws InvalidKeyException, 
+                        NoSuchAlgorithmException, 
+                        NoSuchPaddingException, 
+                        InvalidAlgorithmParameterException,
+                        InvalidParameterSpecException {
+                    JceDecryptor.Factory factory = JceDecryptor.factory();
+                    
+                    JceDecryptor decryptor = factory.symmetric(
+                        "CustomName",
+                        AES_GCM_ALGORITHM, 
+                        AES_SECRET_KEY,
+                        GCM_PARAMETERS,
+                        SecureRandom.getInstanceStrong()
+                    );
+                    assertNotNull(decryptor);
+                    assertEquals("CustomName", decryptor.name());
                 }
             }
         }

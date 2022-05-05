@@ -299,9 +299,9 @@ public class DecryptProcessor implements Processor {
              * @param privateKey The private key to use in decryption.
              * @return A {@link JceDecryptor} which decrypts using the specified algorithm
              * and private key.
-             * @throws NoSuchAlgorithmException if algorithm is invalid or not avaiable in 
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
              * the environment.
-             * @throws NoSuchPaddingException if padding mechanism is invalid or not avaiable in 
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
              * the environment.
              * @throws InvalidKeyException if key is invalid.
              */
@@ -311,11 +311,37 @@ public class DecryptProcessor implements Processor {
             ) throws NoSuchAlgorithmException,
                     NoSuchPaddingException, 
                     InvalidKeyException {
+                return asymmetric(algorithm, algorithm, privateKey);
+            }
+
+            /**
+             * Create an explicitly named {@link JceDecryptor} which decrypts using the specified algorithm
+             * and private key.
+             * 
+             * @param name The name of the created decryptor.
+             * @param algorithm The algorithm.
+             * @param privateKey The private key to use in decryption.
+             * @return A {@link JceDecryptor} which decrypts using the specified algorithm
+             * and private key.
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
+             * the environment.
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
+             * the environment.
+             * @throws InvalidKeyException if key is invalid.
+             */
+            public JceDecryptor asymmetric(
+                    String name,
+                    String algorithm, 
+                    PrivateKey privateKey
+            ) throws NoSuchAlgorithmException,
+                    NoSuchPaddingException, 
+                    InvalidKeyException {
+                requireNonNull(name, "name");
                 requireNonNull(algorithm, "algorithm");
                 requireNonNull(privateKey, "privateKey");
                 Cipher cipher = getCipher(algorithm);
                 cipher.init(Cipher.DECRYPT_MODE, privateKey);
-                return new JceDecryptor(cipher);
+                return new JceDecryptor(name, cipher);
             }
 
             /**
@@ -327,9 +353,9 @@ public class DecryptProcessor implements Processor {
              * @param secureRandom The source of randomness.
              * @return A {@link JceDecryptor} which decrypts using the specified algorithm
              * and private key.
-             * @throws NoSuchAlgorithmException if algorithm is invalid or not avaiable in 
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
              * the environment.
-             * @throws NoSuchPaddingException if padding mechanism is invalid or not avaiable in 
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
              * the environment.
              * @throws InvalidKeyException if key is invalid.
              */
@@ -340,12 +366,40 @@ public class DecryptProcessor implements Processor {
             ) throws NoSuchAlgorithmException,
                     NoSuchPaddingException, 
                     InvalidKeyException {
+                return asymmetric(algorithm, algorithm, privateKey, secureRandom);
+            }
+
+            /**
+             * Create an explicitly named {@link JceDecryptor} which decrypts using the specified algorithm
+             * and private key.
+             * 
+             * @param name The name of the created decryptor.
+             * @param algorithm The algorithm.
+             * @param privateKey The private key to use in decryption.
+             * @param secureRandom The source of randomness.
+             * @return A {@link JceDecryptor} which decrypts using the specified algorithm
+             * and private key.
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
+             * the environment.
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
+             * the environment.
+             * @throws InvalidKeyException if key is invalid.
+             */
+            public JceDecryptor asymmetric(
+                    String name,
+                    String algorithm, 
+                    PrivateKey privateKey,
+                    SecureRandom secureRandom
+            ) throws NoSuchAlgorithmException,
+                    NoSuchPaddingException, 
+                    InvalidKeyException {
+                requireNonNull(name, "name");
                 requireNonNull(algorithm, "algorithm");
                 requireNonNull(privateKey, "privateKey");
                 requireNonNull(secureRandom, "secureRandom");
                 Cipher cipher = getCipher(algorithm);
                 cipher.init(Cipher.DECRYPT_MODE, privateKey, secureRandom);
-                return new JceDecryptor(cipher);
+                return new JceDecryptor(name, cipher);
             }
 
             /**
@@ -356,9 +410,9 @@ public class DecryptProcessor implements Processor {
              * @param secretKey The secret key to use in decryption.
              * @return A {@link JceDecryptor} which decrypts using the specified algorithm,
              * secret key, and algorithm parameter spec.
-             * @throws NoSuchAlgorithmException if algorithm is invalid or not avaiable in 
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
              * the environment.
-             * @throws NoSuchPaddingException if padding mechanism is invalid or not avaiable in 
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
              * the environment.
              * @throws InvalidKeyException if key is invalid.
              */
@@ -368,11 +422,37 @@ public class DecryptProcessor implements Processor {
             ) throws NoSuchAlgorithmException, 
                     NoSuchPaddingException, 
                     InvalidKeyException {
+                return symmetric(algorithm, algorithm, secretKey);
+            }
+
+            /**
+             * Create an explicitly named {@link JceDecryptor} which decrypts using the specified algorithm and
+             * secret key.
+             * 
+             * @param name The name of the created decryptor.
+             * @param algorithm The algorithm.
+             * @param secretKey The secret key to use in decryption.
+             * @return A {@link JceDecryptor} which decrypts using the specified algorithm,
+             * secret key, and algorithm parameter spec.
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
+             * the environment.
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
+             * the environment.
+             * @throws InvalidKeyException if key is invalid.
+             */
+            public JceDecryptor symmetric(
+                    String name,
+                    String algorithm, 
+                    SecretKey secretKey
+            ) throws NoSuchAlgorithmException, 
+                    NoSuchPaddingException, 
+                    InvalidKeyException {
+                requireNonNull(name, "name");
                 requireNonNull(algorithm, "algorithm");
                 requireNonNull(secretKey, "secretKey");
                 Cipher cipher = getCipher(algorithm);
                 cipher.init(Cipher.DECRYPT_MODE, secretKey);
-                return new JceDecryptor(cipher);
+                return new JceDecryptor(name, cipher);
             }
 
             /**
@@ -384,9 +464,9 @@ public class DecryptProcessor implements Processor {
              * @param secureRandom The source of randomness.
              * @return A {@link JceDecryptor} which decrypts using the specified algorithm,
              * secret key, and algorithm parameter spec.
-             * @throws NoSuchAlgorithmException if algorithm is invalid or not avaiable in 
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
              * the environment.
-             * @throws NoSuchPaddingException if padding mechanism is invalid or not avaiable in 
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
              * the environment.
              * @throws InvalidKeyException if key is invalid.
              */
@@ -397,12 +477,40 @@ public class DecryptProcessor implements Processor {
             ) throws NoSuchAlgorithmException, 
                     NoSuchPaddingException, 
                     InvalidKeyException {
+                return symmetric(algorithm, algorithm, secretKey, secureRandom);
+            }
+
+            /**
+             * Create an explicitly named {@link JceDecryptor} which decrypts using the specified algorithm and
+             * secret key.
+             * 
+             * @param name The name of the created decryptor.
+             * @param algorithm The algorithm.
+             * @param secretKey The secret key to use in decryption.
+             * @param secureRandom The source of randomness.
+             * @return A {@link JceDecryptor} which decrypts using the specified algorithm,
+             * secret key, and algorithm parameter spec.
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
+             * the environment.
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
+             * the environment.
+             * @throws InvalidKeyException if key is invalid.
+             */
+            public JceDecryptor symmetric(
+                    String name,
+                    String algorithm, 
+                    SecretKey secretKey,
+                    SecureRandom secureRandom
+            ) throws NoSuchAlgorithmException, 
+                    NoSuchPaddingException, 
+                    InvalidKeyException {
+                requireNonNull(name, "name");
                 requireNonNull(algorithm, "algorithm");
                 requireNonNull(secretKey, "secretKey");
                 requireNonNull(secureRandom, "secureRandom");
                 Cipher cipher = getCipher(algorithm);
                 cipher.init(Cipher.DECRYPT_MODE, secretKey, secureRandom);
-                return new JceDecryptor(cipher);
+                return new JceDecryptor(name, cipher);
             }
 
             /**
@@ -414,9 +522,9 @@ public class DecryptProcessor implements Processor {
              * @param algorithmParameterSpec The algorithm parameter spec.
              * @return A {@link JceDecryptor} which decrypts using the specified algorithm,
              * secret key, and algorithm parameter spec.
-             * @throws NoSuchAlgorithmException if algorithm is invalid or not avaiable in 
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
              * the environment.
-             * @throws NoSuchPaddingException if padding mechanism is invalid or not avaiable in 
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
              * the environment.
              * @throws InvalidKeyException if key is invalid.
              * @throws InvalidAlgorithmParameterException if algorithm parameters are invalid.
@@ -429,12 +537,42 @@ public class DecryptProcessor implements Processor {
                     NoSuchPaddingException, 
                     InvalidKeyException, 
                     InvalidAlgorithmParameterException {
+                return symmetric(algorithm, algorithm, secretKey, algorithmParameterSpec);
+            }
+
+            /**
+             * Create an explicitly named {@link JceDecryptor} which decrypts using the specified algorithm,
+             * secret key, and algorithm parameter spec.
+             * 
+             * @param name The name of the created decryptor.
+             * @param algorithm The algorithm.
+             * @param secretKey The secret key to use in decryption.
+             * @param algorithmParameterSpec The algorithm parameter spec.
+             * @return A {@link JceDecryptor} which decrypts using the specified algorithm,
+             * secret key, and algorithm parameter spec.
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
+             * the environment.
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
+             * the environment.
+             * @throws InvalidKeyException if key is invalid.
+             * @throws InvalidAlgorithmParameterException if algorithm parameters are invalid.
+             */
+            public JceDecryptor symmetric(
+                    String name,
+                    String algorithm, 
+                    SecretKey secretKey, 
+                    AlgorithmParameterSpec algorithmParameterSpec
+            ) throws NoSuchAlgorithmException, 
+                    NoSuchPaddingException, 
+                    InvalidKeyException, 
+                    InvalidAlgorithmParameterException {
+                requireNonNull(name, "name");
                 requireNonNull(algorithm, "algorithm");
                 requireNonNull(secretKey, "secretKey");
                 requireNonNull(algorithmParameterSpec, "algorithmParameterSpec");
                 Cipher cipher = getCipher(algorithm);
                 cipher.init(Cipher.DECRYPT_MODE, secretKey, algorithmParameterSpec);
-                return new JceDecryptor(cipher);
+                return new JceDecryptor(name, cipher);
             }
 
             /**
@@ -447,9 +585,9 @@ public class DecryptProcessor implements Processor {
              * @param secureRandom The source of randomness.
              * @return A {@link JceDecryptor} which decrypts using the specified algorithm,
              * secret key, and algorithm parameter spec.
-             * @throws NoSuchAlgorithmException if algorithm is invalid or not avaiable in 
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
              * the environment.
-             * @throws NoSuchPaddingException if padding mechanism is invalid or not avaiable in 
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
              * the environment.
              * @throws InvalidKeyException if key is invalid.
              * @throws InvalidAlgorithmParameterException if algorithm parameters are invalid.
@@ -463,13 +601,45 @@ public class DecryptProcessor implements Processor {
                     NoSuchPaddingException, 
                     InvalidKeyException, 
                     InvalidAlgorithmParameterException {
+                return symmetric(algorithm, algorithm, secretKey, algorithmParameterSpec, secureRandom);
+            }
+
+            /**
+             * Create an explicitly named {@link JceDecryptor} which decrypts using the specified algorithm,
+             * secret key, and algorithm parameter spec.
+             * 
+             * @param name The name of the created decryptor.
+             * @param algorithm The algorithm.
+             * @param secretKey The secret key to use in decryption.
+             * @param algorithmParameterSpec The algorithm parameter spec.
+             * @param secureRandom The source of randomness.
+             * @return A {@link JceDecryptor} which decrypts using the specified algorithm,
+             * secret key, and algorithm parameter spec.
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
+             * the environment.
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
+             * the environment.
+             * @throws InvalidKeyException if key is invalid.
+             * @throws InvalidAlgorithmParameterException if algorithm parameters are invalid.
+             */
+            public JceDecryptor symmetric(
+                    String name,
+                    String algorithm, 
+                    SecretKey secretKey, 
+                    AlgorithmParameterSpec algorithmParameterSpec,
+                    SecureRandom secureRandom
+            ) throws NoSuchAlgorithmException, 
+                    NoSuchPaddingException, 
+                    InvalidKeyException, 
+                    InvalidAlgorithmParameterException {
+                requireNonNull(name, "name");
                 requireNonNull(algorithm, "algorithm");
                 requireNonNull(secretKey, "secretKey");
                 requireNonNull(algorithmParameterSpec, "algorithmParameterSpec");
                 requireNonNull(secureRandom, "secureRandom");
                 Cipher cipher = getCipher(algorithm);
                 cipher.init(Cipher.DECRYPT_MODE, secretKey, algorithmParameterSpec, secureRandom);
-                return new JceDecryptor(cipher);
+                return new JceDecryptor(name, cipher);
             }
             
             /**
@@ -481,9 +651,9 @@ public class DecryptProcessor implements Processor {
              * @param algorithmParameters The algorithm parameters.
              * @return A {@link JceDecryptor} which decrypts using the specified algorithm,
              * secret key, and algorithm parameter spec.
-             * @throws NoSuchAlgorithmException if algorithm is invalid or not avaiable in 
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
              * the environment.
-             * @throws NoSuchPaddingException if padding mechanism is invalid or not avaiable in 
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
              * the environment.
              * @throws InvalidKeyException if key is invalid.
              * @throws InvalidAlgorithmParameterException if algorithm parameters are invalid.
@@ -496,12 +666,42 @@ public class DecryptProcessor implements Processor {
                     NoSuchPaddingException, 
                     InvalidKeyException, 
                     InvalidAlgorithmParameterException {
+                return symmetric(algorithm, algorithm, secretKey, algorithmParameters);
+            }
+            
+            /**
+             * Create an explicitly named {@link JceDecryptor} which decrypts using the specified algorithm,
+             * secret key, and algorithm parameters.
+             * 
+             * @param name The name of the created decryptor.
+             * @param algorithm The algorithm.
+             * @param secretKey The secret key to use in decryption.
+             * @param algorithmParameters The algorithm parameters.
+             * @return A {@link JceDecryptor} which decrypts using the specified algorithm,
+             * secret key, and algorithm parameter spec.
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
+             * the environment.
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
+             * the environment.
+             * @throws InvalidKeyException if key is invalid.
+             * @throws InvalidAlgorithmParameterException if algorithm parameters are invalid.
+             */
+            public JceDecryptor symmetric(
+                    String name,
+                    String algorithm, 
+                    SecretKey secretKey, 
+                    AlgorithmParameters algorithmParameters
+            ) throws NoSuchAlgorithmException, 
+                    NoSuchPaddingException, 
+                    InvalidKeyException, 
+                    InvalidAlgorithmParameterException {
+                requireNonNull(name, "name");
                 requireNonNull(algorithm, "algorithm");
                 requireNonNull(secretKey, "secretKey");
                 requireNonNull(algorithmParameters, "algorithmParameters");
                 Cipher cipher = getCipher(algorithm);
                 cipher.init(Cipher.DECRYPT_MODE, secretKey, algorithmParameters);
-                return new JceDecryptor(cipher);
+                return new JceDecryptor(name, cipher);
             }
             
             /**
@@ -514,9 +714,9 @@ public class DecryptProcessor implements Processor {
              * @param secureRandom The source of randomness.
              * @return A {@link JceDecryptor} which decrypts using the specified algorithm,
              * secret key, and algorithm parameter spec.
-             * @throws NoSuchAlgorithmException if algorithm is invalid or not avaiable in 
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
              * the environment.
-             * @throws NoSuchPaddingException if padding mechanism is invalid or not avaiable in 
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
              * the environment.
              * @throws InvalidKeyException if key is invalid.
              * @throws InvalidAlgorithmParameterException if algorithm parameters are invalid.
@@ -530,13 +730,45 @@ public class DecryptProcessor implements Processor {
                     NoSuchPaddingException, 
                     InvalidKeyException, 
                     InvalidAlgorithmParameterException {
+                return symmetric(algorithm, algorithm, secretKey, algorithmParameters, secureRandom);
+            }
+            
+            /**
+             * Create an explicitly named {@link JceDecryptor} which decrypts using the specified algorithm,
+             * secret key, and algorithm parameters.
+             * 
+             * @param name The name of the created decryptor.
+             * @param algorithm The algorithm.
+             * @param secretKey The secret key to use in decryption.
+             * @param algorithmParameters The algorithm parameters.
+             * @param secureRandom The source of randomness.
+             * @return A {@link JceDecryptor} which decrypts using the specified algorithm,
+             * secret key, and algorithm parameter spec.
+             * @throws NoSuchAlgorithmException if algorithm is invalid or not available in 
+             * the environment.
+             * @throws NoSuchPaddingException if padding mechanism is invalid or not available in 
+             * the environment.
+             * @throws InvalidKeyException if key is invalid.
+             * @throws InvalidAlgorithmParameterException if algorithm parameters are invalid.
+             */
+            public JceDecryptor symmetric(
+                    String name,
+                    String algorithm, 
+                    SecretKey secretKey, 
+                    AlgorithmParameters algorithmParameters,
+                    SecureRandom secureRandom
+            ) throws NoSuchAlgorithmException, 
+                    NoSuchPaddingException, 
+                    InvalidKeyException, 
+                    InvalidAlgorithmParameterException {
+                requireNonNull(name, "name");
                 requireNonNull(algorithm, "algorithm");
                 requireNonNull(secretKey, "secretKey");
                 requireNonNull(algorithmParameters, "algorithmParameters");
                 requireNonNull(secureRandom, "secureRandom");
                 Cipher cipher = getCipher(algorithm);
                 cipher.init(Cipher.DECRYPT_MODE, secretKey, algorithmParameters, secureRandom);
-                return new JceDecryptor(cipher);
+                return new JceDecryptor(name, cipher);
             }
 
             private Cipher getCipher(String algorithm) 
