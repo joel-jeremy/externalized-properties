@@ -11,16 +11,22 @@ import java.lang.reflect.WildcardType;
 import java.util.Optional;
 
 /**
- * Information about methods that go through Externalized Properties proxying.
+ * Represents a method which has been invoked via an Externalized Properties proxy.
  */
 public interface ProxyMethod {
 
     /**
-     * The externalized property name. It will be derived from {@link ExternalizedProperty#value()},
-     * if specified. Otherwise, if {@link ExternalizedProperty#value()}
-     * is not specified, the property name will be derived from the proxy method's
-     * arguments. Specifically, the first argument of the proxy method (the method must only have one 
-     * String argument e.g. {@code String resolve(String propertyName)}).
+     * The externalized property name. 
+     * 
+     * <ol>
+     *  <li>It will be derived from {@link ExternalizedProperty#value()}, if specified.</li> 
+     *  <li>
+     *  Otherwise, if {@link ExternalizedProperty#value()} is not specified, the property name 
+     *  will be derived from the proxy method's arguments. Specifically, the first argument of 
+     *  the proxy method (the method must only have one String argument e.g. 
+     *  {@code String resolve(String propertyName)}).
+     *  </li>
+     * </ol>
      * 
      * @return The externalized property name derived from {@link ExternalizedProperty#value()}, 
      * or from proxy method arguments if {@link ExternalizedProperty#value()}
@@ -151,7 +157,7 @@ public interface ProxyMethod {
      * <p>For example, we have a property method: {@code Optional<String> awesomeMethod();},
      * {@code returnTypeGenericTypeParameter(0)} shall return a {@code String} type/class.
      * 
-     * @param typeParameterIndex The type parameter index to get.
+     * @param typeParameterIndex The index of the type parameter to get.
      * @return The generic return type parameter, if the return type is a generic type 
      * e.g. {@code Optional<String>}.
      */

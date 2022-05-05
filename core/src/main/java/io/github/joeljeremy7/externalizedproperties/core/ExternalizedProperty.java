@@ -53,15 +53,17 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface ExternalizedProperty {
     /**
-     * The name of the externalized property. If a {@link #value()} is not specified,
-     * the property name will be derived from the annotated method's arguments.
-     * Specifically, the first argument of the annotated method (the method must only have 
-     * one {@code String} argument) e.g. <pre>String resolve(String propertyName)</pre>
+     * The name of the externalized property. If a {@link #value()} is not specified or
+     * is empty ({@code ""}), the property name will be derived from the annotated method's 
+     * arguments. Specifically, the first argument of the annotated method (the method must 
+     * only have one {@code String} argument) e.g. 
+     * <blockquote><pre>String resolve(String propertyName)</pre></blockquote>
      * 
-     * @return The name of the externalized property. If a {@link #value()} is not specified,
-     * the property name will be derived from the annotated method's arguments.
-     * Specifically, the first argument of the annotated method (the method must only have 
-     * one {@code String} argument) e.g. <pre>String resolve(String propertyName)</pre>
+     * @return The name of the externalized property. If a {@link #value()} is not specified
+     * or is empty ({@code ""}), the property name will be derived from the annotated method's 
+     * arguments. Specifically, the first argument of the annotated method (the method must 
+     * only have one {@code String} argument) e.g. 
+     * <blockquote><pre>String resolve(String propertyName)</pre></blockquote>
      */
     String value() default "";
 }
