@@ -1,148 +1,92 @@
 plugins {
-  id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+    id 'io.github.gradle-nexus.publish-plugin'
+    id 'com.github.kt3k.coveralls'
+    id 'me.champeau.jmh' apply false
+    id 'net.ltgt.errorprone' apply false
+    id 'net.ltgt.nullaway' apply false
 }
 
-allprojects{
-  group = 'io.github.jeyjeyemem.externalizedproperties'
+apply from: "${rootDir}/gradle/reporting.gradle"
 
-  def snapshotSuffix = rootProject.hasProperty('release') ? '' : '-SNAPSHOT'
-  version = '1.0.0' + snapshotSuffix
+allprojects {
+    group = 'io.github.joeljeremy7.externalizedproperties'
 
-  repositories {
-    mavenLocal()
-    mavenCentral()
-  }
+    def snapshotSuffix = rootProject.hasProperty('release') ? '' : '-SNAPSHOT'
+    version = '1.0.0' + snapshotSuffix
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
 }
 
-subprojects {
-  apply plugin: 'java-library'
-  apply plugin: 'jacoco'
-  apply plugin: 'maven-publish'
-  apply plugin: 'signing'
+def javaProjects = subprojects.findAll { new File(it.projectDir, "src").exists() }
 
-  dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
-  }
+configure(javaProjects) {
+    apply plugin: 'java-library'
+    apply plugin: 'java-test-fixtures'
 
-  test { 
-    useJUnitPlatform() 
-    finalizedBy jacocoTestReport
-  }
+    apply from: "${rootDir}/gradle/dependencies.gradle"
+    apply from: "${rootDir}/gradle/code-quality.gradle"
+    apply from: "${rootDir}/gradle/publishing.gradle"
 
-  jacocoTestReport {
-    dependsOn test
-  }
-
-  java {
-    toolchain {
-      languageVersion = JavaLanguageVersion.of(11)
-    }
-
-    withJavadocJar()
-    withSourcesJar()
-  }
-
-  compileJava {
-    options.release = 8
-  }
-
-  javadoc {
-    configure(options) {
-      tags(
-        'apiNote:a:API Note:',
-        'implSpec:a:Implementation Requirements:',
-        'implNote:a:Implementation Note:'
-      )
-    }
-  }
-
-  publishing {
-    publications {
-      mavenJava(MavenPublication) {
-        from components.java
-
-        pom {
-          name = jar.archiveBaseName
-          description = project.description
-          packaging = 'jar'
-
-          url = 'https://github.com/jeyjeyemem/externalized-properties'
-
-          licenses {
-            license {
-              name = 'The Apache License, Version 2.0'
-              url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    testing {
+        suites { 
+            test { 
+                useJUnitJupiter() 
             }
-          }
-
-          developers {
-            developer {
-              id = 'jeyjeyemem'
-              name = 'Joel Jeremy M. Marquez'
-              email = 'joeljeremy.marquez@gmail.com'
+            integrationTest(JvmTestSuite) {
+                testType = TestSuiteType.INTEGRATION_TEST
+                targets {
+                    all {
+                        testTask.configure {
+                            shouldRunAfter test
+                        }
+                    }
+                }
             }
-          }
-
-          scm {
-            connection = 'scm:git:https://github.com/jeyjeyemem/externalized-properties.git'
-            developerConnection = 'scm:git:https://github.com/jeyjeyemem/externalized-properties.git'
-            url = 'https://github.com/jeyjeyemem/externalized-properties'
-          }
         }
-      }
     }
 
-    if (project.hasProperty('github-packages')) {
-      repositories {
-        maven {
-          url = 'https://maven.pkg.github.com/jeyjeyemem/externalized-properties'
-          name = 'github-packages'
-          credentials {
-            username = System.getenv('GITHUB_ACTOR') ?: property('githubActor')
-            password = System.getenv('GITHUB_TOKEN') ?: property('githubToken')
-          }
+    java {
+        // Use project path relative to the root project path as base name of archives. 
+        // For nested projects such as resolvers, the ':' will be replaced by '-' 
+        // i.e. resolvers:database -> resolvers-database.jar
+        archivesBaseName = rootProject.relativeProjectPath(project.path).replace(':', '-')
+        
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(11)
         }
-      }
     }
-  }
 
-  if (project.hasProperty('release')) {
-    // If release property is set, do not allow publishing with SNAPSHOT dependencies.
-    Task checkSnapshotDependencies = project.tasks.create('checkSnapshotDependencies', {
-      doFirst {
-        def snapshots = project.configurations.findAll {
-          it.canBeResolved
-        }.resolvedConfiguration.resolvedArtifacts.flatten().findAll {
-          it.moduleVersion.id.version.endsWith('-SNAPSHOT')
-        }.unique()
-        if (!snapshots.isEmpty()) {
-          throw new GradleException(
-            "Cannot release with SNAPSHOT dependencies: $snapshots.moduleVersion"
-          )
+    compileJava {
+        options.release = 8
+    }
+
+    javadoc {
+        configure(options) {
+            tags(
+                'apiNote:a:API Note:',
+                'implSpec:a:Implementation Requirements:',
+                'implNote:a:Implementation Note:'
+            )
         }
-      }
-    })
-    project.tasks.publish.dependsOn checkSnapshotDependencies
-  }
-
-  if (project.hasProperty('ossrh')) {
-    signing {
-      required rootProject.hasProperty('release')
-      sign publishing.publications.mavenJava
     }
-  }
+    
+    // Do not publish test fixtures.
+    components.java.withVariantsFromConfiguration(configurations.testFixturesApiElements) { skip() }
+    components.java.withVariantsFromConfiguration(configurations.testFixturesRuntimeElements) { skip() }
 }
 
 if (project.hasProperty('ossrh')) {
-  nexusPublishing {
-    repositories {
-      sonatype {
-        nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
-        snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-        username = System.getenv('OSSRH_USERNAME') ?: property('ossrhUsername')
-        password = System.getenv('OSSRH_PASSWORD') ?: property('ossrhPassword')
-      }
+    nexusPublishing {
+        repositories {
+            sonatype {
+                nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+                snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                username = System.getenv('OSSRH_USERNAME') ?: property('ossrhUsername')
+                password = System.getenv('OSSRH_PASSWORD') ?: property('ossrhPassword')
+            }
+        }
     }
-  }
 }

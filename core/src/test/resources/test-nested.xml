@@ -1,0 +1,17 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<properties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"> <!-- root node may have any name -->
+    <property>
+        <nested>
+            <awesome>property-nested-awesome-value</awesome>
+            <array>
+                <value>1</value>
+                <value>2</value>
+                <value>3</value>
+            </array>
+            <empty-array></empty-array>
+        </nested>
+        <int>7</int>
+        <float>7.7</float>
+        <null xsi:nil="true"/>
+    </property>
+</properties>

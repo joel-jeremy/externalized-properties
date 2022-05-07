@@ -1,0 +1,58 @@
+// Copy classpath of root project
+buildscript {
+    dependencies {
+        classpath files(rootProject.buildscript.configurations.classpath) 
+    } 
+}
+
+apply plugin: 'jacoco'
+apply plugin: 'net.ltgt.errorprone'
+apply plugin: 'net.ltgt.nullaway'
+
+dependencies {
+    errorprone "com.google.errorprone:error_prone_core:${versions.errorprone}"
+    errorprone "com.uber.nullaway:nullaway:${versions.nullaway}"
+    compileOnly "org.checkerframework:checker-qual:${versions.checkerframework}"
+}
+
+jacocoTestCoverageVerification { 
+    violationRules { 
+        rule { 
+            limit { 
+                // When me move to Java 11 and MethodHandleFactory
+                // logic does not need to be split between Java 8 / Java 9+,
+                // let's try to achieve 100% coverage.
+                minimum = 0.98
+            } 
+        } 
+    } 
+}
+check.dependsOn jacocoTestCoverageVerification
+
+tasks.withType(JavaCompile).configureEach { task ->
+    options.errorprone {
+        // Only apply to main source set (not test,jmh)
+        enabled = task.name.equals("compileJava")
+
+        def enabledChecks = [
+            'AssertFalse', 'CatchingUnchecked', 'CheckedExceptionNotThrown', 'ClassName',
+            'ComparisonContractViolated', 'DepAnn', 'EmptyIf', 'EqualsBrokenForNull',
+            'FieldCanBeFinal', 'FieldCanBeLocal', 'FieldCanBeStatic', 'ForEachIterable',
+            'FuzzyEqualsShouldNotBeUsedInEqualsMethod', 'FunctionalInterfaceClash',
+            'IterablePathParameter', 'LockMethodChecker', 'LongLiteralLowerCaseSuffix', 'MissingBraces',
+            'MissingDefault', 'MixedArrayDimensions', 'MissingDefault', 'NoAllocation', 'PackageLocation',
+            'PreferredInterfaceType', 'RedundantThrows', 'RemoveUnusedImports', 'ReturnsNullCollection',
+            'StronglyTypeByteString', 'StronglyTypeTime', 'SwitchDefault', 'TimeUnitMismatch',
+            'TransientMisuse', 'UnlockMethod', 'UnnecessarilyVisible', 'UnnecessaryAnonymousClass',
+            'UnnecessaryOptionalGet', 'UsingJsr305CheckReturnValue'
+        ]
+        enabledChecks.each { enable(it) }
+
+        nullaway {
+            severity = net.ltgt.gradle.errorprone.CheckSeverity.ERROR
+            annotatedPackages.add('io.github.joeljeremy7.externalizedproperties')
+            checkOptionalEmptiness = true
+            suggestSuppressions = true
+        }
+    }
+}

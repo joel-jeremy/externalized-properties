@@ -1,0 +1,16 @@
+{
+    "property": {
+        "nested": {
+            "awesome": "property-nested-awesome-value",
+            "array": [
+                1,
+                2,
+                3
+            ],
+            "empty-array": []
+        },
+        "int": 7,
+        "float": 7.7,
+        "null": null
+    }
+}
