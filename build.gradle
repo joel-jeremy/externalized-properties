@@ -1,6 +1,7 @@
 plugins {
     id 'io.github.gradle-nexus.publish-plugin'
     id 'com.github.kt3k.coveralls'
+    id 'io.snyk.gradle.plugin.snykplugin'
     id 'me.champeau.jmh' apply false
     id 'net.ltgt.errorprone' apply false
     id 'net.ltgt.nullaway' apply false
@@ -8,6 +9,7 @@ plugins {
 
 apply from: "${rootDir}/gradle/reporting.gradle"
 apply from: "${rootDir}/gradle/coveralls.gradle"
+apply from: "${rootDir}/gradle/snyk.gradle"
 
 allprojects {
     group = 'io.github.joeljeremy7.externalizedproperties'

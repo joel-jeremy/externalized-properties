@@ -1,11 +1,12 @@
 name: Publish Snapshot to OSSRH
 on:
   workflow_run:
-    workflows: ["Gradle Build"]
+    workflows: ["Scans"]
     branches: [main]
     types: [completed]
 jobs:
   publish-to-ossrh:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest 
     permissions: 
       contents: read

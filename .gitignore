@@ -14,7 +14,9 @@ bin
 .factorypath
 .project
 .settings
-.springBeans
 
 .java-version
 .DS_Store
+
+snyk
+snyk.sarif

@@ -1,0 +1,6 @@
+snyk {
+  api = System.getenv('SNYK_TOKEN')
+  arguments = '--all-sub-projects --sarif-file-output=snyk.sarif'
+  autoDownload = true
+  autoUpdate = true
+}
