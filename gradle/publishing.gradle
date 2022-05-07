@@ -1,6 +1,10 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
+ext {
+    publishingArtifactId = rootProject.relativeProjectPath(project.path).replace(':', '-')
+}
+
 java {
     withJavadocJar()
     withSourcesJar()
@@ -9,10 +13,11 @@ java {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifactId = publishingArtifactId
             from components.java
 
             pom {
-                name = jar.archiveBaseName
+                name = publishingArtifactId
                 description = project.description
                 packaging = 'jar'
                 url = 'https://github.com/joeljeremy7/externalized-properties'
@@ -29,6 +34,7 @@ publishing {
                         id = 'joeljeremy7'
                         name = 'Joel Jeremy M. Marquez'
                         email = 'joeljeremy.marquez@gmail.com'
+                        roles = [ 'owner', 'developer' ]
                     }
                 }
 

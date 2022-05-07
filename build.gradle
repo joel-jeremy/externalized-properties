@@ -52,10 +52,8 @@ configure(javaProjects) {
     }
 
     java {
-        // Use project path relative to the root project path as base name of archives. 
-        // For nested projects such as resolvers, the ':' will be replaced by '-' 
-        // i.e. resolvers:database -> resolvers-database.jar
-        archivesBaseName = rootProject.relativeProjectPath(project.path).replace(':', '-')
+        // publishingArtifactId from publishing.gradle
+        archivesBaseName = publishingArtifactId
         
         toolchain {
             languageVersion = JavaLanguageVersion.of(11)
