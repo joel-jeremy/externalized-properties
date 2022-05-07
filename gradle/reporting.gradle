@@ -21,16 +21,3 @@ dependencies {
     testReportAggregation javaProjects
     jacocoAggregation javaProjects
 }
-
-coveralls {
-    sourceDirs = javaProjects.sourceSets.main.allSource.srcDirs.flatten()
-    jacocoReportPath = "${buildDir}/reports/jacoco/testCodeCoveregeReport/testCodeCoveregeReport.xml"
-}
-
-tasks.named('coveralls').configure {
-    group = 'Coverage reports'
-    description = 'Uploads the aggregated coverage report to Coveralls'
-
-    dependsOn testCodeCoverageReport
-    onlyIf { System.getenv('CI') }
-}

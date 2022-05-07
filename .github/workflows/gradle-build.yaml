@@ -1,7 +1,5 @@
 name: Gradle Build
 on: [push, pull_request]
-env:
-  MIN_JVM_VERSION: 8
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,12 +25,3 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build
-
-      - name: Publish Coverage
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        if: >
-          matrix.java == env.MIN_JVM_VERSION
-          && github.event_name == 'push'
-        run: ./gradlew coveralls -S
-        continue-on-error: true

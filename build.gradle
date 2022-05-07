@@ -7,6 +7,7 @@ plugins {
 }
 
 apply from: "${rootDir}/gradle/reporting.gradle"
+apply from: "${rootDir}/gradle/coveralls.gradle"
 
 allprojects {
     group = 'io.github.joeljeremy7.externalizedproperties'
