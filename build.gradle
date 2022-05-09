@@ -12,6 +12,8 @@ apply from: "${rootDir}/gradle/coveralls.gradle"
 apply from: "${rootDir}/gradle/snyk.gradle"
 
 allprojects {
+    apply from: "${rootDir}/gradle/dependencies.gradle"
+    
     group = 'io.github.joeljeremy7.externalizedproperties'
 
     def snapshotSuffix = rootProject.hasProperty('release') ? '' : '-SNAPSHOT'
@@ -29,9 +31,8 @@ configure(javaProjects) {
     apply plugin: 'java-library'
     apply plugin: 'java-test-fixtures'
 
-    apply from: "${rootDir}/gradle/dependencies.gradle"
-    apply from: "${rootDir}/gradle/code-quality.gradle"
     apply from: "${rootDir}/gradle/publishing.gradle"
+    apply from: "${rootDir}/gradle/code-quality.gradle"
 
     testing {
         suites { 

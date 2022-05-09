@@ -13,9 +13,6 @@ reporting {
 }
 
 def javaProjects = subprojects.findAll { new File(it.projectDir, "src").exists() }
-configure(javaProjects) {
-    apply plugin: 'java-library'
-}
 
 dependencies {
     testReportAggregation javaProjects
