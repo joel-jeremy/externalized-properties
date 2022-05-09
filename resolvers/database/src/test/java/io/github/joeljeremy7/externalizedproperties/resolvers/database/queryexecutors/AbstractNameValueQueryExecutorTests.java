@@ -287,13 +287,14 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
+            Connection connection = CONNECTION_PROVIDER.getConnection();
             List<String> propertiesToQuery = Arrays.asList(
                 "test.property.1",
                 "test.property.2"
             );
             
             Map<String, String> resolved = queryExecutor.queryProperties(
-                CONNECTION_PROVIDER.getConnection(),
+                connection,
                 propertiesToQuery
             );
 
@@ -337,14 +338,15 @@ public class AbstractNameValueQueryExecutorTests {
                     }
 
                 };
-
+            
+            Connection connection = CONNECTION_PROVIDER.getConnection();
             List<String> propertiesToQuery = Arrays.asList(
                 "test.property.1",
                 "test.property.2"
             );
             
             Map<String, String> resolved = queryExecutor.queryProperties(
-                CONNECTION_PROVIDER.getConnection(),
+                connection,
                 propertiesToQuery
             );
 
@@ -363,7 +365,7 @@ public class AbstractNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when schema is invalid")
-        void test10() {
+        void test10() throws SQLException {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
@@ -389,6 +391,7 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
+            Connection connection = CONNECTION_PROVIDER.getConnection();
             List<String> propertiesToQuery = Arrays.asList(
                 "test.property.1",
                 "test.property.2"
@@ -397,7 +400,7 @@ public class AbstractNameValueQueryExecutorTests {
             assertThrows(
                 SQLException.class, 
                 () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(), 
+                    connection, 
                     propertiesToQuery
                 )
             );
@@ -405,7 +408,7 @@ public class AbstractNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when table is invalid")
-        void test11() {
+        void test11() throws SQLException {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
@@ -426,6 +429,7 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
+            Connection connection = CONNECTION_PROVIDER.getConnection();
             List<String> propertiesToQuery = Arrays.asList(
                 "test.property.1",
                 "test.property.2"
@@ -434,7 +438,7 @@ public class AbstractNameValueQueryExecutorTests {
             assertThrows(
                 SQLException.class, 
                 () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(), 
+                    connection, 
                     propertiesToQuery
                 )
             );
@@ -442,7 +446,7 @@ public class AbstractNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when property name column is invalid")
-        void test12() {
+        void test12() throws SQLException {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
@@ -463,6 +467,7 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
+            Connection connection = CONNECTION_PROVIDER.getConnection();
             List<String> propertiesToQuery = Arrays.asList(
                 "test.property.1",
                 "test.property.2"
@@ -471,7 +476,7 @@ public class AbstractNameValueQueryExecutorTests {
             assertThrows(
                 SQLException.class, 
                 () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(), 
+                    connection, 
                     propertiesToQuery
                 )
             );
@@ -479,7 +484,7 @@ public class AbstractNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when property name column is invalid")
-        void test13() {
+        void test13() throws SQLException {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
@@ -500,6 +505,7 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
+            Connection connection = CONNECTION_PROVIDER.getConnection();
             List<String> propertiesToQuery = Arrays.asList(
                 "test.property.1",
                 "test.property.2"
@@ -508,7 +514,7 @@ public class AbstractNameValueQueryExecutorTests {
             assertThrows(
                 SQLException.class, 
                 () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(), 
+                    connection, 
                     propertiesToQuery
                 )
             );
