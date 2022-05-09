@@ -21,15 +21,15 @@ testing {
                 implementation project
                 implementation project(':core')
                 implementation(project.dependencies.testFixtures(project))
-                // implementation platform('org.testcontainers:testcontainers-bom:1.16.3')
-                implementation 'org.testcontainers:junit-jupiter:1.16.3'
-                implementation 'org.testcontainers:postgresql:1.16.3'
-                implementation 'org.testcontainers:mysql:1.16.3'
-                implementation "org.testcontainers:oracle-xe:1.16.3"
-                implementation "org.testcontainers:mssqlserver:1.16.3"
+                // implementation platform('org.testcontainers:testcontainers-bom:1.17.1')
+                implementation 'org.testcontainers:junit-jupiter:1.17.1'
+                implementation 'org.testcontainers:postgresql:1.17.1'
+                implementation 'org.testcontainers:mysql:1.17.1'
+                implementation "org.testcontainers:oracle-xe:1.17.1"
+                implementation "org.testcontainers:mssqlserver:1.17.1"
                 implementation 'com.zaxxer:HikariCP:5.0.1'
-                runtimeOnly 'org.postgresql:postgresql:42.3.3'
-                runtimeOnly 'mysql:mysql-connector-java:8.0.28'
+                runtimeOnly 'org.postgresql:postgresql:42.3.5'
+                runtimeOnly 'mysql:mysql-connector-java:8.0.29'
                 runtimeOnly 'com.oracle.database.jdbc:ojdbc8:21.5.0.0'
                 runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc:10.2.0.jre8'
             }
