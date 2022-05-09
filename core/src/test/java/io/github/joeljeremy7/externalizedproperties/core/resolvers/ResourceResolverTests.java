@@ -11,6 +11,11 @@ import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMetho
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,6 +25,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -30,6 +36,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ResourceResolverTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final ResourceReader PROPERTIES_READER = new PropertiesReader();
+    private static final ResourceReader JSON_READER = new JsonReader();
+    private static final ResourceReader YAML_READER = new YamlReader();
+    private static final ResourceReader XML_READER = new XmlReader();
     
     @Nested
     class FromUrlFactoryMethod {
@@ -43,21 +53,10 @@ public class ResourceResolverTests {
         }
 
         @Test
-        @DisplayName("should throw when URL resource does not exist")
-        void urlTest2() {
-            assertThrows(
-                IOException.class, 
-                () -> ResourceResolver.fromUrl(
-                    new URL("file://non.existent.properties")
-                )
-            );
-        }
-
-        @Test
         @DisplayName("should not return null")
-        void urlTest3() throws IOException {
+        void urlTest2() throws IOException {
             ResourceResolver resolver = ResourceResolver.fromUrl(
-                getClass().getResource("/test.properties")
+                classpathResource("/test.properties")
             );
 
             assertNotNull(resolver);
@@ -68,40 +67,28 @@ public class ResourceResolverTests {
         void urlAndReaderOverloadTest1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> ResourceResolver.fromUrl(null, new PropertiesReader())
+                () -> ResourceResolver.fromUrl(null, PROPERTIES_READER)
             );
         }
 
         @Test
-        @DisplayName("should throw when url argument is null")
+        @DisplayName("should throw when reader argument is null")
         void urlAndReaderOverloadTest2() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> ResourceResolver.fromUrl(
-                    getClass().getResource("/test.properties"), 
+                    classpathResource("/test.properties"), 
                     null
                 )
             );
         }
 
         @Test
-        @DisplayName("should throw when URL resource does not exist")
-        void urlAndReaderOverloadTest3() {
-            assertThrows(
-                IOException.class, 
-                () -> ResourceResolver.fromUrl(
-                    new URL("file://non.existent.properties"), 
-                    new PropertiesReader()
-                )
-            );
-        }
-
-        @Test
-        @DisplayName("should not return null")
-        void urlAndReaderOverloadTest4() throws IOException {
+        @DisplayName("should never return null")
+        void urlAndReaderOverloadTest3() throws IOException {
             ResourceResolver resolver = ResourceResolver.fromUrl(
-                getClass().getResource("/test.properties"), 
-                new PropertiesReader()
+                classpathResource("/test.properties"), 
+                PROPERTIES_READER
             );
 
             assertNotNull(resolver);
@@ -131,21 +118,10 @@ public class ResourceResolverTests {
         }
 
         @Test
-        @DisplayName("should throw when URI is invalid")
-        void uriTest3() {
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> ResourceResolver.fromUri(
-                    URI.create("invalid_uri")
-                )
-            );
-        }
-
-        @Test
         @DisplayName("should not return null")
-        void uriTest4() throws IOException, URISyntaxException {
+        void uriTest3() throws IOException, URISyntaxException {
             ResourceResolver resolver = ResourceResolver.fromUri(
-                getClass().getResource("/test.properties").toURI()
+                classpathResource("/test.properties").toURI()
             );
 
             assertNotNull(resolver);
@@ -156,7 +132,7 @@ public class ResourceResolverTests {
         void uriAndReaderOverloadTest1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> ResourceResolver.fromUri(null, new PropertiesReader())
+                () -> ResourceResolver.fromUri(null, PROPERTIES_READER)
             );
         }
 
@@ -166,7 +142,7 @@ public class ResourceResolverTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> ResourceResolver.fromUri(
-                    getClass().getResource("/test.properties").toURI(), 
+                    classpathResource("/test.properties").toURI(), 
                     null
                 )
             );
@@ -179,29 +155,17 @@ public class ResourceResolverTests {
                 IOException.class, 
                 () -> ResourceResolver.fromUri(
                     URI.create("file://non.existent.properties"), 
-                    new PropertiesReader()
-                )
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when URI is invalid")
-        void uriAndReaderOverloadTest4() {
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> ResourceResolver.fromUri(
-                    URI.create("invalid_uri"), 
-                    new PropertiesReader()
+                    PROPERTIES_READER
                 )
             );
         }
 
         @Test
         @DisplayName("should not return null")
-        void uriAndReaderOverloadTest5() throws IOException, URISyntaxException {
+        void uriAndReaderOverloadTest4() throws IOException, URISyntaxException {
             ResourceResolver resolver = ResourceResolver.fromUri(
-                getClass().getResource("/test.properties").toURI(), 
-                new PropertiesReader()
+                classpathResource("/test.properties").toURI(), 
+                PROPERTIES_READER
             );
 
             assertNotNull(resolver);
@@ -214,7 +178,7 @@ public class ResourceResolverTests {
         @DisplayName("should resolve loaded properties from URL")
         void test1() throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test.properties")
+                classpathResource("/test.properties")
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -234,7 +198,7 @@ public class ResourceResolverTests {
         )
         void test2() throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test.properties")
+                classpathResource("/test.properties")
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -246,12 +210,13 @@ public class ResourceResolverTests {
             assertFalse(result.isPresent());
         }
 
-        @Test
-        @DisplayName("should resolve loaded properties from URL using specified JSON reader")
-        void test3() throws IOException {
+        @ParameterizedTest
+        @ArgumentsSource(ResourceReaderProvider.class)
+        @DisplayName("should resolve loaded properties from URL using specified resource readers")
+        void test3(String resourcePath, ResourceReader resourceReader) throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test.json"),
-                new JsonReader()
+                classpathResource(resourcePath),
+                resourceReader
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -261,52 +226,14 @@ public class ResourceResolverTests {
                 resolver.resolve(proxyMethod, "property");
 
             assertTrue(result.isPresent());
-            // Matches value in test.json.
-            assertEquals("property-value", result.get());
-        }
-
-        @Test
-        @DisplayName("should resolve loaded properties from URL using specified YAML reader")
-        void test4() throws IOException {
-            ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test.yaml"),
-                new YamlReader()
-            );
-
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
-            );
-            Optional<String> result = 
-                resolver.resolve(proxyMethod, "property");
-
-            assertTrue(result.isPresent());
-            // Matches value in test.yaml.
-            assertEquals("property-value", result.get());
-        }
-
-        @Test
-        @DisplayName("should resolve loaded properties from URL using specified XML reader")
-        void test5() throws IOException {
-            ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test.xml"),
-                new XmlReader()
-            );
-
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
-            );
-            Optional<String> result = 
-                resolver.resolve(proxyMethod, "property");
-
-            assertTrue(result.isPresent());
-            // Matches value in test.xml.
+            // Matches value in test resource file.
             assertEquals("property-value", result.get());
         }
 
         @Test
         @DisplayName("should resolve raw resource contents loaded from URL")
-        void test6() throws IOException {
-            URL resourceUrl = getClass().getResource("/test.properties");
+        void test4() throws IOException {
+            URL resourceUrl = classpathResource("/test.properties");
             ResourceResolver resolver = resolverToTest(resourceUrl);
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -320,12 +247,13 @@ public class ResourceResolverTests {
             assertEquals(readAsString(resourceUrl.openStream()), result.get());
         }
 
-        @Test
-        @DisplayName("should flatten nested JSON properties")
-        void flattenTest1() throws IOException {
+        @ParameterizedTest
+        @ArgumentsSource(NestedResourceReaderProvider.class)
+        @DisplayName("should flatten nested properties (YAML/JSON/XML)")
+        void flattenTest1(String resourcePath, ResourceReader resourceReader) throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test-nested.json"),
-                new JsonReader()
+                classpathResource(resourcePath),
+                resourceReader
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -335,45 +263,7 @@ public class ResourceResolverTests {
                 resolver.resolve(proxyMethod, "property.nested.awesome");
 
             assertTrue(result.isPresent());
-            // Matches value in test-nested.json.
-            assertEquals("property-nested-awesome-value", result.get());
-        }
-
-        @Test
-        @DisplayName("should flatten nested YAML properties")
-        void flattenTest2() throws IOException {
-            ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test-nested.yaml"),
-                new YamlReader()
-            );
-
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
-            );
-            Optional<String> result = 
-                resolver.resolve(proxyMethod, "property.nested.awesome");
-
-            assertTrue(result.isPresent());
-            // Matches value in test-nested.json.
-            assertEquals("property-nested-awesome-value", result.get());
-        }
-
-        @Test
-        @DisplayName("should flatten nested XML properties")
-        void flattenTest3() throws IOException {
-            ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test-nested.xml"),
-                new XmlReader()
-            );
-
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
-            );
-            Optional<String> result = 
-                resolver.resolve(proxyMethod, "property.nested.awesome");
-
-            assertTrue(result.isPresent());
-            // Matches value in test-nested.json.
+            // Matches value in test-nested resource file.
             assertEquals("property-nested-awesome-value", result.get());
         }
 
@@ -381,8 +271,8 @@ public class ResourceResolverTests {
         @DisplayName("should flatten JSON array properties into array notation")
         void flattenArrayTest1() throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test-nested.json"),
-                new JsonReader()
+                classpathResource("/test-nested.json"),
+                JSON_READER
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -408,8 +298,8 @@ public class ResourceResolverTests {
         @DisplayName("should flatten YAML array properties into array notation")
         void flattenArrayTest2() throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test-nested.yaml"),
-                new YamlReader()
+                classpathResource("/test-nested.yaml"),
+                YAML_READER
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -435,8 +325,8 @@ public class ResourceResolverTests {
         @DisplayName("should flatten XML array properties into array notation")
         void flattenArrayTest3() throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test-nested.xml"),
-                new XmlReader()
+                classpathResource("/test-nested.xml"),
+                XML_READER
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -462,8 +352,8 @@ public class ResourceResolverTests {
         @DisplayName("should flatten JSON array properties into array notation")
         void flattenArrayTest4() throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test-nested.json"),
-                new JsonReader()
+                classpathResource("/test-nested.json"),
+                JSON_READER
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -482,8 +372,8 @@ public class ResourceResolverTests {
         @DisplayName("should flatten YAML array properties into array notation")
         void flattenArrayTest5() throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test-nested.yaml"),
-                new YamlReader()
+                classpathResource("/test-nested.yaml"),
+                YAML_READER
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -502,8 +392,8 @@ public class ResourceResolverTests {
         @DisplayName("should flatten XML array properties into array notation")
         void flattenArrayTest6() throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test-nested.xml"),
-                new XmlReader()
+                classpathResource("/test-nested.xml"),
+                XML_READER
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -522,8 +412,8 @@ public class ResourceResolverTests {
         @DisplayName("should convert null to empty String")
         void flattenNullTest1() throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test-nested.json"),
-                new JsonReader()
+                classpathResource("/test-nested.json"),
+                JSON_READER
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -542,8 +432,8 @@ public class ResourceResolverTests {
         @DisplayName("should convert null to empty String")
         void flattenNullTest2() throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test-nested.yaml"),
-                new YamlReader()
+                classpathResource("/test-nested.yaml"),
+                YAML_READER
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -562,8 +452,8 @@ public class ResourceResolverTests {
         @DisplayName("should convert null to empty String")
         void flattenNullTest3() throws IOException {
             ResourceResolver resolver = resolverToTest(
-                getClass().getResource("/test-nested.xml"),
-                new XmlReader()
+                classpathResource("/test-nested.xml"),
+                XML_READER
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -596,9 +486,41 @@ public class ResourceResolverTests {
         }
         return output.toString(StandardCharsets.UTF_8.name());
     }
+    
+    private URL classpathResource(String classpathResource) {
+        return getClass().getResource(classpathResource);
+    }
 
     public static interface ProxyInterface {
         @ExternalizedProperty("property")
         String property();
+    }
+
+    public static class ResourceReaderProvider implements ArgumentsProvider {
+        @Override
+        public Stream<? extends Arguments> provideArguments(
+                ExtensionContext context
+        ) throws Exception {
+            // File/resource and reader mappings.
+            return Stream.of(
+                Arguments.of("/test.yaml", YAML_READER),
+                Arguments.of("/test.json", JSON_READER),
+                Arguments.of("/test.xml", XML_READER)
+            );
+        }
+    }
+
+    public static class NestedResourceReaderProvider implements ArgumentsProvider {
+        @Override
+        public Stream<? extends Arguments> provideArguments(
+                ExtensionContext context
+        ) throws Exception {
+            // File/resource and reader mappings.
+            return Stream.of(
+                Arguments.of("/test-nested.yaml", YAML_READER),
+                Arguments.of("/test-nested.json", JSON_READER),
+                Arguments.of("/test-nested.xml", XML_READER)
+            );
+        }
     }
 }

@@ -17,8 +17,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -31,10 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class RootProcessorTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
-
-    private static final String AES_ALGORITHM = "AES";
-    private static final SecretKey AES_SECRET_KEY = EncryptionUtils.generateAesSecretKey();
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES = 
+        ExternalizedProperties.builder().withDefaults().build();
     
+    @Nested
     class Constructor {
         @Test
         @DisplayName("should throw when externalized properties argument is null")
@@ -54,7 +54,7 @@ public class RootProcessorTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootProcessor(
-                    ExternalizedProperties.builder().withDefaults().build(),
+                    EXTERNALIZED_PROPERTIES,
                     (ProcessorProvider[])null
                 )
             );
@@ -66,7 +66,7 @@ public class RootProcessorTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootProcessor(
-                    ExternalizedProperties.builder().withDefaults().build(),
+                    EXTERNALIZED_PROPERTIES,
                     (Collection<ProcessorProvider<?>>)null
                 )
             );
@@ -99,9 +99,7 @@ public class RootProcessorTests {
             ProcessorProvider<RootProcessor> provider = 
                 RootProcessor.provider(DecryptProcessor.provider(createAesDecryptor()));
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 
@@ -135,9 +133,7 @@ public class RootProcessorTests {
                     Arrays.asList(DecryptProcessor.provider(createAesDecryptor()))
                 );
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 
@@ -184,8 +180,7 @@ public class RootProcessorTests {
             );
 
             String plainText = "plain-text-value";
-            String encryptedBase64Encoded = 
-                EncryptionUtils.encryptAesBase64(plainText, AES_ALGORITHM, AES_SECRET_KEY);
+            String encryptedBase64Encoded = EncryptionUtils.encryptAesBase64(plainText);
 
             String result = processor.process(
                 proxyMethod, 
@@ -217,8 +212,7 @@ public class RootProcessorTests {
             );
 
             String plainText = "plain-text-value";
-            String encryptedBase64Encoded = 
-                EncryptionUtils.encryptAesBase64(plainText, AES_ALGORITHM, AES_SECRET_KEY);
+            String encryptedBase64Encoded = EncryptionUtils.encryptAesBase64(plainText);
 
             assertThrows(
                 ProcessingException.class, 
@@ -241,15 +235,22 @@ public class RootProcessorTests {
 
     private static Decryptor createAesDecryptor() {
         try {
-            return JceDecryptor.factory().symmetric(AES_ALGORITHM, AES_SECRET_KEY);
-        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+            return JceDecryptor.factory().symmetric(
+                EncryptionUtils.AES_GCM_ALGORITHM, 
+                EncryptionUtils.DEFAULT_AES_SECRET_KEY,
+                EncryptionUtils.DEFAULT_GCM_PARAMETER_SPEC
+            );
+        } catch (InvalidKeyException | 
+                NoSuchAlgorithmException | 
+                NoSuchPaddingException | 
+                InvalidAlgorithmParameterException e) {
             throw new IllegalStateException("Cannot instantiate decryptor.", e);
         }
     }
 
     public static interface ProxyInterface {
         @ExternalizedProperty("test.decrypt")
-        @Decrypt(AES_ALGORITHM)
+        @Decrypt(EncryptionUtils.AES_GCM_ALGORITHM)
         String decrypt();
     }
 }

@@ -20,8 +20,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -38,9 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RootResolverTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
-    
-    private static final String AES_ALGORITHM = "AES";
-    private static final SecretKey AES_SECRET_KEY = EncryptionUtils.generateAesSecretKey();
     
     @Nested
     class Constructor {
@@ -254,9 +251,7 @@ public class RootResolverTests {
         public void test5() {
             String originalPropertyValue = "property-value";
             String base64EncodedPropertyValue = EncryptionUtils.encryptAesBase64(
-                originalPropertyValue, 
-                AES_ALGORITHM, 
-                AES_SECRET_KEY
+                originalPropertyValue
             );
             Map<String, String> propertySource = new HashMap<>();
             propertySource.put("test.decrypt", base64EncodedPropertyValue);
@@ -306,8 +301,15 @@ public class RootResolverTests {
 
     private static Decryptor getAesDecryptor() {
         try {
-            return JceDecryptor.factory().symmetric(AES_ALGORITHM, AES_SECRET_KEY);
-        } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+            return JceDecryptor.factory().symmetric(
+                EncryptionUtils.AES_GCM_ALGORITHM, 
+                EncryptionUtils.DEFAULT_AES_SECRET_KEY,
+                EncryptionUtils.DEFAULT_GCM_PARAMETER_SPEC 
+            );
+        } catch (InvalidKeyException | 
+                NoSuchAlgorithmException | 
+                NoSuchPaddingException | 
+                InvalidAlgorithmParameterException e) {
             throw new IllegalStateException("Cannot instantiate decryptor.", e);
         }
     }
@@ -320,7 +322,7 @@ public class RootResolverTests {
         String propertyVariable();
 
         @ExternalizedProperty("test.decrypt")
-        @Decrypt(AES_ALGORITHM)
+        @Decrypt(EncryptionUtils.AES_GCM_ALGORITHM)
         String propertyDecrypt();
     }
 }

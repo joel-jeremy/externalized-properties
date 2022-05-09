@@ -8,6 +8,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import java.security.AlgorithmParameters;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
@@ -15,6 +16,10 @@ import java.util.Base64;
 
 public class EncryptionUtils {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    
+    public static final SecretKey DEFAULT_AES_SECRET_KEY = generateAesSecretKey();
+    public static final AlgorithmParameterSpec DEFAULT_GCM_PARAMETER_SPEC = createGcmParameterSpec();
+    public static final AlgorithmParameters DEFAULT_GCM_PARAMETERS = createGcmParameters();
 
     public static final int DEFAULT_AES_KEY_SIZE = 256;
     public static final String AES_ALGORITHM = "AES";
@@ -25,9 +30,11 @@ public class EncryptionUtils {
     public static final int DEFAULT_GCM_TAG_LENGTH = 128;
     public static final int DEFAULT_GCM_IV_LENGTH = 12;
         
-        
     public static final int DEFAULT_RSA_KEY_SIZE = 1024;
     public static final String RSA_ALGORITHM = "RSA";
+    public static final KeyPair DEFAULT_RSA_KEY_PAIR = generateRsaKeyPair();
+    public static final PrivateKey DEFAULT_RSA_PRIVATE_KEY = DEFAULT_RSA_KEY_PAIR.getPrivate();
+    public static final PublicKey DEFAULT_RSA_PUBLIC_KEY = DEFAULT_RSA_KEY_PAIR.getPublic();
 
     private EncryptionUtils(){}
 
@@ -107,6 +114,12 @@ public class EncryptionUtils {
         }
     }
 
+    public static String encryptRsaBase64(String value) {
+        return Base64.getEncoder().encodeToString(
+            encryptRsa(value, DEFAULT_RSA_PUBLIC_KEY)
+        );
+    }
+
     public static String encryptRsaBase64(String value, PublicKey publicKey) {
         return Base64.getEncoder().encodeToString(
             encryptRsa(value, publicKey)
@@ -124,6 +137,10 @@ public class EncryptionUtils {
                 e
             );
         }
+    }
+
+    public static String encryptAesBase64(String value) {
+        return Base64.getEncoder().encodeToString(encryptAes(value));
     }
 
     public static String encryptAesBase64(
@@ -144,6 +161,15 @@ public class EncryptionUtils {
     ) {
         return Base64.getEncoder().encodeToString(
             encryptAes(value, aesAlgorithm, secretKey, algorithmParameterSpec)
+        );
+    }
+
+    public static byte[] encryptAes(String value) {
+        return encryptAes(
+            value,
+            AES_GCM_ALGORITHM,
+            DEFAULT_AES_SECRET_KEY,
+            DEFAULT_GCM_PARAMETER_SPEC
         );
     }
 

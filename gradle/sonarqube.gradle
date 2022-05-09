@@ -1,0 +1,14 @@
+allprojects {
+    apply plugin: 'org.sonarqube'
+}
+
+sonarqube {
+    properties {
+        property 'sonar.organization', 'externalized-properties'
+        property 'sonar.login', System.getenv('SONAR_TOKEN')
+        property 'sonar.host.url', 'https://sonarcloud.io'
+        property 'sonar.coverage.jacoco.xmlReportPaths', "${buildDir}/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml"
+    }
+}
+
+tasks.sonarqube.dependsOn(testCodeCoverageReport)

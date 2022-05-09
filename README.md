@@ -6,6 +6,7 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/joeljeremy7/externalized-properties/blob/main/LICENSE)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/joeljeremy7/externalized-properties.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/joeljeremy7/externalized-properties/alerts/)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/joeljeremy7/externalized-properties.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/joeljeremy7/externalized-properties/context:java)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=joeljeremy7_externalized-properties&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=joeljeremy7_externalized-properties)
 
 A lightweight and extensible library to resolve application properties from various external sources.
 
