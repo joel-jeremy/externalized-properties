@@ -92,17 +92,12 @@ public static void main(String[] args) {
 private ExternalizedProperties buildExternalizedProperties() {
     // Create the ExternalizedProperties instance with default and additional resolvers.
     // Default resolvers include system properties and environment variable resolvers.
-
+    
     return ExternalizedProperties.builder()
         .withDefaultResolvers() 
         .resolvers(
             ResourceResolver.provider(getClass().getResource("/app.properties")),
-            ResourceResolver.provider(
-                getClass().getResource("/app.yaml"),
-                // There is no built-in YamlReader class.
-                // See: core/src/test/java/io/github/joeljeremy7/externalizedproperties/core/resolvers/resourcereaders
-                new YamlReader()
-            ),
+            MapResolver.provider(getPropertiesMap()),
             // DatabaseResolver is not part of the core module. It is part of a separate resolver-database module.
             DatabaseResolver.provider(new JdbcConnectionProvider(getDataSource())),
             // CustomAwsSsmResolver is an example custom resolver implementation which resolves properties from AWS SSM.
@@ -131,21 +126,28 @@ public interface ApplicationProperties {
 }
 
 public static void main(String[] args) {
+    // Processor to decrypt @Decrypt("MyAESDecryptor")
+    ProcessorProvider<DecryptProcessor> aesDecryptProcessor = DecryptProcessor.provider(
+        JceDecryptor.factory().symmetric(
+            "MyAESDecryptor",
+            "AES/GCM/NoPadding", 
+            getSecretKey(),
+            getGcmParameterSpec()
+        )
+    );
+
+    // Processor to decrypt @Decrypt("MyRSADecryptor")
+    ProcessorProvider<DecryptProcessor> rsaDecryptProcessor = DecryptProcessor.provider(
+        JceDecryptor.factory().asymmetric(
+            "MyRSADecryptor",
+            "RSA", 
+            getPrivateKey()
+        )
+    );
+
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
         .withDefaultResolvers()
-        .processors(
-            DecryptProcessor.provider(JceDecryptor.factory().symmetric(
-                "MyAESDecryptor",
-                "AES/GCM/NoPadding", 
-                getSecretKey(),
-                getGcmParameterSpec()
-            )),
-            DecryptProcessor.provider(JceDecryptor.factory().asymmetric(
-                "MyRSADecryptor",
-                "RSA", 
-                getPrivateKey()
-            ))
-        )
+        .processors(aesDecryptProcessor, rsaDecryptProcessor)
         .build();
 
      // Proxied interface.
