@@ -24,8 +24,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.AlgorithmParameters;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.Security;
@@ -46,16 +46,14 @@ public class DecryptProcessorTests {
     private static final String AES_ALGORITHM = EncryptionUtils.AES_ALGORITHM;
     private static final String AES_GCM_ALGORITHM = EncryptionUtils.AES_GCM_ALGORITHM;
     private static final AlgorithmParameterSpec GCM_PARAMETER_SPEC = 
-        EncryptionUtils.createGcmParameterSpec();
-    private static final AlgorithmParameters GCM_PARAMETERS = 
-        EncryptionUtils.createGcmParameters();
-    private static final SecretKey AES_SECRET_KEY = EncryptionUtils.generateAesSecretKey();
+        EncryptionUtils.DEFAULT_GCM_PARAMETER_SPEC;
+    private static final AlgorithmParameters GCM_PARAMETERS = EncryptionUtils.DEFAULT_GCM_PARAMETERS;
+    private static final SecretKey AES_SECRET_KEY = EncryptionUtils.DEFAULT_AES_SECRET_KEY;
     private static final Decryptor AES_GCM_DECRYPTOR = createSymmetricDecryptor();
 
     // RSA constants.
-
-    private static final String RSA_ALGORITHM = "RSA";
-    private static final KeyPair RSA_KEY_PAIR = EncryptionUtils.generateRsaKeyPair();
+    private static final String RSA_ALGORITHM = EncryptionUtils.RSA_ALGORITHM;
+    private static final PrivateKey RSA_PRIVATE_KEY = EncryptionUtils.DEFAULT_RSA_PRIVATE_KEY;
     private static final Decryptor RSA_DECRYPTOR = createAsymmetricDecryptor();
 
     private static final String BOUNCY_CASTLE_PROVIDER_NAME = "BC";
@@ -150,9 +148,7 @@ public class DecryptProcessorTests {
 
             String plainText = "plain-text";
             String aesEncryptedBase64 = EncryptionUtils.encryptAesBase64(
-                plainText, 
-                AES_GCM_ALGORITHM,
-                AES_SECRET_KEY
+                plainText
             );
             
             assertThrows(
@@ -171,9 +167,7 @@ public class DecryptProcessorTests {
 
             String plainText = "plain-text";
             String aesEncryptedBase64 = EncryptionUtils.encryptAesBase64(
-                plainText, 
-                AES_GCM_ALGORITHM,
-                AES_SECRET_KEY
+                plainText
             );
             
             assertThrows(
@@ -194,9 +188,7 @@ public class DecryptProcessorTests {
             // Oops! This is encrypted with AES, not RSA. 
             // Should throw when decrypting with RSA.
             String aesEncryptedBase64 = EncryptionUtils.encryptAesBase64(
-                plainText, 
-                AES_GCM_ALGORITHM, 
-                AES_SECRET_KEY
+                plainText
             );
             
             assertThrows(
@@ -214,12 +206,7 @@ public class DecryptProcessorTests {
             );
 
             String plainText = "plain-text";
-            byte[] encrypted = EncryptionUtils.encryptAes(
-                plainText, 
-                AES_GCM_ALGORITHM, 
-                AES_SECRET_KEY,
-                GCM_PARAMETER_SPEC
-            );
+            byte[] encrypted = EncryptionUtils.encryptAes(plainText);
 
             // Encrypted bytes were not encoded in Base64.
             String notInBase64Format = new String(encrypted, StandardCharsets.UTF_8);
@@ -274,8 +261,7 @@ public class DecryptProcessorTests {
             );
 
             String plainText = "plain-text";
-            String rsaEncryptedBase64 = 
-                EncryptionUtils.encryptRsaBase64(plainText, RSA_KEY_PAIR.getPublic());
+            String rsaEncryptedBase64 = EncryptionUtils.encryptRsaBase64(plainText);
             String decrypted = processor.process(proxyMethod, rsaEncryptedBase64);
 
             assertEquals(plainText, decrypted);
@@ -389,7 +375,7 @@ public class DecryptProcessorTests {
                     JceDecryptor.Factory factory = JceDecryptor.factory();
                     assertThrows(
                         IllegalArgumentException.class, 
-                        () -> factory.asymmetric(null, RSA_KEY_PAIR.getPrivate())
+                        () -> factory.asymmetric(null, RSA_PRIVATE_KEY)
                     );
                 }
 
@@ -408,7 +394,7 @@ public class DecryptProcessorTests {
                 void test1() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
                     JceDecryptor.Factory factory = JceDecryptor.factory();
                     JceDecryptor decryptor = 
-                        factory.asymmetric(RSA_ALGORITHM, RSA_KEY_PAIR.getPrivate());
+                        factory.asymmetric(RSA_ALGORITHM, RSA_PRIVATE_KEY);
                     assertNotNull(decryptor);
                 }
 
@@ -418,7 +404,7 @@ public class DecryptProcessorTests {
                     JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
                     JceDecryptor decryptor = factory.asymmetric(
                         RSA_ALGORITHM, 
-                        RSA_KEY_PAIR.getPrivate()
+                        RSA_PRIVATE_KEY
                     );
                     assertNotNull(decryptor);
                 }
@@ -431,7 +417,7 @@ public class DecryptProcessorTests {
                     );
                     JceDecryptor decryptor = factory.asymmetric(
                         RSA_ALGORITHM, 
-                        RSA_KEY_PAIR.getPrivate()
+                        RSA_PRIVATE_KEY
                     );
                     assertNotNull(decryptor);
                 }
@@ -445,7 +431,7 @@ public class DecryptProcessorTests {
                     JceDecryptor.Factory factory = JceDecryptor.factory();
                     assertThrows(
                         IllegalArgumentException.class, 
-                        () -> factory.asymmetric(null, RSA_ALGORITHM, RSA_KEY_PAIR.getPrivate())
+                        () -> factory.asymmetric(null, RSA_ALGORITHM, RSA_PRIVATE_KEY)
                     );
                 }
 
@@ -455,7 +441,7 @@ public class DecryptProcessorTests {
                     JceDecryptor.Factory factory = JceDecryptor.factory();
                     assertThrows(
                         IllegalArgumentException.class, 
-                        () -> factory.asymmetric("CustomName", null, RSA_KEY_PAIR.getPrivate())
+                        () -> factory.asymmetric("CustomName", null, RSA_PRIVATE_KEY)
                     );
                 }
 
@@ -474,7 +460,7 @@ public class DecryptProcessorTests {
                 void test1() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
                     JceDecryptor.Factory factory = JceDecryptor.factory();
                     JceDecryptor decryptor = 
-                        factory.asymmetric("CustomName", RSA_ALGORITHM, RSA_KEY_PAIR.getPrivate());
+                        factory.asymmetric("CustomName", RSA_ALGORITHM, RSA_PRIVATE_KEY);
                     assertNotNull(decryptor);
                 }
 
@@ -485,7 +471,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.asymmetric(
                         "CustomName",
                         RSA_ALGORITHM, 
-                        RSA_KEY_PAIR.getPrivate()
+                        RSA_PRIVATE_KEY
                     );
                     assertNotNull(decryptor);
                 }
@@ -499,7 +485,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.asymmetric(
                         "CustomName",
                         RSA_ALGORITHM, 
-                        RSA_KEY_PAIR.getPrivate()
+                        RSA_PRIVATE_KEY
                     );
                     assertNotNull(decryptor);
                 }
@@ -511,7 +497,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.asymmetric(
                         "CustomName",
                         RSA_ALGORITHM, 
-                        RSA_KEY_PAIR.getPrivate()
+                        RSA_PRIVATE_KEY
                     );
                     assertNotNull(decryptor);
                     assertEquals("CustomName", decryptor.name());
@@ -528,7 +514,7 @@ public class DecryptProcessorTests {
                         IllegalArgumentException.class, 
                         () -> factory.asymmetric(
                             null, 
-                            RSA_KEY_PAIR.getPrivate(),
+                            RSA_PRIVATE_KEY,
                             SecureRandom.getInstanceStrong()
                         )
                     );
@@ -554,7 +540,7 @@ public class DecryptProcessorTests {
                     JceDecryptor.Factory factory = JceDecryptor.factory();
                     JceDecryptor decryptor = factory.asymmetric(
                         RSA_ALGORITHM, 
-                        RSA_KEY_PAIR.getPrivate(),
+                        RSA_PRIVATE_KEY,
                         SecureRandom.getInstanceStrong()
                     );
                     assertNotNull(decryptor);
@@ -566,7 +552,7 @@ public class DecryptProcessorTests {
                     JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
                     JceDecryptor decryptor = factory.asymmetric(
                         RSA_ALGORITHM, 
-                        RSA_KEY_PAIR.getPrivate(),
+                        RSA_PRIVATE_KEY,
                         SecureRandom.getInstanceStrong()
                     );
                     assertNotNull(decryptor);
@@ -580,7 +566,7 @@ public class DecryptProcessorTests {
                     );
                     JceDecryptor decryptor = factory.asymmetric(
                         RSA_ALGORITHM, 
-                        RSA_KEY_PAIR.getPrivate(),
+                        RSA_PRIVATE_KEY,
                         SecureRandom.getInstanceStrong()
                     );
                     assertNotNull(decryptor);
@@ -598,7 +584,7 @@ public class DecryptProcessorTests {
                         () -> factory.asymmetric(
                             null, 
                             RSA_ALGORITHM,
-                            RSA_KEY_PAIR.getPrivate(),
+                            RSA_PRIVATE_KEY,
                             SecureRandom.getInstanceStrong()
                         )
                     );
@@ -613,7 +599,7 @@ public class DecryptProcessorTests {
                         () -> factory.asymmetric(
                             "CustomName",
                             null, 
-                            RSA_KEY_PAIR.getPrivate(),
+                            RSA_PRIVATE_KEY,
                             SecureRandom.getInstanceStrong()
                         )
                     );
@@ -641,7 +627,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.asymmetric(
                         "CustomName",
                         RSA_ALGORITHM, 
-                        RSA_KEY_PAIR.getPrivate(),
+                        RSA_PRIVATE_KEY,
                         SecureRandom.getInstanceStrong()
                     );
                     assertNotNull(decryptor);
@@ -654,7 +640,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.asymmetric(
                         "CustomName",
                         RSA_ALGORITHM, 
-                        RSA_KEY_PAIR.getPrivate(),
+                        RSA_PRIVATE_KEY,
                         SecureRandom.getInstanceStrong()
                     );
                     assertNotNull(decryptor);
@@ -669,7 +655,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.asymmetric(
                         "CustomName",
                         RSA_ALGORITHM, 
-                        RSA_KEY_PAIR.getPrivate(),
+                        RSA_PRIVATE_KEY,
                         SecureRandom.getInstanceStrong()
                     );
                     assertNotNull(decryptor);
@@ -682,7 +668,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.asymmetric(
                         "CustomName",
                         RSA_ALGORITHM, 
-                        RSA_KEY_PAIR.getPrivate(),
+                        RSA_PRIVATE_KEY,
                         SecureRandom.getInstanceStrong()
                     );
                     assertNotNull(decryptor);
@@ -2050,7 +2036,7 @@ public class DecryptProcessorTests {
 
     private static Decryptor createAsymmetricDecryptor() {
         try {
-            return JceDecryptor.factory().asymmetric(RSA_ALGORITHM, RSA_KEY_PAIR.getPrivate());
+            return JceDecryptor.factory().asymmetric(RSA_ALGORITHM, RSA_PRIVATE_KEY);
         } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new IllegalStateException("Cannot instantiate decryptor.", e);
         }
