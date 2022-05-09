@@ -44,7 +44,7 @@ public class AbstractNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when schema abstract method returns null")
-        void test1() {
+        void test1() throws SQLException {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
@@ -70,17 +70,17 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
-            assertThrows(IllegalStateException.class, 
-                () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(),
-                    Arrays.asList("test.property.1")
-                )
+            Connection connection = CONNECTION_PROVIDER.getConnection();
+            List<String> propertiesToQuery = Arrays.asList("test.property.1");
+            assertThrows(
+                IllegalStateException.class, 
+                () -> queryExecutor.queryProperties(connection, propertiesToQuery)
             );
         }
 
         @Test
         @DisplayName("should throw when table abstract method returns null")
-        void test2() {
+        void test2() throws SQLException {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
@@ -101,17 +101,17 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
-            assertThrows(IllegalStateException.class, 
-                () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(),
-                    Arrays.asList("test.property.1")
-                )
+            Connection connection = CONNECTION_PROVIDER.getConnection();
+            List<String> propertiesToQuery = Arrays.asList("test.property.1");
+            assertThrows(
+                IllegalStateException.class, 
+                () -> queryExecutor.queryProperties(connection, propertiesToQuery)
             );
         }
 
         @Test
         @DisplayName("should throw when table abstract method returns an empty string")
-        void test3() {
+        void test3() throws SQLException {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
@@ -132,17 +132,17 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
-            assertThrows(IllegalStateException.class, 
-                () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(),
-                    Arrays.asList("test.property.1")
-                )
+            Connection connection = CONNECTION_PROVIDER.getConnection();
+            List<String> propertiesToQuery = Arrays.asList("test.property.1");
+            assertThrows(
+                IllegalStateException.class, 
+                () -> queryExecutor.queryProperties(connection, propertiesToQuery)
             );
         }
 
         @Test
         @DisplayName("should throw when propertyNameColumn abstract method returns null")
-        void test4() {
+        void test4() throws SQLException {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
@@ -163,17 +163,17 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
-            assertThrows(IllegalStateException.class, 
-                () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(),
-                    Arrays.asList("test.property.1")
-                )
+            Connection connection = CONNECTION_PROVIDER.getConnection();
+            List<String> propertiesToQuery = Arrays.asList("test.property.1");
+            assertThrows(
+                IllegalStateException.class, 
+                () -> queryExecutor.queryProperties(connection, propertiesToQuery)
             );
         }
 
         @Test
         @DisplayName("should throw when propertyNameColumn abstract method returns an empty string")
-        void test5() {
+        void test5() throws SQLException {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
@@ -194,17 +194,17 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
-            assertThrows(IllegalStateException.class, 
-                () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(),
-                    Arrays.asList("test.property.1")
-                )
+            Connection connection = CONNECTION_PROVIDER.getConnection();
+            List<String> propertiesToQuery = Arrays.asList("test.property.1");
+            assertThrows(
+                IllegalStateException.class, 
+                () -> queryExecutor.queryProperties(connection, propertiesToQuery)
             );
         }
 
         @Test
         @DisplayName("should throw when propertyValueColumn abstract method returns null")
-        void test6() {
+        void test6() throws SQLException {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
@@ -225,17 +225,17 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
-            assertThrows(IllegalStateException.class, 
-                () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(),
-                    Arrays.asList("test.property.1")
-                )
+            Connection connection = CONNECTION_PROVIDER.getConnection();
+            List<String> propertiesToQuery = Arrays.asList("test.property.1");
+            assertThrows(
+                IllegalStateException.class, 
+                () -> queryExecutor.queryProperties(connection, propertiesToQuery)
             );
         }
 
         @Test
         @DisplayName("should throw when propertyValueColumn abstract method returns an empty string")
-        void test7() {
+        void test7() throws SQLException {
             AbstractNameValueQueryExecutor queryExecutor = 
                 new AbstractNameValueQueryExecutor() {
 
@@ -256,11 +256,11 @@ public class AbstractNameValueQueryExecutorTests {
 
                 };
 
-            assertThrows(IllegalStateException.class, 
-                () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(),
-                    Arrays.asList("test.property.1")
-                )
+            Connection connection = CONNECTION_PROVIDER.getConnection();
+            List<String> propertiesToQuery = Arrays.asList("test.property.1");
+            assertThrows(
+                IllegalStateException.class, 
+                () -> queryExecutor.queryProperties(connection, propertiesToQuery)
             );
         }
 

@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SimpleNameValueQueryExecutorTests {
     static final int NUMBER_OF_TEST_ENTRIES = 2;
-    static final String H2_CONNECTION_STRING = 
-        H2Utils.buildConnectionString(SimpleNameValueQueryExecutorTests.class.getSimpleName());
-    static final ConnectionProvider CONNECTION_PROVIDER = 
-        H2Utils.createConnectionProvider(
-            H2_CONNECTION_STRING, 
-            "sa"
-        );
+    static final String H2_CONNECTION_STRING = H2Utils.buildConnectionString(
+        SimpleNameValueQueryExecutorTests.class.getSimpleName()
+    );
+    static final ConnectionProvider CONNECTION_PROVIDER = H2Utils.createConnectionProvider(
+        H2_CONNECTION_STRING, 
+        "sa"
+    );
 
     @BeforeAll
     static void setup() throws SQLException {
@@ -129,13 +129,14 @@ public class SimpleNameValueQueryExecutorTests {
             SimpleNameValueQueryExecutor queryExecutor =
                 new SimpleNameValueQueryExecutor();
 
+            Connection connection = CONNECTION_PROVIDER.getConnection();
             List<String> propertiesToQuery = Arrays.asList(
                 "test.property.1",
                 "test.property.2"
             );
             
             Map<String, String> resolved = queryExecutor.queryProperties(
-                CONNECTION_PROVIDER.getConnection(),
+                connection,
                 propertiesToQuery
             );
 
@@ -163,13 +164,14 @@ public class SimpleNameValueQueryExecutorTests {
                     SimpleNameValueQueryExecutor.PROPERTY_VALUE_COLUMN
                 );
 
+            Connection connection = CONNECTION_PROVIDER.getConnection();
             List<String> propertiesToQuery = Arrays.asList(
                 "test.property.1",
                 "test.property.2"
             );
             
             Map<String, String> resolved = queryExecutor.queryProperties(
-                CONNECTION_PROVIDER.getConnection(),
+                connection,
                 propertiesToQuery
             );
 
@@ -188,7 +190,7 @@ public class SimpleNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when schema is invalid")
-        void test3() {
+        void test3() throws SQLException {
             SimpleNameValueQueryExecutor queryExecutor =
                 new SimpleNameValueQueryExecutor(
                     "NON_EXISTENT_SCHEMA",
@@ -197,6 +199,7 @@ public class SimpleNameValueQueryExecutorTests {
                     SimpleNameValueQueryExecutor.PROPERTY_VALUE_COLUMN
                 );
 
+            Connection connection = CONNECTION_PROVIDER.getConnection();
             List<String> propertiesToQuery = Arrays.asList(
                 "test.property.1",
                 "test.property.2"
@@ -205,7 +208,7 @@ public class SimpleNameValueQueryExecutorTests {
             assertThrows(
                 SQLException.class, 
                 () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(), 
+                    connection, 
                     propertiesToQuery
                 )
             );
@@ -213,7 +216,7 @@ public class SimpleNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when table is invalid")
-        void test4() {
+        void test4() throws SQLException {
             SimpleNameValueQueryExecutor queryExecutor =
                 new SimpleNameValueQueryExecutor(
                     "PUBLIC",
@@ -222,6 +225,7 @@ public class SimpleNameValueQueryExecutorTests {
                     SimpleNameValueQueryExecutor.PROPERTY_VALUE_COLUMN
                 );
 
+            Connection connection = CONNECTION_PROVIDER.getConnection();
             List<String> propertiesToQuery = Arrays.asList(
                 "test.property.1",
                 "test.property.2"
@@ -230,7 +234,7 @@ public class SimpleNameValueQueryExecutorTests {
             assertThrows(
                 SQLException.class, 
                 () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(), 
+                    connection, 
                     propertiesToQuery
                 )
             );
@@ -238,7 +242,7 @@ public class SimpleNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when property name column is invalid")
-        void test12() {
+        void test12() throws SQLException {
             SimpleNameValueQueryExecutor queryExecutor =
                 new SimpleNameValueQueryExecutor(
                     "PUBLIC",
@@ -247,6 +251,7 @@ public class SimpleNameValueQueryExecutorTests {
                     SimpleNameValueQueryExecutor.PROPERTY_VALUE_COLUMN
                 );
 
+            Connection connection = CONNECTION_PROVIDER.getConnection();
             List<String> propertiesToQuery = Arrays.asList(
                 "test.property.1",
                 "test.property.2"
@@ -255,7 +260,7 @@ public class SimpleNameValueQueryExecutorTests {
             assertThrows(
                 SQLException.class, 
                 () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(), 
+                    connection, 
                     propertiesToQuery
                 )
             );
@@ -263,7 +268,7 @@ public class SimpleNameValueQueryExecutorTests {
 
         @Test
         @DisplayName("should throw when property name column is invalid")
-        void test13() {
+        void test13() throws SQLException {
             SimpleNameValueQueryExecutor queryExecutor =
                 new SimpleNameValueQueryExecutor(
                     "PUBLIC",
@@ -272,6 +277,7 @@ public class SimpleNameValueQueryExecutorTests {
                     "NON_EXISTENT_COLUMN"
                 );
 
+            Connection connection = CONNECTION_PROVIDER.getConnection();
             List<String> propertiesToQuery = Arrays.asList(
                 "test.property.1",
                 "test.property.2"
@@ -280,7 +286,7 @@ public class SimpleNameValueQueryExecutorTests {
             assertThrows(
                 SQLException.class, 
                 () -> queryExecutor.queryProperties(
-                    CONNECTION_PROVIDER.getConnection(), 
+                    connection, 
                     propertiesToQuery
                 )
             );

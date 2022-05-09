@@ -31,7 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class RootProcessorTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES = 
+        ExternalizedProperties.builder().withDefaults().build();
     
+    @Nested
     class Constructor {
         @Test
         @DisplayName("should throw when externalized properties argument is null")
@@ -51,7 +54,7 @@ public class RootProcessorTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootProcessor(
-                    ExternalizedProperties.builder().withDefaults().build(),
+                    EXTERNALIZED_PROPERTIES,
                     (ProcessorProvider[])null
                 )
             );
@@ -63,7 +66,7 @@ public class RootProcessorTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootProcessor(
-                    ExternalizedProperties.builder().withDefaults().build(),
+                    EXTERNALIZED_PROPERTIES,
                     (Collection<ProcessorProvider<?>>)null
                 )
             );
@@ -96,9 +99,7 @@ public class RootProcessorTests {
             ProcessorProvider<RootProcessor> provider = 
                 RootProcessor.provider(DecryptProcessor.provider(createAesDecryptor()));
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 
@@ -132,9 +133,7 @@ public class RootProcessorTests {
                     Arrays.asList(DecryptProcessor.provider(createAesDecryptor()))
                 );
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 
