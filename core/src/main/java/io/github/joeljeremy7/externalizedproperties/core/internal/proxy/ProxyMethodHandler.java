@@ -53,11 +53,9 @@ public class ProxyMethodHandler {
      */
     public Object handle(Object proxy, Method method, Object[] args) {
         ProxyMethod proxyMethod = new ProxyMethodAdapter(method, args);
-        if (proxyMethod.externalizedPropertyName().isPresent()) {
-            Optional<?> result = resolver.resolve(
-                    proxyMethod, 
-                    proxyMethod.externalizedPropertyName().get()
-                )
+        Optional<String> externalizedPropertyName = proxyMethod.externalizedPropertyName();
+        if (externalizedPropertyName.isPresent()) {
+            Optional<?> result = resolver.resolve(proxyMethod, externalizedPropertyName.get())
                 .map(resolved -> converter.convert(proxyMethod, resolved).value());
                     
             if (result.isPresent()) {
