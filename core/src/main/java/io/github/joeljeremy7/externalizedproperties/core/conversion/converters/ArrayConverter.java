@@ -57,7 +57,7 @@ public class ArrayConverter implements Converter<Object[]> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<? extends Object[]> convert(
+    public ConversionResult<Object[]> convert(
             ProxyMethod proxyMethod,
             String valueToConvert,
             Type targetType

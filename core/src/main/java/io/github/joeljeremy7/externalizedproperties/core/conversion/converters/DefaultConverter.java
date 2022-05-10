@@ -9,7 +9,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Default property converter which delegates to the following converters 
@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class DefaultConverter implements Converter<Object> {
 
-    private final ClassValue<Converter<?>> convertersByTargetType;
+    private final ClassValue<Converter<Object>> convertersByTargetType;
 
     /**
      * Constructs a {@link DefaultConverter} instance 
@@ -43,8 +43,8 @@ public class DefaultConverter implements Converter<Object> {
      * @param rootConverter The root converter.
      */
     public DefaultConverter(Converter<?> rootConverter) {
-        // In order.
-        final List<Converter<?>> defaultHandlers = 
+        convertersByTargetType = new ConvertersByTargetType(
+            // In order.
             Arrays.asList(
                 new PrimitiveConverter(),
                 new ListConverter(rootConverter),
@@ -53,19 +53,8 @@ public class DefaultConverter implements Converter<Object> {
                 new OptionalConverter(rootConverter),
                 new EnumConverter(),
                 new DateTimeConverter()
-            );
-
-        convertersByTargetType = new ClassValue<Converter<?>>() {
-            @Override
-            protected @Nullable Converter<?> computeValue(Class<?> targetType) {
-                for (Converter<?> converter : defaultHandlers) {
-                    if (converter.canConvertTo(targetType)) {
-                        return converter;
-                    }
-                }
-                return null;
-            }
-        };
+            )
+        );
     }
 
     /**
@@ -89,13 +78,13 @@ public class DefaultConverter implements Converter<Object> {
     
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<?> convert(
+    public ConversionResult<Object> convert(
             ProxyMethod proxyMethod,
             String valueToConvert,
             Type targetType
     ) {
         Class<?> rawTargetType = TypeUtilities.getRawType(targetType);
-        Converter<?> converter = convertersByTargetType.get(rawTargetType);
+        Converter<Object> converter = convertersByTargetType.get(rawTargetType);
         if (converter == null) {
             return ConversionResult.skip();
         }
@@ -105,5 +94,40 @@ public class DefaultConverter implements Converter<Object> {
             valueToConvert,
             targetType
         );
+    }
+
+    /**
+     * Maps a {@link Converter} instances to target types.
+     */
+    private static class ConvertersByTargetType extends ClassValue<Converter<Object>> {
+
+        private final Collection<Converter<?>> defaultConverters;
+
+        /**
+         * Constructor.
+         * 
+         * @param defaultConverters The default converters.
+         */
+        ConvertersByTargetType(Collection<Converter<?>> defaultConverters) {
+            this.defaultConverters = defaultConverters;
+        }
+
+        /**
+         * This method will return a {@link Converter} instance based on the specified target type.
+         * 
+         * @param targetType The target type to convert to.
+         * @return A {@link Converter} instance which support conversion to the target type.
+         */
+        @Override
+        protected @Nullable Converter<Object> computeValue(Class<?> targetType) {
+            for (Converter<?> converter : defaultConverters) {
+                if (converter.canConvertTo(targetType)) {
+                    @SuppressWarnings("unchecked")
+                    Converter<Object> casted = (Converter<Object>)converter;
+                    return casted;
+                }
+            }
+            return null;
+        }
     }
 }

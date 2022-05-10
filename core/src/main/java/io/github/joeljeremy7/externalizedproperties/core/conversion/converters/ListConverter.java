@@ -93,7 +93,7 @@ public class ListConverter implements Converter<List<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<? extends List<?>> convert(
+    public ConversionResult<List<?>> convert(
             ProxyMethod proxyMethod,
             String valueToConvert,
             Type targetType

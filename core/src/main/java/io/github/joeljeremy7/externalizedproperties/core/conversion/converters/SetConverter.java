@@ -95,7 +95,7 @@ public class SetConverter implements Converter<Set<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<? extends Set<?>> convert(
+    public ConversionResult<Set<?>> convert(
             ProxyMethod proxyMethod,
             String valueToConvert,
             Type targetType

@@ -46,7 +46,7 @@ public class OptionalConverter implements Converter<Optional<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<? extends Optional<?>> convert(
+    public ConversionResult<Optional<?>> convert(
             ProxyMethod proxyMethod,
             String valueToConvert,
             Type targetType

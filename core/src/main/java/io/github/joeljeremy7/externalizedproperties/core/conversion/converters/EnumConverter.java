@@ -30,7 +30,7 @@ public class EnumConverter implements Converter<Enum<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<? extends Enum<?>> convert(
+    public ConversionResult<Enum<?>> convert(
             ProxyMethod proxyMethod,
             String valueToConvert,
             Type targetType

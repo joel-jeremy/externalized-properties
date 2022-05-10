@@ -45,7 +45,7 @@ public class NoOpConverter implements Converter<Object> {
      * @return {@link ConversionResult#skip()} 
      */
     @Override
-    public ConversionResult<? extends Object> convert(
+    public ConversionResult<Object> convert(
             ProxyMethod proxyMethod, 
             String valueToConvert, 
             Type targetType

@@ -21,6 +21,7 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 
 /**
  * Supports conversion to Java's built in date/time types:
@@ -42,7 +43,7 @@ import java.time.format.DateTimeFormatter;
  * @apiNote The {@link DateTimeFormat} annotation may be used to specify a date/time 
  * format/pattern to use when converting to date/time types.
  */
-public class DateTimeConverter implements Converter<Object> {
+public class DateTimeConverter implements Converter<TemporalAccessor> {
     /**
      * The {@link ConverterProvider} for {@link DateTimeConverter}.
      * 
@@ -71,7 +72,7 @@ public class DateTimeConverter implements Converter<Object> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<?> convert(
+    public ConversionResult<TemporalAccessor> convert(
             ProxyMethod proxyMethod,
             String valueToConvert,
             Type targetType

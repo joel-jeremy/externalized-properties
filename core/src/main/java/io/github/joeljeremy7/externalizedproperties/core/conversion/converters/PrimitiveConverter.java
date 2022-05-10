@@ -43,7 +43,7 @@ public class PrimitiveConverter implements Converter<Object> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<?> convert(
+    public ConversionResult<Object> convert(
             ProxyMethod proxyMethod,
             String valueToConvert,
             Type targetType
