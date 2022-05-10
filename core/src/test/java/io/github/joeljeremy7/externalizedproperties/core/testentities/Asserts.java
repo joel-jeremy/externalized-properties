@@ -2,6 +2,7 @@ package io.github.joeljeremy7.externalizedproperties.core.testentities;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -13,21 +14,22 @@ public class Asserts {
             Collection<T> collectionToVerify, 
             Supplier<T> itemSupplier
     ) {
+        T item = itemSupplier.get();
+        Collection<T> itemCollection = Collections.singletonList(item);
+
         assertThrows(
             UnsupportedOperationException.class,
-            () -> collectionToVerify.add(itemSupplier.get())
+            () -> collectionToVerify.add(item)
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> collectionToVerify.remove(itemSupplier.get())
+            () -> collectionToVerify.remove(item)
         );
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> collectionToVerify.addAll(
-                Collections.singletonList(itemSupplier.get())
-            )
+            () -> collectionToVerify.addAll(itemCollection)
         );
 
         assertThrows(
@@ -37,9 +39,7 @@ public class Asserts {
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> collectionToVerify.removeAll(
-                Collections.singletonList(itemSupplier.get())
-            )
+            () -> collectionToVerify.removeAll(itemCollection)
         );
 
         assertThrows(
@@ -49,14 +49,13 @@ public class Asserts {
 
         assertThrows(
             UnsupportedOperationException.class,
-            () -> collectionToVerify.retainAll(
-                Collections.singletonList(itemSupplier.get())
-            )
+            () -> collectionToVerify.retainAll(itemCollection)
         );
 
+        Iterator<T> iterator = collectionToVerify.iterator();
         assertThrows(
             UnsupportedOperationException.class,
-            () -> collectionToVerify.iterator().remove()
+            () -> iterator.remove()
         );
     }
 
@@ -65,106 +64,68 @@ public class Asserts {
             Supplier<K> keySupplier,
             Function<K, V> valueFactory
     ) {
+        K key = keySupplier.get();
+        V value = valueFactory.apply(key);
+
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> {
-                K key = keySupplier.get();
-                mapToVerify.compute(key, (k,v) -> valueFactory.apply(k));
-            }
+            () -> mapToVerify.compute(key, (k,v) -> valueFactory.apply(k))
         );
 
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> {
-                K key = keySupplier.get();
-                mapToVerify.computeIfAbsent(key, k -> valueFactory.apply(k));
-            }
+            () -> mapToVerify.computeIfAbsent(key, k -> valueFactory.apply(k))
         );
 
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> {
-                K key = keySupplier.get();
-                mapToVerify.computeIfPresent(key, (k,v) -> valueFactory.apply(k));
-            }
+            () -> mapToVerify.computeIfPresent(key, (k,v) -> valueFactory.apply(k))
         );
 
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> {
-                K key = keySupplier.get();
-                V value = valueFactory.apply(key);
-                mapToVerify.merge(key, value, (ov, nv) -> nv);
-            }
+            () -> mapToVerify.merge(key, value, (ov, nv) -> nv)
         );
 
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> {
-                K key = keySupplier.get();
-                V value = valueFactory.apply(key);
-                mapToVerify.put(key, value);
-            }
+            () -> mapToVerify.put(key, value)
         );
 
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> {
-                K key = keySupplier.get();
-                V value = valueFactory.apply(key);
-                mapToVerify.putAll(Collections.singletonMap(key, value));
-            }
+            () -> mapToVerify.putAll(Collections.singletonMap(key, value))
         );
 
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> {
-                K key = keySupplier.get();
-                V value = valueFactory.apply(key);
-                mapToVerify.putIfAbsent(key, value);
-            }
+            () -> mapToVerify.putIfAbsent(key, value)
         );
 
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> {
-                K key = keySupplier.get();
-                mapToVerify.remove(key);
-            }
+            () -> mapToVerify.remove(key)
         );
 
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> {
-                K key = keySupplier.get();
-                V value = valueFactory.apply(key);
-                mapToVerify.remove(key, value);
-            }
+            () -> mapToVerify.remove(key, value)
         );
 
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> {
-                K key = keySupplier.get();
-                V value = valueFactory.apply(key);
-                mapToVerify.replace(key, value);
-            }
+            () -> mapToVerify.replace(key, value)
         );
 
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> {
-                K key = keySupplier.get();
-                V value = valueFactory.apply(key);
-                mapToVerify.replace(key, value, value);
-            }
+            () -> mapToVerify.replace(key, value, value)
+
         );
 
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> {
-                mapToVerify.replaceAll((k, v) -> valueFactory.apply(k));
-            }
+            () -> mapToVerify.replaceAll((k, v) -> valueFactory.apply(k))
         );
 
         assertThrows(

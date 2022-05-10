@@ -211,9 +211,10 @@ public class ExternalizedPropertiesTests {
             @Test
             @DisplayName("should throw when cache duration argument is null")
             void test1() {
+                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class, 
-                    () -> ExternalizedProperties.builder().withCacheDuration(null)
+                    () -> builder.withCacheDuration(null)
                 );
             }
 

@@ -93,7 +93,7 @@ public class ListConverter implements Converter<List<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<? extends List<?>> convert(
+    public ConversionResult<List<?>> convert(
             ProxyMethod proxyMethod,
             String valueToConvert,
             Type targetType
@@ -114,8 +114,7 @@ public class ListConverter implements Converter<List<?>> {
     }
 
     private List<Object> newList(int capacity) {
-        @SuppressWarnings("unchecked")
-        List<Object> list = (List<Object>)listFactory.newList(capacity);
+        List<Object> list = listFactory.newList(capacity);
         if (list == null || !list.isEmpty()) {
             throw new IllegalStateException(
                 "List factory implementation must not return null or a populated list."
@@ -173,6 +172,6 @@ public class ListConverter implements Converter<List<?>> {
          * @param capacity The requested capacity of the {@link List}.
          * @return A new mutable {@link List} instance (optionally with given the capacity).
          */
-        List<?> newList(int capacity);
+        List<Object> newList(int capacity);
     }
 }

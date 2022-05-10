@@ -95,7 +95,7 @@ public class SetConverter implements Converter<Set<?>> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<? extends Set<?>> convert(
+    public ConversionResult<Set<?>> convert(
             ProxyMethod proxyMethod,
             String valueToConvert,
             Type targetType
@@ -116,8 +116,7 @@ public class SetConverter implements Converter<Set<?>> {
     }
 
     private Set<Object> newSet(int capacity) {
-        @SuppressWarnings("unchecked")
-        Set<Object> set = (Set<Object>)setFactory.newSet(capacity);
+        Set<Object> set = setFactory.newSet(capacity);
         if (set == null || !set.isEmpty()) {
             throw new IllegalStateException(
                 "Set factory implementation must not return null or a populated set."
@@ -175,6 +174,6 @@ public class SetConverter implements Converter<Set<?>> {
          * @param capacity The requested capacity of the {@link Set}.
          * @return A new mutable {@link Set} instance (optionally with given the capacity).
          */
-        Set<?> newSet(int capacity);
+        Set<Object> newSet(int capacity);
     }
 }

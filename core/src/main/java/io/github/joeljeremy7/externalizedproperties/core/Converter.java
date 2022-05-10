@@ -36,7 +36,7 @@ public interface Converter<T> {
      * handle conversion to the target type and that the conversion process should skip/move 
      * to the next registered converter in the conversion pipeline.
      */
-    default ConversionResult<? extends T> convert(
+    default ConversionResult<T> convert(
         ProxyMethod proxyMethod, 
         String valueToConvert
     ) {
@@ -60,7 +60,7 @@ public interface Converter<T> {
      * if the converter cannot handle conversion to the target type and that the conversion 
      * process should skip/move to the next registered converter in the conversion pipeline.
      */
-    ConversionResult<? extends T> convert(
+    ConversionResult<T> convert(
         ProxyMethod proxyMethod, 
         String valueToConvert,
         Type targetType

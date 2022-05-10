@@ -101,7 +101,7 @@ public class RootConverter implements Converter<Object> {
 
     /** {@inheritDoc} */
     @Override
-    public ConversionResult<?> convert(
+    public ConversionResult<Object> convert(
             ProxyMethod proxyMethod,
             String valueToConvert,
             Type targetType
@@ -116,12 +116,11 @@ public class RootConverter implements Converter<Object> {
             return ConversionResult.of(valueToConvert);
         }
         
-        List<Converter<?>> converters = 
-            convertersByTargetType.get(rawTargetType);
+        List<Converter<Object>> converters = convertersByTargetType.get(rawTargetType);
 
         try {
-            for (Converter<?> converter : converters) {
-                ConversionResult<?> result = converter.convert(
+            for (Converter<Object> converter : converters) {
+                ConversionResult<Object> result = converter.convert(
                     proxyMethod,
                     valueToConvert,
                     targetType
@@ -165,9 +164,9 @@ public class RootConverter implements Converter<Object> {
     }
 
     /**
-     * Maps target type to converter instances which supports the target type.
+     * Maps a list of {@link Converter} instances to target types.
      */
-    private static class ConvertersByTargetType extends ClassValue<List<Converter<?>>> {
+    private static class ConvertersByTargetType extends ClassValue<List<Converter<Object>>> {
 
         private final RootConverter rootConverter;
         private final ExternalizedProperties externalizedProperties;
@@ -189,25 +188,28 @@ public class RootConverter implements Converter<Object> {
         }
 
         /**
-         * This method will return a converter instance based on the specified target type.
+         * This method will return a list of {@link Converter} instances based on the specified 
+         * target type.
          * 
          * @param targetType The target type to convert to.
          * @return The list of {@link Converter} instances which support conversion to the
          * target type.
          */
         @Override
-        protected List<Converter<?>> computeValue(Class<?> targetType) {
+        protected List<Converter<Object>> computeValue(Class<?> targetType) {
             // We should not throw here because result of this method is
             // used in canConvertTo(...) to determine supported target types.
 
-            List<Converter<?>> supportsTargetType = new ArrayList<>();
+            List<Converter<Object>> supportsTargetType = new ArrayList<>();
             for (ConverterProvider<?> converterProvider : registeredConverterProviders) {
                 Converter<?> converter = converterProvider.get(
                     externalizedProperties,
                     rootConverter
                 );
                 if (converter.canConvertTo(targetType)) {
-                    supportsTargetType.add(converter);
+                    @SuppressWarnings("unchecked")
+                    Converter<Object> casted = (Converter<Object>)converter;
+                    supportsTargetType.add(casted);
                 }
             }
             return supportsTargetType;

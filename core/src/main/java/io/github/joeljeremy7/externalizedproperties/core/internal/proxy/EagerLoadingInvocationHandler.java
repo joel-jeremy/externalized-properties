@@ -126,12 +126,12 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
 
             // Everything after here are methods with no parameters.
 
-            // Methods with annotation.
-            if (candidate.isAnnotationPresent(ExternalizedProperty.class)) {
-                supportedMethods.add(candidate);
-            }
-            // No annotation but is default interface method.
-            else if (candidate.isDefault()) {
+            // Supported methods:
+            // - Methods with @ExternalizedProperty annotation.
+            // - Methods with no @ExternalizedProperty annotation but is default interface method.
+            if (candidate.isAnnotationPresent(ExternalizedProperty.class) ||
+                candidate.isDefault()
+            ) {
                 supportedMethods.add(candidate);
             }
         }
