@@ -92,9 +92,10 @@ public class Asserts {
             () -> mapToVerify.put(key, value)
         );
 
+        Map<K, V> map = Collections.singletonMap(key, value);
         assertThrows(
             UnsupportedOperationException.class, 
-            () -> mapToVerify.putAll(Collections.singletonMap(key, value))
+            () -> mapToVerify.putAll(map)
         );
 
         assertThrows(
