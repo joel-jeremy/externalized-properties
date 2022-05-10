@@ -8,7 +8,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -18,7 +17,7 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  */
 public class MapResolver implements Resolver {
     private final Map<String, String> propertySource;
-    private final Function<String, String> unresolvedPropertyHandler;
+    private final UnresolvedPropertyHandler unresolvedPropertyHandler;
 
     /**
      * Constructor.
@@ -42,7 +41,7 @@ public class MapResolver implements Resolver {
      */
     public MapResolver(
             Map<String, String> propertySource,
-            Function<String, String> unresolvedPropertyHandler
+            UnresolvedPropertyHandler unresolvedPropertyHandler
     ) {
         // Copy.
         this.propertySource = new ConcurrentHashMap<>(
@@ -78,7 +77,7 @@ public class MapResolver implements Resolver {
      */
     public static ResolverProvider<MapResolver> provider(
             Map<String, String> propertySource,
-            Function<String, String> unresolvedPropertyHandler
+            UnresolvedPropertyHandler unresolvedPropertyHandler
     ) {
         requireNonNull(propertySource, "propertySource");
         requireNonNull(unresolvedPropertyHandler, "unresolvedPropertyHandler");
@@ -108,7 +107,7 @@ public class MapResolver implements Resolver {
         }
 
         // Try to resolve from unresolved handler and cache result.
-        propertyValue = unresolvedPropertyHandler.apply(propertyName);
+        propertyValue = unresolvedPropertyHandler.handle(propertyName);
         if (propertyValue != null) {
             propertySource.putIfAbsent(propertyName, propertyValue);
             return propertyValue;
@@ -116,5 +115,21 @@ public class MapResolver implements Resolver {
 
         // Unable to resolve property.
         return null;
+    }
+
+    /**
+     * Any properties not found in the source properties will tried to be resolved via this handler. 
+     * This should accept a property name and return the property value for the given property name. 
+     * {@code null} return values are allowed but will be discarded.
+     */
+    public static interface UnresolvedPropertyHandler {
+        /**
+         * Try to resolve the value for the property name which {@link MapResolver} failed to resolve.
+         * 
+         * @param unresolvedPropertyName The name of the property which cannot be resolved from the
+         * {@link MapResolver}.
+         * @return The resolved property value. {@code null} is allowed but will be discarded.
+         */
+        @Nullable String handle(String unresolvedPropertyName);
     }
 }

@@ -29,11 +29,13 @@ public class EagerLoadingInvocationHandlerTests {
         @Test
         @DisplayName("should throw when decorated invocation handler argument is null")
         void test1() {
+            StubCacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
+
             assertThrows(
                 IllegalArgumentException.class,
                 () -> EagerLoadingInvocationHandler.eagerLoad(
                     null,  
-                    new StubCacheStrategy<>(),
+                    cacheStrategy,
                     EagerLoadingProxyInterface.class
                 )
             );
@@ -42,10 +44,12 @@ public class EagerLoadingInvocationHandlerTests {
         @Test
         @DisplayName("should throw when cache strategy argument is null")
         void test2() {
+            StubInvocationHandler decorated = new StubInvocationHandler();
+
             assertThrows(
                 IllegalArgumentException.class,
                 () -> EagerLoadingInvocationHandler.eagerLoad(
-                    new StubInvocationHandler(), 
+                    decorated, 
                     null,
                     EagerLoadingProxyInterface.class
                 )
@@ -55,11 +59,14 @@ public class EagerLoadingInvocationHandlerTests {
         @Test
         @DisplayName("should throw when proxy interface argument is null")
         void test5() {
+            StubInvocationHandler decorated = new StubInvocationHandler();
+            StubCacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
+
             assertThrows(
                 IllegalArgumentException.class,
                 () -> EagerLoadingInvocationHandler.eagerLoad(
-                    new StubInvocationHandler(), 
-                    new StubCacheStrategy<>(),
+                    decorated, 
+                    cacheStrategy,
                     null
                 )
             );

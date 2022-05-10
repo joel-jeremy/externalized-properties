@@ -33,7 +33,7 @@ public class OptionalConverterTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ConverterProvider<OptionalConverter> provider = 
                 OptionalConverter.provider();
 
@@ -42,7 +42,7 @@ public class OptionalConverterTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ConverterProvider<OptionalConverter> provider = 
                 OptionalConverter.provider();
             

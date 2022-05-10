@@ -25,12 +25,14 @@ public class CachingInvocationHandlerTests {
     class Constructor {
         @Test
         @DisplayName("should throw when decorated argument is null")
-        public void test1() {
+        void test1() {
+            StubCacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
+
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new CachingInvocationHandler(
                     null,
-                    new StubCacheStrategy<>(),
+                    cacheStrategy,
                     StubProxyInterface.class
                 )
             );
@@ -38,11 +40,13 @@ public class CachingInvocationHandlerTests {
 
         @Test
         @DisplayName("should throw when cache strategy argument is null")
-        public void test2() {
+        void test2() {
+            StubInvocationHandler decorated = new StubInvocationHandler();
+
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new CachingInvocationHandler(
-                    new StubInvocationHandler(),
+                    decorated,
                     null,
                     StubProxyInterface.class
                 )
@@ -51,12 +55,15 @@ public class CachingInvocationHandlerTests {
 
         @Test
         @DisplayName("should throw when proxy interface argument is null")
-        public void test3() {
+        void test3() {
+            StubInvocationHandler decorated = new StubInvocationHandler();
+            StubCacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
+            
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new CachingInvocationHandler(
-                    new StubInvocationHandler(),
-                    new StubCacheStrategy<>(),
+                    decorated,
+                    cacheStrategy,
                     null
                 )
             );
@@ -67,7 +74,7 @@ public class CachingInvocationHandlerTests {
     class InvokeMethod {
         @Test
         @DisplayName("should return cached property values")
-        public void test1() throws Throwable {
+        void test1() throws Throwable {
             Method stubMethod = stubMethod();
 
             StubCacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
@@ -105,7 +112,7 @@ public class CachingInvocationHandlerTests {
             "should resolve uncached property values from decorated invocation handler" +
             "and cache the resolved value"
         )
-        public void test2() throws Throwable {
+        void test2() throws Throwable {
             Method stubMethod = stubMethod();
 
             // Always return the same string for any invoked proxy method.
@@ -141,7 +148,7 @@ public class CachingInvocationHandlerTests {
             "should not cache and return null " + 
             "when property could not be resolved from decorated invocation handler"
         )
-        public void test3() throws Throwable {
+        void test3() throws Throwable {
             Method stubMethod = stubMethod();
 
             // Always return null.
@@ -171,7 +178,7 @@ public class CachingInvocationHandlerTests {
         }
         @Test
         @DisplayName("should throw when decorated invocation handler throws")
-        public void test4() throws Throwable {
+        void test4() throws Throwable {
             Method stubMethod = stubMethod();
 
             // Always return the same string for any invoked proxy method.
@@ -186,10 +193,12 @@ public class CachingInvocationHandlerTests {
                     StubProxyInterface.class
                 );
             
+            Object stubProxy = stubProxy(decorated);
+            
             assertThrows(
             ExternalizedPropertiesException.class, 
                 () ->cachingInvocationHandler.invoke(
-                    stubProxy(decorated), 
+                    stubProxy, 
                     stubMethod, 
                     new Object[0]
                 )

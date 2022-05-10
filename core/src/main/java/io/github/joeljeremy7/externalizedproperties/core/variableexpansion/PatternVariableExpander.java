@@ -55,7 +55,7 @@ public class PatternVariableExpander implements VariableExpander {
      * @return The {@link VariableExpanderProvider} for {@link PatternVariableExpander}.
      */
     public static VariableExpanderProvider<PatternVariableExpander> provider() {
-        return externalizedProperties -> new PatternVariableExpander(externalizedProperties);
+        return PatternVariableExpander::new;
     }
 
     /**

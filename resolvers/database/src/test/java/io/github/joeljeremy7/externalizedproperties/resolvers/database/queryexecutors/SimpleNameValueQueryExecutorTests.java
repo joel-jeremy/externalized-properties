@@ -159,9 +159,9 @@ public class SimpleNameValueQueryExecutorTests {
             SimpleNameValueQueryExecutor queryExecutor =
                 new SimpleNameValueQueryExecutor(
                     "PUBLIC", // PUBLIC is H2's default schema
-                    SimpleNameValueQueryExecutor.TABLE,
-                    SimpleNameValueQueryExecutor.PROPERTY_NAME_COLUMN,
-                    SimpleNameValueQueryExecutor.PROPERTY_VALUE_COLUMN
+                    SimpleNameValueQueryExecutor.DEFAULT_TABLE,
+                    SimpleNameValueQueryExecutor.DEFAULT_PROPERTY_NAME_COLUMN,
+                    SimpleNameValueQueryExecutor.DEFAULT_PROPERTY_VALUE_COLUMN
                 );
 
             Connection connection = CONNECTION_PROVIDER.getConnection();
@@ -194,9 +194,9 @@ public class SimpleNameValueQueryExecutorTests {
             SimpleNameValueQueryExecutor queryExecutor =
                 new SimpleNameValueQueryExecutor(
                     "NON_EXISTENT_SCHEMA",
-                    SimpleNameValueQueryExecutor.TABLE,
-                    SimpleNameValueQueryExecutor.PROPERTY_NAME_COLUMN,
-                    SimpleNameValueQueryExecutor.PROPERTY_VALUE_COLUMN
+                    SimpleNameValueQueryExecutor.DEFAULT_TABLE,
+                    SimpleNameValueQueryExecutor.DEFAULT_PROPERTY_NAME_COLUMN,
+                    SimpleNameValueQueryExecutor.DEFAULT_PROPERTY_VALUE_COLUMN
                 );
 
             Connection connection = CONNECTION_PROVIDER.getConnection();
@@ -221,8 +221,8 @@ public class SimpleNameValueQueryExecutorTests {
                 new SimpleNameValueQueryExecutor(
                     "PUBLIC",
                     "NON_EXISTENT_TABLE",
-                    SimpleNameValueQueryExecutor.PROPERTY_NAME_COLUMN,
-                    SimpleNameValueQueryExecutor.PROPERTY_VALUE_COLUMN
+                    SimpleNameValueQueryExecutor.DEFAULT_PROPERTY_NAME_COLUMN,
+                    SimpleNameValueQueryExecutor.DEFAULT_PROPERTY_VALUE_COLUMN
                 );
 
             Connection connection = CONNECTION_PROVIDER.getConnection();
@@ -246,9 +246,9 @@ public class SimpleNameValueQueryExecutorTests {
             SimpleNameValueQueryExecutor queryExecutor =
                 new SimpleNameValueQueryExecutor(
                     "PUBLIC",
-                    SimpleNameValueQueryExecutor.TABLE,
+                    SimpleNameValueQueryExecutor.DEFAULT_TABLE,
                     "NON_EXISTENT_COLUMN",
-                    SimpleNameValueQueryExecutor.PROPERTY_VALUE_COLUMN
+                    SimpleNameValueQueryExecutor.DEFAULT_PROPERTY_VALUE_COLUMN
                 );
 
             Connection connection = CONNECTION_PROVIDER.getConnection();
@@ -272,8 +272,8 @@ public class SimpleNameValueQueryExecutorTests {
             SimpleNameValueQueryExecutor queryExecutor =
                 new SimpleNameValueQueryExecutor(
                     "PUBLIC",
-                    SimpleNameValueQueryExecutor.TABLE,
-                    SimpleNameValueQueryExecutor.PROPERTY_NAME_COLUMN,
+                    SimpleNameValueQueryExecutor.DEFAULT_TABLE,
+                    SimpleNameValueQueryExecutor.DEFAULT_PROPERTY_NAME_COLUMN,
                     "NON_EXISTENT_COLUMN"
                 );
 

@@ -42,7 +42,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
     class InvokeMethod {
         @Test
         @DisplayName("should resolve property")
-        public void test1() throws Throwable {
+        void test1() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property", "test.value.1");
 
@@ -85,7 +85,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should resolve property from map and not from default interface method value"
         )
-        public void test2() throws Throwable {
+        void test2() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.with.default.value", "test.value");
 
@@ -128,7 +128,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should resolve property from map and not from default interface method value parameter"
         )
-        public void test3() throws Throwable {
+        void test3() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.with.default.value", "test.value");
 
@@ -170,7 +170,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should resolve default value from default interface method")
-        public void test4() throws Throwable {
+        void test4() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -208,7 +208,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should resolve default value from default interface method parameter")
-        public void test5() throws Throwable {
+        void test5() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -250,7 +250,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should always return default value from default interface method when not annotated"
         )
-        public void test6() throws Throwable {
+        void test6() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -291,7 +291,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             "should always return default value from default interface method parameter " + 
             "when not annotated"
         )
-        public void test7() throws Throwable {
+        void test7() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -331,7 +331,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should throw when an annotated non-Optional property cannot be resolved.")
-        public void test8() {
+        void test8() {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -358,9 +358,11 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                     )
                 );
 
+            Object proxy = externalizedProperties.proxy(proxyInterface);
+
             assertThrows(UnresolvedPropertiesException.class, () -> {
                 handler.invoke(
-                    externalizedProperties.proxy(proxyInterface), 
+                    proxy, 
                     proxyMethod, 
                     null
                 );
@@ -369,7 +371,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should throw when an unannotated non-Optional property cannot be resolved.")
-        public void test9() {
+        void test9() {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -396,9 +398,11 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                     )
                 );
 
+            Object proxy = externalizedProperties.proxy(proxyInterface);
+
             assertThrows(UnresolvedPropertiesException.class, () -> {
                 handler.invoke(
-                    externalizedProperties.proxy(proxyInterface), 
+                    proxy, 
                     proxyMethod, 
                     null
                 );
@@ -411,7 +415,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should convert a non-String property via Converter.")
-        public void conversionTest1() throws Throwable {
+        void conversionTest1() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.int", "1");
 
@@ -456,7 +460,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should expand variable in property name.")
-        public void variableExpansionTest1() throws Throwable {
+        void variableExpansionTest1() throws Throwable {
             Map<String, String> map = new HashMap<>();
             String customVariableValue = "custom-variable";
             map.put("custom.variable", customVariableValue);
@@ -499,7 +503,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should throw when variable value cannot be resolved.")
-        public void variableExpansionTest2() {
+        void variableExpansionTest2() {
             Map<String, String> map = new HashMap<>();
             map.put("property-custom-variable", "property.value");
 
@@ -529,12 +533,14 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                     )
                 );
 
+            Object proxy = externalizedProperties.proxy(proxyInterface);
+
             // There is no custom-variable-value property.
             // Property name of VariableProxyInterface.variableProperty() won't be able to be expanded.
             assertThrows(
                 VariableExpansionException.class, 
                 () -> handler.invoke(
-                    externalizedProperties.proxy(proxyInterface), 
+                    proxy, 
                     proxyMethod, 
                     null
                 )
@@ -547,7 +553,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should resolve property")
-        public void optionalTest1() throws Throwable {
+        void optionalTest1() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional", "test.value");
 
@@ -593,7 +599,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should resolve property from map and not from default interface method value")
-        public void optionalTest2() throws Throwable {
+        void optionalTest2() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional.with.default.value", "test.value");
 
@@ -641,7 +647,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should resolve property from map and not from default interface method value parameter"
         )
-        public void optionalTest3() throws Throwable {
+        void optionalTest3() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional.with.default.value", "test.value");
 
@@ -688,7 +694,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should resolve default value from default interface method")
-        public void optionalTest4() throws Throwable {
+        void optionalTest4() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -731,7 +737,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should resolve default value from default interface method parameter")
-        public void optionalTest5() throws Throwable {
+        void optionalTest5() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -777,7 +783,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should always return default value from default interface method when not annotated"
         )
-        public void optionalTest6() throws Throwable {
+        void optionalTest6() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -823,7 +829,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             "should always return default value from default interface method parameter " + 
             "when not annotated"
         )
-        public void optionalTest7() throws Throwable {
+        void optionalTest7() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -869,7 +875,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should return empty Optional when an annotated Optional property cannot be resolved."
         )
-        public void optionalTest8() throws Throwable {
+        void optionalTest8() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -913,7 +919,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should return empty Optional when an unannotated Optional property cannot be resolved."
         )
-        public void optionalTest9() throws Throwable {
+        void optionalTest9() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -955,7 +961,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should convert a non-String Optional property via Converter.")
-        public void optionalTest10() throws Throwable {
+        void optionalTest10() throws Throwable {
             Map<String, String> map = new HashMap<>();
             map.put("property.optional.nonstring", "1");
 
@@ -1002,7 +1008,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should return true when proxy object references are the same")
-        public void proxyEqualsTest1() throws Throwable {
+        void proxyEqualsTest1() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -1045,7 +1051,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should return false when proxy object references are not same")
-        public void proxyEqualsTest2() throws Throwable {
+        void proxyEqualsTest2() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -1091,7 +1097,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         @DisplayName(
             "should treat equals method with different signature as a proxy method"
         )
-        public void proxyEqualsTest3() throws Throwable {
+        void proxyEqualsTest3() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -1136,7 +1142,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should return proxy's identity hash code")
-        public void proxyHashCodeTest1() throws Throwable {
+        void proxyHashCodeTest1() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -1178,7 +1184,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should return standard Object.toString() format")
-        public void proxyToStringTest1() throws Throwable {
+        void proxyToStringTest1() throws Throwable {
             ResolverProvider<?> resolverProvider = MapResolver.provider(Collections.emptyMap());
             ConverterProvider<?> converterProvider = NoOpConverter.provider();
             ExternalizedProperties externalizedProperties = externalizedProperties(

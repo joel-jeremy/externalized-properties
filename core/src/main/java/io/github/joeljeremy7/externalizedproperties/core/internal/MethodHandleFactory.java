@@ -6,6 +6,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -57,7 +58,13 @@ public class MethodHandleFactory {
 
     private static class Java8MethodHandleFactory {
         private static MethodHandle buildMethodHandle(Method method) 
-                throws Exception {
+                throws InstantiationException, 
+                    IllegalAccessException, 
+                    IllegalArgumentException, 
+                    InvocationTargetException, 
+                    NoSuchMethodException, 
+                    SecurityException 
+        {
             // This will only work on Java 8.
             // For Java9+, the new private lookup API should be used.
             final Constructor<Lookup> constructor = Lookup.class
@@ -76,18 +83,20 @@ public class MethodHandleFactory {
         // This will only work on Java 9+.
         // This method should be present in Java 9+.
         // Method handle for MethodHandles.privateLookupIn(...) method.
-        private final static MethodHandle JAVA_9_MH_PRIVATE_LOOKUP_IN =
+        private static final MethodHandle JAVA_9_MH_PRIVATE_LOOKUP_IN =
             privateLookupInMethodHandleOrThrow();
         
         private static MethodHandle buildMethodHandle(Method method) 
-                throws Throwable {
+                throws Throwable 
+        {
             Lookup privateLookup = privateLookupIn(method.getDeclaringClass());
             return privateLookup.in(method.getDeclaringClass())
                 .unreflectSpecial(method, method.getDeclaringClass());
         }
 
         private static Lookup privateLookupIn(Class<?> classToLookup) 
-                throws Throwable {
+                throws Throwable 
+        {
             return (Lookup)JAVA_9_MH_PRIVATE_LOOKUP_IN.invokeWithArguments(
                 classToLookup,
                 MethodHandles.lookup()

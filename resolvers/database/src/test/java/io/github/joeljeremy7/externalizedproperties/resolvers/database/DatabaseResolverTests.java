@@ -26,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class DatabaseResolverTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
+        ExternalizedProperties.builder().withDefaults().build();
 
     private static final int NUMBER_OF_TEST_ENTRIES = 2;
     private static final String H2_CONNECTION_STRING = 
@@ -43,8 +45,10 @@ public class DatabaseResolverTests {
         @Test
         @DisplayName("should throw when connection provider argument is null")
         void test1() {
+            QueryExecutor queryExecutor = new SimpleNameValueQueryExecutor();
+
             assertThrows(IllegalArgumentException.class, () -> {
-                new DatabaseResolver(null, new SimpleNameValueQueryExecutor());
+                new DatabaseResolver(null, queryExecutor);
             });
         }
 
@@ -61,7 +65,7 @@ public class DatabaseResolverTests {
     class ProviderMethodWithConnectionProviderOverload {
         @Test
         @DisplayName("should throw when connection provider argument is null.")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> DatabaseResolver.provider(null)
@@ -70,7 +74,7 @@ public class DatabaseResolverTests {
 
         @Test
         @DisplayName("should not return null.")
-        public void test2() {
+        void test2() {
             ResolverProvider<DatabaseResolver> provider = 
                 DatabaseResolver.provider(CONNECTION_PROVIDER);
 
@@ -79,13 +83,11 @@ public class DatabaseResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test3() {
+        void test3() {
             ResolverProvider<DatabaseResolver> provider = 
                 DatabaseResolver.provider(CONNECTION_PROVIDER);
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 
@@ -93,19 +95,21 @@ public class DatabaseResolverTests {
     class ProviderMethodWithConnectionProviderAndQueryExecutorOverload {
         @Test
         @DisplayName("should throw when connection provider argument is null.")
-        public void test1() {
+        void test1() {
+            QueryExecutor queryExecutor = new SimpleNameValueQueryExecutor();
+
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> DatabaseResolver.provider(
                     null,
-                    new SimpleNameValueQueryExecutor()
+                    queryExecutor
                 )
             );
         }
 
         @Test
         @DisplayName("should throw when query executor argument is null.")
-        public void test2() {
+        void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> DatabaseResolver.provider(
@@ -117,7 +121,7 @@ public class DatabaseResolverTests {
 
         @Test
         @DisplayName("should not return null.")
-        public void test3() {
+        void test3() {
             ResolverProvider<DatabaseResolver> provider = 
                 DatabaseResolver.provider(
                     CONNECTION_PROVIDER, 
@@ -129,16 +133,14 @@ public class DatabaseResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test4() {
+        void test4() {
             ResolverProvider<DatabaseResolver> provider = 
                 DatabaseResolver.provider(
                     CONNECTION_PROVIDER,
                     new SimpleNameValueQueryExecutor()
                 );
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 

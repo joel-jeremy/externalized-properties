@@ -36,8 +36,8 @@ public class Tokenizer {
      * @return The resulting array.
      */
     public String[] tokenizeValue(ProxyMethod proxyMethod, String value) {
-        String delimiter = determineDelimiter(proxyMethod);
-        String[] tokens = value.split(delimiter);
+        String delimiterToUse = determineDelimiter(proxyMethod);
+        String[] tokens = value.split(delimiterToUse);
         return stripEmptyValuesIfNecessary(proxyMethod, tokens);
     }
 

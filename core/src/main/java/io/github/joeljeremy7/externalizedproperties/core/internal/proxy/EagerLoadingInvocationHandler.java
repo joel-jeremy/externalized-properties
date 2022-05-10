@@ -120,7 +120,7 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
         List<Method> supportedMethods = new ArrayList<>(methods.length);
         for (Method candidate : methods) {
             if (candidate.getParameterCount() > 0) {
-                // Methods with parameters are not supported;
+                // Methods with parameters are not supported.
                 continue;
             }
 
@@ -129,13 +129,10 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
             // Methods with annotation.
             if (candidate.isAnnotationPresent(ExternalizedProperty.class)) {
                 supportedMethods.add(candidate);
-                continue;
             }
-
             // No annotation but is default interface method.
-            if (candidate.isDefault()) {
+            else if (candidate.isDefault()) {
                 supportedMethods.add(candidate);
-                continue;
             }
         }
         return supportedMethods;

@@ -11,14 +11,13 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UnresolvedPropertiesExceptionTests {
     @Nested
     class Constructor {
         @Test
         @DisplayName("should set unresolved property name")
-        public void test1() {
+        void test1() {
             String unresolvedPropertyName = "test.property";
 
             UnresolvedPropertiesException unresolvedPropertiesException = 
@@ -27,7 +26,7 @@ public class UnresolvedPropertiesExceptionTests {
                     "test.property cannot be resolved"
                 );
 
-            assertTrue(unresolvedPropertiesException.unresolvedPropertyNames().size() == 1);
+            assertEquals(1, unresolvedPropertiesException.unresolvedPropertyNames().size());
             assertEquals(
                 unresolvedPropertyName, 
                 unresolvedPropertiesException.unresolvedPropertyNames()
@@ -39,7 +38,7 @@ public class UnresolvedPropertiesExceptionTests {
 
         @Test
         @DisplayName("should set unresolved property name")
-        public void test2() {
+        void test2() {
             String unresolvedPropertyName = "test.property";
 
             UnresolvedPropertiesException unresolvedPropertiesException = 
@@ -49,7 +48,7 @@ public class UnresolvedPropertiesExceptionTests {
                     new RuntimeException("cause")
                 );
 
-            assertTrue(unresolvedPropertiesException.unresolvedPropertyNames().size() == 1);
+            assertEquals(1, unresolvedPropertiesException.unresolvedPropertyNames().size());
             assertEquals(
                 unresolvedPropertyName, 
                 unresolvedPropertiesException.unresolvedPropertyNames()
@@ -57,9 +56,11 @@ public class UnresolvedPropertiesExceptionTests {
                     .findFirst()
                     .orElse(null)
             );
-        }@Test
+        }
+        
+        @Test
         @DisplayName("should set unresolved property name")
-        public void test3() {
+        void test3() {
             Set<String> unresolvedPropertyNames = new HashSet<>(Arrays.asList(
                 "test.property.1",
                 "test.property.2"
@@ -83,7 +84,7 @@ public class UnresolvedPropertiesExceptionTests {
 
         @Test
         @DisplayName("should set unresolved property name")
-        public void test4() {
+        void test4() {
             Set<String> unresolvedPropertyNames = new HashSet<>(Arrays.asList(
                 "test.property.1",
                 "test.property.2"
@@ -111,7 +112,7 @@ public class UnresolvedPropertiesExceptionTests {
     class UnresolvedPropertyNamesMethod {
         @Test
         @DisplayName("should return an unmodifiable set")
-        public void test1() {
+        void test1() {
             Set<String> unresolvedPropertyNames = new HashSet<>(Arrays.asList(
                 "test.property.1",
                 "test.property.2"

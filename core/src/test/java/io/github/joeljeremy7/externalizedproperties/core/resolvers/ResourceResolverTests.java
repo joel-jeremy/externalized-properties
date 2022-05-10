@@ -74,10 +74,12 @@ public class ResourceResolverTests {
         @Test
         @DisplayName("should throw when reader argument is null")
         void urlAndReaderOverloadTest2() {
+            URL testPropertiesUrl = classpathResource("/test.properties");
+
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> ResourceResolver.fromUrl(
-                    classpathResource("/test.properties"), 
+                    testPropertiesUrl, 
                     null
                 )
             );
@@ -138,11 +140,13 @@ public class ResourceResolverTests {
 
         @Test
         @DisplayName("should throw when reader argument is null")
-        void uriAndReaderOverloadTest2() {
+        void uriAndReaderOverloadTest2() throws URISyntaxException {
+            URI testPropertiesUri = classpathResource("/test.properties").toURI();
+
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> ResourceResolver.fromUri(
-                    classpathResource("/test.properties").toURI(), 
+                    testPropertiesUri, 
                     null
                 )
             );

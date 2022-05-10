@@ -13,7 +13,7 @@ public class ConversionResultTests {
     class OfMethod {
         @Test
         @DisplayName("should throw when value argument is null.")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> ConversionResult.of(null)
@@ -25,7 +25,7 @@ public class ConversionResultTests {
     class SkipMethod {
         @Test
         @DisplayName("should always return the same object reference.")
-        public void test1() {
+        void test1() {
             assertSame(ConversionResult.skip(), ConversionResult.skip());
         }
     }
@@ -34,7 +34,7 @@ public class ConversionResultTests {
     class ValueMethod {
         @Test
         @DisplayName("should return the provided value via of() factory method.")
-        public void test1() {
+        void test1() {
             ConversionResult<String> result = ConversionResult.of("test");
             assertEquals("test", result.value());
         }
@@ -44,7 +44,7 @@ public class ConversionResultTests {
             "should throw when result object is a skip result " + 
             "created via skip() factory method."
         )
-        public void test2() {
+        void test2() {
             ConversionResult<String> skipResult = ConversionResult.skip();
             assertThrows(
                 IllegalStateException.class, 

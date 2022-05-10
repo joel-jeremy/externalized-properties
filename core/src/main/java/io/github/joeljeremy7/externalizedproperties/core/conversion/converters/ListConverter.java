@@ -12,6 +12,7 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
@@ -115,9 +116,9 @@ public class ListConverter implements Converter<List<?>> {
     private List<Object> newList(int capacity) {
         @SuppressWarnings("unchecked")
         List<Object> list = (List<Object>)listFactory.newList(capacity);
-        if (list == null) {
+        if (list == null || !list.isEmpty()) {
             throw new IllegalStateException(
-                "List factory implementation must not return null."
+                "List factory implementation must not return null or a populated list."
             );
         }
         return list;
@@ -125,9 +126,7 @@ public class ListConverter implements Converter<List<?>> {
 
     private List<Object> newList(Object[] values) {
         List<Object> list = newList(values.length);
-        for (Object value : values) {
-            list.add(value);
-        }
+        Collections.addAll(list, values);
         return list;
     }
 
@@ -168,7 +167,8 @@ public class ListConverter implements Converter<List<?>> {
     public static interface ListFactory {
         /**
          * Create a new mutable {@link List} instance (optionally with given the capacity). 
-         * This function must not return null.
+         * This function must not return null and must only return a list with no elements.
+         * Otherwise, an exception will be thrown.
          * 
          * @param capacity The requested capacity of the {@link List}.
          * @return A new mutable {@link List} instance (optionally with given the capacity).

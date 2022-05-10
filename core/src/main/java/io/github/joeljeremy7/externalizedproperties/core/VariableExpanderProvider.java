@@ -56,7 +56,7 @@ public interface VariableExpanderProvider<T extends VariableExpander> {
     static final class Memoized<T extends VariableExpander> implements VariableExpanderProvider<T> {
 
         private final VariableExpanderProvider<T> provider;
-        private final AtomicReference<T> memoized = new AtomicReference<>(null);
+        private final AtomicReference<T> variableExpanderRef = new AtomicReference<>(null);
 
         private Memoized(VariableExpanderProvider<T> provider) {
             this.provider = requireNonNull(provider, "provider");
@@ -65,11 +65,11 @@ public interface VariableExpanderProvider<T extends VariableExpander> {
         /** {@inheritDoc} */
         @Override
         public T get(ExternalizedProperties externalizedProperties) {
-            T result = memoized.get();
+            T result = variableExpanderRef.get();
             if (result == null) {
                 result = provider.get(externalizedProperties);
-                memoized.compareAndSet(null, result);
-                result = memoized.get();
+                variableExpanderRef.compareAndSet(null, result);
+                result = variableExpanderRef.get();
                 if (result == null) {
                     throw new IllegalStateException("Memoized provider returned null.");
                 }

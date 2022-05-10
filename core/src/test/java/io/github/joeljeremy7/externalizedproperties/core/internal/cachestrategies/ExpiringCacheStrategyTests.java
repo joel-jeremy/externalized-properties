@@ -21,19 +21,22 @@ public class ExpiringCacheStrategyTests {
     class Constructor {
         @Test
         @DisplayName("should throw when decorated argument is null")
-        public void test1() {
+        void test1() {
+            Duration duration = Duration.ofSeconds(30);
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new ExpiringCacheStrategy<>(null, Duration.ofSeconds(30))
+                () -> new ExpiringCacheStrategy<>(null, duration)
             );
         }
 
         @Test
         @DisplayName("should throw when cache item lifetime argument is null")
-        public void test2() {
+        void test2() {
+            StubCacheStrategy<?, ?> cacheStrategy = new StubCacheStrategy<>();
+            
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new ExpiringCacheStrategy<>(new StubCacheStrategy<>(), null)
+                () -> new ExpiringCacheStrategy<>(cacheStrategy, null)
             );
         }
     }
@@ -42,7 +45,7 @@ public class ExpiringCacheStrategyTests {
     class CacheMethod {
         @Test
         @DisplayName("should cache value to the decorated cache strategy")
-        public void test1() {
+        void test1() {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
@@ -63,7 +66,7 @@ public class ExpiringCacheStrategyTests {
 
         @Test
         @DisplayName("should expire cache entries when cache item lifetime elapses")
-        public void test2() throws Throwable {
+        void test2() throws Throwable {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
@@ -91,7 +94,7 @@ public class ExpiringCacheStrategyTests {
     class GetMethod {
         @Test
         @DisplayName("should return cached value from the decorated cache strategy")
-        public void test1() {
+        void test1() {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
@@ -118,7 +121,7 @@ public class ExpiringCacheStrategyTests {
         @DisplayName(
             "should return empty Optional when key is not found in the decorated cache strategy"
         )
-        public void test2() {
+        void test2() {
             String cacheKey = "cache.key";
     
             StubCacheStrategy<String, String> empty = new StubCacheStrategy<>();
@@ -140,7 +143,7 @@ public class ExpiringCacheStrategyTests {
     class ExpireMethod {
         @Test
         @DisplayName("should expire cached value from the decorated cache strategy")
-        public void test1() {
+        void test1() {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
@@ -164,7 +167,7 @@ public class ExpiringCacheStrategyTests {
     class ExpireAllMethod {
         @Test
         @DisplayName("should expire all cached values from the decorated cache strategy")
-        public void test1() {
+        void test1() {
             String cacheKey = "cache.key";
             String cacheValue = "property.value";
     

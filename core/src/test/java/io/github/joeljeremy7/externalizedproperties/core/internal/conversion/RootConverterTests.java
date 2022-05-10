@@ -31,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RootConverterTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES = 
+        ExternalizedProperties.builder().withDefaults().build();
 
     @Nested
     class Constructor {
@@ -38,7 +40,7 @@ public class RootConverterTests {
         @DisplayName(
             "should throw when externalized proeprties argument is null."
         )
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootConverter(
@@ -52,11 +54,11 @@ public class RootConverterTests {
         @DisplayName(
             "should throw when converters collection argument is null."
         )
-        public void test2() {
+        void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootConverter(
-                    ExternalizedProperties.builder().withDefaults().build(),
+                    EXTERNALIZED_PROPERTIES,
                     (Collection<ConverterProvider<?>>)null
                 )  
             );
@@ -66,11 +68,11 @@ public class RootConverterTests {
         @DisplayName(
             "should throw when converters varargs argument is null."
         )
-        public void test3() {
+        void test3() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootConverter(
-                    ExternalizedProperties.builder().withDefaults().build(),
+                    EXTERNALIZED_PROPERTIES,
                     (ConverterProvider[])null
                 )  
             );
@@ -103,9 +105,7 @@ public class RootConverterTests {
             RootConverter.Provider provider = 
                 RootConverter.provider(DefaultConverter.provider());
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 
@@ -123,10 +123,9 @@ public class RootConverterTests {
         @Test
         @DisplayName("should not return null")
         void test2() {
-            RootConverter.Provider provider = 
-                RootConverter.provider(
-                    Arrays.asList(DefaultConverter.provider())
-                );
+            RootConverter.Provider provider = RootConverter.provider(
+                Arrays.asList(DefaultConverter.provider())
+            );
 
             assertNotNull(provider);
         }
@@ -134,14 +133,11 @@ public class RootConverterTests {
         @Test
         @DisplayName("should not return null on get")
         void test3() {
-            RootConverter.Provider provider = 
-                RootConverter.provider(
-                    Arrays.asList(DefaultConverter.provider())
-                );
-
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
+            RootConverter.Provider provider = RootConverter.provider(
+                Arrays.asList(DefaultConverter.provider())
             );
+
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 
@@ -152,7 +148,7 @@ public class RootConverterTests {
             "should return true when configured converters " + 
             "support conversion to the target type"
         )
-        public void test1() {
+        void test1() {
             ConverterProvider<?> provider = (ep, rc) -> new PrimitiveConverter();
             RootConverter converter = rootConverter(provider);
 
@@ -172,7 +168,7 @@ public class RootConverterTests {
             "should return false when configured converters " + 
             "does not support conversion to the target type"
         )
-        public void test2() {
+        void test2() {
             ConverterProvider<?> provider = (ep, rc) -> new PrimitiveConverter();
             RootConverter converter = rootConverter(provider);
 
@@ -190,7 +186,7 @@ public class RootConverterTests {
         @DisplayName(
             "should throw when proxy method argument is null."
         )
-        public void test1() {
+        void test1() {
             ConverterProvider<?> provider = (ep, rc) -> new PrimitiveConverter();
             RootConverter converter = rootConverter(provider);
 
@@ -204,7 +200,7 @@ public class RootConverterTests {
         @DisplayName(
             "should throw when value to convert argument is null."
         )
-        public void test2() {
+        void test2() {
             ConverterProvider<?> provider = (ep, rc) -> new PrimitiveConverter();
             RootConverter converter = rootConverter(provider);
 
@@ -222,7 +218,7 @@ public class RootConverterTests {
         @DisplayName(
             "should throw when value target type argument is null."
         )
-        public void test3() {
+        void test3() {
             ConverterProvider<?> provider = (ep, rc) -> new PrimitiveConverter();
             RootConverter converter = rootConverter(provider);
 
@@ -240,7 +236,7 @@ public class RootConverterTests {
         @DisplayName(
             "should correctly convert to target type."
         )
-        public void test4() {
+        void test4() {
             ConverterProvider<?> provider = (ep, rc) -> new PrimitiveConverter();
             RootConverter converter = rootConverter(provider);
 
@@ -263,7 +259,7 @@ public class RootConverterTests {
         @DisplayName(
             "should throw when there is no handler that can convert to target type."
         )
-        public void tes54() {
+        void tes54() {
             ConverterProvider<?> provider = (ep, rc) -> new PrimitiveConverter();
             RootConverter converter = rootConverter(provider);
 
@@ -274,10 +270,7 @@ public class RootConverterTests {
             // No handler registered to convert to List.
             assertThrows(
                 ConversionException.class, 
-                () -> converter.convert(
-                    proxyMethod, 
-                    "1,2,3"
-                )
+                () -> converter.convert(proxyMethod, "1,2,3")
             );
         }
 
@@ -285,7 +278,7 @@ public class RootConverterTests {
         @DisplayName(
             "should wrap and re-throw when handler has thrown an exception."
         )
-        public void test6() {
+        void test6() {
             // Handler that can convert anything but always throws.
             Converter<?> throwingHandler = new Converter<Object>() {
                 @Override
@@ -310,13 +303,11 @@ public class RootConverterTests {
                 ProxyInterface::intProperty
             );
 
+            Type targetType = proxyMethod.returnType();
+
             assertThrows(
                 ConversionException.class, 
-                () -> converter.convert(
-                    proxyMethod,
-                    "1",
-                    proxyMethod.returnType()
-                )
+                () -> converter.convert(proxyMethod, "1", targetType)
             );
         }
 
@@ -324,7 +315,7 @@ public class RootConverterTests {
         @DisplayName(
             "should skip to next converter when skip result is returned."
         )
-        public void test7() throws InterruptedException {
+        void test7() throws InterruptedException {
             Converter<?> handler1 = new Converter<Object>() {
                 @Override
                 public boolean canConvertTo(Class<?> targetType) {

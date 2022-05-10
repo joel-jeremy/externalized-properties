@@ -23,7 +23,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
     class Constructor {
         @Test
         @DisplayName("should not throw when invoking default constructor")
-        public void test1() {
+        void test1() {
             assertDoesNotThrow(
                 () -> new WeakConcurrentHashMapCacheStrategy<>()
             );
@@ -31,7 +31,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
 
         @Test
         @DisplayName("should throw when cache argument argument is null")
-        public void test2() {
+        void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new WeakConcurrentHashMapCacheStrategy<>(null)
@@ -40,10 +40,10 @@ public class WeakConcurrentHashMapCacheStrategyTests {
     }
 
     @Nested
-    class WeakKeyReference {
+    class WeakKeyReferenceTests {
         @Test
         @DisplayName("should automatically remove cache key when weak references are cleared")
-        public void test1() throws InterruptedException {
+        void test1() throws InterruptedException {
             CacheKey cacheKey1 = new CacheKey("cache.key.1");
             CacheKey cacheKey2 = new CacheKey("cache.key.2");
     
@@ -62,19 +62,19 @@ public class WeakConcurrentHashMapCacheStrategyTests {
 
             // Original key references were nulled so create a new reference
             // with matching string keys for lookups.
-            CacheKey cacheKey1Copy = new CacheKey("cache.key.1");
-            CacheKey cacheKey2Copy = new CacheKey("cache.key.2");
+            CacheKey cacheKey1Lookup = new CacheKey("cache.key.1");
+            CacheKey cacheKey2Lookup = new CacheKey("cache.key.2");
 
             assertTimeoutPreemptively(Duration.ofSeconds(86400), () -> {
                 // Wait for GC to clear references.
-                while (cacheStrategy.get(cacheKey1Copy).isPresent() ||
-                        cacheStrategy.get(cacheKey1Copy).isPresent()) {
+                while (cacheStrategy.get(cacheKey1Lookup).isPresent() ||
+                        cacheStrategy.get(cacheKey2Lookup).isPresent()) {
                     System.gc();
                 }
             });
             
-            assertFalse(cacheStrategy.get(cacheKey1Copy).isPresent());
-            assertFalse(cacheStrategy.get(cacheKey2Copy).isPresent());
+            assertFalse(cacheStrategy.get(cacheKey1Lookup).isPresent());
+            assertFalse(cacheStrategy.get(cacheKey2Lookup).isPresent());
         }
     }
 
@@ -82,7 +82,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
     class CacheMethod {
         @Test
         @DisplayName("should cache value to the cache map")
-        public void test1() {
+        void test1() {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
@@ -102,7 +102,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
     class GetMethod {
         @Test
         @DisplayName("should return cached value from the cache map")
-        public void test1() {
+        void test1() {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
@@ -125,7 +125,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
 
         @Test
         @DisplayName("should return empty Optional when key is not found in cache map")
-        public void test2() {
+        void test2() {
             String cacheKey = "cache.key";
     
             // Empty cache.
@@ -143,7 +143,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
     class ExpireMethod {
         @Test
         @DisplayName("should expire cached value from the cache map")
-        public void test1() {
+        void test1() {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
@@ -166,7 +166,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
     class ExpireAllMethod {
         @Test
         @DisplayName("should expire all cached values from the cache map")
-        public void test1() {
+        void test1() {
             String cacheKey1 = "cache.key.1";
             String cacheValue1 = "property.value.1";
             String cacheKey2 = "cache.key.2";
@@ -200,7 +200,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
         class EqualsMethod {
             @Test
             @DisplayName("should return true when WeakKey referents are equal")
-            public void test1() {
+            void test1() {
                 String referent = "referent";
                 WeakConcurrentHashMapCacheStrategy.WeakKey<String> key = 
                     new WeakConcurrentHashMapCacheStrategy.WeakKey<>(referent);
@@ -213,7 +213,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
 
             @Test
             @DisplayName("should return false when WeakKey referents are not equal")
-            public void test2() {
+            void test2() {
                 String referent1 = "referent1";
                 WeakConcurrentHashMapCacheStrategy.WeakKey<String> key = 
                     new WeakConcurrentHashMapCacheStrategy.WeakKey<>(referent1);
@@ -227,7 +227,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
 
             @Test
             @DisplayName("should return false when object is not a WeakKey")
-            public void test3() {
+            void test3() {
                 String referent = "referent";
                 WeakConcurrentHashMapCacheStrategy.WeakKey<String> key = 
                     new WeakConcurrentHashMapCacheStrategy.WeakKey<>(referent);

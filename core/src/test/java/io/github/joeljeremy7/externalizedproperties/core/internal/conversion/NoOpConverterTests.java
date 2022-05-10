@@ -54,7 +54,7 @@ public class NoOpConverterTests {
     class CanConvertToMethod {
         @Test
         @DisplayName("should always return false")
-        public void test1() {
+        void test1() {
             assertFalse(
                 NoOpConverter.INSTANCE.canConvertTo(int.class)
             );
@@ -74,7 +74,7 @@ public class NoOpConverterTests {
     class ConvertMethod {
         @Test
         @DisplayName("should always return skip result")
-        public void test1() {
+        void test1() {
             ProxyMethod intProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 ProxyInterface::intProperty
             );

@@ -25,7 +25,7 @@ public class SimpleVariableExpanderTests {
     class Constructor {
         @Test
         @DisplayName("should throw when externalized properties argument is null")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
@@ -38,7 +38,7 @@ public class SimpleVariableExpanderTests {
 
         @Test
         @DisplayName("should throw when variable prefix argument is null")
-        public void test2() {
+        void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
@@ -51,7 +51,7 @@ public class SimpleVariableExpanderTests {
 
         @Test
         @DisplayName("should throw when variable prefix argument is empty")
-        public void test3() {
+        void test3() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
@@ -64,7 +64,7 @@ public class SimpleVariableExpanderTests {
 
         @Test
         @DisplayName("should throw when variable suffix argument is null")
-        public void test4() {
+        void test4() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
@@ -77,7 +77,7 @@ public class SimpleVariableExpanderTests {
 
         @Test
         @DisplayName("should throw when variable suffix argument is empty")
-        public void test5() {
+        void test5() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
@@ -93,7 +93,7 @@ public class SimpleVariableExpanderTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             VariableExpanderProvider<SimpleVariableExpander> provider = 
                 SimpleVariableExpander.provider();
 
@@ -102,7 +102,7 @@ public class SimpleVariableExpanderTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             VariableExpanderProvider<SimpleVariableExpander> provider = 
                 SimpleVariableExpander.provider();
 
@@ -121,7 +121,7 @@ public class SimpleVariableExpanderTests {
     class ProviderMethodWithVariablePrefixAndSuffixOverload {
         @Test
         @DisplayName("should throw when variable prefix is null or empty.")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> SimpleVariableExpander.provider(null, "}")
@@ -134,7 +134,7 @@ public class SimpleVariableExpanderTests {
 
         @Test
         @DisplayName("should throw when variable suffix is null or empty.")
-        public void test2() {
+        void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> SimpleVariableExpander.provider("${", null)
@@ -146,7 +146,7 @@ public class SimpleVariableExpanderTests {
         }
         @Test
         @DisplayName("should not return null.")
-        public void test3() {
+        void test3() {
             VariableExpanderProvider<SimpleVariableExpander> provider = 
                 SimpleVariableExpander.provider("${", "}");
 
@@ -155,7 +155,7 @@ public class SimpleVariableExpanderTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test4() {
+        void test4() {
             VariableExpanderProvider<SimpleVariableExpander> provider = 
                 SimpleVariableExpander.provider("${", "}");
 
@@ -174,7 +174,7 @@ public class SimpleVariableExpanderTests {
     class ExpandVariablesMethod {
         @Test
         @DisplayName("should return value when value is null or empty")
-        public void test1() {
+        void test1() {
             SimpleVariableExpander variableExpander = variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -196,7 +196,7 @@ public class SimpleVariableExpanderTests {
 
         @Test
         @DisplayName("should expand variable with value from resolver")
-        public void test2() {
+        void test2() {
             SimpleVariableExpander variableExpander = variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -221,7 +221,7 @@ public class SimpleVariableExpanderTests {
 
         @Test
         @DisplayName("should expand multiple variables with values from resolvers")
-        public void test3() {
+        void test3() {
             SimpleVariableExpander variableExpander = variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -247,7 +247,7 @@ public class SimpleVariableExpanderTests {
 
         @Test
         @DisplayName("should return original string when there are no variables")
-        public void test4() {
+        void test4() {
             SimpleVariableExpander variableExpander = variableExpander();
             
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -267,7 +267,7 @@ public class SimpleVariableExpanderTests {
 
         @Test
         @DisplayName("should throw when variable cannot be resolved from any resolvers")
-        public void test5() {
+        void test5() {
             SimpleVariableExpander variableExpander = variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -288,7 +288,7 @@ public class SimpleVariableExpanderTests {
             "should skip expansion when there is no variable name between " +
             "variable prefix and variable suffix"
         )
-        public void test6() {
+        void test6() {
             SimpleVariableExpander variableExpander = variableExpander();
             
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -308,7 +308,7 @@ public class SimpleVariableExpanderTests {
             "should skip expansion " + 
             "when there is there is a variable prefix detected but no variable suffix"
         )
-        public void test7() {
+        void test7() {
             SimpleVariableExpander variableExpander = variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -327,7 +327,7 @@ public class SimpleVariableExpanderTests {
         @DisplayName(
             "should expand variable with value from resolver using custom prefix and suffix"
         )
-        public void test8() {
+        void test8() {
             SimpleVariableExpander variableExpander = variableExpander(
                 "#[",
                 "]"

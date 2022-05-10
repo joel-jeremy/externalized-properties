@@ -4,6 +4,7 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
+import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver.UnresolvedPropertyHandler;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -40,9 +40,11 @@ public class MapResolverTests {
         @Test
         @DisplayName("should throw when unresolved property handler argument is null.")
         void test2() {
+            Map<String, String> map = new HashMap<>();
+
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new MapResolver(new HashMap<>(), null)
+                () -> new MapResolver(map, null)
             );
         }
     }
@@ -51,7 +53,7 @@ public class MapResolverTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ResolverProvider<MapResolver> provider = 
                 MapResolver.provider(Collections.emptyMap());
 
@@ -60,7 +62,7 @@ public class MapResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ResolverProvider<MapResolver> provider = 
                 MapResolver.provider(Collections.emptyMap());
 
@@ -74,7 +76,7 @@ public class MapResolverTests {
     class ProviderMethodWithUnresolvedPropertyHandlerOverload {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ResolverProvider<MapResolver> provider = 
                 MapResolver.provider(
                     Collections.emptyMap(),
@@ -86,7 +88,7 @@ public class MapResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ResolverProvider<MapResolver> provider = 
                 MapResolver.provider(
                     Collections.emptyMap(),
@@ -180,7 +182,7 @@ public class MapResolverTests {
         void test3() {
             AtomicBoolean unresolvedPropertyHandlerInvoked = new AtomicBoolean(false);
 
-            Function<String, String> unresolvedPropertyHandler = 
+            UnresolvedPropertyHandler unresolvedPropertyHandler = 
                 propertyName -> {
                     unresolvedPropertyHandlerInvoked.set(true);
                     return propertyName + "-default-value";
@@ -200,7 +202,7 @@ public class MapResolverTests {
             assertNotNull(result);
             assertTrue(result.isPresent());
             assertEquals(
-                unresolvedPropertyHandler.apply("property"), 
+                unresolvedPropertyHandler.handle("property"), 
                 result.get()    
             );
         }
@@ -212,7 +214,7 @@ public class MapResolverTests {
 
     private MapResolver resolverToTest(
             Map<String, String> map,
-            Function<String, String> unresolverPropertyHandler
+            UnresolvedPropertyHandler unresolverPropertyHandler
     ) {
         return new MapResolver(map, unresolverPropertyHandler);
     }

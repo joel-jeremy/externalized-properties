@@ -134,27 +134,12 @@ public class ProxyMethodHandler {
             Method method, 
             Object[] args
     ) {
-        try {
-            DefaultInterfaceMethodHandler handler = buildDefaultInterfaceMethodHandler(
-                proxy, 
-                method, 
-                methodHandleFactory
-            );
-            return handler.invoke(args);
-        }
-        catch (RuntimeException ex) {
-            throw ex;
-        }
-        catch (Throwable ex) {
-            throw new ExternalizedPropertiesException(
-                String.format(
-                    "Error occurred while invoking default interface method. " +
-                    "Proxy method: %s.",
-                    method.toGenericString()
-                ), 
-                ex
-            );
-        }
+        DefaultInterfaceMethodHandler handler = buildDefaultInterfaceMethodHandler(
+            proxy, 
+            method, 
+            methodHandleFactory
+        );
+        return handler.invoke(args);
     }
 
     private DefaultInterfaceMethodHandler buildDefaultInterfaceMethodHandler(
@@ -163,9 +148,20 @@ public class ProxyMethodHandler {
             MethodHandleFactory methodHandleFactory
     ) {
         if (proxyMethod.isDefault()) {
-            MethodHandle methodHandle = methodHandleFactory.createMethodHandle(proxyMethod);
+            MethodHandle methodHandle = methodHandleFactory.createMethodHandle(proxyMethod).bindTo(proxy);
             return args -> {
-                return methodHandle.bindTo(proxy).invokeWithArguments(args);
+                try {
+                    return methodHandle.invokeWithArguments(args);
+                } catch (Throwable e) {
+                    throw new ExternalizedPropertiesException(
+                        String.format(
+                            "Error occurred while invoking default interface method. " +
+                            "Proxy method: %s.",
+                            proxyMethod.toGenericString()
+                        ), 
+                        e
+                    );
+                }
             };
         }
 
@@ -189,6 +185,6 @@ public class ProxyMethodHandler {
     }
 
     private static interface DefaultInterfaceMethodHandler {
-        Object invoke(Object... args) throws Throwable;
+        Object invoke(Object... args);
     }
 }

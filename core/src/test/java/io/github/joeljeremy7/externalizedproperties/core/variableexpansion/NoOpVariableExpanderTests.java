@@ -21,7 +21,7 @@ public class NoOpVariableExpanderTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             VariableExpanderProvider<NoOpVariableExpander> provider = 
                 NoOpVariableExpander.provider();
 
@@ -30,7 +30,7 @@ public class NoOpVariableExpanderTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             VariableExpanderProvider<NoOpVariableExpander> provider = 
                 NoOpVariableExpander.provider();
 
@@ -50,7 +50,7 @@ public class NoOpVariableExpanderTests {
     class ExpandVariablesMethod {
         @Test
         @DisplayName("should just return the input value")
-        public void test1() {
+        void test1() {
             String value = "${test}";
             
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
