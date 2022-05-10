@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +53,7 @@ public class SetConverterTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ConverterProvider<SetConverter> provider = 
                 SetConverter.provider();
 
@@ -61,7 +62,7 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ConverterProvider<SetConverter> provider = 
                 SetConverter.provider();
             
@@ -81,7 +82,7 @@ public class SetConverterTests {
     class ProviderMethodWithSetFactoryOverload {
         @Test
         @DisplayName("should throw when list factory argument is null.")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> SetConverter.provider(null)
@@ -90,7 +91,7 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should not return null.")
-        public void test2() {
+        void test2() {
             ConverterProvider<SetConverter> provider = 
                 SetConverter.provider(LinkedHashSet::new);
 
@@ -99,7 +100,7 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test3() {
+        void test3() {
             ConverterProvider<SetConverter> provider = 
                 SetConverter.provider(LinkedHashSet::new);
             
@@ -595,7 +596,30 @@ public class SetConverterTests {
             // Throws IllegalStateException if set factory returned null.
             assertThrows(
                 IllegalStateException.class, 
-                () -> converter.convert(proxyMethod, "value1,,value3,,value5")
+                () -> converter.convert(proxyMethod, "value1,value2,value3")
+            );
+        }
+        
+        @Test
+        @DisplayName(
+            "should throw when provided set factory returns a populated set."
+        )
+        void setFactoryTest3() {
+            SetConverter converter = converterToTest(
+                // Returns a populated set.
+                capacity -> new HashSet<>(Arrays.asList(
+                    "should", "not", "be", "populated"
+                ))
+            );
+
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::setProperty
+            );
+
+            // Throws IllegalStateException if set factory returned a populated set.
+            assertThrows(
+                IllegalStateException.class, 
+                () -> converter.convert(proxyMethod, "value1,value2,value3")
             );
         }
     }

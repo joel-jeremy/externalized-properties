@@ -207,7 +207,8 @@ public class ResourceResolver extends MapResolver {
     }
 
     private static Map<String, String> readFromUrl(URL url, ResourceReader reader) 
-            throws IOException {
+            throws IOException 
+    {
         Map<String, String> result = new LinkedHashMap<>();
         String resourceContent = readString(url.openStream());
         // Add the raw resource String as property.
@@ -229,9 +230,9 @@ public class ResourceResolver extends MapResolver {
     }
 
     private static Map<String, String> flattenMap(Map<String, Object> source) {
-		Map<String, String> result = new LinkedHashMap<>();
-		buildFlattenedMap(result, source, null);
-		return result;
+		Map<String, String> flattened = new LinkedHashMap<>();
+		buildFlattenedMap(flattened, source, null);
+		return flattened;
 	}
 
 	private static void buildFlattenedMap(
@@ -239,16 +240,10 @@ public class ResourceResolver extends MapResolver {
             Map<String, Object> source, 
             @Nullable String parentPath
     ) {
-        source.forEach((key, value) -> {
-            // Means this is nested.
-            if (parentPath != null) {
-                if (key.startsWith("[")) {
-                    key = parentPath + key;
-                }
-                else {
-                    key = parentPath + '.' + key;
-                }
-            }
+        for (Map.Entry<String, Object> e : source.entrySet()) {
+            String key = determineKey(e.getKey(), parentPath);
+            Object value = e.getValue();
+
             if (value instanceof String) {
                 result.put(key, (String)value);
             }
@@ -262,25 +257,48 @@ public class ResourceResolver extends MapResolver {
                 // Need a compound key
                 @SuppressWarnings("unchecked")
                 Collection<Object> collection = (Collection<Object>)value;
-                if (collection.isEmpty()) {
-                    result.put(key, "");
-                }
-                else {
-                    int count = 0;
-                    for (Object item : collection) {
-                        buildFlattenedMap(
-                            result, 
-                            Collections.singletonMap("[" + count++ + "]", item), 
-                            key
-                        );
-                    }
-                }
+                buildFlattenedCollection(result, collection, key);
             }
             else {
                 // Stringify value or empty.
                 result.put(key, (value != null ? value.toString() : ""));
             }
-        });
+        }
+    }
+
+    private static void buildFlattenedCollection(
+            Map<String, String> result, 
+            Collection<Object> source,
+            String key
+    ) {
+        if (source.isEmpty()) {
+            result.put(key, "");
+            return;
+        }
+
+        int index = 0;
+        for (Object item : source) {
+            buildFlattenedMap(
+                result, 
+                Collections.singletonMap("[" + index++ + "]", item), 
+                key
+            );
+        }
+    }
+
+    private static String determineKey(
+            String key,
+            @Nullable String parentPath
+    ) {
+        if (parentPath != null) {
+            // Means this is nested.
+            if (key.startsWith("[")) {
+                return parentPath + key;
+            }
+
+            return parentPath + '.' + key;
+        }
+        return key;
     }
 
     /**
@@ -321,7 +339,7 @@ public class ResourceResolver extends MapResolver {
                 )
                 .collect(Collectors.toMap(
                     e -> (String)e.getKey(), 
-                    e -> e.getValue()
+                    Map.Entry::getValue
                 ));
         }
     }

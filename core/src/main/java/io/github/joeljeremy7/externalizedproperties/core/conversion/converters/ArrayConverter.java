@@ -142,12 +142,9 @@ public class ArrayConverter implements Converter<Object[]> {
 
     private void throwIfArrayHasTypeVariables(Type targetType) {
         GenericArrayType genericArray = TypeUtilities.asGenericArrayType(targetType);
-        if (genericArray != null) {
-            if (TypeUtilities.isTypeVariable(genericArray.getGenericComponentType())) {
-                throw new ConversionException(
-                    "Type variables e.g. T[] are not supported."
-                );
-            }
+        if (genericArray != null && 
+                TypeUtilities.isTypeVariable(genericArray.getGenericComponentType())) {
+            throw new ConversionException("Type variables e.g. T[] are not supported.");
         }
     }
 }

@@ -30,21 +30,22 @@ public class CachingResolverTests {
         @Test
         @DisplayName("should throw when decorated argument is null.")
         void test1() {
+            StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
+
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new CachingResolver(null, new StubCacheStrategy<>())
+                () -> new CachingResolver(null, cacheStrategy)
             );
         }
 
         @Test
         @DisplayName("should throw when cache strategy argument is null.")
         void test2() {
+            StubResolver decorated = new StubResolver();
+
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new CachingResolver(
-                    new StubResolver(),
-                    null
-                )
+                () -> new CachingResolver(decorated, null)
             );
         }
     }
@@ -53,40 +54,50 @@ public class CachingResolverTests {
     class ProviderMethod {
         @Test
         @DisplayName("should throw when decorated argument is null.")
-        public void test1() {
+        void test1() {
+            StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
+
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> CachingResolver.provider(null, new StubCacheStrategy<>())
+                () -> CachingResolver.provider(null, cacheStrategy)
             );
         }
 
         @Test
         @DisplayName("should throw when cache strategy argument is null.")
-        public void test2() {
+        void test2() {
+            ResolverProvider<?> decorated = StubResolver.provider();
+
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> CachingResolver.provider(StubResolver.provider(), null)
+                () -> CachingResolver.provider(decorated, null)
             );
         }
 
         @Test
         @DisplayName("should not return null.")
-        public void test3() {
+        void test3() {
+            ResolverProvider<?> decorated = StubResolver.provider();
+            StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
+
             ResolverProvider<CachingResolver> provider = 
-                CachingResolver.provider(StubResolver.provider(), new StubCacheStrategy<>());
+                CachingResolver.provider(decorated, cacheStrategy);
 
             assertNotNull(provider);
         }
 
         @Test
         @DisplayName("should return an instance on get")
-        public void test4() {
-            ResolverProvider<CachingResolver> provider = 
-                CachingResolver.provider(StubResolver.provider(), new StubCacheStrategy<>());
+        void test4() {
+            ResolverProvider<?> decorated = StubResolver.provider();
+            StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            ResolverProvider<CachingResolver> provider = 
+                CachingResolver.provider(decorated, cacheStrategy);
+            ExternalizedProperties externalizedProperties = 
+                ExternalizedProperties.builder().withDefaults().build();
+
+            assertNotNull(provider.get(externalizedProperties));
         }
     }
 

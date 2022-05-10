@@ -57,7 +57,7 @@ public interface ResolverProvider<T extends Resolver> {
     static final class Memoized<T extends Resolver> implements ResolverProvider<T> {
 
         private final ResolverProvider<T> provider;
-        private final AtomicReference<T> memoized = new AtomicReference<>(null);
+        private final AtomicReference<T> resolverRef = new AtomicReference<>(null);
 
         private Memoized(ResolverProvider<T> provider) {
             this.provider = requireNonNull(provider, "provider");
@@ -66,11 +66,11 @@ public interface ResolverProvider<T extends Resolver> {
         /** {@inheritDoc} */
         @Override
         public T get(ExternalizedProperties externalizedProperties) {
-            T result = memoized.get();
+            T result = resolverRef.get();
             if (result == null) {
                 result = provider.get(externalizedProperties);
-                memoized.compareAndSet(null, result);
-                result = memoized.get();
+                resolverRef.compareAndSet(null, result);
+                result = resolverRef.get();
                 if (result == null) {
                     throw new IllegalStateException("Memoized provider returned null.");
                 }

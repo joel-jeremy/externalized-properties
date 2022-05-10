@@ -6,7 +6,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import java.util.Objects;
+import java.util.Objects; 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -104,7 +104,7 @@ public class WeakConcurrentHashMapCacheStrategy<K, V> implements CacheStrategy<K
             if (obj instanceof WeakKey) {
                 @SuppressWarnings("unchecked")
                 WeakKey<K> other = (WeakKey<K>)obj;
-                if (Objects.equals(get(), other.get())) {
+                if (Objects.equals(super.get(), other.get())) {
                     return true;
                 }
             }

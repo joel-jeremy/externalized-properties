@@ -32,7 +32,7 @@ public class SimpleNameValueQueryExecutor extends AbstractNameValueQueryExecutor
      * {@code io.github.joeljeremy7.externalizedproperties.resolvers.database.
      * queryexecutors.SimpleNameValueQueryExecutor.schema} system property.
      */
-    public static final String SCHEMA = System.getProperty(
+    public static final String DEFAULT_SCHEMA = System.getProperty(
         SCHEMA_SYSTEM_PROPERTY,
         ""
     );
@@ -43,7 +43,7 @@ public class SimpleNameValueQueryExecutor extends AbstractNameValueQueryExecutor
      * via the {@code io.github.joeljeremy7.externalizedproperties.resolvers.database.
      * queryexecutors.SimpleNameValueQueryExecutor.table} system property.
      */
-    public static final String TABLE = System.getProperty(
+    public static final String DEFAULT_TABLE = System.getProperty(
         TABLE_SYSTEM_PROPERTY,
         "externalized_properties"
     );
@@ -54,7 +54,7 @@ public class SimpleNameValueQueryExecutor extends AbstractNameValueQueryExecutor
      * {@code io.github.joeljeremy7.externalizedproperties.resolvers.database.
      * queryexecutors.SimpleNameValueQueryExecutor.propertyNameColumn} system property.
      */
-    public static final String PROPERTY_NAME_COLUMN = System.getProperty(
+    public static final String DEFAULT_PROPERTY_NAME_COLUMN = System.getProperty(
         PROPERTY_NAME_COLUMN_SYSTEM_PROPERTY,
         "property_name"
     );
@@ -65,7 +65,7 @@ public class SimpleNameValueQueryExecutor extends AbstractNameValueQueryExecutor
      * {@code io.github.joeljeremy7.externalizedproperties.resolvers.database.
      * queryexecutors.SimpleNameValueQueryExecutor.propertyValueColumn} system property.
      */
-    public static final String PROPERTY_VALUE_COLUMN = System.getProperty(
+    public static final String DEFAULT_PROPERTY_VALUE_COLUMN = System.getProperty(
         PROPERTY_VALUE_COLUMN_SYSTEM_PROPERTY,
         "property_value"
     );
@@ -79,7 +79,12 @@ public class SimpleNameValueQueryExecutor extends AbstractNameValueQueryExecutor
      * Default constructor. Default database elements will be used.
      */
     public SimpleNameValueQueryExecutor() {
-        this(SCHEMA, TABLE, PROPERTY_NAME_COLUMN, PROPERTY_VALUE_COLUMN);
+        this(
+            DEFAULT_SCHEMA, 
+            DEFAULT_TABLE, 
+            DEFAULT_PROPERTY_NAME_COLUMN, 
+            DEFAULT_PROPERTY_VALUE_COLUMN
+        );
     }
 
     /**

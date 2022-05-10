@@ -42,7 +42,7 @@ public class DateTimeConverterTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ConverterProvider<DateTimeConverter> provider = 
                 DateTimeConverter.provider();
 
@@ -51,7 +51,7 @@ public class DateTimeConverterTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ConverterProvider<DateTimeConverter> provider = 
                 DateTimeConverter.provider();
             

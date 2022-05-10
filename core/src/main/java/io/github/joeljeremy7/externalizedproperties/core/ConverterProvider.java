@@ -64,7 +64,7 @@ public interface ConverterProvider<T extends Converter<?>> {
     static final class Memoized<T extends Converter<?>> implements ConverterProvider<T> {
 
         private final ConverterProvider<T> provider;
-        private final AtomicReference<T> memoized = new AtomicReference<>(null);
+        private final AtomicReference<T> converterRef = new AtomicReference<>(null);
 
         private Memoized(ConverterProvider<T> provider) {
             this.provider = requireNonNull(provider, "provider");
@@ -76,11 +76,11 @@ public interface ConverterProvider<T extends Converter<?>> {
                 ExternalizedProperties externalizedProperties,
                 Converter<?> rootConverter
         ) {
-            T result = memoized.get();
+            T result = converterRef.get();
             if (result == null) {
                 result = provider.get(externalizedProperties, rootConverter);
-                memoized.compareAndSet(null, result);
-                result = memoized.get();
+                converterRef.compareAndSet(null, result);
+                result = converterRef.get();
                 if (result == null) {
                     throw new IllegalStateException("Memoized provider returned null.");
                 }

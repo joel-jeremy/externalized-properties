@@ -72,13 +72,15 @@ public class ConverterProviderTests {
                     .withDefaultResolvers()
                     .converters(memoized)
                     .build();
+
+            RootConverter rootConverter = new RootConverter(
+                externalizedProperties, 
+                memoized
+            );
             
             assertThrows(
                 IllegalStateException.class, 
-                () -> memoized.get(
-                    externalizedProperties,
-                    new RootConverter(externalizedProperties, memoized)
-                )
+                () -> memoized.get(externalizedProperties, rootConverter)
             );
         }
 

@@ -29,7 +29,7 @@ public class PatternVariableExpanderTests {
     class Constructor {
         @Test
         @DisplayName("should throw when externalized properties argument is null")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> new PatternVariableExpander(null)
@@ -38,7 +38,7 @@ public class PatternVariableExpanderTests {
 
         @Test
         @DisplayName("should throw when variable pattern argument is null")
-        public void test2() {
+        void test2() {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> new PatternVariableExpander(
@@ -53,7 +53,7 @@ public class PatternVariableExpanderTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             VariableExpanderProvider<PatternVariableExpander> provider = 
                 PatternVariableExpander.provider();
 
@@ -62,7 +62,7 @@ public class PatternVariableExpanderTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             VariableExpanderProvider<PatternVariableExpander> provider = 
                 PatternVariableExpander.provider();
 
@@ -81,7 +81,7 @@ public class PatternVariableExpanderTests {
     class ProviderMethodWithVariablePatternOverload {
         @Test
         @DisplayName("should throw when variable suffix is null.")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> PatternVariableExpander.provider(null)
@@ -90,7 +90,7 @@ public class PatternVariableExpanderTests {
 
         @Test
         @DisplayName("should not return null.")
-        public void test2() {
+        void test2() {
             VariableExpanderProvider<PatternVariableExpander> provider = 
                 PatternVariableExpander.provider(Pattern.compile("\\$\\{(.+?)\\}"));
 
@@ -99,7 +99,7 @@ public class PatternVariableExpanderTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test3() {
+        void test3() {
             VariableExpanderProvider<PatternVariableExpander> provider = 
                 PatternVariableExpander.provider(Pattern.compile("\\$\\{(.+?)\\}"));
 
@@ -118,7 +118,7 @@ public class PatternVariableExpanderTests {
     class ExpandVariablesMethod {
         @Test
         @DisplayName("should return value when value is null or empty")
-        public void test1() {
+        void test1() {
             PatternVariableExpander variableExpander = variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -140,7 +140,7 @@ public class PatternVariableExpanderTests {
 
         @Test
         @DisplayName("should expand variables with values from resolvers")
-        public void test2() {
+        void test2() {
             PatternVariableExpander variableExpander = variableExpander();
             
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -165,7 +165,7 @@ public class PatternVariableExpanderTests {
 
         @Test
         @DisplayName("should return same string when there are no variables")
-        public void test3() {
+        void test3() {
             PatternVariableExpander variableExpander =  variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -185,7 +185,7 @@ public class PatternVariableExpanderTests {
 
         @Test
         @DisplayName("should throw when variable cannot be resolved from any resolvers")
-        public void test4() {
+        void test4() {
             PatternVariableExpander variableExpander = variableExpander();
             
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -205,7 +205,7 @@ public class PatternVariableExpanderTests {
         @DisplayName(
             "should expand variable with value from resolver using custom prefix and suffix"
         )
-        public void test5() {
+        void test5() {
             PatternVariableExpander variableExpander = variableExpander(
                 CUSTOM_VARIABLE_PATTERN
             );

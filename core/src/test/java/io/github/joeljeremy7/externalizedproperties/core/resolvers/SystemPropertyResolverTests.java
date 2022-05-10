@@ -24,7 +24,7 @@ public class SystemPropertyResolverTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ResolverProvider<SystemPropertyResolver> provider = 
                 SystemPropertyResolver.provider();
 
@@ -33,7 +33,7 @@ public class SystemPropertyResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ResolverProvider<SystemPropertyResolver> provider = 
                 SystemPropertyResolver.provider();
 

@@ -25,7 +25,7 @@ public class ProxyMethodAdapterTests {
     class Constructor {
         @Test
         @DisplayName("should throw when method argument is null")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new ProxyMethodAdapter(null)
@@ -37,7 +37,7 @@ public class ProxyMethodAdapterTests {
     class DeclaringClassMethod {
         @Test
         @DisplayName("should return method's declaring class.")
-        public void test1() {
+        void test1() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -53,7 +53,7 @@ public class ProxyMethodAdapterTests {
     class NameMethod {
         @Test
         @DisplayName("should return method name.")
-        public void test1() {
+        void test1() {
             String methodName = "property";
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
@@ -70,7 +70,7 @@ public class ProxyMethodAdapterTests {
     class ExternalizedPropertyNameMethod {
         @Test
         @DisplayName("should return name of the property.")
-        public void test1() {
+        void test1() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -92,7 +92,7 @@ public class ProxyMethodAdapterTests {
         @DisplayName(
             "should return all annotations the method is annotated with."
         )
-        public void test() {
+        void test() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -101,7 +101,7 @@ public class ProxyMethodAdapterTests {
         
             Annotation[] annotations = proxyMethod.annotations();
             
-            assertTrue(annotations.length == 1);
+            assertEquals(1, annotations.length);
             assertEquals(ExternalizedProperty.class, annotations[0].annotationType());
         }
 
@@ -109,7 +109,7 @@ public class ProxyMethodAdapterTests {
         @DisplayName(
             "should return empty array when method is not annotated with any annotations."
         )
-        public void test2() {
+        void test2() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::defaultPropertyWithParameterNoAnnotation
@@ -118,7 +118,7 @@ public class ProxyMethodAdapterTests {
 
             Annotation[] annotations = proxyMethod.annotations();
 
-            assertTrue(annotations.length == 0);
+            assertEquals(0, annotations.length);
         }
     }
 
@@ -129,7 +129,7 @@ public class ProxyMethodAdapterTests {
             "should return the annotation " + 
             "when method is annotation with the specified annotation class."
         )
-        public void test() {
+        void test() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -147,7 +147,7 @@ public class ProxyMethodAdapterTests {
             "should return an empty Optional " + 
             "when method is not annotated with the specified annotation class."
         )
-        public void test2() {
+        void test2() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -168,7 +168,7 @@ public class ProxyMethodAdapterTests {
         @DisplayName(
             "should return true when method is annotated with the specified annotation class."
         )
-        public void test1() {
+        void test1() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -184,7 +184,7 @@ public class ProxyMethodAdapterTests {
         @DisplayName(
             "should return false when method is annotated with the specified annotation class."
         )
-        public void test2() {
+        void test2() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -201,7 +201,7 @@ public class ProxyMethodAdapterTests {
     class RawReturnTypeMethod {
         @Test
         @DisplayName("should return method's return type.")
-        public void test1() {
+        void test1() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -218,7 +218,7 @@ public class ProxyMethodAdapterTests {
     class ReturnTypeMethod {
         @Test
         @DisplayName("should return method's generic return type.")
-        public void test1() {
+        void test1() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -235,7 +235,7 @@ public class ProxyMethodAdapterTests {
     class RawParameterTypesMethod {
         @Test
         @DisplayName("should return method's parameter types.")
-        public void test1() {
+        void test1() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::defaultPropertyWithParameter
@@ -253,7 +253,7 @@ public class ProxyMethodAdapterTests {
     class ParameterTypesMethod {
         @Test
         @DisplayName("should return method's generic parameter types.")
-        public void test1() {
+        void test1() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::defaultPropertyWithParameter
@@ -271,7 +271,7 @@ public class ProxyMethodAdapterTests {
     class HasReturnTypeMethod {
         @Test
         @DisplayName("should return true when method's return type matches.")
-        public void test1() {
+        void test1() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -285,7 +285,7 @@ public class ProxyMethodAdapterTests {
 
         @Test
         @DisplayName("should return false when method's return type does not match.")
-        public void test2() {
+        void test2() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -302,7 +302,7 @@ public class ProxyMethodAdapterTests {
     class HasReturnTypeMethodWithTypeArgument {
         @Test
         @DisplayName("should return true when method's return type matches.")
-        public void test1() {
+        void test1() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -318,7 +318,7 @@ public class ProxyMethodAdapterTests {
 
         @Test
         @DisplayName("should return false when method's return type does not match.")
-        public void test2() {
+        void test2() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -340,7 +340,7 @@ public class ProxyMethodAdapterTests {
             "should return method return type's generic type parameters " + 
             "when method's return type is a generic type."
         )
-        public void test1() {
+        void test1() {
             Method method = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::optionalProperty
@@ -360,7 +360,7 @@ public class ProxyMethodAdapterTests {
             "should return empty generic type parameter list " + 
             "when method's return type is not a generic type."
         )
-        public void test2() {
+        void test2() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -371,7 +371,7 @@ public class ProxyMethodAdapterTests {
                 proxyMethod.typeParametersOfReturnType();
 
             // ProxyInterface.property returns a String which is not generic.
-            assertTrue(genericTypeParameters.length == 0);
+            assertEquals(0, genericTypeParameters.length);
         }
     }
 
@@ -382,7 +382,7 @@ public class ProxyMethodAdapterTests {
             "should return method return type's generic type parameter " + 
             "when method's return type is a generic type."
         )
-        public void test1() {
+        void test1() {
             Method method = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::optionalProperty
@@ -402,7 +402,7 @@ public class ProxyMethodAdapterTests {
             "should return empty Optional when method's return type " + 
             "is a generic type but requested type parameter index is out of bounds."
         )
-        public void test2() {
+        void test2() {
             Method method = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::optionalProperty
@@ -421,7 +421,7 @@ public class ProxyMethodAdapterTests {
             "should return empty Optional" + 
             "when method's return type is not a generic type."
         )
-        public void test3() {
+        void test3() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -440,7 +440,7 @@ public class ProxyMethodAdapterTests {
     class IsDefaultInterfaceMethodMethod {
         @Test
         @DisplayName("should return true when method is a default interface method.")
-        public void test1() {
+        void test1() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::defaultPropertyWithParameterNoAnnotation
@@ -454,7 +454,7 @@ public class ProxyMethodAdapterTests {
 
         @Test
         @DisplayName("should return false when method is not a default interface method.")
-        public void test2() {
+        void test2() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -471,7 +471,7 @@ public class ProxyMethodAdapterTests {
     class MethodSignatureStringMethod {
         @Test
         @DisplayName("should return method's signature string.")
-        public void test1() {
+        void test1() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::property
@@ -489,7 +489,7 @@ public class ProxyMethodAdapterTests {
 
         @Test
         @DisplayName("should return method's generic signature string.")
-        public void test2() {
+        void test2() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::optionalProperty
@@ -508,7 +508,7 @@ public class ProxyMethodAdapterTests {
     class ToStringMethod {
         @Test
         @DisplayName("should match methodSignatureString() method.")
-        public void test2() {
+        void test2() {
             Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
                 ProxyInterface.class, 
                 ProxyInterface::optionalProperty

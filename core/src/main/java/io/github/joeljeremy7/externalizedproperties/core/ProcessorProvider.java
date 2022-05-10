@@ -57,7 +57,7 @@ public interface ProcessorProvider<T extends Processor> {
     static final class Memoized<T extends Processor> implements ProcessorProvider<T> {
 
         private final ProcessorProvider<T> provider;
-        private final AtomicReference<T> memoized = new AtomicReference<>(null);
+        private final AtomicReference<T> processorRef = new AtomicReference<>(null);
 
         private Memoized(ProcessorProvider<T> provider) {
             this.provider = requireNonNull(provider, "provider");
@@ -66,11 +66,11 @@ public interface ProcessorProvider<T extends Processor> {
         /** {@inheritDoc} */
         @Override
         public T get(ExternalizedProperties externalizedProperties) {
-            T result = memoized.get();
+            T result = processorRef.get();
             if (result == null) {
                 result = provider.get(externalizedProperties);
-                memoized.compareAndSet(null, result);
-                result = memoized.get();
+                processorRef.compareAndSet(null, result);
+                result = processorRef.get();
                 if (result == null) {
                     throw new IllegalStateException("Memoized provider returned null.");
                 }

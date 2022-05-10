@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -15,7 +16,7 @@ public class ArgumentsTests {
     class RequireNonNullMethod {
         @Test
         @DisplayName("should throw when arg argument is null.")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> Arguments.requireNonNull(null, "arg")
@@ -24,7 +25,7 @@ public class ArgumentsTests {
 
         @Test
         @DisplayName("should return non-null arg.")
-        public void test4() {
+        void test4() {
             String arg = "my-arg";
             String result = Arguments.requireNonNull(arg, "arg.");
 
@@ -36,7 +37,7 @@ public class ArgumentsTests {
     class RequireNonNullOrEmptyStringMethod {
         @Test
         @DisplayName("should throw when arg argument is null.")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> Arguments.requireNonNullOrEmptyString(
@@ -48,7 +49,7 @@ public class ArgumentsTests {
 
         @Test
         @DisplayName("should return non-null arg.")
-        public void test4() {
+        void test4() {
             String arg = "my-arg";
             String result = Arguments.requireNonNullOrEmptyString(
                 arg,
@@ -63,7 +64,7 @@ public class ArgumentsTests {
     class RequireNonNullOrEmptyCollectionMethod {
         @Test
         @DisplayName("should throw when arg collection argument is null.")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> Arguments.requireNonNullOrEmptyCollection(
@@ -75,11 +76,12 @@ public class ArgumentsTests {
         
         @Test
         @DisplayName("should throw when arg collection argument is empty.")
-        public void test2() {
+        void test2() {
+            List<?> arg = Collections.emptyList();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> Arguments.requireNonNullOrEmptyCollection(
-                    Collections.emptyList(),
+                    arg,
                     "arg"
                 )
             );
@@ -87,7 +89,7 @@ public class ArgumentsTests {
 
         @Test
         @DisplayName("should return non-null or empty collection arg.")
-        public void test5() {
+        void test5() {
             Collection<String> arg = Collections.singleton("my-arg");
             Collection<String> result = Arguments.requireNonNullOrEmptyCollection(
                 arg,
@@ -101,7 +103,7 @@ public class ArgumentsTests {
         class RequireNonNullOrEmptyArrayMethod {
             @Test
             @DisplayName("should throw when arg array argument is null.")
-            public void test1() {
+            void test1() {
                 assertThrows(
                     IllegalArgumentException.class, 
                     () -> Arguments.requireNonNullOrEmptyArray(
@@ -113,7 +115,7 @@ public class ArgumentsTests {
             
             @Test
             @DisplayName("should throw when arg array argument is empty.")
-            public void test2() {
+            void test2() {
                 assertThrows(
                     IllegalArgumentException.class, 
                     () -> Arguments.requireNonNullOrEmptyArray(
@@ -125,7 +127,7 @@ public class ArgumentsTests {
 
             @Test
             @DisplayName("should return non-null or empty collection arg.")
-            public void test5() {
+            void test5() {
                 String[] arg = new String[] { "my-arg" };
                 String[] result = Arguments.requireNonNullOrEmptyArray(
                     arg,

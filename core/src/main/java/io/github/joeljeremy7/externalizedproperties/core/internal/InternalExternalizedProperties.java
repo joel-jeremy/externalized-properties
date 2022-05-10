@@ -77,7 +77,7 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         }
     }
 
-    private <T> void throwIfVoidReturnType(Method proxyMethod) {
+    private void throwIfVoidReturnType(Method proxyMethod) {
         if (proxyMethod.getReturnType().equals(Void.TYPE) || 
             proxyMethod.getReturnType().equals(Void.class)
         ) {
@@ -87,7 +87,7 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         }
     }
 
-    private <T> void throwIfInvalidMethodSignature(Method proxyMethod) {
+    private void throwIfInvalidMethodSignature(Method proxyMethod) {
         ExternalizedProperty externalizedProperty = 
             proxyMethod.getAnnotation(ExternalizedProperty.class);
         // No need to validate method signature if method is not annotated with 

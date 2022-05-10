@@ -4,6 +4,7 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
+import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver.UnresolvedPropertyHandler;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -80,7 +80,7 @@ public class PropertiesResolverTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ResolverProvider<PropertiesResolver> provider = 
                 PropertiesResolver.provider(new Properties());
 
@@ -89,7 +89,7 @@ public class PropertiesResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ResolverProvider<PropertiesResolver> provider = 
                 PropertiesResolver.provider(new Properties());
 
@@ -104,7 +104,7 @@ public class PropertiesResolverTests {
     class ProviderMethodWithUnresolvedPropertyHandlerOverload {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ResolverProvider<PropertiesResolver> provider = 
                 PropertiesResolver.provider(
                     new Properties(),
@@ -116,7 +116,7 @@ public class PropertiesResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ResolverProvider<PropertiesResolver> provider = 
                 PropertiesResolver.provider(
                     new Properties(),
@@ -183,7 +183,7 @@ public class PropertiesResolverTests {
         void test3() {
             AtomicBoolean unresolvedPropertyHandlerInvoked = new AtomicBoolean(false);
 
-            Function<String, String> unresolvedPropertyHandler = 
+            UnresolvedPropertyHandler unresolvedPropertyHandler = 
                 propertyName -> {
                     unresolvedPropertyHandlerInvoked.set(true);
                     return propertyName + "-default-value";
@@ -203,7 +203,7 @@ public class PropertiesResolverTests {
             assertNotNull(result);
             assertTrue(result.isPresent());
             assertEquals(
-                unresolvedPropertyHandler.apply("property"), 
+                unresolvedPropertyHandler.handle("property"), 
                 result.get()
             );
         }
@@ -215,7 +215,7 @@ public class PropertiesResolverTests {
 
     private PropertiesResolver resolverToTest(
             Properties properties,
-            Function<String, String> unresolverPropertyHandler
+            UnresolvedPropertyHandler unresolverPropertyHandler
     ) {
         return new PropertiesResolver(properties, unresolverPropertyHandler);
     }

@@ -33,6 +33,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -57,6 +58,8 @@ public class DecryptProcessorTests {
     private static final Decryptor RSA_DECRYPTOR = createAsymmetricDecryptor();
 
     private static final String BOUNCY_CASTLE_PROVIDER_NAME = "BC";
+
+    private static final SecureRandom STRONG_SECURE_RANDOM = getStrongSecureRandom();
 
     @BeforeAll
     static void setup() {
@@ -96,9 +99,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should throw when decryptors argument is empty")
         void withCollectionOverloadTest2() {
+            List<Decryptor> empty = Collections.emptyList();
+
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> new DecryptProcessor(Collections.emptyList())
+                () -> new DecryptProcessor(empty)
             );
         }
     }
@@ -107,7 +112,7 @@ public class DecryptProcessorTests {
     class ProviderMethod {
         @Test
         @DisplayName("should throw when decryptor argument is null.")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> DecryptProcessor.provider(null)
@@ -116,7 +121,7 @@ public class DecryptProcessorTests {
 
         @Test
         @DisplayName("should not return null.")
-        public void test2() {
+        void test2() {
             ProcessorProvider<DecryptProcessor> provider = 
                 DecryptProcessor.provider(AES_GCM_DECRYPTOR);
 
@@ -125,13 +130,13 @@ public class DecryptProcessorTests {
 
         @Test
         @DisplayName("should return an instance on get")
-        public void test3() {
+        void test3() {
             ProcessorProvider<DecryptProcessor> provider = 
                 DecryptProcessor.provider(AES_GCM_DECRYPTOR);
+            ExternalizedProperties externalizedProperties = 
+                ExternalizedProperties.builder().withDefaults().build();
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(externalizedProperties));
         }
     }
 
@@ -515,7 +520,7 @@ public class DecryptProcessorTests {
                         () -> factory.asymmetric(
                             null, 
                             RSA_PRIVATE_KEY,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -529,7 +534,7 @@ public class DecryptProcessorTests {
                         () -> factory.asymmetric(
                             RSA_ALGORITHM, 
                             null,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -541,7 +546,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.asymmetric(
                         RSA_ALGORITHM, 
                         RSA_PRIVATE_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -553,7 +558,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.asymmetric(
                         RSA_ALGORITHM, 
                         RSA_PRIVATE_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -567,7 +572,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.asymmetric(
                         RSA_ALGORITHM, 
                         RSA_PRIVATE_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -585,7 +590,7 @@ public class DecryptProcessorTests {
                             null, 
                             RSA_ALGORITHM,
                             RSA_PRIVATE_KEY,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -600,7 +605,7 @@ public class DecryptProcessorTests {
                             "CustomName",
                             null, 
                             RSA_PRIVATE_KEY,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -615,7 +620,7 @@ public class DecryptProcessorTests {
                             "CustomName",
                             RSA_ALGORITHM, 
                             null,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -628,7 +633,7 @@ public class DecryptProcessorTests {
                         "CustomName",
                         RSA_ALGORITHM, 
                         RSA_PRIVATE_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -641,7 +646,7 @@ public class DecryptProcessorTests {
                         "CustomName",
                         RSA_ALGORITHM, 
                         RSA_PRIVATE_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -656,7 +661,7 @@ public class DecryptProcessorTests {
                         "CustomName",
                         RSA_ALGORITHM, 
                         RSA_PRIVATE_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -669,7 +674,7 @@ public class DecryptProcessorTests {
                         "CustomName",
                         RSA_ALGORITHM, 
                         RSA_PRIVATE_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                     assertEquals("CustomName", decryptor.name());
@@ -855,7 +860,7 @@ public class DecryptProcessorTests {
                         () -> factory.symmetric(
                             null, 
                             AES_SECRET_KEY,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -869,7 +874,7 @@ public class DecryptProcessorTests {
                         () -> factory.symmetric(
                             AES_ALGORITHM, 
                             null,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -884,7 +889,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.symmetric(
                         AES_ALGORITHM, 
                         AES_SECRET_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -896,7 +901,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.symmetric(
                         AES_ALGORITHM, 
                         AES_SECRET_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -910,7 +915,7 @@ public class DecryptProcessorTests {
                     JceDecryptor decryptor = factory.symmetric(
                         AES_ALGORITHM, 
                         AES_SECRET_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -928,7 +933,7 @@ public class DecryptProcessorTests {
                             null,
                             AES_ALGORITHM, 
                             AES_SECRET_KEY,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -943,7 +948,7 @@ public class DecryptProcessorTests {
                             "CustomName",
                             null, 
                             AES_SECRET_KEY,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -958,7 +963,7 @@ public class DecryptProcessorTests {
                             "CustomName",
                             AES_ALGORITHM, 
                             null,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -974,7 +979,7 @@ public class DecryptProcessorTests {
                         "CustomName",
                         AES_ALGORITHM, 
                         AES_SECRET_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -987,7 +992,7 @@ public class DecryptProcessorTests {
                         "CustomName",
                         AES_ALGORITHM, 
                         AES_SECRET_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1002,7 +1007,7 @@ public class DecryptProcessorTests {
                         "CustomName",
                         AES_ALGORITHM, 
                         AES_SECRET_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1015,7 +1020,7 @@ public class DecryptProcessorTests {
                         "CustomName",
                         AES_ALGORITHM, 
                         AES_SECRET_KEY,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                     assertEquals("CustomName", decryptor.name());
@@ -1256,7 +1261,7 @@ public class DecryptProcessorTests {
                             null, 
                             AES_SECRET_KEY,
                             GCM_PARAMETER_SPEC,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1271,7 +1276,7 @@ public class DecryptProcessorTests {
                             AES_GCM_ALGORITHM, 
                             null,
                             GCM_PARAMETER_SPEC,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1286,7 +1291,7 @@ public class DecryptProcessorTests {
                             AES_GCM_ALGORITHM, 
                             AES_SECRET_KEY,
                             (AlgorithmParameterSpec)null,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1317,7 +1322,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETER_SPEC,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1333,7 +1338,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETER_SPEC,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1351,7 +1356,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETER_SPEC,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1369,7 +1374,7 @@ public class DecryptProcessorTests {
                             AES_ALGORITHM, 
                             AES_SECRET_KEY,
                             GCM_PARAMETER_SPEC,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1385,7 +1390,7 @@ public class DecryptProcessorTests {
                             null, 
                             AES_SECRET_KEY,
                             GCM_PARAMETER_SPEC,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1401,7 +1406,7 @@ public class DecryptProcessorTests {
                             AES_GCM_ALGORITHM, 
                             null,
                             GCM_PARAMETER_SPEC,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1417,7 +1422,7 @@ public class DecryptProcessorTests {
                             AES_GCM_ALGORITHM, 
                             AES_SECRET_KEY,
                             (AlgorithmParameterSpec)null,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1450,7 +1455,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETER_SPEC,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1467,7 +1472,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETER_SPEC,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1486,7 +1491,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETER_SPEC,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1505,7 +1510,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETER_SPEC,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                     assertEquals("CustomName", decryptor.name());
@@ -1752,7 +1757,7 @@ public class DecryptProcessorTests {
                             null, 
                             AES_SECRET_KEY,
                             GCM_PARAMETERS,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1767,7 +1772,7 @@ public class DecryptProcessorTests {
                             AES_GCM_ALGORITHM, 
                             null,
                             GCM_PARAMETERS,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1782,7 +1787,7 @@ public class DecryptProcessorTests {
                             AES_GCM_ALGORITHM, 
                             AES_SECRET_KEY,
                             (AlgorithmParameters)null,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1814,7 +1819,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETERS,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1831,7 +1836,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETERS,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1851,7 +1856,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETERS,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1869,7 +1874,7 @@ public class DecryptProcessorTests {
                             AES_ALGORITHM, 
                             AES_SECRET_KEY,
                             GCM_PARAMETERS,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1885,7 +1890,7 @@ public class DecryptProcessorTests {
                             null, 
                             AES_SECRET_KEY,
                             GCM_PARAMETERS,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1901,7 +1906,7 @@ public class DecryptProcessorTests {
                             AES_GCM_ALGORITHM, 
                             null,
                             GCM_PARAMETERS,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1917,7 +1922,7 @@ public class DecryptProcessorTests {
                             AES_GCM_ALGORITHM, 
                             AES_SECRET_KEY,
                             (AlgorithmParameters)null,
-                            SecureRandom.getInstanceStrong()
+                            STRONG_SECURE_RANDOM
                         )
                     );
                 }
@@ -1951,7 +1956,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETERS,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1969,7 +1974,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETERS,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -1990,7 +1995,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETERS,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                 }
@@ -2009,7 +2014,7 @@ public class DecryptProcessorTests {
                         AES_GCM_ALGORITHM, 
                         AES_SECRET_KEY,
                         GCM_PARAMETERS,
-                        SecureRandom.getInstanceStrong()
+                        STRONG_SECURE_RANDOM
                     );
                     assertNotNull(decryptor);
                     assertEquals("CustomName", decryptor.name());
@@ -2039,6 +2044,17 @@ public class DecryptProcessorTests {
             return JceDecryptor.factory().asymmetric(RSA_ALGORITHM, RSA_PRIVATE_KEY);
         } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
             throw new IllegalStateException("Cannot instantiate decryptor.", e);
+        }
+    }
+
+    private static SecureRandom getStrongSecureRandom() {
+        try {
+            return SecureRandom.getInstanceStrong();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(
+                "Cannot obtain strong secure random instance.", 
+                e
+            );
         }
     }
 

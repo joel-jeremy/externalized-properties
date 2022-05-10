@@ -53,20 +53,20 @@ public class ExternalizedPropertiesTests {
             @Test
             @DisplayName("should throw when resolver providers collection argument is null")
             void test1() {
+                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> ExternalizedProperties.builder()
-                        .resolvers((Collection<ResolverProvider<?>>)null)
+                    () -> builder.resolvers((Collection<ResolverProvider<?>>)null)
                 );
             }
 
             @Test
             @DisplayName("should throw when resolver providers varargs argument is null")
             void test2() {
+                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> ExternalizedProperties.builder()
-                        .resolvers((ResolverProvider[])null)
+                    () -> builder.resolvers((ResolverProvider[])null)
                 );
             }
         }
@@ -76,20 +76,20 @@ public class ExternalizedPropertiesTests {
             @Test
             @DisplayName("should throw when converter providers collection argument is null")
             void test1() {
+                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> ExternalizedProperties.builder()
-                        .converters((Collection<ConverterProvider<?>>)null)
+                    () -> builder.converters((Collection<ConverterProvider<?>>)null)
                 );
             }
         
             @Test
             @DisplayName("should throw when converter providers varargs argument is null")
             void test2() {
+                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> ExternalizedProperties.builder()
-                        .converters((ConverterProvider[])null)
+                    () -> builder.converters((ConverterProvider[])null)
                 );
             }
         }
@@ -99,20 +99,20 @@ public class ExternalizedPropertiesTests {
             @Test
             @DisplayName("should throw when processor providers collection argument is null")
             void test1() {
+                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> ExternalizedProperties.builder()
-                        .processors((Collection<ProcessorProvider<?>>)null)
+                    () -> builder.processors((Collection<ProcessorProvider<?>>)null)
                 );
             }
         
             @Test
             @DisplayName("should throw when processor providers varargs argument is null")
             void test2() {
+                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> ExternalizedProperties.builder()
-                        .processors((ProcessorProvider[])null)
+                    () -> builder.processors((ProcessorProvider[])null)
                 );
             }
         }
@@ -122,10 +122,10 @@ public class ExternalizedPropertiesTests {
             @Test
             @DisplayName("should throw when variable expander factory argument is null")
             void test1() {
+                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> ExternalizedProperties.builder()
-                        .variableExpander(null)
+                    () -> builder.variableExpander(null)
                 );
             }
         }
@@ -135,9 +135,10 @@ public class ExternalizedPropertiesTests {
             @Test
             @DisplayName("should throw on build when there are no resolvers")
             void test1() {
+                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalStateException.class,
-                    () -> ExternalizedProperties.builder().build()
+                    () -> builder.build()
                 );
             }
         }
@@ -219,9 +220,9 @@ public class ExternalizedPropertiesTests {
             @Test
             @DisplayName("should throw when cache duration argument is null")
             void test2() {
+                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertDoesNotThrow(
-                    () -> ExternalizedProperties.builder()
-                        .withCacheDuration(Duration.ofMinutes(1))
+                    () -> builder.withCacheDuration(Duration.ofMinutes(1))
                 );
             }
         }

@@ -24,7 +24,7 @@ public class EnvironmentVariableResolverTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ResolverProvider<EnvironmentVariableResolver> provider = 
                 EnvironmentVariableResolver.provider();
 
@@ -33,7 +33,7 @@ public class EnvironmentVariableResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ResolverProvider<EnvironmentVariableResolver> provider = 
                 EnvironmentVariableResolver.provider();
 

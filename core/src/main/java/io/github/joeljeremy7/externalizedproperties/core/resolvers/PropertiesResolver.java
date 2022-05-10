@@ -7,7 +7,6 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
@@ -52,7 +51,7 @@ public class PropertiesResolver extends MapResolver {
      */
     public PropertiesResolver(
             Properties properties, 
-            Function<String, String> unresolvedPropertyHandler
+            UnresolvedPropertyHandler unresolvedPropertyHandler
     ) {
         super(
             ignoreNonStringProperties(requireNonNull(properties, "properties")),
@@ -98,7 +97,7 @@ public class PropertiesResolver extends MapResolver {
      */
     public static ResolverProvider<PropertiesResolver> provider(
             Properties properties, 
-            Function<String, String> unresolvedPropertyHandler
+            UnresolvedPropertyHandler unresolvedPropertyHandler
     ) {
         requireNonNull(properties, "properties");
         requireNonNull(unresolvedPropertyHandler, "unresolvedPropertyHandler");

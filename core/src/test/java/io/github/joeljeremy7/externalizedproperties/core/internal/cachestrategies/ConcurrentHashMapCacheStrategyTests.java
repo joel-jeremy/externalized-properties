@@ -20,7 +20,7 @@ public class ConcurrentHashMapCacheStrategyTests {
     class Constructor {
         @Test
         @DisplayName("should not throw when invoking default constructor")
-        public void test1() {
+        void test1() {
             assertDoesNotThrow(
                 () -> new ConcurrentHashMapCacheStrategy<>()
             );
@@ -28,7 +28,7 @@ public class ConcurrentHashMapCacheStrategyTests {
 
         @Test
         @DisplayName("should throw when cache argument argument is null")
-        public void test2() {
+        void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new ConcurrentHashMapCacheStrategy<>(null)
@@ -40,7 +40,7 @@ public class ConcurrentHashMapCacheStrategyTests {
     class CacheMethod {
         @Test
         @DisplayName("should cache value to the cache map")
-        public void test1() {
+        void test1() {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
@@ -60,7 +60,7 @@ public class ConcurrentHashMapCacheStrategyTests {
     class GetMethod {
         @Test
         @DisplayName("should return cached value from the cache map")
-        public void test1() {
+        void test1() {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
             
@@ -81,7 +81,7 @@ public class ConcurrentHashMapCacheStrategyTests {
 
         @Test
         @DisplayName("should return empty Optional when key is not found in cache map")
-        public void test2() {
+        void test2() {
             String cacheKey = "cache.key";
     
             // Empty cache.
@@ -99,7 +99,7 @@ public class ConcurrentHashMapCacheStrategyTests {
     class ExpireMethod {
         @Test
         @DisplayName("should expire cached value from the cache map")
-        public void test1() {
+        void test1() {
             String cacheKey = "cache.key";
             String cacheValue = "cache.value";
     
@@ -122,7 +122,7 @@ public class ConcurrentHashMapCacheStrategyTests {
     class ExpireAllMethod {
         @Test
         @DisplayName("should expire all cached values from the cache map")
-        public void test1() {
+        void test1() {
             String cacheKey1 = "cache.key.1";
             String cacheValue1 = "property.value.1";
             String cacheKey2 = "cache.key.2";

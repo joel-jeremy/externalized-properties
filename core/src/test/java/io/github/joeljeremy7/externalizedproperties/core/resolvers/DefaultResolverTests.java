@@ -24,7 +24,7 @@ public class DefaultResolverTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ResolverProvider<DefaultResolver> provider = 
                 DefaultResolver.provider();
 
@@ -33,7 +33,7 @@ public class DefaultResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ResolverProvider<DefaultResolver> provider = 
                 DefaultResolver.provider();
 

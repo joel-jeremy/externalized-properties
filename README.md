@@ -6,11 +6,11 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/joeljeremy7/externalized-properties/blob/main/LICENSE)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/joeljeremy7/externalized-properties.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/joeljeremy7/externalized-properties/alerts/)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/joeljeremy7/externalized-properties.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/joeljeremy7/externalized-properties/context:java)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=joeljeremy7_externalized-properties&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=joeljeremy7_externalized-properties)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=joeljeremy7_externalized-properties&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=joeljeremy7_externalized-properties)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=joeljeremy7_externalized-properties&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=joeljeremy7_externalized-properties)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=joeljeremy7_externalized-properties&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=joeljeremy7_externalized-properties)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=joeljeremy7_externalized-properties&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=joeljeremy7_externalized-properties)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=io.github.joeljeremy7.externalizedproperties&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=io.github.joeljeremy7.externalizedproperties)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joeljeremy7.externalizedproperties&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joeljeremy7.externalizedproperties)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joeljeremy7.externalizedproperties&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joeljeremy7.externalizedproperties)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joeljeremy7.externalizedproperties&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joeljeremy7.externalizedproperties)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=io.github.joeljeremy7.externalizedproperties&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=io.github.joeljeremy7.externalizedproperties)
 
 A lightweight and extensible library to resolve application properties from various external sources.
 

@@ -31,19 +31,14 @@ public class PrimitiveConverter implements Converter<Object> {
         }
 
         // Primitive wrappers.
-        if (Boolean.class.equals(targetType)) {
-            return true;
-        } else if (Integer.class.equals(targetType)) {
-            return true;
-        } else if (Long.class.equals(targetType)) {
-            return true;
-        } else if (Short.class.equals(targetType)) { 
-            return true;
-        } else if (Float.class.equals(targetType)) {
-            return true;
-        } else if (Double.class.equals(targetType)) {
-            return true;
-        } else if (Byte.class.equals(targetType)) {
+        if (Boolean.class.equals(targetType) || 
+            Integer.class.equals(targetType) ||
+            Long.class.equals(targetType) ||
+            Short.class.equals(targetType) ||
+            Float.class.equals(targetType) ||
+            Double.class.equals(targetType) ||
+            Byte.class.equals(targetType)
+        ) {
             return true;
         }
 

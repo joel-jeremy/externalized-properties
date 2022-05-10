@@ -63,7 +63,7 @@ public class SimpleVariableExpander implements VariableExpander {
      * @return The {@link VariableExpanderProvider} for {@link SimpleVariableExpander}.
      */
     public static VariableExpanderProvider<SimpleVariableExpander> provider() {
-        return externalizedProperties -> new SimpleVariableExpander(externalizedProperties);
+        return SimpleVariableExpander::new;
     }
 
     /**

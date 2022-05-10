@@ -18,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AbstractNameValueQueryExecutorTests {
     // Reuse SimpleNameValueQueryExecutor database elements.
-    static final String TABLE = SimpleNameValueQueryExecutor.TABLE;
-    static final String PROPERTY_NAME_COLUMN = SimpleNameValueQueryExecutor.PROPERTY_NAME_COLUMN;
-    static final String PROPERTY_VALUE_COLUMN = SimpleNameValueQueryExecutor.PROPERTY_VALUE_COLUMN;
+    static final String TABLE = SimpleNameValueQueryExecutor.DEFAULT_TABLE;
+    static final String PROPERTY_NAME_COLUMN = SimpleNameValueQueryExecutor.DEFAULT_PROPERTY_NAME_COLUMN;
+    static final String PROPERTY_VALUE_COLUMN = SimpleNameValueQueryExecutor.DEFAULT_PROPERTY_VALUE_COLUMN;
 
     static final int NUMBER_OF_TEST_ENTRIES = 2;
 

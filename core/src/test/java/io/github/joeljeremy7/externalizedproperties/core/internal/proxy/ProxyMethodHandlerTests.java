@@ -47,11 +47,13 @@ public class ProxyMethodHandlerTests {
     class Constructor {
         @Test
         @DisplayName("should throw when resolver argument is null.")
-        public void test1() {
+        void test1() {
+            Converter<?> rootConverter = rootConverter();
+
             assertThrows(IllegalArgumentException.class, () ->
                 new ProxyMethodHandler(
                     null,
-                    rootConverter(),
+                    rootConverter,
                     methodHandleFactory
                 )
             );
@@ -59,10 +61,12 @@ public class ProxyMethodHandlerTests {
 
         @Test
         @DisplayName("should throw when converter argument is null.")
-        public void test2() {
+        void test2() {
+            Resolver rootResolver = rootResolver();
+
             assertThrows(IllegalArgumentException.class, () ->
                 new ProxyMethodHandler(
-                    rootResolver(),
+                    rootResolver,
                     null,
                     methodHandleFactory
                 )
@@ -71,11 +75,14 @@ public class ProxyMethodHandlerTests {
 
         @Test
         @DisplayName("should throw when method handle builder argument is null.")
-        public void test3() {
+        void test3() {
+            Resolver rootResolver = rootResolver();
+            Converter<?> rootConverter = rootConverter();
+            
             assertThrows(IllegalArgumentException.class, () ->
                 new ProxyMethodHandler(
-                    rootResolver(),
-                    rootConverter(),
+                    rootResolver,
+                    rootConverter,
                     null
                 )
             );
@@ -86,7 +93,7 @@ public class ProxyMethodHandlerTests {
     class InvokeDefaultInterfaceMethodMethod {
         @Test
         @DisplayName("should invoke default interface method.")
-        public void test1() {
+        void test1() {
             Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface);    
@@ -108,7 +115,7 @@ public class ProxyMethodHandlerTests {
 
         @Test
         @DisplayName("should throw when method is not a default interface method.")
-        public void test2() {
+        void test2() {
             Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
@@ -129,7 +136,7 @@ public class ProxyMethodHandlerTests {
         @DisplayName(
             "should rethrow same runtime exception when default interface method throws an exception."
         )
-        public void test3() {
+        void test3() {
             Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
@@ -153,7 +160,7 @@ public class ProxyMethodHandlerTests {
         @DisplayName(
             "should wrap non-runtime exception thrown by default interface method."
         )
-        public void test4() {
+        void test4() {
             Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
@@ -176,7 +183,7 @@ public class ProxyMethodHandlerTests {
 
         @Test
         @DisplayName("should receive method arguments.")
-        public void test5() {
+        void test5() {
             Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
@@ -203,7 +210,7 @@ public class ProxyMethodHandlerTests {
             "should return default interface method invocation result " + 
             "when method is a default interface method."
         )
-        public void test1() {
+        void test1() {
             Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
@@ -227,7 +234,7 @@ public class ProxyMethodHandlerTests {
         @DisplayName(
             "should return an empty Optional when method has an Optional method return type."
         )
-        public void test2() {
+        void test2() {
             Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
@@ -251,7 +258,7 @@ public class ProxyMethodHandlerTests {
             "should throw when method is not a default interface method " +
             "and does not have an Optional method return type."
         )
-        public void test3() {
+        void test3() {
             Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
@@ -276,7 +283,7 @@ public class ProxyMethodHandlerTests {
     class ResolvePropertyMethod {
         @Test
         @DisplayName("should return value from resolver.")
-        public void test1() {
+        void test1() {
             Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
@@ -302,7 +309,7 @@ public class ProxyMethodHandlerTests {
             "should return default value " + 
             "when method is not annotated with @ExternalizedProperty."
         )
-        public void test2() {
+        void test2() {
             Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 
@@ -333,7 +340,7 @@ public class ProxyMethodHandlerTests {
             "when method is annotated with @ExternalizedProperty " + 
             "but property cannot be resolved via the resolver."
         )
-        public void test3() {
+        void test3() {
             Class<ProxyInterface> proxyInterface = ProxyInterface.class;
 
             Object proxy = proxy(proxyInterface); 

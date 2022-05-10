@@ -51,7 +51,7 @@ public class ListConverterTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ConverterProvider<ListConverter> provider = 
                 ListConverter.provider();
 
@@ -60,7 +60,7 @@ public class ListConverterTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ConverterProvider<ListConverter> provider = 
                 ListConverter.provider();
             
@@ -83,7 +83,7 @@ public class ListConverterTests {
     class ProviderMethodWithListFactoryOverload {
         @Test
         @DisplayName("should throw when list factory argument is null.")
-        public void test1() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> ListConverter.provider(null)
@@ -92,7 +92,7 @@ public class ListConverterTests {
 
         @Test
         @DisplayName("should not return null.")
-        public void test2() {
+        void test2() {
             ConverterProvider<ListConverter> provider = 
                 ListConverter.provider(ArrayList::new);
 
@@ -101,7 +101,7 @@ public class ListConverterTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test3() {
+        void test3() {
             ConverterProvider<ListConverter> provider = 
                 ListConverter.provider(ArrayList::new);
             
@@ -579,7 +579,31 @@ public class ListConverterTests {
                 IllegalStateException.class, 
                 () -> converter.convert(
                     proxyMethod,
-                    "value1,value2,value3,value4,value5"
+                    "value1,value2,value3"
+                )
+            );
+        }
+        
+        @Test
+        @DisplayName(
+            "should throw when provided list factory returns a populated list."
+        )
+        void listFactoryTest3() {
+            ListConverter converter = converterToTest(
+                // Returns a populated list.
+                capacity -> Arrays.asList("this", "should", "not", "be", "populated")
+            );
+
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::listProperty
+            );
+            
+            // Throws IllegalStateException if list factory returned a populated list.
+            assertThrows(
+                IllegalStateException.class, 
+                () -> converter.convert(
+                    proxyMethod,
+                    "value1,value2,value3"
                 )
             );
         }

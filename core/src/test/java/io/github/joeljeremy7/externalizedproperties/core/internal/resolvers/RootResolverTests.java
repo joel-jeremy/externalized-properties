@@ -4,6 +4,7 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.ProcessorProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
+import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderProvider;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.Decrypt;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor;
@@ -27,6 +28,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,19 +40,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RootResolverTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES = 
+        ExternalizedProperties.builder().withDefaults().build();
     
     @Nested
     class Constructor {
         @Test
         @DisplayName("should throw when externalized properties argument is null")
         void test1() {
+            List<ResolverProvider<?>> resolverProviders = Arrays.asList(DefaultResolver.provider());
+            ProcessorProvider<RootProcessor> rootProcessorProvider = RootProcessor.provider();
+            VariableExpanderProvider<?> variableExpanderProvider =  SimpleVariableExpander.provider();
+
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootResolver(
                     null,
-                    Arrays.asList(DefaultResolver.provider()),
-                    RootProcessor.provider(),
-                    SimpleVariableExpander.provider()
+                    resolverProviders,
+                    rootProcessorProvider,
+                    variableExpanderProvider
                 )
             );
         }
@@ -58,13 +66,16 @@ public class RootResolverTests {
         @Test
         @DisplayName("should throw when resolver provider argument is null")
         void test2() {
+            ProcessorProvider<RootProcessor> rootProcessorProvider = RootProcessor.provider();
+            VariableExpanderProvider<?> variableExpanderProvider =  SimpleVariableExpander.provider();
+
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootResolver(
-                    ExternalizedProperties.builder().withDefaults().build(),
+                    EXTERNALIZED_PROPERTIES,
                     null,
-                    RootProcessor.provider(),
-                    SimpleVariableExpander.provider()
+                    rootProcessorProvider,
+                    variableExpanderProvider
                 )
             );
         }
@@ -72,13 +83,16 @@ public class RootResolverTests {
         @Test
         @DisplayName("should throw when root processor provider argument is null")
         void test3() {
+            List<ResolverProvider<?>> resolverProviders = Arrays.asList(DefaultResolver.provider());
+            VariableExpanderProvider<?> variableExpanderProvider =  SimpleVariableExpander.provider();
+
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootResolver(
-                    ExternalizedProperties.builder().withDefaults().build(),
-                    Arrays.asList(DefaultResolver.provider()),
+                    EXTERNALIZED_PROPERTIES,
+                    resolverProviders,
                     null,
-                    SimpleVariableExpander.provider()
+                    variableExpanderProvider
                 )
             );
         }
@@ -86,12 +100,15 @@ public class RootResolverTests {
         @Test
         @DisplayName("should throw when variable expander provider argument is null")
         void test4() {
+            List<ResolverProvider<?>> resolverProviders = Arrays.asList(DefaultResolver.provider());
+            ProcessorProvider<RootProcessor> rootProcessorProvider = RootProcessor.provider();
+
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootResolver(
-                    ExternalizedProperties.builder().withDefaults().build(),
-                    Arrays.asList(DefaultResolver.provider()),
-                    RootProcessor.provider(),
+                    EXTERNALIZED_PROPERTIES,
+                    resolverProviders,
+                    rootProcessorProvider,
                     null
                 )
             );
@@ -103,12 +120,15 @@ public class RootResolverTests {
         @Test
         @DisplayName("should throw when resolver providers argument is null")
         void test1() {
+            ProcessorProvider<RootProcessor> rootProcessorProvider = RootProcessor.provider();
+            VariableExpanderProvider<?> variableExpanderProvider =  SimpleVariableExpander.provider();
+
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> RootResolver.provider(
                     null,
-                    RootProcessor.provider(),
-                    SimpleVariableExpander.provider()
+                    rootProcessorProvider,
+                    variableExpanderProvider
                 )
             );
         }
@@ -116,12 +136,15 @@ public class RootResolverTests {
         @Test
         @DisplayName("should throw when root processor provider argument is null")
         void test2() {
+            List<ResolverProvider<?>> resolverProviders = Arrays.asList(DefaultResolver.provider());
+            VariableExpanderProvider<?> variableExpanderProvider =  SimpleVariableExpander.provider();
+
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> RootResolver.provider(
-                    Arrays.asList(DefaultResolver.provider()),
+                    resolverProviders,
                     null,
-                    SimpleVariableExpander.provider()
+                    variableExpanderProvider
                 )
             );
         }
@@ -129,11 +152,14 @@ public class RootResolverTests {
         @Test
         @DisplayName("should throw when variable expander provider argument is null")
         void test3() {
+            List<ResolverProvider<?>> resolverProviders = Arrays.asList(DefaultResolver.provider());
+            ProcessorProvider<RootProcessor> rootProcessorProvider = RootProcessor.provider();
+
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> RootResolver.provider(
-                    Arrays.asList(DefaultResolver.provider()),
-                    RootProcessor.provider(),
+                    resolverProviders,
+                    rootProcessorProvider,
                     null
                 )
             );
@@ -142,12 +168,15 @@ public class RootResolverTests {
         @Test
         @DisplayName("should not return null")
         void test4() {
-            ResolverProvider<RootResolver> provider = 
-                RootResolver.provider(
-                    Arrays.asList(DefaultResolver.provider()),
-                    RootProcessor.provider(),
-                    SimpleVariableExpander.provider()
-                );
+            List<ResolverProvider<?>> resolverProviders = Arrays.asList(DefaultResolver.provider());
+            ProcessorProvider<RootProcessor> rootProcessorProvider = RootProcessor.provider();
+            VariableExpanderProvider<?> variableExpanderProvider =  SimpleVariableExpander.provider();
+
+            ResolverProvider<RootResolver> provider = RootResolver.provider(
+                resolverProviders,
+                rootProcessorProvider,
+                variableExpanderProvider
+            );
 
             assertNotNull(provider);
         }
@@ -155,15 +184,18 @@ public class RootResolverTests {
         @Test
         @DisplayName("should not return null on get")
         void test5() {
-            ResolverProvider<RootResolver> provider = 
-                RootResolver.provider(
-                    Arrays.asList(DefaultResolver.provider()),
-                    RootProcessor.provider(),
-                    SimpleVariableExpander.provider()
-                );
+            List<ResolverProvider<?>> resolverProviders = Arrays.asList(DefaultResolver.provider());
+            ProcessorProvider<RootProcessor> rootProcessorProvider = RootProcessor.provider();
+            VariableExpanderProvider<?> variableExpanderProvider =  SimpleVariableExpander.provider();
+
+            ResolverProvider<RootResolver> provider = RootResolver.provider(
+                resolverProviders,
+                rootProcessorProvider,
+                variableExpanderProvider
+            );
 
             assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
+                provider.get(EXTERNALIZED_PROPERTIES)
             );
         }
     }
@@ -172,7 +204,7 @@ public class RootResolverTests {
     class ResolveMethod {
         @Test
         @DisplayName("should throw when proxy method argument is null")
-        public void test1() {
+        void test1() {
             RootResolver resolver = rootResolver(DefaultResolver.provider());
             
             assertThrows(
@@ -183,7 +215,7 @@ public class RootResolverTests {
 
         @Test
         @DisplayName("should throw when property name is null")
-        public void test2() {
+        void test2() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 ProxyInterface::property
             );
@@ -199,7 +231,7 @@ public class RootResolverTests {
 
         @Test
         @DisplayName("should resolve properties from registered resolvers")
-        public void test3() {
+        void test3() {
             Map<String, String> propertySource = new HashMap<>();
             propertySource.put("property", "property-value");
             
@@ -223,7 +255,7 @@ public class RootResolverTests {
 
         @Test
         @DisplayName("should expand variables in externalized property name")
-        public void test4() {
+        void test4() {
             Map<String, String> propertySource = new HashMap<>();
             propertySource.put("property", "property-expanded");
             propertySource.put("property-expanded", "variable-expanded");
@@ -248,7 +280,7 @@ public class RootResolverTests {
 
         @Test
         @DisplayName("should process resolved properties via registered processors")
-        public void test5() {
+        void test5() {
             String originalPropertyValue = "property-value";
             String base64EncodedPropertyValue = EncryptionUtils.encryptAesBase64(
                 originalPropertyValue

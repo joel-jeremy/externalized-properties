@@ -22,7 +22,7 @@ public class TypeReferenceTests {
     class TypeMethod {
         @Test
         @DisplayName("should return non-generic type")
-        public void test1() {
+        void test1() {
             TypeReference<Integer> listType = new TypeReference<Integer>(){};
 
             // Detects Integer.
@@ -32,7 +32,7 @@ public class TypeReferenceTests {
 
         @Test
         @DisplayName("should return generic parameterized type")
-        public void test2() {
+        void test2() {
             TypeReference<List<String>> listType = new TypeReference<List<String>>(){};
 
             // Method returns a List<String>.
@@ -49,7 +49,7 @@ public class TypeReferenceTests {
 
         @Test
         @DisplayName("should detect non-generic array type")
-        public void test4() {
+        void test4() {
             TypeReference<Integer[]> listType = new TypeReference<Integer[]>(){};
 
             assertTrue(listType.type() instanceof Class<?>);
@@ -58,7 +58,7 @@ public class TypeReferenceTests {
 
         @Test
         @DisplayName("should return generic array type")
-        public void test5() {
+        void test5() {
             TypeReference<Optional<Optional<String>>[]> listType = 
                 new TypeReference<Optional<Optional<String>>[]>(){};
 
@@ -92,7 +92,7 @@ public class TypeReferenceTests {
     class RawTypeMethod {
         @Test
         @DisplayName("should return non-generic class when referenced type is non-generic")
-        public void test1() {
+        void test1() {
             TypeReference<Integer> listType = new TypeReference<Integer>(){};
 
             // Detects Integer.
@@ -101,7 +101,7 @@ public class TypeReferenceTests {
 
         @Test
         @DisplayName("should return raw class of generic parameterized type")
-        public void test2() {
+        void test2() {
             TypeReference<List<String>> listType = new TypeReference<List<String>>(){};
 
             // Detects List<String>.
@@ -110,7 +110,7 @@ public class TypeReferenceTests {
 
         @Test
         @DisplayName("should return raw class of non-generic array type")
-        public void test4() {
+        void test4() {
             TypeReference<Integer[]> listType = new TypeReference<Integer[]>(){};
 
             assertEquals(listType.rawType(), Integer[].class);
@@ -118,7 +118,7 @@ public class TypeReferenceTests {
 
         @Test
         @DisplayName("should return raw class of generic array type")
-        public void test5() {
+        void test5() {
             TypeReference<Optional<Integer>[]> listType = 
                 new TypeReference<Optional<Integer>[]>(){};
 
@@ -139,17 +139,17 @@ public class TypeReferenceTests {
     class GenericTypeParametersMethod {
         @Test
         @DisplayName("should return empty array when referenced type is non-generic")
-        public void test1() {
+        void test1() {
             TypeReference<Integer> listType = new TypeReference<Integer>(){};
 
-            assertTrue(listType.genericTypeParameters().length == 0);
+            assertEquals(0, listType.genericTypeParameters().length);
         }
 
         @Test
         @DisplayName(
             "should return type parameter array when referenced type is a parameterized type"
         )
-        public void test2() {
+        void test2() {
             TypeReference<List<String>> listType = new TypeReference<List<String>>(){};
 
             // Return String from List<String>.
@@ -163,21 +163,21 @@ public class TypeReferenceTests {
         @DisplayName(
             "should return empty array when referenced type is a non-generic array type"
         )
-        public void test4() {
+        void test4() {
             TypeReference<Integer[]> listType = new TypeReference<Integer[]>(){};
 
-            assertTrue(listType.genericTypeParameters().length == 0);
+            assertEquals(0, listType.genericTypeParameters().length);
         }
 
         @Test
         @DisplayName(
             "should return empty array when referenced type is a generic array type"
         )
-        public void test5() {
+        void test5() {
             TypeReference<Optional<Integer>[]> listType = 
                 new TypeReference<Optional<Integer>[]>(){};
 
-            assertTrue(listType.genericTypeParameters().length == 0);
+                assertEquals(0, listType.genericTypeParameters().length);
         }
 
         @Test
@@ -187,7 +187,7 @@ public class TypeReferenceTests {
         public <T> void test6() {
             TypeReference<T> listType = new TypeReference<T>(){};
 
-            assertTrue(listType.genericTypeParameters().length == 0);
+            assertEquals(0, listType.genericTypeParameters().length);
         }
     }
 

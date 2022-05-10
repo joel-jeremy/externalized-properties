@@ -25,7 +25,7 @@ public class InternalExternalizedPropertiesTests {
     class ProxyMethod {
         @Test
         @DisplayName("should throw when proxy interface argument is null")
-        public void test1() {
+        void test1() {
             // Do not resolve any property.
             ResolverProvider<?> provider = StubResolver.provider(
                 StubResolver.NULL_VALUE_RESOLVER
@@ -42,7 +42,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should create a proxy")
-        public void test2() {
+        void test2() {
             // Do not resolve any property.
             ResolverProvider<?> provider = StubResolver.provider(
                 StubResolver.NULL_VALUE_RESOLVER
@@ -62,19 +62,20 @@ public class InternalExternalizedPropertiesTests {
     class ProxyMethodWithClassLoaderOverload {
         @Test
         @DisplayName("should throw when proxy interface argument is null")
-        public void test1() {
+        void test1() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(StubResolver.provider());
+            ClassLoader classLoader = getClass().getClassLoader();
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> externalizedProperties.proxy(null, getClass().getClassLoader()) 
+                () -> externalizedProperties.proxy(null, classLoader) 
             );
         }
 
         @Test
         @DisplayName("should throw when class loader argument is null")
-        public void test2() {
+        void test2() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(StubResolver.provider());
 
@@ -86,7 +87,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should throw when proxy interface argument is not an interface")
-        public void test3() {
+        void test3() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(StubResolver.provider());
 
@@ -98,7 +99,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should throw when proxy interface contains void-returning methods")
-        public void test4() {
+        void test4() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(StubResolver.provider());
 
@@ -110,7 +111,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should throw when proxy interface contains Void-returning methods")
-        public void test5() {
+        void test5() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(StubResolver.provider());
 
@@ -125,7 +126,7 @@ public class InternalExternalizedPropertiesTests {
             "should throw when proxy interface @ResolverMethod does not have " +
             "a single String argument"
         )
-        public void test6() {
+        void test6() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(StubResolver.provider());
 
@@ -142,7 +143,7 @@ public class InternalExternalizedPropertiesTests {
             "should throw when proxy interface @ResolverMethod have " +
             "multiple arguments"
         )
-        public void test7() {
+        void test7() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(StubResolver.provider());
 
@@ -159,7 +160,7 @@ public class InternalExternalizedPropertiesTests {
             "should throw when proxy interface @ResolverMethod have " +
             "non-String argument"
         )
-        public void test8() {
+        void test8() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(StubResolver.provider());
 
@@ -173,7 +174,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should create a proxy")
-        public void test9() {
+        void test9() {
             // Do not resolve any property.
             ResolverProvider<?> provider = StubResolver.provider(
                 StubResolver.NULL_VALUE_RESOLVER

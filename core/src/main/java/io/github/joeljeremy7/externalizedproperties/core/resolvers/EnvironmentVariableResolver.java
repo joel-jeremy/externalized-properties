@@ -10,6 +10,10 @@ import java.util.Optional;
  * from environment variables.
  */
 public class EnvironmentVariableResolver extends MapResolver {
+    private static final char DOT = '.';
+    private static final char DASH = '-';
+    private static final char UNDERSCORE = '_';
+
     /**
      * Constructor.
      */
@@ -42,21 +46,31 @@ public class EnvironmentVariableResolver extends MapResolver {
         return externalizedProperties -> new EnvironmentVariableResolver();
     }
 
+    /**
+     * Format property name to environment variables naming convention.
+     * Such that:
+     * <ul>
+     *  <li>{@code path} will be formatted to {@code PATH}</li>
+     *  <li>{@code java.version} will be formatted to {@code JAVA_VERSION}</li>
+     *  <li>{@code java-home} will be formatted to {@code JAVA_HOME}</li>
+     * </ul>
+     * 
+     * @param propertyName The property name to format.
+     * @return The formatted property name.
+     */
     private static String format(String propertyName) {
+
         // Avoid String allocations.
         char[] propertyNameChars = propertyName.toCharArray();
-        for (int i = 0; i < propertyNameChars.length; i++) {
-            if (propertyNameChars[i] == '.') {
-                propertyNameChars[i] = '_';
+        for (int currentIndex = 0; currentIndex < propertyNameChars.length; currentIndex++) {
+            char currentChar = propertyNameChars[currentIndex];
+
+            if (currentChar == DOT || currentChar == DASH) {
+                propertyNameChars[currentIndex] = currentChar = UNDERSCORE;
                 continue;
             }
 
-            if (propertyNameChars[i] == '-') {
-                propertyNameChars[i] = '_';
-                continue;
-            }
-
-            propertyNameChars[i] = Character.toUpperCase(propertyNameChars[i]);
+            propertyNameChars[currentIndex] = Character.toUpperCase(currentChar);
         }
         return new String(propertyNameChars);
     }

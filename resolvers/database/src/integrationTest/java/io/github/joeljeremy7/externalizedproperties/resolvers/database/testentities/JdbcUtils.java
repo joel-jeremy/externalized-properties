@@ -55,9 +55,9 @@ public class JdbcUtils {
         // SimpleNameValueQueryExecutor
         createPropertiesTable(
             connection,
-            SimpleNameValueQueryExecutor.TABLE,
-            SimpleNameValueQueryExecutor.PROPERTY_NAME_COLUMN,
-            SimpleNameValueQueryExecutor.PROPERTY_VALUE_COLUMN,
+            SimpleNameValueQueryExecutor.DEFAULT_TABLE,
+            SimpleNameValueQueryExecutor.DEFAULT_PROPERTY_NAME_COLUMN,
+            SimpleNameValueQueryExecutor.DEFAULT_PROPERTY_VALUE_COLUMN,
             numberOfTestEntries
         );
     }

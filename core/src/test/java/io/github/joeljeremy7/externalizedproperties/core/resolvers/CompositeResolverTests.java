@@ -31,7 +31,7 @@ public class CompositeResolverTests {
     class ProviderMethodWithVarArgsOverload {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ResolverProvider<CompositeResolver> provider = 
                 CompositeResolver.provider(StubResolver.provider());
 
@@ -40,7 +40,7 @@ public class CompositeResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ResolverProvider<CompositeResolver> provider = 
                 CompositeResolver.provider(StubResolver.provider());
 
@@ -54,7 +54,7 @@ public class CompositeResolverTests {
     class ProviderMethodWithCollectionOverload {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ResolverProvider<CompositeResolver> provider = 
                 CompositeResolver.provider(Arrays.asList(StubResolver.provider()));
 
@@ -63,7 +63,7 @@ public class CompositeResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ResolverProvider<CompositeResolver> provider = 
                 CompositeResolver.provider(Arrays.asList(StubResolver.provider()));
 
@@ -77,7 +77,7 @@ public class CompositeResolverTests {
     class FlattenedProviderMethodWithVarArgsOverload {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ResolverProvider<Resolver> provider = 
                 CompositeResolver.flattenedProvider(StubResolver.provider());
 
@@ -86,7 +86,7 @@ public class CompositeResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ResolverProvider<Resolver> provider = 
                 CompositeResolver.flattenedProvider(StubResolver.provider());
 
@@ -97,7 +97,7 @@ public class CompositeResolverTests {
 
         @Test
         @DisplayName("should return the flattened instance on get.")
-        public void test3() {
+        void test3() {
             ResolverProvider<Resolver> provider = 
                 CompositeResolver.flattenedProvider(StubResolver.provider());
 
@@ -112,7 +112,7 @@ public class CompositeResolverTests {
             "should return the composite resolver instance on get " +
             "when there are multiple resolvers."
         )
-        public void test4() {
+        void test4() {
             ResolverProvider<Resolver> provider = 
                 CompositeResolver.flattenedProvider(
                     StubResolver.provider(),
@@ -130,7 +130,7 @@ public class CompositeResolverTests {
     class FlattenedProviderMethodWithCollectionOverload {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ResolverProvider<Resolver> provider = 
                 CompositeResolver.flattenedProvider(
                     Arrays.asList(StubResolver.provider())
@@ -141,7 +141,7 @@ public class CompositeResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ResolverProvider<Resolver> provider = 
                 CompositeResolver.flattenedProvider(
                     Arrays.asList(StubResolver.provider())
@@ -154,7 +154,7 @@ public class CompositeResolverTests {
 
         @Test
         @DisplayName("should return the single remaining resolver instance on get.")
-        public void test3() {
+        void test3() {
             ResolverProvider<Resolver> provider = 
                 CompositeResolver.flattenedProvider(
                     Arrays.asList(StubResolver.provider())
@@ -171,7 +171,7 @@ public class CompositeResolverTests {
             "should return the composite resolver instance on get " +
             "when there are multiple resolvers."
         )
-        public void test4() {
+        void test4() {
             ResolverProvider<Resolver> provider = 
                 CompositeResolver.flattenedProvider(Arrays.asList(
                     StubResolver.provider(),
@@ -197,9 +197,11 @@ public class CompositeResolverTests {
                 )
             );
 
+            List<Resolver> emptyResolvers = Collections.emptyList();
+
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> CompositeResolver.from(Collections.emptyList())
+                () -> CompositeResolver.from(emptyResolvers)
             );
         }
 
@@ -232,9 +234,11 @@ public class CompositeResolverTests {
                 )
             );
 
+            List<Resolver> emptyResolvers = Collections.emptyList();
+
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> CompositeResolver.flatten(Collections.emptyList())
+                () -> CompositeResolver.flatten(emptyResolvers)
             );
         }
 

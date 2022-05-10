@@ -70,7 +70,7 @@ public class ConversionResult<T> {
      * @return The conversion result containing the given value.
      */
     public static <T> ConversionResult<T> of(T value) {
-        return new ConversionResult<T>(value);
+        return new ConversionResult<>(value);
     }
 
     /**
@@ -91,5 +91,5 @@ public class ConversionResult<T> {
         @SuppressWarnings("unchecked")
         ConversionResult<T> skipResult = (ConversionResult<T>)SKIP;
         return skipResult;
-    };
+    }
 }

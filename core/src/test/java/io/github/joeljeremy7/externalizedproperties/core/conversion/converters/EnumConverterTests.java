@@ -26,7 +26,7 @@ public class EnumConverterTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        public void test1() {
+        void test1() {
             ConverterProvider<EnumConverter> provider = 
                 EnumConverter.provider();
 
@@ -35,7 +35,7 @@ public class EnumConverterTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        public void test2() {
+        void test2() {
             ConverterProvider<EnumConverter> provider = 
                 EnumConverter.provider();
             

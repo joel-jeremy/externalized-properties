@@ -10,6 +10,7 @@ import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -117,9 +118,9 @@ public class SetConverter implements Converter<Set<?>> {
     private Set<Object> newSet(int capacity) {
         @SuppressWarnings("unchecked")
         Set<Object> set = (Set<Object>)setFactory.newSet(capacity);
-        if (set == null) {
+        if (set == null || !set.isEmpty()) {
             throw new IllegalStateException(
-                "Set factory implementation must not return null."
+                "Set factory implementation must not return null or a populated set."
             );
         }
         return set;
@@ -127,9 +128,7 @@ public class SetConverter implements Converter<Set<?>> {
 
     private Set<Object> newSet(Object[] values) {
         Set<Object> set = newSet(values.length);
-        for (Object value : values) {
-            set.add(value);
-        }
+        Collections.addAll(set, values);
         return set;
     }
 
@@ -169,8 +168,9 @@ public class SetConverter implements Converter<Set<?>> {
      */
     public static interface SetFactory {
         /**
-         * Create a new mutable {@link Set} instance (optionally with given the capacity). 
-         * This function must not return null.
+         * Create a new mutable {@link Set} instance (optionally with given the capacity).  
+         * This function must not return null and must only return a set with no elements.
+         * Otherwise, an exception will be thrown.
          * 
          * @param capacity The requested capacity of the {@link Set}.
          * @return A new mutable {@link Set} instance (optionally with given the capacity).

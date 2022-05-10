@@ -16,19 +16,22 @@ public class CachingExternalizedPropertiesTests {
     class Constructor {
         @Test
         @DisplayName("should throw when decorated externalized properties argument is null")
-        public void test1() {
+        void test1() {
+            StubCacheStrategy<ClassLoader, ClassValue<?>> cacheStrategy = 
+                new StubCacheStrategy<>();
+            
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new CachingExternalizedProperties(
                     null,
-                    new StubCacheStrategy<>()
+                    cacheStrategy
                 )
             );
         }
 
         @Test
         @DisplayName("should throw when resolved property cache strategy argument is null")
-        public void test2() {
+        void test2() {
             ExternalizedProperties decorated = ExternalizedProperties.builder()
                 .withDefaults()
                 .build();
@@ -47,7 +50,7 @@ public class CachingExternalizedPropertiesTests {
     class ProxyMethod {
         @Test
         @DisplayName("should delegate to decorated externalized properties")
-        public void test1() {
+        void test1() {
             ExternalizedProperties decorated = ExternalizedProperties.builder()
                 .withDefaults()
                 .build();
@@ -70,7 +73,7 @@ public class CachingExternalizedPropertiesTests {
         @DisplayName(
             "should cache returned proxy instance from decorated externalized properties"
         )
-        public void test2() {
+        void test2() {
             ExternalizedProperties decorated = ExternalizedProperties.builder()
                 .withDefaults()
                 .build();
@@ -97,7 +100,7 @@ public class CachingExternalizedPropertiesTests {
     class ProxyMethodWithClassLoaderOverload {
         @Test
         @DisplayName("should delegate to decorated externalized properties")
-        public void test1() {
+        void test1() {
             ExternalizedProperties decorated = ExternalizedProperties.builder()
                 .withDefaults()
                 .build();
@@ -121,7 +124,7 @@ public class CachingExternalizedPropertiesTests {
         @DisplayName(
             "should cache returned proxy instance from decorated externalized properties"
         )
-        public void test2() {
+        void test2() {
             ExternalizedProperties decorated = ExternalizedProperties.builder()
                 .withDefaults()
                 .build();

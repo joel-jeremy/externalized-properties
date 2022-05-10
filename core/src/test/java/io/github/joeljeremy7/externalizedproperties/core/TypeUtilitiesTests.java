@@ -28,7 +28,7 @@ public class TypeUtilitiesTests {
     class GetRawTypeMethod {
         @Test
         @DisplayName("should throw when type argument is null.")
-        public void nullTest() {
+        void nullTest() {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> TypeUtilities.getRawType(null)
@@ -37,7 +37,7 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return same class when type is a class.")
-        public void classTest1() {
+        void classTest1() {
             assertEquals(
                 String.class, 
                 TypeUtilities.getRawType(String.class)
@@ -46,7 +46,7 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return raw type when type is a parameterized type.")
-        public void parameterizedTest1() {
+        void parameterizedTest1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::parameterizedTypeReturnType
             );
@@ -65,7 +65,7 @@ public class TypeUtilitiesTests {
             "should return Object array class when type is a generic array type " + 
             "with type variable that has no extends declaration."
         )
-        public void genericArrayTypeTest1() {
+        void genericArrayTypeTest1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::genericArrayTypeReturnTypeWithTypeVariable
             );
@@ -84,7 +84,7 @@ public class TypeUtilitiesTests {
             "should return correct bound when type is a generic array type " + 
             "with type variable that has an extends declaration."
         )
-        public void genericArrayTypeTest2() {
+        void genericArrayTypeTest2() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::genericArrayTypeReturnTypeWithTypeVariableExtends
             );
@@ -103,7 +103,7 @@ public class TypeUtilitiesTests {
             "should return Object class when type is a type variable " + 
             "that has no extends declaration."
         )
-        public void typeVariableTest1() {
+        void typeVariableTest1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::typeVariableReturnType
             );
@@ -122,7 +122,7 @@ public class TypeUtilitiesTests {
             "should return correct bound when type is a type variable " + 
             "that has an extends declaration."
         )
-        public void typeVariableTest2() {
+        void typeVariableTest2() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::typeVariableReturnTypeExtends
             );
@@ -141,7 +141,7 @@ public class TypeUtilitiesTests {
             "should return Object class when type is a wildcard type " + 
             "that has no extends declaration."
         )
-        public void wildcardTypeTest1() {
+        void wildcardTypeTest1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::wildcardTypeReturnType
             );
@@ -167,7 +167,7 @@ public class TypeUtilitiesTests {
             "should return correct upper bound when type is a wildcard type " + 
             "that has an extends declaration e.g. <? extends String>."
         )
-        public void wildcardTypeTest2() {
+        void wildcardTypeTest2() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::wildcardTypeReturnTypeExtends
             );
@@ -193,7 +193,7 @@ public class TypeUtilitiesTests {
             "should return correct upper bound when type is a wildcard type " + 
             "that has a super declaration e.g. <? super String>."
         )
-        public void wildcardTypeTest3() {
+        void wildcardTypeTest3() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::wildcardTypeReturnTypeSuper
             );
@@ -216,17 +216,18 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should throw when type argument is an unrecognized type")
-        public void unrecognizedTypeTest() {
+        void unrecognizedTypeTest() {
             // For any reason JDK decides to add a new type.
+            UnsupportedType unsupportedType = new UnsupportedType();
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> TypeUtilities.getRawType(new UnsupportedType())
+                () -> TypeUtilities.getRawType(unsupportedType)
             );
         }
 
         @Test
         @DisplayName("should throw when type argument is an unrecognized type")
-        public void unrecognizedGenericArrayComponentTypeTest() {
+        void unrecognizedGenericArrayComponentTypeTest() {
             GenericArrayType genericArrayType = new GenericArrayType() {
                 @Override
                 public Type getGenericComponentType() {
@@ -244,7 +245,7 @@ public class TypeUtilitiesTests {
     class GetTypeParametersMethod {
         @Test
         @DisplayName("should return generic type parameter.")
-        public void test1() {
+        void test1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::parameterizedTypeReturnType
             );
@@ -259,14 +260,14 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return empty array when type is not a parameterized type.")
-        public void test2() {
+        void test2() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::nonParameterizedTypeReturnType
             );
             
             Type genericReturnType = proxyMethod.returnType();
 
-            assertTrue(TypeUtilities.getTypeParameters(genericReturnType).length == 0);
+            assertEquals(0, TypeUtilities.getTypeParameters(genericReturnType).length);
         }
     }
 
@@ -274,7 +275,7 @@ public class TypeUtilitiesTests {
     class IsClassMethod {
         @Test
         @DisplayName("should return true when type is a class.")
-        public void test1() {
+        void test1() {
             Type type = String.class;
             assertTrue(type instanceof Class<?>);
             assertTrue(TypeUtilities.isClass(type));
@@ -282,7 +283,7 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return false when type is not a class.")
-        public void test2() {
+        void test2() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::parameterizedTypeReturnType
             );
@@ -298,7 +299,7 @@ public class TypeUtilitiesTests {
     class IsParameterizedTypeMethod {
         @Test
         @DisplayName("should return true when type is a parameterized type.")
-        public void test1() {
+        void test1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::parameterizedTypeReturnType
             );
@@ -310,7 +311,7 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return false when type is not a parameterized type.")
-        public void test2() {
+        void test2() {
             Type type = String.class;
             assertFalse(type instanceof ParameterizedType);
             assertFalse(TypeUtilities.isParameterizedType(type));
@@ -321,7 +322,7 @@ public class TypeUtilitiesTests {
     class IsGenericArrayTypeMethod {
         @Test
         @DisplayName("should return true when type is a generic array type.")
-        public void test1() {
+        void test1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::genericArrayTypeReturnTypeWithTypeVariable
             );
@@ -333,7 +334,7 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return false when type is not a generic array type.")
-        public void test2() {
+        void test2() {
             Type type = String.class;
             assertFalse(type instanceof GenericArrayType);
             assertFalse(TypeUtilities.isGenericArrayType(type));
@@ -344,7 +345,7 @@ public class TypeUtilitiesTests {
     class IsTypeVariableMethod {
         @Test
         @DisplayName("should return true when type is a type variable.")
-        public void test1() {
+        void test1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::typeVariableReturnType
             );
@@ -356,7 +357,7 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return false when type is not a type variable.")
-        public void test2() {
+        void test2() {
             Type type = String.class;
             assertFalse(type instanceof TypeVariable<?>);
             assertFalse(TypeUtilities.isTypeVariable(type));
@@ -367,7 +368,7 @@ public class TypeUtilitiesTests {
     class IsWildcardTypeMethod {
         @Test
         @DisplayName("should return true when type is a wildcard type.")
-        public void test1() {
+        void test1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::wildcardTypeReturnType
             );
@@ -387,7 +388,7 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return false when type is not a wildcard type.")
-        public void test2() {
+        void test2() {
             Type type = String.class;
             assertFalse(type instanceof WildcardType);
             assertFalse(TypeUtilities.isWildcardType(type));
@@ -398,7 +399,7 @@ public class TypeUtilitiesTests {
     class AsClassMethod {
         @Test
         @DisplayName("should return a class when type is a class.")
-        public void test1() {
+        void test1() {
             Type type = String.class;
 
             assertEquals(
@@ -409,7 +410,7 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return null when type is not a class.")
-        public void test2() {
+        void test2() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::parameterizedTypeReturnType
             );
@@ -424,7 +425,7 @@ public class TypeUtilitiesTests {
     class AsParameterizedTypeMethod {
         @Test
         @DisplayName("should return a parameterized type when type is a parameterized type.")
-        public void test1() {
+        void test1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::parameterizedTypeReturnType
             );
@@ -439,7 +440,7 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return null when type is not a parameterized type.")
-        public void test2() {
+        void test2() {
             Type type = String.class;
             assertFalse(type instanceof ParameterizedType);
             assertNull(TypeUtilities.asParameterizedType(type));
@@ -450,7 +451,7 @@ public class TypeUtilitiesTests {
     class AsGenericArrayTypeMethod {
         @Test
         @DisplayName("should return a generic array type when type is a generic array type.")
-        public void test1() {
+        void test1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::genericArrayTypeReturnTypeWithTypeVariable
             );
@@ -465,7 +466,7 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return null when type is not a generic array type.")
-        public void test2() {
+        void test2() {
             Type type = String.class;
             assertFalse(type instanceof GenericArrayType);
             assertNull(TypeUtilities.asGenericArrayType(type));
@@ -476,7 +477,7 @@ public class TypeUtilitiesTests {
     class AsTypeVariableMethod {
         @Test
         @DisplayName("should return a type variable when type is a type variable.")
-        public void test1() {
+        void test1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::typeVariableReturnType
             );
@@ -491,7 +492,7 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return false when type is not a type variable.")
-        public void test2() {
+        void test2() {
             Type type = String.class;
             assertFalse(type instanceof TypeVariable<?>);
             assertNull(TypeUtilities.asTypeVariable(type));
@@ -502,7 +503,7 @@ public class TypeUtilitiesTests {
     class AsWildcardTypeMethod {
         @Test
         @DisplayName("should return a wildcard type when type is a wildcard type.")
-        public void test1() {
+        void test1() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 TypesInterface::wildcardTypeReturnType
             );
@@ -525,7 +526,7 @@ public class TypeUtilitiesTests {
 
         @Test
         @DisplayName("should return null when type is not a wildcard type.")
-        public void test2() {
+        void test2() {
             Type type = String.class;
             assertFalse(type instanceof WildcardType);
             assertNull(TypeUtilities.asWildcardType(type));
