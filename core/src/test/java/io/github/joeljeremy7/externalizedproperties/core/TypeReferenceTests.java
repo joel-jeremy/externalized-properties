@@ -78,7 +78,7 @@ public class TypeReferenceTests {
 
         @Test
         @DisplayName("should return upper bound of type variable")
-        public <T extends Number> void test6() {
+        <T extends Number> void test6() {
             TypeReference<T> listType = new TypeReference<T>(){};
 
             assertTrue(listType.type() instanceof TypeVariable);
@@ -127,7 +127,7 @@ public class TypeReferenceTests {
 
         @Test
         @DisplayName("should return upper bound of type variable")
-        public <T extends Number> void test6() {
+        <T extends Number> void test6() {
             TypeReference<T> listType = new TypeReference<T>(){};
 
             // Should return the type variable bound.
@@ -184,7 +184,7 @@ public class TypeReferenceTests {
         @DisplayName(
             "should return empty array when referenced type is a type variable"
         )
-        public <T> void test6() {
+        <T> void test6() {
             TypeReference<T> listType = new TypeReference<T>(){};
 
             assertEquals(0, listType.genericTypeParameters().length);

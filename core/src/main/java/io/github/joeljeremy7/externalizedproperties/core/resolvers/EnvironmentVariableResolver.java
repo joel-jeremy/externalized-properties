@@ -66,7 +66,7 @@ public class EnvironmentVariableResolver extends MapResolver {
             char currentChar = propertyNameChars[currentIndex];
 
             if (currentChar == DOT || currentChar == DASH) {
-                propertyNameChars[currentIndex] = currentChar = UNDERSCORE;
+                propertyNameChars[currentIndex] = UNDERSCORE;
                 continue;
             }
 
