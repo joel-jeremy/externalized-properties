@@ -1,6 +1,6 @@
 apply plugin: 'me.champeau.jmh'
 
-description = 'Externalized Properties Core.'
+description = 'Externalized Properties Core'
 
 jar {
     manifest {

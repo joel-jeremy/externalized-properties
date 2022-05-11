@@ -33,7 +33,7 @@ configure(javaProjects) {
     apply plugin: 'java-library'
     apply plugin: 'java-test-fixtures'
 
-    apply from: "${rootDir}/gradle/publishing.gradle"
+    apply from: "${rootDir}/gradle/publications.gradle"
     apply from: "${rootDir}/gradle/code-quality.gradle"
 
     testing {
@@ -55,8 +55,7 @@ configure(javaProjects) {
     }
 
     java {
-        // publishingArtifactId from publishing.gradle
-        archivesBaseName = publishingArtifactId
+        archivesBaseName = rootProject.relativeProjectPath(project.path).replace(':', '-')
         
         toolchain {
             languageVersion = JavaLanguageVersion.of(11)
