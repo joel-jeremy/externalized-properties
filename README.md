@@ -20,10 +20,6 @@ Externalized Properties was inspired by the [The Twelve Factor Methodology](http
 
 The goal of this library is to make it easy for applications to implement configuration best practices by providing easy-to-use APIs as well as providing the flexibility to choose where to store their configurations/properties.
 
-## Wiki
-
-- For more information and examples please browse through the wiki: <https://github.com/joeljeremy7/externalized-properties/wiki>
-
 ## Getting Started
 
 ### Gradle

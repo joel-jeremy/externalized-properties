@@ -3,10 +3,6 @@ apply plugin: 'java-test-fixtures'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-ext {
-    publishingArtifactId = rootProject.relativeProjectPath(project.path).replace(':', '-')
-}
-
 java {
     withJavadocJar()
     withSourcesJar()
@@ -19,12 +15,16 @@ components.java.withVariantsFromConfiguration(configurations.testFixturesRuntime
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId = publishingArtifactId
+            afterEvaluate {
+                artifactId = archivesBaseName
+            }
             from components.java
 
             pom {
-                name = publishingArtifactId
-                description = project.description
+                afterEvaluate {
+                    name = project.description
+					description = project.description
+				}
                 packaging = 'jar'
                 url = 'https://github.com/joeljeremy7/externalized-properties'
 
