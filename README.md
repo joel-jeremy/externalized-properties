@@ -25,7 +25,7 @@ The goal of this library is to make it easy for applications to implement config
 ### Gradle
 
 ```gradle
-implementation 'io.github.joeljeremy7.externalizedproperties:core:1.0.0-SNAPSHOT'
+implementation 'io.github.joeljeremy7.externalizedproperties:core:${version}'
 ```
 
 ### Maven
@@ -34,7 +34,7 @@ implementation 'io.github.joeljeremy7.externalizedproperties:core:1.0.0-SNAPSHOT
 <dependency>
     <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
     <artifactId>core</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>${version}</version>
 </dependency>
 ```
 
@@ -54,24 +54,20 @@ module foo.bar {
 }
 ```
 
-## Sample Projects
-
-Sample projects can be found in: <https://github.com/joeljeremy7/externalized-properties-samples>
-
 ## Features
 
 Externalized Properties makes the best use of Java's strong typing by proxying an interface and using that as a facade to resolve properties.
 
-### Interface Proxying
+### Dynamic Proxies
 
 Given an interface:
 
 ```java
 public interface ApplicationProperties {
-    @ExternalizedProperty("database.url")
-    String databaseUrl();
-    @ExternalizedProperty("database.driver")
-    String databaseDriver();
+    @ExternalizedProperty("java.home")
+    String javaHome();
+    @ExternalizedProperty("java.version")
+    String javaVersion();
 }
 ```
 
@@ -85,24 +81,21 @@ public static void main(String[] args) {
     ApplicationProperties props = externalizedProperties.proxy(ApplicationProperties.class);
 
     // Use properties.
-    String databaseUrl = props.databaseUrl();
-    String databaseDriver = props.databaseDriver();
+    String javaHome = props.javaHome();
+    String javaVersion = props.javaVersion();
 
-    System.out.println("Database URL: " + databaseUrl);
-    System.out.println("Database Driver: " + databaseDriver);
+    System.out.println("java.home: " + javaHome);
+    System.out.println("java.version: " + javaVersion);
 }
 
-private ExternalizedProperties buildExternalizedProperties() {
+private static ExternalizedProperties buildExternalizedProperties() {
     // Create the ExternalizedProperties instance with default and additional resolvers.
     // Default resolvers include system properties and environment variable resolvers.
     
     return ExternalizedProperties.builder()
-        .withDefaultResolvers() 
+        .withDefaults() 
         .resolvers(
             ResourceResolver.provider(getClass().getResource("/app.properties")),
-            MapResolver.provider(getPropertiesMap()),
-            // DatabaseResolver is not part of the core module. It is part of a separate resolver-database module.
-            DatabaseResolver.provider(new JdbcConnectionProvider(getDataSource())),
             // CustomAwsSsmResolver is an example custom resolver implementation which resolves properties from AWS SSM.
             ResolverProvider.of(new CustomAwsSsmResolver(buildAwsSsmClient()))
         ) 
@@ -130,26 +123,12 @@ public interface ApplicationProperties {
 
 public static void main(String[] args) {
     // Processor to decrypt @Decrypt("MyAESDecryptor")
-    ProcessorProvider<DecryptProcessor> aesDecryptProcessor = DecryptProcessor.provider(
-        JceDecryptor.factory().symmetric(
-            "MyAESDecryptor",
-            "AES/GCM/NoPadding", 
-            getSecretKey(),
-            getGcmParameterSpec()
-        )
-    );
-
+    ProcessorProvider<DecryptProcessor> aesDecryptProcessor = aesDecryptProcessor();
     // Processor to decrypt @Decrypt("MyRSADecryptor")
-    ProcessorProvider<DecryptProcessor> rsaDecryptProcessor = DecryptProcessor.provider(
-        JceDecryptor.factory().asymmetric(
-            "MyRSADecryptor",
-            "RSA", 
-            getPrivateKey()
-        )
-    );
+    ProcessorProvider<DecryptProcessor> rsaDecryptProcessor = rsaDecryptProcessor();
 
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .withDefaultResolvers()
+        .withDefaults()
         .processors(aesDecryptProcessor, rsaDecryptProcessor)
         .build();
 
@@ -157,11 +136,32 @@ public static void main(String[] args) {
     ApplicationProperties props = externalizedProperties.proxy(ApplicationProperties.class);
 
     // Automatically decrypted via @Decrypt/DecryptProcessor.
-    String decryptedAes = props.aesEncryptedProperty();
-    String decryptedRsa = props.rsaEncryptedProperty();
+    String decryptedAesProperty = props.aesEncryptedProperty();
+    String decryptedRsaProperty = props.rsaEncryptedProperty();
 
-    System.out.println("Decrypted property: " + decryptedAes)
-    System.out.println("Decrypted property: " + decryptedRsa)
+    System.out.println("Decrypted AES encrypted property: " + decryptedAesProperty)
+    System.out.println("Decrypted RSA encrypted property: " + decryptedRsaProperty)
+}
+
+private static ProcessorProvider<DecryptProcessor> aesDecryptProcessor() {
+    return DecryptProcessor.provider(
+        JceDecryptor.factory().symmetric(
+            "MyAESDecryptor",
+            "AES/GCM/NoPadding", 
+            getSecretKey(),
+            getGcmParameterSpec()
+        )
+    );
+}
+
+private static ProcessorProvider<DecryptProcessor> rsaDecryptProcessor() {
+    return DecryptProcessor.provider(
+        JceDecryptor.factory().asymmetric(
+            "MyRSADecryptor",
+            "RSA", 
+            getPrivateKey()
+        )
+    );
 }
 ```
 
@@ -183,7 +183,7 @@ Custom processing can be achieved in 3 steps:
     Requirements for custom processor annotations:  
     a. The annotation should target methods  
     b. The annotation should have runtime retention  
-    c. The annotation should be annotated with @ProcessorWith(...) annotation
+    c. The annotation should be annotated with @ProcessWith(...) annotation
 
     e.g.
 
@@ -207,11 +207,9 @@ Custom processing can be achieved in 3 steps:
     
     public static void main(String[] args) {
         ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-            .withDefaultResolvers()
-            .processors(
-                // Register custom processor to process @Base64Encode
-                ProcessorProvider.of(new Base64EncodeProcessor())
-            )
+            .withDefaults()
+            // Register custom processor to process @Base64Encode
+            .processors(ProcessorProvider.of(new Base64EncodeProcessor()))
             .build();
 
         ApplicationProperties props = externalizedProperties.proxy(ApplicationProperties.class);
@@ -227,26 +225,15 @@ Custom processing can be achieved in 3 steps:
 
 Externalized Properties has powerful support for conversion of properties to various types. There are several built-in converters but it is very easy to create a custom converter by implementing the `Converter` interface.
 
-To register converters to the library, it must be done through the builder:
-
-```java
-private ExternalizedProperties buildExternalizedProperties() {
-    return ExternalizedProperties.builder()
-        .withDefaultResolvers()
-        .withDefaultConverters()
-        .converters(
-            ConverterProvider.of(new CustomTypeConverter())
-        )
-        .build();
-}
-```
-
 To convert a property via the proxy interface, just set the method return type to the target type, and the library will handle the conversion behind the scenes - using the registered converters.
 
 ```java
 public interface ApplicationProperties {
     @ExternalizedProperty("timeout.millis")
     int timeoutInMilliseconds();
+
+    @ExternalizedProperty("custom.type.property")
+    CustomType customTypeProperty();
 }
 
 public static void main(String[] args) {
@@ -257,8 +244,17 @@ public static void main(String[] args) {
 
     // Use properties.
     int timeoutInMilliseconds = props.timeoutInMilliseconds();
+    CustomType customType = props.customTypeProperty();
 
     System.out.println("Timeout in milliseconds: " + timeoutInMilliseconds);
+    System.out.println("Custom type property: " + customType);
+}
+
+private static ExternalizedProperties buildExternalizedProperties() {
+    return ExternalizedProperties.builder()
+        .withDefaults()
+        .converters(ConverterProvider.of(new CustomTypeConverter()))
+        .build();
 }
 ```
 
