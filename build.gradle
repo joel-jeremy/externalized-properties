@@ -19,7 +19,7 @@ allprojects {
     group = 'io.github.joeljeremy7.externalizedproperties'
 
     def snapshotSuffix = rootProject.hasProperty('release') ? '' : '-SNAPSHOT'
-    version = '1.0.0' + snapshotSuffix
+    version = '1.0.0-alpha' + snapshotSuffix
 
     repositories {
         mavenLocal()
@@ -76,10 +76,6 @@ configure(javaProjects) {
             )
         }
     }
-    
-    // Do not publish test fixtures.
-    components.java.withVariantsFromConfiguration(configurations.testFixturesApiElements) { skip() }
-    components.java.withVariantsFromConfiguration(configurations.testFixturesRuntimeElements) { skip() }
 }
 
 if (project.hasProperty('ossrh')) {

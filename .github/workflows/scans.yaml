@@ -14,10 +14,12 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
-          cache: 'gradle'
       
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
+      
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
 
       - name: Snyk
         env:
@@ -48,10 +50,12 @@ jobs:
         with:
           java-version: 11
           distribution: 'temurin'
-          cache: 'gradle'
       
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
+      
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
       
       - name: Cache SonarCloud packages
         uses: actions/cache@v1

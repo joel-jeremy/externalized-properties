@@ -1,3 +1,5 @@
+apply plugin: 'java-library'
+apply plugin: 'java-test-fixtures'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
@@ -9,6 +11,10 @@ java {
     withJavadocJar()
     withSourcesJar()
 }
+
+// Do not publish test fixtures.
+components.java.withVariantsFromConfiguration(configurations.testFixturesApiElements) { skip() }
+components.java.withVariantsFromConfiguration(configurations.testFixturesRuntimeElements) { skip() }
 
 publishing {
     publications {
@@ -80,9 +86,12 @@ if (project.hasProperty('release')) {
     project.tasks.publish.dependsOn checkSnapshotDependencies
 }
 
-if (project.hasProperty('ossrh')) {
-    signing {
-        required rootProject.hasProperty('release')
-        sign publishing.publications.mavenJava
-    }
+signing {
+    required project.hasProperty('ossrh')
+
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
+    
+    sign publishing.publications.mavenJava
 }
