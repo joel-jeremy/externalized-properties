@@ -57,12 +57,13 @@ module foo.bar {
 
 ## Features
 
-### - [Property Resolution](docs/property-resolution.md)
+### 🌟 [Property Resolution](docs/property-resolution.md)
 
-- Default Values
-- Variable Expansion
-- Caching
+✔️ Default/Fallback Values  
+✔️ Variable Expansion  
+✔️ Caching  
+✔️ Eager Loading
 
-### - [Property Post-Processing](docs/property-post-processing.md)
+### 🌟 [Property Post-Processing](docs/property-post-processing.md)
 
-### - [Property Conversion](docs/property-conversion.md)
+### 🌟 [Property Conversion](docs/property-conversion.md)
