@@ -68,7 +68,7 @@ public interface ApplicationProperties {
 }
 ```
 
-## 🌟 Non-static Property Name
+## 🌟 Non-static Property Names
 
 Externalized Properties supports resolution of properties whose names are not known at compile time e.g.
 
