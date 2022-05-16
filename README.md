@@ -57,7 +57,7 @@ module foo.bar {
 
 ## 🌟 Features
 
-### 🔗 [Property Resolution](docs/property-resolution.md)
+### 🔗 [Property Resolution via Java Dynamic Proxies](docs/property-resolution.md) ([Why Dynamic Proxies?](docs/why-dynamic-proxies.md))
 
 ✨ Default/Fallback Values  
 ✨ Variable Expansion  
@@ -72,6 +72,8 @@ module foo.bar {
 ### 🔗 [Property Conversion](docs/property-conversion.md)
 
 ✨ Generic Type Conversion
+
+##  
 
 ## 🏎️ Quick Start
 
