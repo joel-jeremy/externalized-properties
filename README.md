@@ -60,10 +60,11 @@ module foo.bar {
 ### 🔗 [Property Resolution via Java Dynamic Proxies](docs/property-resolution.md) ([Why Dynamic Proxies?](docs/why-dynamic-proxies.md))
 
 ✨ Default/Fallback Values  
+✨ Non-static Property Names
 ✨ Variable Expansion  
 ✨ Caching  
 ✨ Eager Loading  
-✨ Automatic cache reload  
+✨ Automatic Cache Reload  
 
 ### 🔗 [Property Post-Processing](docs/property-post-processing.md)
 

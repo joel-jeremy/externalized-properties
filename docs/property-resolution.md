@@ -46,7 +46,7 @@ private static ExternalizedProperties buildExternalizedProperties() {
 }
 ```
 
-## 🌟 Default property values
+## 🌟 Default/Fallback Values
 
 Externalized Properties supports default values by using Java's default interface methods e.g.
 
@@ -62,9 +62,27 @@ public interface ApplicationProperties {
     @ExternalizedProperty("my.property")
     default String myPropertyOrDefault(String defaultValue) {
         // If "my.property" cannot be resolved, 
-        // defaultValue will be returned.
+        // The variable defaultValue will be returned.
         return defaultValue;
     }
+}
+```
+
+## 🌟 Non-static Property Name
+
+Externalized Properties supports resolution of properties whose names are not known at compile time e.g.
+
+```java
+/**
+ * No property name in annotation. 
+ * Property name is provided on runtime.
+ */
+public interface ApplicationProperties {
+    @ExternalizedProperty
+    String resolve(String propertyName);
+
+    @ExternalizedProperty
+    int resolveInt(String propertyName);
 }
 ```
 
@@ -86,7 +104,7 @@ public interface ApplicationProperties {
 }
 ```
 
-If custom variable expansion if required, the default variable expander can be overriden via `ExternalizedProperties.Builder` e.g.
+If custom variable expansion is required, the default variable expander can be overriden via `ExternalizedProperties.Builder` e.g.
 
 ```java
 public static void main(String[] args) {
