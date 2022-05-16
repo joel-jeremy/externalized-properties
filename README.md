@@ -26,7 +26,7 @@ The goal of this library is to make it easy for applications to implement config
 ### Gradle
 
 ```gradle
-implementation 'io.github.joeljeremy7.externalizedproperties:core:${version}'
+implementation "io.github.joeljeremy7.externalizedproperties:core:${version}"
 ```
 
 ### Maven
