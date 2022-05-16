@@ -73,8 +73,6 @@ module foo.bar {
 
 ✨ Generic Type Conversion
 
-##  
-
 ## 🏎️ Quick Start
 
 Given an interface:
