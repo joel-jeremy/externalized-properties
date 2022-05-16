@@ -21,7 +21,7 @@ Externalized Properties was inspired by the [The Twelve Factor Methodology](http
 
 The goal of this library is to make it easy for applications to implement configuration best practices by providing easy-to-use APIs as well as providing the flexibility to choose where to store their configurations/properties.
 
-## ⚙️ Installation
+## 🛠️ Installation
 
 ### Gradle
 
@@ -46,7 +46,7 @@ Externalized Properties jars are published with Automatic-Module-Name manifest a
 - Core - `io.github.joeljeremy7.externalizedproperties.core`
 - Database Resolver - `io.github.joeljeremy7.externalizedproperties.resolvers.database`
 
-Module authors can use above modules in their module-info.java:
+Module authors can use above module names in their module-info.java:
 
 ```java
 module foo.bar {
@@ -57,23 +57,23 @@ module foo.bar {
 
 ## 🌟 Features
 
-### ✅ [Property Resolution](docs/property-resolution.md)
+### 🔗 [Property Resolution](docs/property-resolution.md)
 
-📍 Default/Fallback Values  
-📍 Variable Expansion  
-📍 Caching  
-📍 Eager Loading
-📍 Automatic cache reload  
+✨ Default/Fallback Values  
+✨ Variable Expansion  
+✨ Caching  
+✨ Eager Loading  
+✨ Automatic cache reload  
 
-### ✅ [Property Post-Processing](docs/property-post-processing.md)
+### 🔗 [Property Post-Processing](docs/property-post-processing.md)
 
-📍 Symmetric/Asymmetric Decryption
+✨ Symmetric/Asymmetric Decryption
 
-### ✅ [Property Conversion](docs/property-conversion.md)
+### 🔗 [Property Conversion](docs/property-conversion.md)
 
-📍 Generic Type Conversion
+✨ Generic Type Conversion
 
-## 🏃 Quick Start
+## 🏎️ Quick Start
 
 Given an interface:
 

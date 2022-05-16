@@ -14,7 +14,7 @@ Since Externalized Properties works with interfaces, it makes it easy to integra
 
 Another side-effect of being dependency injection friendly is that it also makes it easy to mock/stub out configurations/properties on unit tests. It's as simple as creating a stub implementation of the proxy interface or using mocking frameworks to mock the proxy interface.
 
-## 🏃 Quick Start
+## 🏎️ Quick Start
 
 Given an interface:
 
@@ -22,7 +22,7 @@ Given an interface:
 public interface ApplicationProperties {
     @ExternalizedProperty("java.home")
     String javaHome();
-    
+
     @ExternalizedProperty("java.version")
     String javaVersion();
 }
