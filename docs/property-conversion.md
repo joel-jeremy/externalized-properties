@@ -1,8 +1,8 @@
 # Property Conversion
 
-Externalized Properties has powerful support for conversion of properties to various types. There are several built-in converters but it is very easy to create a custom converter by implementing the `Converter` interface.
+Externalized Properties has powerful support for conversion of properties to various types. There are several built-in converters but it is very easy to create a custom converter by implementing the [Converter](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Converter.java) interface.
 
-To convert a property via the proxy interface, just set the method return type to the target type, and the library will handle the conversion behind the scenes - using the registered converters.
+To convert properties, just set return types of the proxy interface methods to the target type, and the library will handle the conversion behind the scenes - using the registered converters.
 
 ```java
 public interface ApplicationProperties {
@@ -32,7 +32,7 @@ private static ExternalizedProperties buildExternalizedProperties() {
 }
 ```
 
-## Conversion to Generic Types
+## 🌟 Conversion to Generic Types
 
 Externalized Properties has support for generic types. Given the proxy interface:
 

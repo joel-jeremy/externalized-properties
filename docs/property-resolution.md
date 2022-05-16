@@ -4,7 +4,7 @@ Externalized Properties makes the best use of Java's strong typing by using Java
 
 It works by creating dynamic/configurable proxy instances (created at runtime by Java) that implement user-defined interfaces as facade to resolve properties.
 
-## Dynamic Proxies
+## ✨ Dynamic Proxies
 
 Given an interface:
 
@@ -45,17 +45,17 @@ private static ExternalizedProperties buildExternalizedProperties() {
 }
 ```
 
-## Why Dynamic Proxies?
+## 🙋 Why Dynamic Proxies?
 
-### 1. Dependency Injection
+### 📌 Dependency Injection Friendly
 
-Using dynamic proxies, which implements user-defined interfaces, makes it easy to integrate with dependency injection frameworks. Just inject the user-defined interfaces to your classes and your chosen framework will handle the rest.
+Since Externalized Properties works with interfaces, it makes it easy to integrate with dependency injection (DI) frameworks. it's as simple as building `ExternalizedProperties`, creating a dynamic proxy from an interface, and registering the proxy interface to your chosen DI framework.
 
-### 2. Testability
+### 🧪 Testing Friendly
 
-Another side-effect of being dependency injection friendly is that it also makes it easy to mock/stub out configurations on unit tests by using mocking frameworks or creating a stub implementation of the proxy interface.
+Another side-effect of being dependency injection friendly is that it also makes it easy to mock/stub out configurations/properties on unit tests. It's as simple as creating a stub implementation of the proxy interface or using mocking frameworks to mock the proxy interface.
 
-## Default property values
+## 🌟 Default property values
 
 Externalized Properties supports default values by using Java's default interface methods e.g.
 
@@ -77,9 +77,9 @@ public interface ApplicationProperties {
 }
 ```
 
-## Variable Expansion
+## 🌟 Variable Expansion
 
-Externalized Properties supports variable expansion in property names e.g.
+Variable expansion is supported in property names and is enabled by default e.g.
 
 ```java
 public interface ApplicationProperties {
@@ -89,19 +89,41 @@ public interface ApplicationProperties {
     }
 
     // ${environment} will be replaced with whatever the 
-    // value of the "environment" property is. 
+    // value of the "environment" property is e.g. dev.my.property
     @ExternalizedProperty("${environment}.my.property")
     String myProperty();
 }
 ```
 
-## Caching
-
-Caching can be enabled via `ExternalizedProperties.Builder`.
+If custom variable expansion if required, the default variable expander can be overriden via `ExternalizedProperties.Builder` e.g.
 
 ```java
-private static ExternalizedProperties buildExternalizedProperties() {
-    return ExternalizedProperties.builder()
+public static void main(String[] args) {
+    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+        .withDefaults() 
+        .variableExpander(
+            // Format: #(variable)
+            SimpleVariableExpander.provider("#(", ")")
+        )
+        .build();
+    
+    ApplicationProperties appProperties = externalizedProperties.proxy(ApplicationProperties.class);
+}
+```
+
+Built-in variable expander implementations:
+
+- [SimpleVariableExpander](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/variableexpansion/SimpleVariableExpander.java) - Uses a speficied prefix and suffix to match variables.
+- [PatternVariableExpander](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/variableexpansion/PatternVariableExpander.java) - Uses a regex to match variables.
+- [NoOpVariableExpander](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/variableexpansion/NoOpVariableExpander.java) - Disables variable expansion.
+
+## 🌟 Caching
+
+Caching is enabled by default, but when not using defaults, it can be enabled via `ExternalizedProperties.Builder`. All proxies created by the resulting `ExternalizedProperties` instance will cache any resolved properties.
+
+```java
+public static void main(String[] args) {
+    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
         .withDefaults() 
         // Cache results of proxy method invocations.
         .withProxyInvocationCaching()
@@ -110,21 +132,27 @@ private static ExternalizedProperties buildExternalizedProperties() {
         // Default is 30 minutes.
         .withCacheDuration(Duration.ofMinutes(10))
         .build();
+    
+    // This proxy will cache any resolved properties.
+    ApplicationProperties appProperties = externalizedProperties.proxy(ApplicationProperties.class);
 }
 ```
 
-## Eager Loading
+## 🌟 Eager Loading
 
-Eager loading can be enabled via `ExternalizedProperties.Builder`.
+Eager loading is opt-in and can be enabled via `ExternalizedProperties.Builder`. All proxies created by the resulting `ExternalizedProperties` instance will eagerly load properties upon creation.
 
 ```java
-private static ExternalizedProperties buildExternalizedProperties() {
-    return ExternalizedProperties.builder()
+private static void main(String[] args) {
+    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
         .withDefaults() 
         // Eager load properties.
         .withProxyEagerLoading()
         // Default is 30 minutes.
         .withCacheDuration(Duration.ofMinutes(10))
         .build();
+
+    // This proxy should already have its properties loaded.
+    ApplicationProperties appProperties = externalizedProperties.proxy(ApplicationProperties.class);
 }
 ```

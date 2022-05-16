@@ -2,7 +2,7 @@
 
 Externalized Properties provides a mechanism to selectively apply post-processing to resolved properties.
 
-This feature may be used to apply transformations to resolved properties such as automatic decryption, masking, validation, etc. This can be achieved via a combination of annotations and `Processor`s e.g.
+This feature may be used to apply transformations to resolved properties such as automatic decryption, masking, validation, etc. This can be achieved via a combination of annotations and [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java)s e.g.
 
 ```java
 public interface ApplicationProperties {
@@ -56,9 +56,9 @@ private static ProcessorProvider<DecryptProcessor> rsaDecryptProcessor() {
 }
 ```
 
-## Custom Processors
+## 🚀 Custom Processors
 
-### 1. Create a processor by implemention the `Processor` interface
+### 1. Create a processor by implementing the [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java) interface
 
 ```java
 public class Base64EncodeProcessor implements Processor {
@@ -69,13 +69,13 @@ public class Base64EncodeProcessor implements Processor {
 }
 ```
 
-### 2. Create an annotation to annotate methods that should go through the processor
+### 2. Create an annotation to annotate methods which should go through the processor
 
 Requirements for custom processor annotations:  
 
 a. The annotation should target methods  
 b. The annotation should have runtime retention  
-c. The annotation should be annotated with @ProcessWith(...) annotation
+c. The annotation should be annotated with the [ProcessWith](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/processing/ProcessWith.java) annotation
 
 e.g.
 
