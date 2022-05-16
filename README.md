@@ -21,7 +21,7 @@ Externalized Properties was inspired by the [The Twelve Factor Methodology](http
 
 The goal of this library is to make it easy for applications to implement configuration best practices by providing easy-to-use APIs as well as providing the flexibility to choose where to store their configurations/properties.
 
-## Getting Started
+## ⚙️ Installation
 
 ### Gradle
 
@@ -39,14 +39,14 @@ implementation 'io.github.joeljeremy7.externalizedproperties:core:${version}'
 </dependency>
 ```
 
-### Java 9 Module Names
+### 🧩 Java 9 Module Names
 
 Externalized Properties jars are published with Automatic-Module-Name manifest attribute:
 
 - Core - `io.github.joeljeremy7.externalizedproperties.core`
 - Database Resolver - `io.github.joeljeremy7.externalizedproperties.resolvers.database`
 
-Module authors can use above module names in their module-info.java:
+Module authors can use above modules in their module-info.java:
 
 ```java
 module foo.bar {
@@ -55,15 +55,63 @@ module foo.bar {
 }
 ```
 
-## Features
+## 🌟 Features
 
-### 🌟 [Property Resolution](docs/property-resolution.md)
+### ✅ [Property Resolution](docs/property-resolution.md)
 
-✔️ Default/Fallback Values  
-✔️ Variable Expansion  
-✔️ Caching  
-✔️ Eager Loading
+📍 Default/Fallback Values  
+📍 Variable Expansion  
+📍 Caching  
+📍 Eager Loading
+📍 Automatic cache reload  
 
-### 🌟 [Property Post-Processing](docs/property-post-processing.md)
+### ✅ [Property Post-Processing](docs/property-post-processing.md)
 
-### 🌟 [Property Conversion](docs/property-conversion.md)
+📍 Symmetric/Asymmetric Decryption
+
+### ✅ [Property Conversion](docs/property-conversion.md)
+
+📍 Generic Type Conversion
+
+## 🏃 Quick Start
+
+Given an interface:
+
+```java
+public interface ApplicationProperties {
+    @ExternalizedProperty("java.home")
+    String javaHome();
+
+    @ExternalizedProperty("encrypted.property")
+    @Decrypt("MyDecryptor")
+    String encryptedProperty();
+
+    @ExternalizedProperty("java.version")
+    int javaVersion();
+}
+```
+
+We can initialize and start resolving external configurations/properties by:
+
+```java
+public static void main(String[] args) {
+    ExternalizedProperties externalizedProperties = buildExternalizedProperties();
+
+    // Proxied interface.
+    ApplicationProperties props = externalizedProperties.proxy(ApplicationProperties.class);
+
+    // Use properties.
+    String javaHome = props.javaHome();
+    String encryptedProperty = props.encryptedProperty();
+    int javaVersion = props.javaVersion();
+}
+
+private static ExternalizedProperties buildExternalizedProperties() {
+    return ExternalizedProperties.builder()
+        .withDefaults() 
+        .resolvers(...)
+        .processors(...)
+        .converters(...) 
+        .build();
+}
+```

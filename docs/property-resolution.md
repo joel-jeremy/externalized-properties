@@ -4,7 +4,17 @@ Externalized Properties makes the best use of Java's strong typing by using Java
 
 It works by creating dynamic/configurable proxy instances (created at runtime by Java) that implement user-defined interfaces as facade to resolve properties.
 
-## ✨ Dynamic Proxies
+## 🙋 Why Dynamic Proxies?
+
+### 📌 Dependency Injection Friendly
+
+Since Externalized Properties works with interfaces, it makes it easy to integrate with dependency injection (DI) frameworks. it's as simple as building `ExternalizedProperties`, creating a dynamic proxy from an interface, and registering the proxy interface to your chosen DI framework.
+
+### 🧪 Testing Friendly
+
+Another side-effect of being dependency injection friendly is that it also makes it easy to mock/stub out configurations/properties on unit tests. It's as simple as creating a stub implementation of the proxy interface or using mocking frameworks to mock the proxy interface.
+
+## 🏃 Quick Start
 
 Given an interface:
 
@@ -12,6 +22,7 @@ Given an interface:
 public interface ApplicationProperties {
     @ExternalizedProperty("java.home")
     String javaHome();
+    
     @ExternalizedProperty("java.version")
     String javaVersion();
 }
@@ -32,9 +43,7 @@ public static void main(String[] args) {
 }
 
 private static ExternalizedProperties buildExternalizedProperties() {
-    // Create the ExternalizedProperties instance with default and additional resolvers.
     // Default resolvers include system properties and environment variable resolvers.
-    
     return ExternalizedProperties.builder()
         .withDefaults() 
         .resolvers(
@@ -44,16 +53,6 @@ private static ExternalizedProperties buildExternalizedProperties() {
         .build();
 }
 ```
-
-## 🙋 Why Dynamic Proxies?
-
-### 📌 Dependency Injection Friendly
-
-Since Externalized Properties works with interfaces, it makes it easy to integrate with dependency injection (DI) frameworks. it's as simple as building `ExternalizedProperties`, creating a dynamic proxy from an interface, and registering the proxy interface to your chosen DI framework.
-
-### 🧪 Testing Friendly
-
-Another side-effect of being dependency injection friendly is that it also makes it easy to mock/stub out configurations/properties on unit tests. It's as simple as creating a stub implementation of the proxy interface or using mocking frameworks to mock the proxy interface.
 
 ## 🌟 Default property values
 
