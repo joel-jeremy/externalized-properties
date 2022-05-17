@@ -25,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MapResolverTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
+        ExternalizedProperties.builder().withDefaults().build();
     
     @Nested
     class Constructor {
@@ -53,7 +55,7 @@ public class MapResolverTests {
     class ProviderMethod {
         @Test
         @DisplayName("should not return null.")
-        void test1() {
+        void mapOverloadTest1() {
             ResolverProvider<MapResolver> provider = 
                 MapResolver.provider(Collections.emptyMap());
 
@@ -62,21 +64,16 @@ public class MapResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        void test2() {
+        void mapOverloadTest2() {
             ResolverProvider<MapResolver> provider = 
                 MapResolver.provider(Collections.emptyMap());
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
-    }
 
-    @Nested
-    class ProviderMethodWithUnresolvedPropertyHandlerOverload {
         @Test
         @DisplayName("should not return null.")
-        void test1() {
+        void mapAndUnresolvedPropertyHandlerOverloadTest1() {
             ResolverProvider<MapResolver> provider = 
                 MapResolver.provider(
                     Collections.emptyMap(),
@@ -88,16 +85,14 @@ public class MapResolverTests {
 
         @Test
         @DisplayName("should return an instance on get.")
-        void test2() {
+        void mapAndUnresolvedPropertyHandlerOverloadTest2() {
             ResolverProvider<MapResolver> provider = 
                 MapResolver.provider(
                     Collections.emptyMap(),
                     System::getProperty
                 );
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 

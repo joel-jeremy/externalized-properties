@@ -1,6 +1,8 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.ResourceResolver.PropertiesReader;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.ResourceResolver.ResourceReader;
@@ -24,6 +26,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -36,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ResourceResolverTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
+        ExternalizedProperties.builder().withDefaults().build();
     private static final ResourceReader PROPERTIES_READER = new PropertiesReader();
     private static final ResourceReader JSON_READER = new JsonReader();
     private static final ResourceReader YAML_READER = new YamlReader();
@@ -123,7 +129,7 @@ public class ResourceResolverTests {
         @DisplayName("should not return null")
         void uriTest3() throws IOException, URISyntaxException {
             ResourceResolver resolver = ResourceResolver.fromUri(
-                classpathResource("/test.properties").toURI()
+                classpathResourceAsUri("/test.properties")
             );
 
             assertNotNull(resolver);
@@ -141,7 +147,7 @@ public class ResourceResolverTests {
         @Test
         @DisplayName("should throw when reader argument is null")
         void uriAndReaderOverloadTest2() throws URISyntaxException {
-            URI testPropertiesUri = classpathResource("/test.properties").toURI();
+            URI testPropertiesUri = classpathResourceAsUri("/test.properties");
 
             assertThrows(
                 IllegalArgumentException.class, 
@@ -168,11 +174,255 @@ public class ResourceResolverTests {
         @DisplayName("should not return null")
         void uriAndReaderOverloadTest4() throws IOException, URISyntaxException {
             ResourceResolver resolver = ResourceResolver.fromUri(
-                classpathResource("/test.properties").toURI(), 
+                classpathResourceAsUri("/test.properties"), 
                 PROPERTIES_READER
             );
 
             assertNotNull(resolver);
+        }
+    }
+
+    @Nested
+    class FromPathFactoryMethod {
+        @Test
+        @DisplayName("should throw when path argument is null")
+        void pathTest1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResourceResolver.fromPath(null)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when path resource does not exist")
+        void pathTest2() {
+            assertThrows(
+                IOException.class, 
+                () -> ResourceResolver.fromPath(
+                    Paths.get("path", "to", "non.existent.properties")
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should not return null")
+        void pathTest3() throws IOException, URISyntaxException {
+            Path testPropertiesPath = Paths.get(
+                classpathResourceAsUri("/test.properties")
+            );
+
+            ResourceResolver resolver = ResourceResolver.fromPath(
+                testPropertiesPath
+            );
+
+            assertNotNull(resolver);
+        }
+
+        @Test
+        @DisplayName("should throw when path argument is null")
+        void pathAndReaderOverloadTest1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResourceResolver.fromPath(null, PROPERTIES_READER)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when reader argument is null")
+        void pathAndReaderOverloadTest2() throws URISyntaxException {
+            Path testPropertiesPath = Paths.get(
+                classpathResourceAsUri("/test.properties")
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResourceResolver.fromPath(
+                    testPropertiesPath, 
+                    null
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when path resource does not exist")
+        void pathAndReaderOverloadTest3() {
+            assertThrows(
+                IOException.class, 
+                () -> ResourceResolver.fromPath(
+                    Paths.get("path", "to", "non.existent.properties"), 
+                    PROPERTIES_READER
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should not return null")
+        void pathAndReaderOverloadTest4() throws IOException, URISyntaxException {
+            Path testPropertiesPath = Paths.get(
+                classpathResourceAsUri("/test.properties")
+            );
+
+            ResourceResolver resolver = ResourceResolver.fromPath(
+                testPropertiesPath, 
+                PROPERTIES_READER
+            );
+
+            assertNotNull(resolver);
+        }
+    }
+
+    @Nested
+    class ProviderMethod {
+        @Test
+        @DisplayName("should throw when url argument is null.")
+        void urlOverloadTest1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResourceResolver.provider((URL)null)
+            );
+        }
+
+        @Test
+        @DisplayName("should return an instance on get.")
+        void urlOverloadTest2() throws IOException {
+            ResolverProvider<ResourceResolver> provider = 
+                ResourceResolver.provider(classpathResource("/test.properties"));
+
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
+        }
+
+        @Test
+        @DisplayName("should throw when url argument is null.")
+        void urlAndReaderOverloadTest1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResourceResolver.provider((URL)null, PROPERTIES_READER)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when reader argument is null.")
+        void urlAndReaderOverloadTest2() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResourceResolver.provider(
+                    classpathResource("/test.properties"),
+                    null
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should return an instance on get.")
+        void urlAndReaderOverloadTest3() throws IOException {
+            ResolverProvider<ResourceResolver> provider = ResourceResolver.provider(
+                classpathResource("/test.properties"),
+                PROPERTIES_READER
+            );
+
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
+        }
+        
+        @Test
+        @DisplayName("should throw when uri argument is null.")
+        void uriOverloadTest1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResourceResolver.provider((URI)null)
+            );
+        }
+
+        @Test
+        @DisplayName("should return an instance on get.")
+        void uriOverloadTest2() throws URISyntaxException, IOException {
+            ResolverProvider<ResourceResolver> provider = ResourceResolver.provider(
+                classpathResourceAsUri("/test.properties")
+            );
+
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
+        }
+
+        @Test
+        @DisplayName("should throw when url argument is null.")
+        void uriAndReaderOverloadTest1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResourceResolver.provider((URI)null, PROPERTIES_READER)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when reader argument is null.")
+        void uriAndReaderOverloadTest2() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResourceResolver.provider(
+                    classpathResourceAsUri("/test.properties"),
+                    null
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should return an instance on get.")
+        void uriAndReaderOverloadTest3() throws URISyntaxException, IOException {
+            ResolverProvider<ResourceResolver> provider = ResourceResolver.provider(
+                classpathResourceAsUri("/test.properties"),
+                PROPERTIES_READER
+            );
+
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
+        }
+
+        @Test
+        @DisplayName("should throw when uri argument is null.")
+        void pathOverloadTest1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResourceResolver.provider((Path)null)
+            );
+        }
+
+        @Test
+        @DisplayName("should return an instance on get.")
+        void pathOverloadTest2() throws URISyntaxException, IOException {
+            ResolverProvider<ResourceResolver> provider = ResourceResolver.provider(
+                classpathResourceAsPath("/test.properties")
+            );
+
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
+        }
+
+        @Test
+        @DisplayName("should throw when url argument is null.")
+        void pathAndReaderOverloadTest1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResourceResolver.provider((Path)null, PROPERTIES_READER)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when reader argument is null.")
+        void pathAndReaderOverloadTest2() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> ResourceResolver.provider(
+                    classpathResourceAsPath("/test.properties"),
+                    null
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should return an instance on get.")
+        void pathAndReaderOverloadTest3() throws URISyntaxException, IOException {
+            ResolverProvider<ResourceResolver> provider = ResourceResolver.provider(
+                classpathResourceAsPath("/test.properties"),
+                PROPERTIES_READER
+            );
+
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 
@@ -493,6 +743,14 @@ public class ResourceResolverTests {
     
     private URL classpathResource(String classpathResource) {
         return getClass().getResource(classpathResource);
+    }
+    
+    private URI classpathResourceAsUri(String classpathResource) throws URISyntaxException {
+        return getClass().getResource(classpathResource).toURI();
+    }
+    
+    private Path classpathResourceAsPath(String classpathResource) throws URISyntaxException {
+        return Paths.get(getClass().getResource(classpathResource).toURI());
     }
 
     public static interface ProxyInterface {

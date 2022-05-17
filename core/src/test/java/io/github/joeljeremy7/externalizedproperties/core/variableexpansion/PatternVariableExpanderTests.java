@@ -22,7 +22,7 @@ public class PatternVariableExpanderTests {
     // Variable pattern: #[variable]
     private static final Pattern CUSTOM_VARIABLE_PATTERN = Pattern.compile("#\\[(.+?)\\]");
 
-    static ExternalizedProperties EXTERNALIZED_PROPERTIES = 
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES = 
         ExternalizedProperties.builder().withDefaults().build();
 
     @Nested

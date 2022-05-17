@@ -23,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PropertiesResolverTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
+        ExternalizedProperties.builder().withDefaults().build();
     private static final Properties EMPTY_PROPERTIES = new Properties();
 
     @Nested
@@ -93,9 +95,7 @@ public class PropertiesResolverTests {
             ResolverProvider<PropertiesResolver> provider = 
                 PropertiesResolver.provider(new Properties());
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 
@@ -123,9 +123,7 @@ public class PropertiesResolverTests {
                     System::getProperty
                 );
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 
