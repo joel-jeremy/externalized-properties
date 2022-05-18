@@ -17,8 +17,8 @@ import java.util.Collection;
  * <ol>
  *  <li>{@link PrimitiveConverter}</li>
  *  <li>{@link ListConverter}</li>
+ *  <li>{@link SetConverter}</li>
  *  <li>{@link ArrayConverter}</li>
- *  <li>{@link OptionalConverter}</li>
  *  <li>{@link EnumConverter}</li>
  *  <li>{@link DateTimeConverter}</li>
  * </ol>
@@ -35,7 +35,6 @@ public class DefaultConverter implements Converter<Object> {
      *  <li>{@link ListConverter}</li>
      *  <li>{@link SetConverter}</li>
      *  <li>{@link ArrayConverter}</li>
-     *  <li>{@link OptionalConverter}</li>
      *  <li>{@link EnumConverter}</li>
      *  <li>{@link DateTimeConverter}</li>
      * </ol>
@@ -50,7 +49,6 @@ public class DefaultConverter implements Converter<Object> {
                 new ListConverter(rootConverter),
                 new SetConverter(rootConverter),
                 new ArrayConverter(rootConverter),
-                new OptionalConverter(rootConverter),
                 new EnumConverter(),
                 new DateTimeConverter()
             )

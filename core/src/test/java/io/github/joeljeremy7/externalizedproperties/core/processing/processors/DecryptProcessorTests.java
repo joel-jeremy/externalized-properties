@@ -133,10 +133,10 @@ public class DecryptProcessorTests {
         void test3() {
             ProcessorProvider<DecryptProcessor> provider = 
                 DecryptProcessor.provider(AES_GCM_DECRYPTOR);
-            ExternalizedProperties externalizedProperties = 
-                ExternalizedProperties.builder().withDefaults().build();
 
-            assertNotNull(provider.get(externalizedProperties));
+            assertNotNull(
+                provider.get(ExternalizedProperties.builder().withDefaults().build())
+            );
         }
     }
 

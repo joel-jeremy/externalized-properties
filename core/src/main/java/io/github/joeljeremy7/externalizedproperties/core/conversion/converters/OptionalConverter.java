@@ -14,6 +14,9 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
 
 /**
  * Supports conversion of values to an {@link Optional} instance.
+ * 
+ * <p>This is converter is registered out of the box (no need to explicitly register) as
+ * conversion to an Optional is natively supported.</p>
  */
 public class OptionalConverter implements Converter<Optional<?>> {
 

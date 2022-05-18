@@ -36,6 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SetConverterTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
+        ExternalizedProperties.builder().withDefaults().build();
     
     @Nested
     class Constructor {
@@ -66,13 +68,10 @@ public class SetConverterTests {
             ConverterProvider<SetConverter> provider = 
                 SetConverter.provider();
             
-            ExternalizedProperties externalizedProperties = 
-                ExternalizedProperties.builder().withDefaults().build();
-            
             assertNotNull(
                 provider.get(
-                    ExternalizedProperties.builder().withDefaults().build(),
-                    new RootConverter(externalizedProperties, provider)
+                    EXTERNALIZED_PROPERTIES,
+                    new RootConverter(EXTERNALIZED_PROPERTIES, provider)
                 )
             );
         }

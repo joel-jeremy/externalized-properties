@@ -6,12 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Methods marked with this annotation will allow {@link ExternalizedProperties} 
- * to load property values from external sources. The name of the externalized property 
- * will be derived from {@link #value()}, if it is specified. Otherwise,
- * the property name will be derived from the annotated method's arguments.
- * Specifically, the first argument of the annotated method (the method must only have 
- * one {@code String} argument).
+ * This annotation is used to specify which externalized property should be mapped to 
+ * the annotated method. The name of the externalized property will be derived from 
+ * {@link #value()}, if it is specified. Otherwise, the property name will be derived 
+ * from the annotated method's arguments. Specifically, the first argument of the 
+ * annotated method (the method must only have one {@code String} argument).
  * 
  * <p>Examples:</p>
  * 
@@ -33,9 +32,13 @@ import java.lang.annotation.Target;
  *         return someDefaultValue;
  *     }
  * 
+ *     {@code // Property name not specified in ExternalizedProperty annotation.}
+ *     {@code // It will be derived from the method parameters.}
  *     {@code @}ExternalizedProperty
  *     String resolve(String propertyName);
- * 
+ *     
+ *     {@code // Property name not specified in ExternalizedProperty annotation.}
+ *     {@code // It will be derived from the method parameters.}
  *     {@code @}ExternalizedProperty
  *     int resolveInt(String propertyName);
  * 

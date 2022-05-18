@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 
 /**
  * Processor annotation to apply decryption to the property.
+ * Property must be in Base64 format.
  */
 @ProcessWith(DecryptProcessor.class)
 @Target(ElementType.METHOD)

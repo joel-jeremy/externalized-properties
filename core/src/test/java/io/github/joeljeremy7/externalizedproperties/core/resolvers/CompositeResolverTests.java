@@ -26,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CompositeResolverTests {
     private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
+        ExternalizedProperties.builder().withDefaults().build();
 
     @Nested
     class ProviderMethodWithVarArgsOverload {
@@ -45,7 +47,7 @@ public class CompositeResolverTests {
                 CompositeResolver.provider(StubResolver.provider());
 
             assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
+                provider.get(EXTERNALIZED_PROPERTIES)
             );
         }
     }
@@ -67,9 +69,7 @@ public class CompositeResolverTests {
             ResolverProvider<CompositeResolver> provider = 
                 CompositeResolver.provider(Arrays.asList(StubResolver.provider()));
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 
@@ -90,9 +90,7 @@ public class CompositeResolverTests {
             ResolverProvider<Resolver> provider = 
                 CompositeResolver.flattenedProvider(StubResolver.provider());
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
 
         @Test
@@ -101,8 +99,7 @@ public class CompositeResolverTests {
             ResolverProvider<Resolver> provider = 
                 CompositeResolver.flattenedProvider(StubResolver.provider());
 
-            Resolver resolver = 
-                provider.get(ExternalizedProperties.builder().withDefaults().build());
+            Resolver resolver = provider.get(EXTERNALIZED_PROPERTIES);
             assertNotNull(resolver);
             assertTrue(resolver instanceof StubResolver);
         }
@@ -119,8 +116,7 @@ public class CompositeResolverTests {
                     DefaultResolver.provider()
                 );
 
-            Resolver resolver = 
-                provider.get(ExternalizedProperties.builder().withDefaults().build());
+            Resolver resolver = provider.get(EXTERNALIZED_PROPERTIES);
             assertNotNull(resolver);
             assertTrue(resolver instanceof CompositeResolver);
         }
@@ -147,9 +143,7 @@ public class CompositeResolverTests {
                     Arrays.asList(StubResolver.provider())
                 );
 
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
+            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
 
         @Test
@@ -160,8 +154,7 @@ public class CompositeResolverTests {
                     Arrays.asList(StubResolver.provider())
                 );
 
-            Resolver resolver = 
-                provider.get(ExternalizedProperties.builder().withDefaults().build());
+            Resolver resolver = provider.get(EXTERNALIZED_PROPERTIES);
             assertNotNull(resolver);
             assertTrue(resolver instanceof StubResolver);
         }
@@ -178,8 +171,7 @@ public class CompositeResolverTests {
                     DefaultResolver.provider()
                 ));
 
-            Resolver resolver = 
-                provider.get(ExternalizedProperties.builder().withDefaults().build());
+            Resolver resolver = provider.get(EXTERNALIZED_PROPERTIES);
             assertNotNull(resolver);
             assertTrue(resolver instanceof CompositeResolver);
         }

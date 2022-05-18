@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -172,14 +171,6 @@ public class DefaultConverterTests {
         void arrayTest1() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(String[].class);
-            assertTrue(canConvert);
-        }
-
-        @Test
-        @DisplayName("should return true when target type is an Optional.")
-        void optionalTest1() {
-            DefaultConverter converter = converterToTest();
-            boolean canConvert = converter.canConvertTo(Optional.class);
             assertTrue(canConvert);
         }
 
@@ -680,30 +671,6 @@ public class DefaultConverterTests {
                 new String[] { "a", "b", "c" }, 
                 (String[])arrayValue
             );
-        }
-
-        @Test
-        @DisplayName("should convert resolved property to an Optional.")
-        void optionalTest1() {
-            DefaultConverter converter = converterToTest();
-
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::optionalProperty // This method returns an Optional.
-            );
-            
-            ConversionResult<?> optionalResult = converter.convert(
-                proxyMethod,
-                "optional-value"
-            );
-            assertNotNull(optionalResult);
-            Object optionalValue = optionalResult.value();
-            
-            assertNotNull(optionalValue);
-            assertTrue(optionalValue instanceof Optional<?>);
-
-            Optional<?> opt = (Optional<?>)optionalValue;
-            assertTrue(opt.isPresent());
-            assertEquals("optional-value", opt.get());
         }
 
         @Test

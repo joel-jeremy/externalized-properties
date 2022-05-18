@@ -139,7 +139,7 @@ public class SimpleVariableExpander implements VariableExpander {
         }
     }
 
-    static interface ResolverProxy {
+    private static interface ResolverProxy {
         @ExternalizedProperty
         public String resolve(String propertyName);
     }

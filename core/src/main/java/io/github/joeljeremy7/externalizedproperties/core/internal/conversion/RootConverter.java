@@ -6,6 +6,7 @@ import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.OptionalConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.Type;
@@ -184,7 +185,7 @@ public class RootConverter implements Converter<Object> {
         ) {
             this.rootConverter = rootConverter;
             this.externalizedProperties = externalizedProperties;
-            this.registeredConverterProviders = memoizeAll(registeredConverterProviders);
+            this.registeredConverterProviders = setupConverters(registeredConverterProviders);
         }
 
         /**
@@ -213,6 +214,20 @@ public class RootConverter implements Converter<Object> {
                 }
             }
             return supportsTargetType;
+        }
+
+        private static List<ConverterProvider<?>> setupConverters(
+                Collection<ConverterProvider<?>> converterProviders
+        ) {
+            List<ConverterProvider<?>> registered = new ArrayList<>(
+                converterProviders.size() + 1
+            );
+            
+            registered.addAll(converterProviders);
+            // Optional conversion is supported out of the box.
+            registered.add(OptionalConverter.provider());
+
+            return memoizeAll(registered);
         }
 
         private static List<ConverterProvider<?>> memoizeAll(
