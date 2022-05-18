@@ -224,7 +224,7 @@ public class RootConverter implements Converter<Object> {
             );
             
             registered.addAll(converterProviders);
-            // Optional conversion is natively supported. No need to register.
+            // Optional conversion is supported out of the box.
             registered.add(OptionalConverter.provider());
 
             return memoizeAll(registered);
