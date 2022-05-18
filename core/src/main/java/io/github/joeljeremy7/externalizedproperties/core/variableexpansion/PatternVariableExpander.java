@@ -121,7 +121,7 @@ public class PatternVariableExpander implements VariableExpander {
         }
     }
 
-    static interface ResolverProxy {
+    private static interface ResolverProxy {
         @ExternalizedProperty
         String resolve(String propertyName);
     }
