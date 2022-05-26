@@ -38,7 +38,7 @@ public class RootProcessor implements Processor {
      */
     public RootProcessor(Collection<Processor> processors) {
         this.processorByAnnotationType = new ProcessorByAnnotationType(
-            requireNonNull(processors, "processorProviders")
+            requireNonNull(processors, "processors")
         );
     }
 

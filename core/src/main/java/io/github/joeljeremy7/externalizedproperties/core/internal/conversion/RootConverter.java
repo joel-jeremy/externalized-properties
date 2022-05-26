@@ -41,7 +41,7 @@ public class RootConverter implements Converter<Object> {
      */
     public RootConverter(Collection<Converter<?>> converters) {
         this.convertersByTargetType = new ConvertersByTargetType(
-            requireNonNull(converters, "converterProviders")
+            requireNonNull(converters, "converters")
         );
     }
 
@@ -158,13 +158,13 @@ public class RootConverter implements Converter<Object> {
         }
 
         private static List<Converter<?>> setupNativeConverters(
-                Collection<Converter<?>> converterProviders
+                Collection<Converter<?>> converters
         ) {
             List<Converter<?>> registered = new ArrayList<>(
-                converterProviders.size() + 1
+                converters.size() + 1
             );
             
-            registered.addAll(converterProviders);
+            registered.addAll(converters);
             // Optional conversion is natively supported out of the box.
             registered.add(new OptionalConverter());
 
