@@ -1,7 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
-import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 /**
@@ -18,15 +17,6 @@ public class NoOpVariableExpander implements VariableExpander {
 
     private NoOpVariableExpander(){}
 
-    /**
-     * The {@link VariableExpanderProvider} for {@link NoOpVariableExpander}.
-     * 
-     * @return The {@link VariableExpanderProvider} for {@link NoOpVariableExpander}.
-     */
-    public static VariableExpanderProvider<NoOpVariableExpander> provider() {
-        return Singleton.PROVIDER;
-    }
-
     /** {@inheritDoc} */
     @Override
     public String expandVariables(ProxyMethod proxyMethod, String value) {
@@ -38,7 +28,5 @@ public class NoOpVariableExpander implements VariableExpander {
      */
     private static final class Singleton {
         private static final NoOpVariableExpander INSTANCE = new NoOpVariableExpander();
-        private static final VariableExpanderProvider<NoOpVariableExpander> PROVIDER = 
-            externalizedProperties -> INSTANCE;
     }
 }

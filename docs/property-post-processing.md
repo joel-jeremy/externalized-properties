@@ -17,17 +17,17 @@ public interface ApplicationProperties {
 
 public static void main(String[] args) {
     // Processor to decrypt @Decrypt("MyAESDecryptor")
-    ProcessorProvider<DecryptProcessor> aesDecryptProcessor = aesDecryptProcessor();
+    DecryptProcessor aesDecryptProcessor = aesDecryptProcessor();
     // Processor to decrypt @Decrypt("MyRSADecryptor")
-    ProcessorProvider<DecryptProcessor> rsaDecryptProcessor = rsaDecryptProcessor();
+    DecryptProcessor rsaDecryptProcessor = rsaDecryptProcessor();
 
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .withDefaults()
+        .defaults()
         .processors(aesDecryptProcessor, rsaDecryptProcessor)
         .build();
 
      // Proxied interface.
-    ApplicationProperties props = externalizedProperties.proxy(ApplicationProperties.class);
+    ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
 
     // Automatically decrypted via @Decrypt/DecryptProcessor.
     String decryptedAesProperty = props.aesEncryptedProperty();
@@ -35,7 +35,7 @@ public static void main(String[] args) {
 }
 
 private static ProcessorProvider<DecryptProcessor> aesDecryptProcessor() {
-    return DecryptProcessor.provider(
+    return new DecryptProcessor(
         JceDecryptor.factory().symmetric(
             "MyAESDecryptor",
             "AES/GCM/NoPadding", 
@@ -46,7 +46,7 @@ private static ProcessorProvider<DecryptProcessor> aesDecryptProcessor() {
 }
 
 private static ProcessorProvider<DecryptProcessor> rsaDecryptProcessor() {
-    return DecryptProcessor.provider(
+    return new DecryptProcessor(
         JceDecryptor.factory().asymmetric(
             "MyRSADecryptor",
             "RSA", 
@@ -97,12 +97,12 @@ public interface ApplicationProperties {
 
 public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .withDefaults()
+        .defaults()
         // Register custom processor to process @Base64Encode
-        .processors(ProcessorProvider.of(new Base64EncodeProcessor()))
+        .processors(new Base64EncodeProcessor())
         .build();
 
-    ApplicationProperties props = externalizedProperties.proxy(ApplicationProperties.class);
+    ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
 
     // Automatically encoded to Base64.
     String base64EncodedProperty = props.myProperty();

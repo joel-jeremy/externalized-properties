@@ -1,15 +1,18 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 
+import io.github.joeljeremy7.externalizedproperties.core.Convert;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
+import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
 import io.github.joeljeremy7.externalizedproperties.core.UnresolvedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.internal.MethodHandleFactory;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Optional;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
@@ -17,50 +20,63 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
 /**
  * Handles the resolution of properties for proxy methods.
  */
-public class ProxyMethodHandler {
-    private final Resolver resolver;
-    private final Converter<?> converter;
+public class ExternalizedPropertiesExecutor {
+    private final Resolver rootResolver;
+    private final Converter<?> rootConverter;
+    private final ProxyMethodFactory proxyMethodFactory;
     private final MethodHandleFactory methodHandleFactory;
     
     /**
      * Constructor.
      * 
-     * @param resolver The resolver.
-     * @param converter The converter.
+     * @param rootResolver The root resolver.
+     * @param rootConverter The root converter.
+     * @param proxyMethodFactory The proxy method factory.
      * @param methodHandleFactory The method handle factory.
      */
-    public ProxyMethodHandler(
-            Resolver resolver,
-            Converter<?> converter,
+    public ExternalizedPropertiesExecutor(
+            Resolver rootResolver,
+            Converter<?> rootConverter,
+            ProxyMethodFactory proxyMethodFactory,
             MethodHandleFactory methodHandleFactory
     ) {
-        requireNonNull(resolver, "resolver");
-        requireNonNull(converter, "converter");
+        requireNonNull(rootResolver, "rootResolver");
+        requireNonNull(rootConverter, "rootConverter");
+        requireNonNull(proxyMethodFactory, "proxyMethodFactory");
         requireNonNull(methodHandleFactory, "methodHandleFactory");
-
-        this.resolver = resolver;
-        this.converter = converter;
+    
+        this.rootResolver = rootResolver;
+        this.rootConverter = rootConverter;
+        this.proxyMethodFactory = proxyMethodFactory;
         this.methodHandleFactory = methodHandleFactory;
     }
 
     /**
-     * Resolve externalized property.
+     * Handle proxy method invocation.
      * 
      * @param proxy The proxy.
      * @param method The proxy method.
-     * @param args Proxy invocation method arguments.
-     * @return The resolved property.
+     * @param args Proxy method invocation arguments.
+     * @return The proxy method's result.
      */
     public Object handle(Object proxy, Method method, Object[] args) {
-        ProxyMethod proxyMethod = new ProxyMethodAdapter(method, args);
+        ProxyMethod proxyMethod = proxyMethodFactory.proxyMethod(method, args);
         Optional<String> externalizedPropertyName = proxyMethod.externalizedPropertyName();
         if (externalizedPropertyName.isPresent()) {
-            Optional<?> result = resolver.resolve(proxyMethod, externalizedPropertyName.get())
-                .map(resolved -> converter.convert(proxyMethod, resolved).value());
+            Optional<?> result = rootResolver.resolve(proxyMethod, externalizedPropertyName.get())
+                .map(resolved -> rootConverter.convert(proxyMethod, resolved).value());
                     
             if (result.isPresent()) {
                 return result.get();
             }
+        }
+
+        if (proxyMethod.hasAnnotation(Convert.class)) {
+            // No need to validate. Already validated when proxy was built.
+            String valueToConvert = (String)args[0];
+            Type targetType = determineConvertTargetType(args[1]);
+
+            return rootConverter.convert(proxyMethod, valueToConvert, targetType).value();
         }
 
         // Either there was no property name (means not annotated with @ExternalizedProperty)
@@ -142,7 +158,7 @@ public class ProxyMethodHandler {
         return handler.invoke(args);
     }
 
-    private DefaultInterfaceMethodHandler buildDefaultInterfaceMethodHandler(
+    private static DefaultInterfaceMethodHandler buildDefaultInterfaceMethodHandler(
             Object proxy, 
             Method proxyMethod, 
             MethodHandleFactory methodHandleFactory
@@ -175,13 +191,31 @@ public class ProxyMethodHandler {
         };
     }
 
-    private String getExternalizedPropertyNameOrNullLiteral(Method proxyMethod) {
+    private static String getExternalizedPropertyNameOrNullLiteral(Method proxyMethod) {
         ExternalizedProperty externalizedProperty = 
             proxyMethod.getAnnotation(ExternalizedProperty.class);
         if (externalizedProperty == null) {
             return "null";
         }
         return externalizedProperty.value();
+    }
+
+    private static Type determineConvertTargetType(Object arg) {
+        if (arg instanceof TypeReference<?>) {
+            return ((TypeReference<?>)arg).type();
+        }
+        // Class is also a Type.
+        else if (arg instanceof Type) {
+            return (Type)arg;
+        }
+
+        throw new IllegalArgumentException(String.format(
+            "Unable to determine target type of @%s proxy method. " +
+            "Method argument (%s): %s.",
+            Convert.class.getSimpleName(),
+            arg.getClass().getName(),
+            arg
+        ));
     }
 
     private static interface DefaultInterfaceMethodHandler {

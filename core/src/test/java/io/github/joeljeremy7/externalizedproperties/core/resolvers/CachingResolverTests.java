@@ -4,11 +4,10 @@ import io.github.joeljeremy7.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubResolver;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,9 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CachingResolverTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-    
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
+
     @Nested
     class Constructor {
         @Test
@@ -47,57 +46,6 @@ public class CachingResolverTests {
                 IllegalArgumentException.class, 
                 () -> new CachingResolver(decorated, null)
             );
-        }
-    }
-
-    @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should throw when decorated argument is null.")
-        void test1() {
-            StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> CachingResolver.provider(null, cacheStrategy)
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when cache strategy argument is null.")
-        void test2() {
-            ResolverProvider<?> decorated = StubResolver.provider();
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> CachingResolver.provider(decorated, null)
-            );
-        }
-
-        @Test
-        @DisplayName("should not return null.")
-        void test3() {
-            ResolverProvider<?> decorated = StubResolver.provider();
-            StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
-
-            ResolverProvider<CachingResolver> provider = 
-                CachingResolver.provider(decorated, cacheStrategy);
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get")
-        void test4() {
-            ResolverProvider<?> decorated = StubResolver.provider();
-            StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
-
-            ResolverProvider<CachingResolver> provider = 
-                CachingResolver.provider(decorated, cacheStrategy);
-            ExternalizedProperties externalizedProperties = 
-                ExternalizedProperties.builder().withDefaults().build();
-
-            assertNotNull(provider.get(externalizedProperties));
         }
     }
 
@@ -147,7 +95,8 @@ public class CachingResolverTests {
             CachingResolver resolver = resolverToTest(decorated);
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
             Optional<String> result = resolver.resolve(proxyMethod, propertyName);
             
@@ -169,7 +118,8 @@ public class CachingResolverTests {
                 new SystemPropertyResolver()
             );
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
             // Not in system properties.
             Optional<String> result = resolver.resolve(proxyMethod, "property");
@@ -191,7 +141,8 @@ public class CachingResolverTests {
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
             Optional<String> result = resolver.resolve(proxyMethod, propertyName);
             
@@ -216,7 +167,8 @@ public class CachingResolverTests {
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
             // Property is not in system properties.
             Optional<String> result = resolver.resolve(
@@ -247,7 +199,8 @@ public class CachingResolverTests {
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
             // property.cache is not in system properties but is in the strategy cache.
             Optional<String> result = resolver.resolve(proxyMethod, propertyName);
@@ -264,14 +217,14 @@ public class CachingResolverTests {
         }
     }
 
-    private CachingResolver resolverToTest(Resolver decorated) {
+    private static CachingResolver resolverToTest(Resolver decorated) {
         return resolverToTest(
             decorated,
             new StubCacheStrategy<>()
         );
     }
 
-    private CachingResolver resolverToTest(
+    private static CachingResolver resolverToTest(
             Resolver decorated,
             CacheStrategy<String, String> cacheStrategy
     ) {
@@ -280,8 +233,12 @@ public class CachingResolverTests {
             cacheStrategy
         );
     }
+    
+    private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+        return ExternalizedProperties.builder().resolvers(resolvers).build();
+    }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("property")
         String property();
     }

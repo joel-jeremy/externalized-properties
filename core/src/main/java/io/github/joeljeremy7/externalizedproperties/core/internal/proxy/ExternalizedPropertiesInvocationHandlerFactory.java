@@ -8,18 +8,20 @@ import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandler
  * The factory for {@link ExternalizedPropertiesInvocationHandler}.
  */
 public class ExternalizedPropertiesInvocationHandlerFactory 
-        implements InvocationHandlerFactory<ExternalizedPropertiesInvocationHandler> {
+        implements InvocationHandlerFactory {
 
     /** {@inheritDoc} */
     @Override
     public ExternalizedPropertiesInvocationHandler create(
-            Resolver resolver, 
-            Converter<?> converter,
-            Class<?> proxyInterface
+            Class<?> proxyInterface,
+            Resolver rootResolver,
+            Converter<?> rootConverter,
+            ProxyMethodFactory proxyMethodFactory
     ) {
         return new ExternalizedPropertiesInvocationHandler(
-            resolver,
-            converter
+            rootResolver,
+            rootConverter,
+            proxyMethodFactory
         );
     }
     

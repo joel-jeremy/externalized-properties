@@ -1,7 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.ArrayList;
@@ -11,9 +10,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyCollection;
 
 /**
@@ -63,78 +60,6 @@ public class CompositeResolver implements Resolver, Iterable<Resolver> {
     @Override
     public String toString() {
         return resolvers.toString();
-    }
-
-    /**
-     * The {@link ResolverProvider} for {@link CompositeResolver}.
-     * 
-     * @param resolverProviders The {@link ResolverProvider}s.
-     * @return The {@link ResolverProvider} for {@link CompositeResolver}.
-     */
-    public static ResolverProvider<CompositeResolver> provider(
-            ResolverProvider<?>... resolverProviders
-    ) {
-        requireNonNull(resolverProviders, "resolverProviders");
-        return provider(Arrays.asList(resolverProviders));
-    }
-
-    /**
-     * The {@link ResolverProvider} for {@link CompositeResolver}.
-     * 
-     * @param resolverProviders The {@link ResolverProvider}s.
-     * @return The {@link ResolverProvider} for {@link CompositeResolver}.
-     */
-    public static ResolverProvider<CompositeResolver> provider(
-            Collection<ResolverProvider<?>> resolverProviders
-    ) {
-        requireNonNull(resolverProviders, "resolverProviders");
-        return externalizedProperties -> new CompositeResolver(
-            resolverProviders.stream()
-                .map(rp -> rp.get(externalizedProperties))
-                .collect(Collectors.toList())
-        );
-    }
-
-    /**
-     * The {@link ResolverProvider} which creates a {@link Resolver} via 
-     * {@link CompositeResolver#flatten(Collection)}.
-     * 
-     * @implNote This may not necessarily return a {@link CompositeResolver} instance. 
-     * If the flattening operation resulted in a single resolver remaining, 
-     * that resolver instance will be returned. Otherwise, a {@link CompositeResolver} 
-     * instance will be returned which is composed of all the remaining resolvers.
-     * 
-     * @param resolverProviders The {@link ResolverProvider}s.
-     * @return The {@link ResolverProvider} for {@link CompositeResolver}.
-     */
-    public static ResolverProvider<Resolver> flattenedProvider(
-            ResolverProvider<?>... resolverProviders
-    ) {
-        requireNonNull(resolverProviders, "resolverProviders");
-        return flattenedProvider(Arrays.asList(resolverProviders));
-    }
-
-    /**
-     * The {@link ResolverProvider} which creates a {@link Resolver} via 
-     * {@link CompositeResolver#flatten(Collection)}.
-     * 
-     * @implNote This may not necessarily return a {@link CompositeResolver} instance. 
-     * If the flattening operation resulted in a single resolver remaining, 
-     * that resolver instance will be returned. Otherwise, a {@link CompositeResolver} 
-     * instance will be returned which is composed of all the remaining resolvers.
-     * 
-     * @param resolverProviders The {@link ResolverProvider}s.
-     * @return The {@link ResolverProvider} for {@link CompositeResolver}.
-     */
-    public static ResolverProvider<Resolver> flattenedProvider(
-            Collection<ResolverProvider<?>> resolverProviders
-    ) {
-        requireNonNull(resolverProviders, "resolverProviders");
-        return externalizedProperties -> CompositeResolver.flatten(
-            resolverProviders.stream()
-                .map(rp -> rp.get(externalizedProperties))
-                .collect(Collectors.toList())
-        );
     }
 
     /**

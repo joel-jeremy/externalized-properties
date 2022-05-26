@@ -1,8 +1,8 @@
 package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
+import io.github.joeljeremy7.externalizedproperties.core.Convert;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
@@ -13,8 +13,6 @@ import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
-
-import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
  * Supports conversion of values to an array.
@@ -28,26 +26,6 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  */
 public class ArrayConverter implements Converter<Object[]> {
     private final Tokenizer tokenizer = new Tokenizer(",");
-    private final Converter<?> converter;
-
-    /**
-     * Constructor.
-     * 
-     * @param rootConverter The root conveter.
-     */
-    public ArrayConverter(Converter<?> rootConverter) {
-        this.converter = requireNonNull(rootConverter, "rootConverter");
-    }
-
-    /**
-     * The {@link ConverterProvider} for {@link ArrayConverter}.
-     * 
-     * @return The {@link ConverterProvider} for {@link ArrayConverter}.
-     */
-    public static ConverterProvider<ArrayConverter> provider() {
-        return (externalizedProperties, rootConverter) -> 
-            new ArrayConverter(rootConverter);
-    }
 
     /** {@inheritDoc} */
     @Override
@@ -120,14 +98,16 @@ public class ArrayConverter implements Converter<Object[]> {
             TypeUtilities.getRawType(arrayComponentType), 
             values.length
         );
+
+        ConverterProxy rootConverter = proxyMethod.externalizedProperties()
+            .initialize(ConverterProxy.class);
         
         for (int i = 0; i < values.length; i++) {
-            ConversionResult<?> converted = converter.convert(
-                proxyMethod,
+            Object converted = rootConverter.convert(
                 values[i],
                 arrayComponentType
             );
-            convertedArray[i] = converted.value();
+            convertedArray[i] = converted;
         }
 
         return convertedArray;
@@ -146,5 +126,10 @@ public class ArrayConverter implements Converter<Object[]> {
                 TypeUtilities.isTypeVariable(genericArray.getGenericComponentType())) {
             throw new ConversionException("Type variables e.g. T[] are not supported.");
         }
+    }
+
+    private static interface ConverterProxy {
+        @Convert
+        Object convert(String valueToConvert, Type targetType);
     }
 }

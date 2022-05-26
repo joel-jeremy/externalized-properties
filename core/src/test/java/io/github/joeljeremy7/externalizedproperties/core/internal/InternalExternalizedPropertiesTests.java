@@ -1,7 +1,9 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal;
 
+import io.github.joeljeremy7.externalizedproperties.core.Convert;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
+import io.github.joeljeremy7.externalizedproperties.core.Resolver;
+import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
@@ -14,125 +16,90 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class InternalExternalizedPropertiesTests {
     @Nested
-    class ProxyMethod {
+    class InitializeMethod {
         @Test
         @DisplayName("should throw when proxy interface argument is null")
         void test1() {
             // Do not resolve any property.
-            ResolverProvider<?> provider = StubResolver.provider(
+            Resolver resolver = new StubResolver(
                 StubResolver.NULL_VALUE_RESOLVER
             );
             
             InternalExternalizedProperties externalizedProperties = 
-                internalExternalizedProperties(provider);
+                internalExternalizedProperties(resolver);
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> externalizedProperties.proxy(null) 
-            );
-        }
-
-        @Test
-        @DisplayName("should create a proxy")
-        void test2() {
-            // Do not resolve any property.
-            ResolverProvider<?> provider = StubResolver.provider(
-                StubResolver.NULL_VALUE_RESOLVER
-            );
-            
-            InternalExternalizedProperties externalizedProperties = 
-                internalExternalizedProperties(provider);
-
-            ProxyInterface proxy = externalizedProperties.proxy(ProxyInterface.class);
-
-            assertNotNull(proxy);
-            assertTrue(proxy instanceof Proxy);
-        }
-    }
-
-    @Nested
-    class ProxyMethodWithClassLoaderOverload {
-        @Test
-        @DisplayName("should throw when proxy interface argument is null")
-        void test1() {
-            InternalExternalizedProperties externalizedProperties = 
-                internalExternalizedProperties(StubResolver.provider());
-            ClassLoader classLoader = getClass().getClassLoader();
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> externalizedProperties.proxy(null, classLoader) 
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when class loader argument is null")
-        void test2() {
-            InternalExternalizedProperties externalizedProperties = 
-                internalExternalizedProperties(StubResolver.provider());
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> externalizedProperties.proxy(ProxyInterface.class, null)
+                () -> externalizedProperties.initialize(null) 
             );
         }
 
         @Test
         @DisplayName("should throw when proxy interface argument is not an interface")
-        void test3() {
+        void test2() {
             InternalExternalizedProperties externalizedProperties = 
-                internalExternalizedProperties(StubResolver.provider());
+                internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> externalizedProperties.proxy(InternalExternalizedPropertiesTests.class)
+                () -> externalizedProperties.initialize(
+                    InternalExternalizedPropertiesTests.class
+                )
             );
         }
 
         @Test
         @DisplayName("should throw when proxy interface contains void-returning methods")
-        void test4() {
+        void test3() {
             InternalExternalizedProperties externalizedProperties = 
-                internalExternalizedProperties(StubResolver.provider());
+                internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> externalizedProperties.proxy(VoidReturnTypeProxyInterface.class)
+                () -> externalizedProperties.initialize(
+                    VoidReturnTypeProxyInterface.class
+                )
             );
         }
 
         @Test
         @DisplayName("should throw when proxy interface contains Void-returning methods")
-        void test5() {
+        void test4() {
             InternalExternalizedProperties externalizedProperties = 
-                internalExternalizedProperties(StubResolver.provider());
+                internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> externalizedProperties.proxy(VoidClassReturnTypeProxyInterface.class)
+                () -> externalizedProperties.initialize(
+                    VoidClassReturnTypeProxyInterface.class
+                )
             );
         }
 
         @Test
         @DisplayName(
-            "should throw when proxy interface @ResolverMethod does not have " +
+            "should throw when @ExternalizedProperty (no value) proxy method does not have " +
             "a single String argument"
         )
-        void test6() {
+        void test5() {
             InternalExternalizedProperties externalizedProperties = 
-                internalExternalizedProperties(StubResolver.provider());
+                internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> externalizedProperties.proxy(
+                () -> externalizedProperties.initialize(
                     NoStringArgProxyInterface.class
                 )
             );
@@ -140,16 +107,16 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when proxy interface @ResolverMethod have " +
+            "should throw when @ExternalizedProperty (no value) proxy method have " +
             "multiple arguments"
         )
-        void test7() {
+        void test6() {
             InternalExternalizedProperties externalizedProperties = 
-                internalExternalizedProperties(StubResolver.provider());
+                internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> externalizedProperties.proxy(
+                () -> externalizedProperties.initialize(
                     MultipleArgsProxyInterface.class
                 )
             );
@@ -157,60 +124,704 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when proxy interface @ResolverMethod have " +
-            "non-String argument"
+            "should throw when @ExternalizedProperty (no value) proxy method have " +
+            "a non-String argument"
         )
-        void test8() {
+        void test7() {
             InternalExternalizedProperties externalizedProperties = 
-                internalExternalizedProperties(StubResolver.provider());
+                internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> externalizedProperties.proxy(
+                () -> externalizedProperties.initialize(
                     InvalidArgTypeProxyInterface.class
                 )
             );
         }
 
         @Test
-        @DisplayName("should create a proxy")
-        void test9() {
-            // Do not resolve any property.
-            ResolverProvider<?> provider = StubResolver.provider(
-                StubResolver.NULL_VALUE_RESOLVER
+        @DisplayName(
+            "should throw when @Convert proxy method have invalid " +
+            "method parameter types"
+        )
+        void test8() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidArgsConvertProxy.class
+                )
             );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @Convert proxy method have no " +
+            "method parameters"
+        )
+        void test9() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    NoArgsConvertProxy.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @Convert proxy method does not have " +
+            "2 method parameters"
+        )
+        void test10() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    SingleArgConvertProxy.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @Convert proxy method first parameter " + 
+            "is not a String (value to convert)"
+        )
+        void test11() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidFirstArgConvertProxy.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @Convert proxy method second parameter " + 
+            "is not the target type"
+        )
+        void test12() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidSecondArgConvertProxy.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should initialize a proxy that handles @ExternalizedProperty annotations"
+        )
+        void test13() {
+            StubResolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
-                internalExternalizedProperties(provider);
+                internalExternalizedProperties(resolver);
 
-            ProxyInterface proxy = externalizedProperties.proxy(
-                ProxyInterface.class,
-                ProxyInterface.class.getClassLoader()
+            ProxyInterface proxy = externalizedProperties.initialize(
+                ProxyInterface.class
             );
 
             assertNotNull(proxy);
             assertTrue(proxy instanceof Proxy);
+
+            assertEquals(
+                resolver.valueResolver().apply("property"),
+                proxy.property()
+            );
+        }
+
+
+        @Test
+        @DisplayName("should initialize a proxy that handles @Convert annotations")
+        void test14() {
+            Resolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ConvertProxy proxy = externalizedProperties.initialize(
+                ConvertProxy.class
+            );
+
+            assertNotNull(proxy);
+            assertTrue(proxy instanceof Proxy);
+
+            // With target type reference
+            assertEquals(
+                1, 
+                (Integer)proxy.convertToTargetTypeReference(
+                    "1", 
+                    new TypeReference<Integer>(){}
+                )
+            );
+
+            // With target class
+            assertEquals(
+                1, 
+                (Integer)proxy.convertToTargetClass(
+                    "1", 
+                    Integer.class
+                )
+            );
+
+            // With target type
+            assertEquals(
+                1, 
+                (Integer)proxy.convertToTargetType(
+                    "1", 
+                    (Type)Integer.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw ClassCastException when value converted to target type reference " +
+            "is not assignable to the proxy method return type"
+        )
+        void test15() {
+            Resolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConvertProxy.class
+            );
+
+            // Target type is List<String> but proxy interface method
+            // return type is Integer.
+            assertThrows(
+                ClassCastException.class,
+                () -> proxy.convertToTargetTypeReference(
+                    "1,2,3",
+                    new TypeReference<List<String>>(){}
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw ClassCastException when value converted to target class " +
+            "is not assignable to the proxy method return type"
+        )
+        void test16() {
+            Resolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConvertProxy.class
+            );
+
+            // Target type is List but proxy interface method
+            // return type is Integer.
+            assertThrows(
+                ClassCastException.class,
+                () -> proxy.convertToTargetClass(
+                    "1,2,3",
+                    List.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw ClassCastException when value converted to target type " +
+            "is not assignable to the proxy method return type"
+        )
+        void test17() {
+            Resolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConvertProxy.class
+            );
+
+            // Target type is List<String> but proxy interface method
+            // return type is Integer.
+            assertThrows(
+                ClassCastException.class,
+                () -> proxy.convertToTargetType(
+                    "1,2,3",
+                    new TypeReference<List<String>>(){}.type()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw ClassCastException when value converted to target type" + 
+            "is not assignable to the proxy method return type variable"
+        )
+        void test18() {
+            Resolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConvertProxy.class
+            );
+
+            // Target type is List<String> but proxy interface method
+            // return type is Integer.
+            assertThrows(
+                ClassCastException.class,
+                () -> {
+                    // Should throw ClassCastException.
+                    // Value is a List<String> but return variable was resolved to Integer.
+                    Integer mismatch = proxy.convertToTargetTypeWithTypeVariableReturnType(
+                        "1,2,3",
+                        new TypeReference<List<String>>(){}.type()
+                    );
+
+                    fail("Did not throw. Result value: " + mismatch);
+                }
+            );
         }
     }
 
-    private InternalExternalizedProperties internalExternalizedProperties(
-            ResolverProvider<?> resolverProviderToUse
+    @Nested
+    class InitializeMethodWithClassLoaderOverload {
+        @Test
+        @DisplayName("should throw when proxy interface argument is null")
+        void test1() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+            ClassLoader classLoader = getClass().getClassLoader();
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(null, classLoader) 
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when class loader argument is null")
+        void test2() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(ProxyInterface.class, null)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when proxy interface argument is not an interface")
+        void test3() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InternalExternalizedPropertiesTests.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when proxy interface contains void-returning methods")
+        void test4() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    VoidReturnTypeProxyInterface.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when proxy interface contains Void-returning methods")
+        void test5() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    VoidClassReturnTypeProxyInterface.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @ExternalizedProperty (no value) proxy method does not have " +
+            "a single String argument"
+        )
+        void test6() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    NoStringArgProxyInterface.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @ExternalizedProperty (no value) proxy method have " +
+            "multiple arguments"
+        )
+        void test7() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    MultipleArgsProxyInterface.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @ExternalizedProperty (no value) proxy method have " +
+            "a non-String argument"
+        )
+        void test8() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidArgTypeProxyInterface.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @Convert proxy method have invalid " +
+            "method parameter types"
+        )
+        void test9() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidArgsConvertProxy.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @Convert proxy method have no " +
+            "method parameters"
+        )
+        void test10() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    NoArgsConvertProxy.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @Convert proxy method does not have " +
+            "2 method parameters"
+        )
+        void test11() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    SingleArgConvertProxy.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @Convert proxy method first parameter " + 
+            "is not a String (value to convert)"
+        )
+        void test12() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidFirstArgConvertProxy.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @Convert proxy method second parameter " + 
+            "is not the target type"
+        )
+        void test13() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidSecondArgConvertProxy.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should initialize a proxy that handles @ExternalizedProperty annotations"
+        )
+        void test14() {
+            StubResolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ProxyInterface proxy = externalizedProperties.initialize(
+                ProxyInterface.class,
+                getClass().getClassLoader()
+            );
+
+            assertNotNull(proxy);
+            assertTrue(proxy instanceof Proxy);
+
+            assertEquals(
+                resolver.valueResolver().apply("property"),
+                proxy.property()
+            );
+        }
+
+
+        @Test
+        @DisplayName("should initialize a proxy that handles @Convert annotations")
+        void test15() {
+            Resolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ConvertProxy proxy = externalizedProperties.initialize(
+                ConvertProxy.class,
+                getClass().getClassLoader()
+            );
+
+            assertNotNull(proxy);
+            assertTrue(proxy instanceof Proxy);
+
+            // With target type reference
+            assertEquals(
+                1, 
+                (Integer)proxy.convertToTargetTypeReference(
+                    "1", 
+                    new TypeReference<Integer>(){}
+                )
+            );
+
+            // With target class
+            assertEquals(
+                1, 
+                (Integer)proxy.convertToTargetClass(
+                    "1", 
+                    Integer.class
+                )
+            );
+
+            // With target type
+            assertEquals(
+                1, 
+                (Integer)proxy.convertToTargetType(
+                    "1", 
+                    (Type)Integer.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw ClassCastException when value converted to target type reference " +
+            "is not assignable to the proxy method return type"
+        )
+        void test16() {
+            Resolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConvertProxy.class,
+                getClass().getClassLoader()
+            );
+
+            // Target type is List<String> but proxy interface method
+            // return type is Integer.
+            assertThrows(
+                ClassCastException.class,
+                () -> proxy.convertToTargetTypeReference(
+                    "1,2,3",
+                    new TypeReference<List<String>>(){}
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw ClassCastException when value converted to target class " +
+            "is not assignable to the proxy method return type"
+        )
+        void test17() {
+            Resolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConvertProxy.class,
+                getClass().getClassLoader()
+            );
+
+            // Target type is List but proxy interface method
+            // return type is Integer.
+            assertThrows(
+                ClassCastException.class,
+                () -> proxy.convertToTargetClass(
+                    "1,2,3",
+                    List.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw ClassCastException when value converted to target type " +
+            "is not assignable to the proxy method return type"
+        )
+        void test18() {
+            Resolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConvertProxy.class,
+                getClass().getClassLoader()
+            );
+
+            // Target type is List<String> but proxy interface method
+            // return type is Integer.
+            assertThrows(
+                ClassCastException.class,
+                () -> proxy.convertToTargetType(
+                    "1,2,3",
+                    new TypeReference<List<String>>(){}.type()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw ClassCastException when value converted to target type" + 
+            "is not assignable to the proxy method return type variable"
+        )
+        void test19() {
+            Resolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConvertProxy.class,
+                getClass().getClassLoader()
+            );
+
+            // Target type is List<String> but proxy interface method
+            // return type is Integer.
+            assertThrows(
+                ClassCastException.class,
+                () -> {
+                    // Should throw ClassCastException.
+                    // Value is a List<String> but return variable was resolved to Integer.
+                    Integer mismatch = proxy.convertToTargetTypeWithTypeVariableReturnType(
+                        "1,2,3",
+                        new TypeReference<List<String>>(){}.type()
+                    );
+
+                    fail("Did not throw. Result value: " + mismatch);
+                }
+            );
+        }
+    }
+
+    private static InternalExternalizedProperties internalExternalizedProperties(
+            Resolver resolverToUse
     ) {
-        ResolverProvider<RootResolver> rootResolverProvider = RootResolver.provider(
-            Arrays.asList(resolverProviderToUse),
-            e -> new RootProcessor(e),
-            e -> new SimpleVariableExpander(e)
+        RootResolver rootResolver = new RootResolver(
+            Arrays.asList(resolverToUse),
+            new RootProcessor(),
+            new SimpleVariableExpander()
         );
 
-        RootConverter.Provider rootConverterProvider = RootConverter.provider(
-            Arrays.asList((e, r) -> new DefaultConverter(r))
+        RootConverter rootConverter = new RootConverter(
+            new DefaultConverter()
         );
 
         return new InternalExternalizedProperties(
-            rootResolverProvider,
-            rootConverterProvider,
-            (resolver, converter, proxyInterface) -> 
-                new ExternalizedPropertiesInvocationHandler(resolver, converter)
+            rootResolver,
+            rootConverter,
+            (proxyInterface, rr, rc, pmf) -> 
+                new ExternalizedPropertiesInvocationHandler(
+                    rr, rc, pmf
+                )
         );
     }
     
@@ -231,20 +842,89 @@ public class InternalExternalizedPropertiesTests {
         @ExternalizedProperty
         String resolve(int invalidMustBeString);
     }
-    public static interface ProxyInterface {
+
+    private static interface ProxyInterface {
         @ExternalizedProperty("property")
         String property();
     }
 
-    static interface VoidReturnTypeProxyInterface {
+    private static interface VoidReturnTypeProxyInterface {
         // Invalid: Void return types not allowed.
         @ExternalizedProperty("test.invalid.method.void")
         void invalidVoidMethod();
     }
 
-    static interface VoidClassReturnTypeProxyInterface {
+    private static interface VoidClassReturnTypeProxyInterface {
         // Invalid: Void return types not allowed.
         @ExternalizedProperty("test.invalid.method.void")
         Void invalidVoidClassMethod();
+    }
+
+    private static interface ConvertProxy {
+        @Convert
+        <T> T convertToTargetTypeReference(
+            String valueToConvert, 
+            TypeReference<T> targetType
+        );
+        @Convert
+        <T> T convertToTargetClass(String valueToConvert, Class<T> targetType);
+        @Convert
+        <T> T convertToTargetType(String valueToConvert, Type targetType);
+    }
+
+    private static interface InvalidArgsConvertProxy {
+        // First argument must be a String.
+        // Second argument must be one of the ff: TypeReference, Class, Type
+        @Convert
+        <T> T convert(Integer mustBeString, Double mustBeTargetType);
+    }
+
+    private static interface NoArgsConvertProxy {
+        // Must have 2 parameters: The value to convert and the target type.
+        @Convert
+        <T> T convert();
+    }
+
+    private static interface SingleArgConvertProxy {
+        // Must have 2 parameters: The value to convert and the target type.
+        @Convert
+        <T> T convert(String valueToConvert);
+    }
+
+    private static interface InvalidFirstArgConvertProxy {
+        // First parameter must be the value to convert (String)
+        @Convert
+        <T> T convert(Integer mustBeString, Class<T> targetType);
+    }
+
+    private static interface InvalidSecondArgConvertProxy {
+        // Second parameter must be the target type.
+        // Second argument must be one of the ff: TypeReference, Class, Type
+        @Convert
+        <T> T convert(String valueToConvert, Integer mustBeTargetType);
+    }
+
+    private static interface ReturnTypeMismatchConvertProxy {
+        // Return type not assignable with target type.
+        @Convert
+        Integer convertToTargetTypeReference(
+            String valueToConvert, 
+            TypeReference<?> targetType
+        );
+
+        // Return type not assignable with target type.
+        @Convert
+        Integer convertToTargetClass(String valueToConvert, Class<?> targetType);
+
+        // Return type not assignable with target type.
+        @Convert
+        Integer convertToTargetType(String valueToConvert, Type targetType);
+
+        // Return type not assignable with target type.
+        @Convert
+        <T> T convertToTargetTypeWithTypeVariableReturnType(
+            String valueToConvert, 
+            Type targetType
+        );
     }
 }

@@ -2,13 +2,11 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
-import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,58 +28,25 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
 public class ListConverter implements Converter<List<?>> {
     private final ListFactory listFactory;
     /** Internal array converter. */
-    private final ArrayConverter arrayConverter;
+    private final ArrayConverter arrayConverter = new ArrayConverter();
 
     /**
      * Default constructor. 
      * Instances constructed via this constructor will use {@link ArrayList} 
      * as {@link List} or {@link Collection} implementation.
-     * 
-     * @param rootConverter The root converter.
      */
-    public ListConverter(Converter<?> rootConverter) {
-        this(rootConverter, ArrayList::new);
+    public ListConverter() {
+        this(ArrayList::new);
     }
 
     /**
      * Constructor.
      * 
-     * @param rootConverter The root converter.
      * @param listFactory The {@link List} factory. This must return a {@link List} 
      * instance (optionally with given the capacity). This function must not return null.
      */
-    public ListConverter(
-            Converter<?> rootConverter,
-            ListFactory listFactory
-    ) {
-        this.arrayConverter = new ArrayConverter(rootConverter);
+    public ListConverter(ListFactory listFactory) {
         this.listFactory = requireNonNull(listFactory, "listFactory");
-    }
-
-    /**
-     * The {@link ConverterProvider} for {@link ListConverter}.
-     * 
-     * @return The {@link ConverterProvider} for {@link ListConverter}.
-     */
-    public static ConverterProvider<ListConverter> provider() {
-        return (externalizedProperties, rootConverter) -> 
-            new ListConverter(rootConverter);
-    }
-
-    /**
-     * The {@link ConverterProvider} for {@link ListConverter}.
-     * 
-     * @param listFactory The {@link List} factory. This must return a mutable {@link List} 
-     * instance (optionally with given the capacity). This function must not return null.
-     * 
-     * @return The {@link ConverterProvider} for {@link ListConverter}.
-     */
-    public static ConverterProvider<ListConverter> provider(
-            ListFactory listFactory
-    ) {
-        requireNonNull(listFactory, "listFactory");
-        return (externalizedProperties, rootConverter) -> 
-            new ListConverter(rootConverter, listFactory);
     }
 
     /** {@inheritDoc} */
@@ -102,7 +67,7 @@ public class ListConverter implements Converter<List<?>> {
             return ConversionResult.of(newList(0));
         }
         
-        GenericArrayType targetArrayType = toTargetArrayType(targetType);
+        Type targetArrayType = toTargetArrayType(targetType);
         
         Object[] array = arrayConverter.convert(
             proxyMethod,
@@ -141,7 +106,7 @@ public class ListConverter implements Converter<List<?>> {
      * @return The array target type to pass to {@link ArrayConverter} when requesting 
      * to convert to an array.
      */
-    private static GenericArrayType toTargetArrayType(Type targetType) {
+    private static Type toTargetArrayType(Type targetType) {
         Type[] genericTypeParams = TypeUtilities.getTypeParameters(targetType);
         
         // Assume as List<String> when target type has no generic type parameters.
@@ -152,12 +117,7 @@ public class ListConverter implements Converter<List<?>> {
             targetListType = String.class;
         }
 
-        return new GenericArrayType() {
-            @Override
-            public Type getGenericComponentType() {
-                return targetListType;
-            }
-        };
+        return TypeUtilities.getArrayType(targetListType);
     }
 
     /**

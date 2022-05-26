@@ -17,7 +17,7 @@ public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = buildExternalizedProperties();
 
     // Proxied interface.
-    ApplicationProperties props = externalizedProperties.proxy(ApplicationProperties.class);
+    ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
 
     // Use properties.
     int timeoutInMilliseconds = props.timeoutInMilliseconds();
@@ -26,8 +26,8 @@ public static void main(String[] args) {
 
 private static ExternalizedProperties buildExternalizedProperties() {
     return ExternalizedProperties.builder()
-        .withDefaults()
-        .converters(ConverterProvider.of(new CustomTypeConverter()))
+        .defaults()
+        .converters(new CustomTypeConverter())
         .build();
 }
 ```
@@ -55,3 +55,22 @@ public interface ApplicationProperties {
 ````
 
 Each item in the list will be converted to an `Optional<Integer>`.
+
+## 🌟 Converter Methods (via [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java))
+
+Externalized Properties has support for dynamic conversion of String values to any type. This is made possible by the [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java) annotation.
+
+To enable dynamic conversion, a proxy interface method may be annotated with the [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java) annotatation e.g.
+
+(Kindly see [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java) documentation to learn more about the rules of defining a converter method.)
+
+```java
+public interface ProxyInterface {
+    @Convert
+    <T> T convert(String valueToConvert, TypeReference<T> targetType);
+    @Convert
+    <T> T convert(String valueToConvert, Class<T> targetType);
+}
+```
+
+Invoking the methods annotated with [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java) will delegate the arguments to the registered [Converter](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Converter.java)s to do the conversion. The converted value will be returned by the method.

@@ -1,13 +1,11 @@
 package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
-import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,40 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EnumConverterTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-    
-    @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ConverterProvider<EnumConverter> provider = 
-                EnumConverter.provider();
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ConverterProvider<EnumConverter> provider = 
-                EnumConverter.provider();
-            
-            ExternalizedProperties externalizedProperties = 
-                ExternalizedProperties.builder()
-                    .withDefaultResolvers()
-                    .converters(provider)
-                    .build();
-            
-            assertNotNull(
-                provider.get(
-                    externalizedProperties,
-                    new RootConverter(externalizedProperties, provider)
-                )
-            );
-        }
-    }
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
 
     @Nested
     class CanConvertToMethod {
@@ -93,7 +59,8 @@ public class EnumConverterTests {
             EnumConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::enumProperty
+                ProxyInterface::enumProperty,
+                externalizedProperties(converter)
             );
 
             ConversionResult<? extends Enum<?>> result = converter.convert(
@@ -112,7 +79,8 @@ public class EnumConverterTests {
             EnumConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::enumProperty
+                ProxyInterface::enumProperty,
+                externalizedProperties(converter)
             );
 
             assertThrows(ConversionException.class, () -> {
@@ -129,7 +97,8 @@ public class EnumConverterTests {
             EnumConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::notSupportedNotAnEnum
+                ProxyInterface::notSupportedNotAnEnum,
+                externalizedProperties(converter)
             );
             
             ConversionResult<?> result = converter.convert(
@@ -140,11 +109,20 @@ public class EnumConverterTests {
         }
     }
 
-    private EnumConverter converterToTest() {
+    private static EnumConverter converterToTest() {
         return new EnumConverter();
     }
 
-    public static interface ProxyInterface {
+    private static ExternalizedProperties externalizedProperties(
+            EnumConverter converterToTest
+    ) {
+        return ExternalizedProperties.builder()
+            .enableDefaultResolvers()
+            .converters(converterToTest)
+            .build();
+    }
+
+    static interface ProxyInterface {
         @ExternalizedProperty("property.enum")
         TestEnum enumProperty();
 

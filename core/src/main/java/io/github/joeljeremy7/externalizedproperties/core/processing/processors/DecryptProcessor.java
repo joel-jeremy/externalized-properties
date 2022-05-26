@@ -2,7 +2,6 @@ package io.github.joeljeremy7.externalizedproperties.core.processing.processors;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
-import io.github.joeljeremy7.externalizedproperties.core.ProcessorProvider;
 import io.github.joeljeremy7.externalizedproperties.core.processing.Decrypt;
 import io.github.joeljeremy7.externalizedproperties.core.processing.ProcessingException;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
@@ -65,17 +64,6 @@ public class DecryptProcessor implements Processor {
                 DecryptProcessor::throwOnDuplicateDecryptors
             )
         );
-    }
-
-    /**
-     * The {@link ProcessorProvider} for {@link DecryptProcessor}.
-     * 
-     * @param decryptor The {@link Decryptor} to do the decrypting.
-     * @return The {@link ProcessorProvider} for {@link DecryptProcessor}.
-     */
-    public static ProcessorProvider<DecryptProcessor> provider(Decryptor decryptor) {
-        requireNonNull(decryptor, "decryptor");
-        return externalizedProperties -> new DecryptProcessor(decryptor);
     }
 
     /**

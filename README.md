@@ -60,7 +60,7 @@ module foo.bar {
 ### 🔗 [Property Resolution via Java Dynamic Proxies](docs/property-resolution.md) ([Why Dynamic Proxies?](docs/why-dynamic-proxies.md))
 
 ✨ Default/Fallback Values  
-✨ Non-static Property Names  
+✨ Non-static/Dynamic Property Names  
 ✨ Variable Expansion  
 ✨ Caching  
 ✨ Eager Loading  
@@ -72,7 +72,8 @@ module foo.bar {
 
 ### 🔗 [Property Conversion](docs/property-conversion.md)
 
-✨ Generic Type Conversion
+✨ Generic Type Conversion  
+✨ Converter Methods
 
 ## 🏎️ Quick Start
 
@@ -99,7 +100,7 @@ public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = buildExternalizedProperties();
 
     // Proxied interface.
-    ApplicationProperties props = externalizedProperties.proxy(ApplicationProperties.class);
+    ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
 
     // Use properties.
     String javaHome = props.javaHome();
@@ -109,7 +110,7 @@ public static void main(String[] args) {
 
 private static ExternalizedProperties buildExternalizedProperties() {
     return ExternalizedProperties.builder()
-        .withDefaults() 
+        .defaults() 
         .resolvers(...)
         .processors(...)
         .converters(...) 

@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -51,22 +52,22 @@ public class ExternalizedPropertiesTests {
         @Nested
         class ResolversMethod {
             @Test
-            @DisplayName("should throw when resolver providers collection argument is null")
+            @DisplayName("should throw when resolver collection argument is null")
             void test1() {
                 ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> builder.resolvers((Collection<ResolverProvider<?>>)null)
+                    () -> builder.resolvers((Collection<Resolver>)null)
                 );
             }
 
             @Test
-            @DisplayName("should throw when resolver providers varargs argument is null")
+            @DisplayName("should throw when resolver varargs argument is null")
             void test2() {
                 ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> builder.resolvers((ResolverProvider[])null)
+                    () -> builder.resolvers((Resolver[])null)
                 );
             }
         }
@@ -74,22 +75,22 @@ public class ExternalizedPropertiesTests {
         @Nested
         class ConvertersMethod {
             @Test
-            @DisplayName("should throw when converter providers collection argument is null")
+            @DisplayName("should throw when converter collection argument is null")
             void test1() {
                 ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> builder.converters((Collection<ConverterProvider<?>>)null)
+                    () -> builder.converters((Collection<Converter<?>>)null)
                 );
             }
         
             @Test
-            @DisplayName("should throw when converter providers varargs argument is null")
+            @DisplayName("should throw when converter varargs argument is null")
             void test2() {
                 ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> builder.converters((ConverterProvider[])null)
+                    () -> builder.converters((Converter[])null)
                 );
             }
         }
@@ -97,22 +98,22 @@ public class ExternalizedPropertiesTests {
         @Nested
         class ProcessorsMethod {
             @Test
-            @DisplayName("should throw when processor providers collection argument is null")
+            @DisplayName("should throw when processor collection argument is null")
             void test1() {
                 ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> builder.processors((Collection<ProcessorProvider<?>>)null)
+                    () -> builder.processors((Collection<Processor>)null)
                 );
             }
         
             @Test
-            @DisplayName("should throw when processor providers varargs argument is null")
+            @DisplayName("should throw when processor varargs argument is null")
             void test2() {
                 ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class,
-                    () -> builder.processors((ProcessorProvider[])null)
+                    () -> builder.processors((Processor[])null)
                 );
             }
         }
@@ -144,50 +145,10 @@ public class ExternalizedPropertiesTests {
         }
 
         @Nested
-        class WithDefaultResolversMethod {
-            @Test
-            @DisplayName("should register default resolvers")
-            void test1() {
-                // Default resolvers include:
-                // - System property resolver
-                // - Environment variable resolver
-                ExternalizedProperties ep = ExternalizedProperties.builder()
-                    .withDefaultResolvers()
-                    .build();
-
-                testDefaultResolvers(ep);
-            }
-        }
-
-        @Nested
-        class WithDefaultConvertersMethod {
-            @Test
-            @DisplayName("should register default converters")
-            void test1() {
-                Map<String, String> testProps = testProperties();
-        
-                // Default converter includes conversion to:
-                // - Primitives
-                // - Lists/Collections
-                // - Sets
-                // - Arrays
-                // - Optionals
-                // - Enums
-                // - Date/Time classes
-                ExternalizedProperties ep = ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(testProps))
-                    .withDefaultConverters()
-                    .build();
-        
-                testDefaultConverters(ep, testProps);
-            }
-        }
-
-        @Nested
-        class WithDefaultsMethod {
+        class DefaultsMethod {
             @Test
             @DisplayName("should register default resolvers and converters")
-            void test12() {
+            void test1() {
                 // System properties.
                 Map<String, String> testProps = testProperties();
                 testProps.forEach((k, v) -> System.setProperty(k, v));
@@ -196,9 +157,11 @@ public class ExternalizedPropertiesTests {
                 // - Primitives
                 // - Lists/Collections
                 // - Arrays
-                // - Optionals
+                // - Sets
+                // - Enums
+                // - Date/Time classes
                 ExternalizedProperties ep = ExternalizedProperties.builder()
-                    .withDefaults()
+                    .defaults()
                     .build();
         
                 testDefaultResolvers(ep);
@@ -207,14 +170,53 @@ public class ExternalizedPropertiesTests {
         }
 
         @Nested
-        class WithCacheDurationMethod {
+        class EnableDefaultResolversMethod {
+            @Test
+            @DisplayName("should register default resolvers")
+            void test1() {
+                // Default resolvers include:
+                // - System property resolver
+                // - Environment variable resolver
+                ExternalizedProperties ep = ExternalizedProperties.builder()
+                    .enableDefaultResolvers()
+                    .build();
+
+                testDefaultResolvers(ep);
+            }
+        }
+
+        @Nested
+        class EnableDefaultConvertersMethod {
+            @Test
+            @DisplayName("should register default converters")
+            void test1() {
+                Map<String, String> testProps = testProperties();
+        
+                // Default converter includes conversion to:
+                // - Primitives
+                // - Lists/Collections
+                // - Arrays
+                // - Sets
+                // - Enums
+                // - Date/Time classes
+                ExternalizedProperties ep = ExternalizedProperties.builder()
+                    .resolvers(new MapResolver(testProps))
+                    .enableDefaultConverters()
+                    .build();
+        
+                testDefaultConverters(ep, testProps);
+            }
+        }
+
+        @Nested
+        class CacheDurationMethod {
             @Test
             @DisplayName("should throw when cache duration argument is null")
             void test1() {
                 ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class, 
-                    () -> builder.withCacheDuration(null)
+                    () -> builder.cacheDuration(null)
                 );
             }
 
@@ -223,13 +225,13 @@ public class ExternalizedPropertiesTests {
             void test2() {
                 ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertDoesNotThrow(
-                    () -> builder.withCacheDuration(Duration.ofMinutes(1))
+                    () -> builder.cacheDuration(Duration.ofMinutes(1))
                 );
             }
         }
 
         @Nested
-        class WithProxyEagerLoadingMethod {
+        class EnableEagerLoadingMethod {
             @Test
             @DisplayName("should enable proxy eager loading")
             void test1() {
@@ -239,17 +241,14 @@ public class ExternalizedPropertiesTests {
 
                 ExternalizedProperties externalizedProperties = 
                     ExternalizedProperties.builder()
-                        .withDefaultResolvers()
-                        .resolvers(
-                            ResolverProvider.of(mapResolver),
-                            ResolverProvider.of(systemProps)
-                        )
-                        .withDefaultConverters()
-                        .withProxyEagerLoading()
+                        .enableDefaultResolvers()
+                        .resolvers(mapResolver, systemProps)
+                        .enableDefaultConverters()
+                        .enableEagerLoading()
                         .build();
 
                 ProxyInterface proxy = 
-                    externalizedProperties.proxy(ProxyInterface.class);
+                    externalizedProperties.initialize(ProxyInterface.class);
 
                 assertNotNull(proxy);
                 testProps.forEach((key, expectedValue) -> {
@@ -261,8 +260,56 @@ public class ExternalizedPropertiesTests {
             }
         }
 
+        @Nested
+        class EnableInvocationCachingMethod {
+            @Test
+            @DisplayName("should cache proxy invocation results")
+            void test1() {
+                Map<String, String> testProps = testProperties();
+
+                ExternalizedProperties externalizedProperties = 
+                    ExternalizedProperties.builder()
+                        .enableInvocationCaching()
+                        .enableDefaultConverters()
+                        .resolvers(new MapResolver(testProps))
+                        .build();
+
+                ProxyInterface proxy = 
+                    externalizedProperties.initialize(ProxyInterface.class);
+                
+                List<String> result1 = proxy.listProperty();
+                List<String> result2 = proxy.listProperty();
+
+                // Same instance.
+                assertSame(result1, result2);
+            }
+        }
+
+        @Nested
+        class EnableInitializeCachingMethod {
+            @Test
+            @DisplayName("should cache initialized proxies")
+            void test1() {
+                Map<String, String> testProps = testProperties();
+
+                ExternalizedProperties externalizedProperties = 
+                    ExternalizedProperties.builder()
+                        .enableInitializeCaching()
+                        .resolvers(new MapResolver(testProps))
+                        .build();
+
+                ProxyInterface proxy1 = 
+                    externalizedProperties.initialize(ProxyInterface.class);
+                ProxyInterface proxy2 = 
+                    externalizedProperties.initialize(ProxyInterface.class);
+
+                // Same instance.
+                assertSame(proxy1, proxy2);
+            }
+        }
+
         private void testDefaultResolvers(ExternalizedProperties ep) {
-            ProxyInterface proxyInterface = ep.proxy(ProxyInterface.class);
+            ProxyInterface proxyInterface = ep.initialize(ProxyInterface.class);
 
             // Resolved from system properties.
             assertEquals(
@@ -282,7 +329,7 @@ public class ExternalizedPropertiesTests {
                 Map<String, String> expectedProps
         ) {
             ProxyInterface proxy = 
-                externalizedProperties.proxy(ProxyInterface.class);
+                externalizedProperties.initialize(ProxyInterface.class);
 
             // Primitive conversions
             assertEquals(

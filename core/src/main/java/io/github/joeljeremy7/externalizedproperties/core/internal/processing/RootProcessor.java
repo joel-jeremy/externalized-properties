@@ -2,7 +2,6 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.processing;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
-import io.github.joeljeremy7.externalizedproperties.core.ProcessorProvider;
 import io.github.joeljeremy7.externalizedproperties.core.processing.ProcessWith;
 import io.github.joeljeremy7.externalizedproperties.core.processing.ProcessingException;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
@@ -11,9 +10,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -28,68 +25,20 @@ public class RootProcessor implements Processor {
     /**
      * Constructor.
      * 
-     * @param externalizedProperties The {@link ExternalizedProperties} instance.
-     * @param processorProviders The collection of {@link ProcessorProvider}s
-     * to provide processors that handle the actual processing.
+     * @param processors The collection of {@link Processor}s to handle the actual processing.
      */
-    public RootProcessor(
-            ExternalizedProperties externalizedProperties,
-            ProcessorProvider<?>... processorProviders
-    ) {
-        this(
-            externalizedProperties,
-            Arrays.asList(requireNonNull(processorProviders, "processorProviders"))
-        );
+    public RootProcessor(Processor... processors) {
+        this(Arrays.asList(requireNonNull(processors, "processors")));
     }
 
     /**
      * Constructor.
      * 
-     * @param externalizedProperties The {@link ExternalizedProperties} instance.
-     * @param processorProviders The collection of {@link ProcessorProvider}s
-     * to provide processors that handle the actual processing.
+     * @param processors The collection of {@link Processor}s to handle the actual processing.
      */
-    public RootProcessor(
-            ExternalizedProperties externalizedProperties,
-            Collection<ProcessorProvider<?>> processorProviders
-    ) {
+    public RootProcessor(Collection<Processor> processors) {
         this.processorByAnnotationType = new ProcessorByAnnotationType(
-            requireNonNull(externalizedProperties, "externalizedProperties"),
-            requireNonNull(processorProviders, "processorProviders")
-        );
-    }
-
-    /**
-     * The {@link ProcessorProvider} for {@link RootProcessor}.
-     * 
-     * @param processorProviders The registered {@link ProcessorProvider}s which provide 
-     * {@link Processor} instances.
-     * @return The {@link ProcessorProvider} for {@link RootProcessor}.
-     */
-    public static ProcessorProvider<RootProcessor> provider(
-            ProcessorProvider<?>... processorProviders
-    ) {
-        requireNonNull(processorProviders, "processorProviders");
-        return externalizedProperties -> new RootProcessor(
-            externalizedProperties, 
-            processorProviders
-        );
-    }
-
-    /**
-     * The {@link ProcessorProvider} for {@link RootProcessor}.
-     * 
-     * @param processorProviders The registered {@link ProcessorProvider}s which provide 
-     * {@link Processor} instances.
-     * @return The {@link ProcessorProvider} for {@link RootProcessor}.
-     */
-    public static ProcessorProvider<RootProcessor> provider(
-            Collection<ProcessorProvider<?>> processorProviders
-    ) {
-        requireNonNull(processorProviders, "processorProviders");
-        return externalizedProperties -> new RootProcessor(
-            externalizedProperties, 
-            processorProviders
+            requireNonNull(processors, "processorProviders")
         );
     }
 
@@ -117,21 +66,17 @@ public class RootProcessor implements Processor {
      * meta annotation.
      */
     private static class ProcessorByAnnotationType extends ClassValue<Processor> {        
-        private final ExternalizedProperties externalizedProperties;
-        private final List<ProcessorProvider<?>> registeredProcessorProviders;
+        private final Collection<Processor> registeredProcessors;
 
         /**
          * Constructor.
          * 
-         * @param externalizedProperties The {@link ExternalizedProperties} instance.
-         * @param registeredProcessorProviders The registered {@link ProcessorProvider} instances.
+         * @param registeredProcessors The registered {@link ProcessorProvider} instances.
          */
         ProcessorByAnnotationType(
-                ExternalizedProperties externalizedProperties,
-                Collection<ProcessorProvider<?>> registeredProcessorProviders
+                Collection<Processor> registeredProcessors
         ) {
-            this.externalizedProperties = externalizedProperties;
-            this.registeredProcessorProviders = memoizeAll(registeredProcessorProviders);
+            this.registeredProcessors = registeredProcessors;
         }
 
         /**
@@ -155,8 +100,7 @@ public class RootProcessor implements Processor {
                 return null;
             }
                 
-            for (ProcessorProvider<?> processorProvider : registeredProcessorProviders) {
-                Processor processor = processorProvider.get(externalizedProperties);
+            for (Processor processor : registeredProcessors) {
                 if (Objects.equals(processor.getClass(), processWith.value())) {
                     return processor;
                 }
@@ -169,14 +113,6 @@ public class RootProcessor implements Processor {
                 processWith.value().getName(),
                 ExternalizedProperties.class.getSimpleName()
             ));
-        }
-
-        private static List<ProcessorProvider<?>> memoizeAll(
-                Collection<ProcessorProvider<?>> processorProviders
-        ) {
-            return processorProviders.stream()
-                .map(ProcessorProvider::memoize)
-                .collect(Collectors.toList());
         }
     }
 }

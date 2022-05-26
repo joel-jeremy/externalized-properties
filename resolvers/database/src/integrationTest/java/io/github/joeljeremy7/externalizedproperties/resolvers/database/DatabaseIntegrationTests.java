@@ -1,9 +1,11 @@
 package io.github.joeljeremy7.externalizedproperties.resolvers.database;
 
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import io.github.joeljeremy7.externalizedproperties.resolvers.database.testentities.JdbcUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class DatabaseIntegrationTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
 
     /**
      * Override if different connection provider is desired.
@@ -62,7 +64,8 @@ public abstract class DatabaseIntegrationTests {
             DatabaseResolver databaseResolver = 
                 new DatabaseResolver(connectionProvider);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property1
+                ProxyInterface::property1,
+                externalizedProperties(databaseResolver)
             );
             
             String propertyName = "test.property.1";
@@ -79,7 +82,8 @@ public abstract class DatabaseIntegrationTests {
             DatabaseResolver databaseResolver = 
                 new DatabaseResolver(connectionProvider);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::nonExistentProperty
+                ProxyInterface::nonExistentProperty,
+                externalizedProperties(databaseResolver)
             );
 
             String propertyName = "non.existent.property";
@@ -103,7 +107,8 @@ public abstract class DatabaseIntegrationTests {
             DatabaseResolver databaseResolver = 
                 new DatabaseResolver(invalidConnectionProvider);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property1
+                ProxyInterface::property1,
+                externalizedProperties(databaseResolver)
             );
 
             String propertyName = "test.property.1";
@@ -116,8 +121,12 @@ public abstract class DatabaseIntegrationTests {
             assertTrue(exception.getCause() instanceof SQLException);
         }
     }
+    
+    private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+        return ExternalizedProperties.builder().resolvers(resolvers).build();
+    }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("test.property.1")
         String property1();
 

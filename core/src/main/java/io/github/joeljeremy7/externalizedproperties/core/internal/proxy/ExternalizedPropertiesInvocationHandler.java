@@ -16,21 +16,24 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  * This handles invocations of methods that are marked with {@link ExternalizedProperty} annotation.
  */
 public class ExternalizedPropertiesInvocationHandler implements InvocationHandler {
-    private final ProxyMethodHandler proxyMethodHandler;
+    private final ExternalizedPropertiesExecutor externalizedPropertiesExecutor;
 
     /**
      * Constructor.
      * 
-     * @param resolver The resolver.
-     * @param converter The converter.
+     * @param rootResolver The root resolver.
+     * @param rootConverter The root converter.
+     * @param proxyMethodFactory The proxy method factory.
      */
     public ExternalizedPropertiesInvocationHandler(
-            Resolver resolver,
-            Converter<?> converter
+            Resolver rootResolver,
+            Converter<?> rootConverter,
+            ProxyMethodFactory proxyMethodFactory
     ) {
-        this.proxyMethodHandler = new ProxyMethodHandler(
-            requireNonNull(resolver, "resolver"),
-            requireNonNull(converter, "converter"),
+        this.externalizedPropertiesExecutor = new ExternalizedPropertiesExecutor(
+            requireNonNull(rootResolver, "rootResolver"),
+            requireNonNull(rootConverter, "rootConverter"),
+            requireNonNull(proxyMethodFactory, "proxyMethodFactory"),
             new MethodHandleFactory()
         );
     }
@@ -52,7 +55,11 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
             return objectMethodResult;
         }
 
-        return proxyMethodHandler.handle(proxy, method, args != null ? args : new Object[0]);
+        return externalizedPropertiesExecutor.handle(
+            proxy, 
+            method, 
+            args != null ? args : new Object[0]
+        );
     }
     
     // Avoid calling methods in proxy object to avoid recursion.

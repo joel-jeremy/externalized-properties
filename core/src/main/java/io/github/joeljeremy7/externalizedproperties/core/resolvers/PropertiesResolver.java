@@ -1,7 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -56,54 +55,6 @@ public class PropertiesResolver extends MapResolver {
         super(
             ignoreNonStringProperties(requireNonNull(properties, "properties")),
             requireNonNull(unresolvedPropertyHandler, "unresolvedPropertyHandler")
-        );
-    }
-
-    /**
-     * The {@link ResolverProvider} for {@link PropertiesResolver}.
-     * 
-     * @implNote Only properties with keys or values that are of type {@link String}
-     * are supported. Properties that do not meet this criteria will be ignored.
-     * 
-     * @implNote The {@link Properties} keys and values will be copied over to an internal 
-     * {@link ConcurrentHashMap} for thread safety and to avoid the performance penalty of 
-     * {@link Properties}/{@link Hashtable} synchronization.
-     * 
-     * @param properties The source properties instance to build from.
-     * @return The {@link ResolverProvider} for {@link PropertiesResolver}.
-     */
-    public static ResolverProvider<PropertiesResolver> provider(
-            Properties properties 
-    ) {
-        requireNonNull(properties, "properties");
-        return externalizedProperties -> new PropertiesResolver(properties);
-    }
-
-    /**
-     * The {@link ResolverProvider} for {@link PropertiesResolver}.
-     * 
-     * @implNote Only properties with keys or values that are of type {@link String}
-     * are supported. Properties that do not meet this criteria will be ignored.
-     * 
-     * @implNote The {@link Properties} keys and values will be copied over to an internal 
-     * {@link ConcurrentHashMap} for thread safety and to avoid the performance penalty of 
-     * {@link Properties}/{@link Hashtable} synchronization.
-     * 
-     * @param properties The source properties instance to build from.
-     * @param unresolvedPropertyHandler Any properties not found in the source properties will tried 
-     * to be resolved via this handler. This should accept a property name and return the property value 
-     * for the given property name. {@code null} return values are allowed but will be discarded.
-     * @return The {@link ResolverProvider} for {@link MapResolver}.
-     */
-    public static ResolverProvider<PropertiesResolver> provider(
-            Properties properties, 
-            UnresolvedPropertyHandler unresolvedPropertyHandler
-    ) {
-        requireNonNull(properties, "properties");
-        requireNonNull(unresolvedPropertyHandler, "unresolvedPropertyHandler");
-        return externalizedProperties -> new PropertiesResolver(
-            properties,
-            unresolvedPropertyHandler
         );
     }
 

@@ -191,7 +191,7 @@ public class TypeReferenceTests {
         }
     }
 
-    static interface GenericTypes {
+    private static interface GenericTypes {
         List<String> listProperty();
         Optional<Optional<String>>[] arrayPropertyNestedGeneric();
     }

@@ -51,29 +51,29 @@ public abstract class ConversionBenchmarks {
              */
             ExternalizedProperties externalizedProperties =     
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(
+                    .resolvers(new MapResolver(
                         Collections.singletonMap(key, "1")
                     ))
-                    .converters((ep, rc) -> new IntegerConverter())
+                    .converters(new IntegerConverter())
                     .build();
 
-            proxyInterface = externalizedProperties.proxy(ConversionProxyInterface.class);
+            proxyInterface = externalizedProperties.initialize(ConversionProxyInterface.class);
 
             /**
              * Setup with eager loading.
              */
             ExternalizedProperties externalizedPropertiesWithEagerLoading = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(
+                    .resolvers(new MapResolver(
                         Collections.singletonMap(key, "1")
                     ))
-                    .withProxyEagerLoading()
-                    .withCacheDuration(Duration.ofHours(24))
-                    .converters((ep, rc) -> new IntegerConverter())
+                    .enableEagerLoading()
+                    .cacheDuration(Duration.ofHours(24))
+                    .converters(new IntegerConverter())
                     .build();
 
             proxyInterfaceWithEagerLoading = 
-                externalizedPropertiesWithEagerLoading.proxy(
+                externalizedPropertiesWithEagerLoading.initialize(
                     ConversionProxyInterface.class
                 );
             
@@ -82,16 +82,16 @@ public abstract class ConversionBenchmarks {
              */
             ExternalizedProperties externalizedPropertiesWithInvocationCaching = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(
+                    .resolvers(new MapResolver(
                         Collections.singletonMap(key, "1")
                     ))
-                    .withProxyInvocationCaching()
-                    .withCacheDuration(Duration.ofHours(24))
-                    .converters((ep, rc) -> new IntegerConverter())
+                    .enableInvocationCaching()
+                    .cacheDuration(Duration.ofHours(24))
+                    .converters(new IntegerConverter())
                     .build();
 
             proxyInterfaceWithInvocationCaching = 
-                externalizedPropertiesWithInvocationCaching.proxy(
+                externalizedPropertiesWithInvocationCaching.initialize(
                     ConversionProxyInterface.class
                 );
         }

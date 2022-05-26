@@ -1,7 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -50,41 +49,6 @@ public class MapResolver implements Resolver {
         this.unresolvedPropertyHandler = requireNonNull(
             unresolvedPropertyHandler,
             "unresolvedPropertyHandler"
-        );
-    }
-
-    /**
-     * The {@link ResolverProvider} for {@link MapResolver}.
-     * 
-     * @param propertySource The source map where properties will be resolved from.
-     * @return The {@link ResolverProvider} for {@link MapResolver}.
-     */
-    public static ResolverProvider<MapResolver> provider(
-            Map<String, String> propertySource 
-    ) {
-        requireNonNull(propertySource, "propertySource");
-        return externalizedProperties -> new MapResolver(propertySource);
-    }
-
-    /**
-     * The {@link ResolverProvider} for {@link MapResolver}.
-     * 
-     * @param propertySource The source map where properties will be resolved from.
-     * @param unresolvedPropertyHandler Any properties not found in the source properties will tried 
-     * to be resolved via this handler. This should accept a property name and return the property value 
-     * for the given property name. {@code null} return values are allowed but will be discarded.
-     * @return The {@link ResolverProvider} for {@link MapResolver}.
-     */
-    public static ResolverProvider<MapResolver> provider(
-            Map<String, String> propertySource,
-            UnresolvedPropertyHandler unresolvedPropertyHandler
-    ) {
-        requireNonNull(propertySource, "propertySource");
-        requireNonNull(unresolvedPropertyHandler, "unresolvedPropertyHandler");
-
-        return externalizedProperties -> new MapResolver(
-            propertySource,
-            unresolvedPropertyHandler
         );
     }
     

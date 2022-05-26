@@ -1,11 +1,11 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal.conversion;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
+import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,39 +16,10 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class NoOpConverterTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-
-    @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should not return null")
-        void test1() {
-            ConverterProvider<NoOpConverter> provider = NoOpConverter.provider();
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should not return null on get")
-        void test2() {
-            ConverterProvider<NoOpConverter> provider = NoOpConverter.provider();
-            
-            ExternalizedProperties externalizedProperties = 
-                ExternalizedProperties.builder()
-                    .withDefaultResolvers()
-                    .build();
-                
-            assertNotNull(
-                provider.get(
-                    externalizedProperties,
-                    new RootConverter(externalizedProperties)
-                )
-            );
-        }
-    }
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
 
     @Nested
     class CanConvertToMethod {
@@ -76,13 +47,16 @@ public class NoOpConverterTests {
         @DisplayName("should always return skip result")
         void test1() {
             ProxyMethod intProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::intProperty
+                ProxyInterface::intProperty,
+                externalizedProperties()
             );
             ProxyMethod booleanProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::booleanProperty
+                ProxyInterface::booleanProperty,
+                externalizedProperties()
             );
             ProxyMethod doubleProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference( 
-                ProxyInterface::doubleProperty
+                ProxyInterface::doubleProperty,
+                externalizedProperties()
             );
             
             ConversionResult<?> intResult = 
@@ -114,7 +88,14 @@ public class NoOpConverterTests {
         }
     }
 
-    public static interface ProxyInterface {
+    private static ExternalizedProperties externalizedProperties(Converter<?>... converters) {
+        return ExternalizedProperties.builder()
+            .enableDefaultResolvers()
+            .converters(converters)
+            .build();
+    }
+
+    private static interface ProxyInterface {
         @ExternalizedProperty("property.int")
         int intProperty();
     

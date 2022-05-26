@@ -1,18 +1,16 @@
 package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
+import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
-import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,40 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OptionalConverterTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-
-    @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ConverterProvider<OptionalConverter> provider = 
-                OptionalConverter.provider();
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ConverterProvider<OptionalConverter> provider = 
-                OptionalConverter.provider();
-            
-            ExternalizedProperties externalizedProperties = 
-                ExternalizedProperties.builder()
-                    .withDefaultResolvers()
-                    .converters(provider)
-                    .build();
-            
-            assertNotNull(
-                provider.get(
-                    externalizedProperties,
-                    new RootConverter(externalizedProperties, provider)
-                )
-            );
-        }
-    }
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
 
     @Nested
     class CanConvertToMethod {
@@ -96,7 +62,8 @@ public class OptionalConverterTests {
             OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::optionalProperty
+                ProxyInterface::optionalProperty,
+                externalizedProperties(converter)
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
@@ -118,11 +85,12 @@ public class OptionalConverterTests {
             "should convert value according to the Optional's generic type parameter."
         )
         void test2() {
-            OptionalConverter converter = converterToTest(PrimitiveConverter.provider());
+            OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::nonStringOptionalProperty
-                );
+                ProxyInterface::nonStringOptionalProperty,
+                externalizedProperties(converter, new PrimitiveConverter())
+            );
             
             ConversionResult<? extends Optional<?>> result = converter.convert(
                 proxyMethod,
@@ -147,8 +115,9 @@ public class OptionalConverterTests {
             OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::nonStringOptionalProperty
-                );
+                ProxyInterface::nonStringOptionalProperty,
+                externalizedProperties(converter)
+            );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
                 proxyMethod,
@@ -174,7 +143,8 @@ public class OptionalConverterTests {
             OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::optionalPropertyObject
+                ProxyInterface::optionalPropertyObject,
+                externalizedProperties(converter)
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
@@ -199,7 +169,8 @@ public class OptionalConverterTests {
             OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::optionalPropertyWildcard
+                ProxyInterface::optionalPropertyWildcard,
+                externalizedProperties(converter)
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
@@ -222,7 +193,8 @@ public class OptionalConverterTests {
             OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::optionalPropertyT
+                ProxyInterface::optionalPropertyT,
+                externalizedProperties(converter)
             );
                 
             assertThrows(
@@ -237,10 +209,11 @@ public class OptionalConverterTests {
             "Generic type parameter is also a parameterized type e.g. Optional<List<String>>."
         )
         void test7() {
-            OptionalConverter converter = converterToTest(ListConverter.provider());
+            OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::optionalPropertyNestedGenerics
+                ProxyInterface::optionalPropertyNestedGenerics,
+                externalizedProperties(converter, new ListConverter())
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
@@ -266,10 +239,11 @@ public class OptionalConverterTests {
             "Generic type parameter is a generic array e.g. Optional<Optional<String>[]>."
         )
         void test8() {
-            OptionalConverter converter = converterToTest(ArrayConverter.provider());
+            OptionalConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::optionalPropertyNestedGenericsArray
+                ProxyInterface::optionalPropertyNestedGenericsArray,
+                externalizedProperties(converter, new ArrayConverter())
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
@@ -302,7 +276,8 @@ public class OptionalConverterTests {
             OptionalConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::optionalProperty
+                ProxyInterface::optionalProperty,
+                externalizedProperties(converter)
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
@@ -318,30 +293,22 @@ public class OptionalConverterTests {
         }
     }
 
-    private OptionalConverter converterToTest(
-            ConverterProvider<?>... additionalConverters
-    ) {
-        ConverterProvider<OptionalConverter> provider = OptionalConverter.provider();
-        
-        List<ConverterProvider<?>> allProviders = new ArrayList<>(
-            Arrays.asList(additionalConverters)
-        );
-        allProviders.add(provider);
-        
-        ExternalizedProperties externalizedProperties = 
-            ExternalizedProperties.builder()
-                .withDefaultResolvers()
-                .converters(allProviders)
-                .build();
-
-        RootConverter rootConverter = new RootConverter(
-            externalizedProperties, 
-            allProviders
-        );
-        return provider.get(externalizedProperties, rootConverter);
+    private static OptionalConverter converterToTest() {
+        return new OptionalConverter();
     }
 
-    public static interface ProxyInterface {
+    private static ExternalizedProperties externalizedProperties(
+            OptionalConverter converterToTest,
+            Converter<?>... additionalConverters
+    ) {
+        return ExternalizedProperties.builder()
+            .enableDefaultResolvers()
+            .converters(converterToTest)
+            .converters(additionalConverters)
+            .build();
+    }
+
+    static interface ProxyInterface {
         @ExternalizedProperty("property.optional")
         Optional<String> optionalProperty();
 

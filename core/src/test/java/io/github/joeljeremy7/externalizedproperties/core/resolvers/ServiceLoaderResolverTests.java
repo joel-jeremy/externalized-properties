@@ -2,9 +2,9 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
+import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,31 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * Service loader resolvers are configured in resources/META-INF/services folder.
  */
 public class ServiceLoaderResolverTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-    
-    @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ResolverProvider<ServiceLoaderResolver> provider = 
-                ServiceLoaderResolver.provider();
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ResolverProvider<ServiceLoaderResolver> provider = 
-                ServiceLoaderResolver.provider();
-
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
-        }
-    }
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
 
     @Nested
     class ResolveMethod {
@@ -52,10 +29,12 @@ public class ServiceLoaderResolverTests {
         void test1() {
             ServiceLoaderResolver resolver = resolverToTest();
             ProxyMethod javaVersionProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::javaVersion
+                ProxyInterface::javaVersion,
+                externalizedProperties(resolver)
             );
             ProxyMethod pathProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::path
+                ProxyInterface::path,
+                externalizedProperties(resolver)
             );
 
             Optional<String> javaVersion = resolver.resolve(
@@ -87,7 +66,8 @@ public class ServiceLoaderResolverTests {
         void test2() {
             ServiceLoaderResolver resolver = resolverToTest();
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::notFound
+                ProxyInterface::notFound,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
@@ -100,11 +80,15 @@ public class ServiceLoaderResolverTests {
         }
     }
 
-    private ServiceLoaderResolver resolverToTest() {
+    private static ServiceLoaderResolver resolverToTest() {
         return new ServiceLoaderResolver();
     }
+    
+    private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+        return ExternalizedProperties.builder().resolvers(resolvers).build();
+    }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("java.version")
         String javaVersion();
 

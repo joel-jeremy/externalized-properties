@@ -3,10 +3,9 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubResolver;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,158 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CompositeResolverTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
-        ExternalizedProperties.builder().withDefaults().build();
-
-    @Nested
-    class ProviderMethodWithVarArgsOverload {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ResolverProvider<CompositeResolver> provider = 
-                CompositeResolver.provider(StubResolver.provider());
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ResolverProvider<CompositeResolver> provider = 
-                CompositeResolver.provider(StubResolver.provider());
-
-            assertNotNull(
-                provider.get(EXTERNALIZED_PROPERTIES)
-            );
-        }
-    }
-
-    @Nested
-    class ProviderMethodWithCollectionOverload {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ResolverProvider<CompositeResolver> provider = 
-                CompositeResolver.provider(Arrays.asList(StubResolver.provider()));
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ResolverProvider<CompositeResolver> provider = 
-                CompositeResolver.provider(Arrays.asList(StubResolver.provider()));
-
-            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
-        }
-    }
-
-    @Nested
-    class FlattenedProviderMethodWithVarArgsOverload {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ResolverProvider<Resolver> provider = 
-                CompositeResolver.flattenedProvider(StubResolver.provider());
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ResolverProvider<Resolver> provider = 
-                CompositeResolver.flattenedProvider(StubResolver.provider());
-
-            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
-        }
-
-        @Test
-        @DisplayName("should return the flattened instance on get.")
-        void test3() {
-            ResolverProvider<Resolver> provider = 
-                CompositeResolver.flattenedProvider(StubResolver.provider());
-
-            Resolver resolver = provider.get(EXTERNALIZED_PROPERTIES);
-            assertNotNull(resolver);
-            assertTrue(resolver instanceof StubResolver);
-        }
-
-        @Test
-        @DisplayName(
-            "should return the composite resolver instance on get " +
-            "when there are multiple resolvers."
-        )
-        void test4() {
-            ResolverProvider<Resolver> provider = 
-                CompositeResolver.flattenedProvider(
-                    StubResolver.provider(),
-                    DefaultResolver.provider()
-                );
-
-            Resolver resolver = provider.get(EXTERNALIZED_PROPERTIES);
-            assertNotNull(resolver);
-            assertTrue(resolver instanceof CompositeResolver);
-        }
-    }
-
-    @Nested
-    class FlattenedProviderMethodWithCollectionOverload {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ResolverProvider<Resolver> provider = 
-                CompositeResolver.flattenedProvider(
-                    Arrays.asList(StubResolver.provider())
-                );
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ResolverProvider<Resolver> provider = 
-                CompositeResolver.flattenedProvider(
-                    Arrays.asList(StubResolver.provider())
-                );
-
-            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
-        }
-
-        @Test
-        @DisplayName("should return the single remaining resolver instance on get.")
-        void test3() {
-            ResolverProvider<Resolver> provider = 
-                CompositeResolver.flattenedProvider(
-                    Arrays.asList(StubResolver.provider())
-                );
-
-            Resolver resolver = provider.get(EXTERNALIZED_PROPERTIES);
-            assertNotNull(resolver);
-            assertTrue(resolver instanceof StubResolver);
-        }
-
-        @Test
-        @DisplayName(
-            "should return the composite resolver instance on get " +
-            "when there are multiple resolvers."
-        )
-        void test4() {
-            ResolverProvider<Resolver> provider = 
-                CompositeResolver.flattenedProvider(Arrays.asList(
-                    StubResolver.provider(),
-                    DefaultResolver.provider()
-                ));
-
-            Resolver resolver = provider.get(EXTERNALIZED_PROPERTIES);
-            assertNotNull(resolver);
-            assertTrue(resolver instanceof CompositeResolver);
-        }
-    }
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
 
     @Nested
     class FromMethod {
@@ -343,7 +192,8 @@ public class CompositeResolverTests {
             
             CompositeResolver compositeResolver = resolverToTest(resolver);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result = compositeResolver.resolve(proxyMethod, "property");
@@ -376,7 +226,8 @@ public class CompositeResolverTests {
                 resolver2
             );
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(compositeResolver)
             );
 
             Optional<String> result = compositeResolver.resolve(
@@ -418,7 +269,8 @@ public class CompositeResolverTests {
                 resolver3
             );
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property2
+                ProxyInterface::property2,
+                externalizedProperties(compositeResolver)
             );
 
             // Should resolve from resolver2.
@@ -467,7 +319,8 @@ public class CompositeResolverTests {
                 resolver3
             );
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property1
+                ProxyInterface::property1,
+                externalizedProperties(compositeResolver)
             );
 
             Optional<String> result = compositeResolver.resolve(proxyMethod, "property.1");
@@ -505,11 +358,15 @@ public class CompositeResolverTests {
         }
     }
 
-    private CompositeResolver resolverToTest(Resolver... resolvers) {
+    private static CompositeResolver resolverToTest(Resolver... resolvers) {
         return CompositeResolver.from(resolvers);
     }
+    
+    private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+        return ExternalizedProperties.builder().resolvers(resolvers).build();
+    }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("property")
         String property();
 

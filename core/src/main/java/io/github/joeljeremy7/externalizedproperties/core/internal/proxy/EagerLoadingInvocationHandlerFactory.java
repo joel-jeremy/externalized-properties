@@ -15,9 +15,9 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  * The factory for {@link EagerLoadingInvocationHandler}.
  */
 public class EagerLoadingInvocationHandlerFactory 
-        implements InvocationHandlerFactory<EagerLoadingInvocationHandler> {
+        implements InvocationHandlerFactory {
 
-    private final InvocationHandlerFactory<?> decorated;
+    private final InvocationHandlerFactory decorated;
     private final CacheStrategy<Method, Object> cacheStrategy;
 
     /**
@@ -33,7 +33,7 @@ public class EagerLoadingInvocationHandlerFactory
      * @see WeakHashMapCacheStrategy
      */
     public EagerLoadingInvocationHandlerFactory(
-            InvocationHandlerFactory<?> decorated,
+            InvocationHandlerFactory decorated,
             CacheStrategy<Method, Object> cacheStrategy
     ) {
         this.decorated = requireNonNull(decorated, "decorated");
@@ -43,12 +43,18 @@ public class EagerLoadingInvocationHandlerFactory
     /** {@inheritDoc} */
     @Override
     public EagerLoadingInvocationHandler create(
-            Resolver resolver, 
-            Converter<?> converter,
-            Class<?> proxyInterface
+            Class<?> proxyInterface,
+            Resolver rootResolver,
+            Converter<?> rootConverter,
+            ProxyMethodFactory proxyMethodFactory
     ) {
         return EagerLoadingInvocationHandler.eagerLoad(
-            decorated.create(resolver, converter, proxyInterface),
+            decorated.create(
+                proxyInterface, 
+                rootResolver,
+                rootConverter,
+                proxyMethodFactory    
+            ),
             cacheStrategy,
             proxyInterface
         );

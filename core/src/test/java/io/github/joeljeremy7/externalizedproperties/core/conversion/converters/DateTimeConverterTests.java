@@ -1,13 +1,11 @@
 package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.DateTimeFormat;
-import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,40 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DateTimeConverterTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-
-    @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ConverterProvider<DateTimeConverter> provider = 
-                DateTimeConverter.provider();
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ConverterProvider<DateTimeConverter> provider = 
-                DateTimeConverter.provider();
-            
-            ExternalizedProperties externalizedProperties = 
-                ExternalizedProperties.builder()
-                    .withDefaultResolvers()
-                    .converters(provider)
-                    .build();
-            
-            assertNotNull(
-                provider.get(
-                    externalizedProperties,
-                    new RootConverter(externalizedProperties, provider)
-                )
-            );
-        }
-    }
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
 
     @Nested
     class CanConvertMethod {
@@ -185,7 +151,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::localDateTime
+                ProxyInterface::localDateTime,
+                externalizedProperties(converter)
             );
             
             LocalDateTime input = LocalDateTime.of(2022, 12, 19, 12, 30, 0);
@@ -208,7 +175,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::localDate
+                ProxyInterface::localDate,
+                externalizedProperties(converter)
             );
             LocalDate input = LocalDate.of(2022, 12, 19);
             String localDateString = input.toString();
@@ -231,7 +199,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::localTime
+                ProxyInterface::localTime,
+                externalizedProperties(converter)
             );
             
             LocalTime input = LocalTime.of(12, 30, 0);
@@ -254,7 +223,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::offsetDateTime
+                ProxyInterface::offsetDateTime,
+                externalizedProperties(converter)
             );
             
             OffsetDateTime input = OffsetDateTime.of(
@@ -281,7 +251,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::offsetTime
+                ProxyInterface::offsetTime,
+                externalizedProperties(converter)
             );
             
             OffsetTime input = OffsetTime.of( 
@@ -307,7 +278,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::zonedDateTime
+                ProxyInterface::zonedDateTime,
+                externalizedProperties(converter)
             );
             
             ZonedDateTime input = ZonedDateTime.of(
@@ -334,7 +306,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::instant
+                ProxyInterface::instant,
+                externalizedProperties(converter)
             );
             
             Instant input = Instant.now();
@@ -357,7 +330,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::dayOfWeek
+                ProxyInterface::dayOfWeek,
+                externalizedProperties(converter)
             );
             
             DayOfWeek input = DayOfWeek.SUNDAY;
@@ -380,7 +354,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::month
+                ProxyInterface::month,
+                externalizedProperties(converter)
             );
             
             Month input = Month.AUGUST;
@@ -403,7 +378,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::monthDay
+                ProxyInterface::monthDay,
+                externalizedProperties(converter)
             );
             
             MonthDay input = MonthDay.of(Month.DECEMBER, 19);
@@ -426,7 +402,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::year
+                ProxyInterface::year,
+                externalizedProperties(converter)
             );
             
             Year input = Year.of(2022);
@@ -449,7 +426,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::yearMonth
+                ProxyInterface::yearMonth,
+                externalizedProperties(converter)
             );
             
             YearMonth input = YearMonth.of(2022, Month.AUGUST);
@@ -472,7 +450,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
             
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::notSupportedNotADateTimeClass
+                ProxyInterface::notSupportedNotADateTimeClass,
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> result = converter.convert(
@@ -493,7 +472,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::localDateTimeCustomFormat
+                ProxyInterface::localDateTimeCustomFormat,
+                externalizedProperties(converter)
             );
             
             LocalDateTime input = LocalDateTime.of(2022, 12, 19, 12, 30, 0);
@@ -517,7 +497,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::localDateCustomFormat
+                ProxyInterface::localDateCustomFormat,
+                externalizedProperties(converter)
             );
             
             LocalDate input = LocalDate.of(2022, 12, 19);
@@ -541,7 +522,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::localTimeCustomFormat
+                ProxyInterface::localTimeCustomFormat,
+                externalizedProperties(converter)
             );
             
             LocalTime input = LocalTime.of(12, 30, 0);
@@ -565,7 +547,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::offsetDateTimeCustomFormat
+                ProxyInterface::offsetDateTimeCustomFormat,
+                externalizedProperties(converter)
             );
             
             OffsetDateTime input = OffsetDateTime.of(
@@ -593,7 +576,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::offsetTimeCustomFormat
+                ProxyInterface::offsetTimeCustomFormat,
+                externalizedProperties(converter)
             );
             
             OffsetTime input = OffsetTime.of( 
@@ -620,7 +604,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::zonedDateTimeCustomFormat
+                ProxyInterface::zonedDateTimeCustomFormat,
+                externalizedProperties(converter)
             );
             
             ZonedDateTime input = ZonedDateTime.of(
@@ -649,7 +634,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::monthDayCustomFormat
+                ProxyInterface::monthDayCustomFormat,
+                externalizedProperties(converter)
             );
             
             MonthDay input = MonthDay.of(Month.DECEMBER, 19);
@@ -673,7 +659,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::yearCustomFormat
+                ProxyInterface::yearCustomFormat,
+                externalizedProperties(converter)
             );
             
             Year input = Year.of(2022);
@@ -696,7 +683,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::yearMonthCustomFormat
+                ProxyInterface::yearMonthCustomFormat,
+                externalizedProperties(converter)
             );
             
             YearMonth input = YearMonth.of(2022, Month.AUGUST);
@@ -720,7 +708,8 @@ public class DateTimeConverterTests {
             DateTimeConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::notSupportedNotADateTimeClass
+                ProxyInterface::notSupportedNotADateTimeClass,
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> result = converter.convert(
@@ -732,11 +721,20 @@ public class DateTimeConverterTests {
         }
     }
 
-    private DateTimeConverter converterToTest() {
+    private static DateTimeConverter converterToTest() {
         return new DateTimeConverter();
     }
 
-    public static interface ProxyInterface {
+    private static ExternalizedProperties externalizedProperties(
+            DateTimeConverter converterToTest
+    ) {
+        return ExternalizedProperties.builder()
+            .enableDefaultResolvers()
+            .converters(converterToTest)
+            .build();
+    }
+
+    static interface ProxyInterface {
         @ExternalizedProperty("property.localdatetime")
         LocalDateTime localDateTime();
 

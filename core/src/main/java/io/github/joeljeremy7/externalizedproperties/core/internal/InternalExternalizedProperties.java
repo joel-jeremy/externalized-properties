@@ -1,14 +1,18 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal;
 
+import io.github.joeljeremy7.externalizedproperties.core.Convert;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
+import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
+import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.ProxyMethodFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandlerFactory;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -16,46 +20,47 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  * The default {@link ExternalizedProperties} implementation.
  */
 public class InternalExternalizedProperties implements ExternalizedProperties {
-
-    private final ResolverProvider<RootResolver> rootResolverProvider;
-    private final RootConverter.Provider rootConverterProvider;
-    private final InvocationHandlerFactory<?> invocationHandlerFactory;
+    private final RootResolver rootResolver;
+    private final RootConverter rootConverter;
+    private final InvocationHandlerFactory invocationHandlerFactory;
+    private final ProxyMethodFactory proxyMethodFactory;
 
     /**
      * Constructor.
      * 
-     * @param rootResolverProvider The root resolver provider.
-     * @param rootConverterProvider The root converter provider.
+     * @param rootResolver The root resolver.
+     * @param rootConverter The root converter.
      * @param invocationHandlerFactory The invocation handler factory.
      */
     public InternalExternalizedProperties(
-            ResolverProvider<RootResolver> rootResolverProvider,
-            RootConverter.Provider rootConverterProvider,
-            InvocationHandlerFactory<?> invocationHandlerFactory
+            RootResolver rootResolver,
+            RootConverter rootConverter,
+            InvocationHandlerFactory invocationHandlerFactory
     ) {
-        requireNonNull(rootResolverProvider, "rootResolverProvider");
-        requireNonNull(rootConverterProvider, "rootConverterProvider");
+        requireNonNull(rootResolver, "rootResolver");
+        requireNonNull(rootConverter, "rootConverter");
         requireNonNull(invocationHandlerFactory, "invocationHandlerFactory");
-        this.rootResolverProvider = ResolverProvider.memoize(rootResolverProvider);
-        this.rootConverterProvider = RootConverter.Provider.memoize(rootConverterProvider);
+        this.rootResolver = rootResolver;
+        this.rootConverter = rootConverter;
         this.invocationHandlerFactory = invocationHandlerFactory;
+        this.proxyMethodFactory = new ProxyMethodFactory(this);
     }
 
     /** {@inheritDoc} */
     @Override
-    public <T> T proxy(Class<T> proxyInterface) {
+    public <T> T initialize(Class<T> proxyInterface) {
         requireNonNull(proxyInterface, "proxyInterface");
-        return proxy(proxyInterface, proxyInterface.getClassLoader());
+        return initialize(proxyInterface, proxyInterface.getClassLoader());
     }
 
     /** {@inheritDoc} */
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T proxy(Class<T> proxyInterface, ClassLoader classLoader) {
+    public <T> T initialize(Class<T> proxyInterface, ClassLoader classLoader) {
         requireNonNull(proxyInterface, "proxyInterface");
         requireNonNull(classLoader, "classLoader");
 
-        // Validate everything at init time so we can safely skip checks
+        // Try to validate everything at init time so we can safely skip checks
         // later at resolve time for performance.
         validate(proxyInterface);
         
@@ -63,9 +68,10 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
             classLoader, 
             new Class<?>[] { proxyInterface },
             invocationHandlerFactory.create(
-                rootResolverProvider.get(this), 
-                rootConverterProvider.get(this), 
-                proxyInterface
+                proxyInterface,
+                rootResolver,
+                rootConverter,
+                proxyMethodFactory
             )
         );
     }
@@ -74,6 +80,7 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         for (Method proxyMethod : proxyInterface.getMethods()) {
             throwIfVoidReturnType(proxyMethod);
             throwIfInvalidMethodSignature(proxyMethod);
+            throwIfInvalidConvertMethodSignature(proxyMethod);
         }
     }
 
@@ -107,6 +114,52 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         if (!String.class.equals(parameterType)) {
             throw new IllegalArgumentException(
                 "Proxy method must have a single String parameter."
+            );
+        }
+    }
+
+    private void throwIfInvalidConvertMethodSignature(Method proxyMethod) {
+        if (!proxyMethod.isAnnotationPresent(Convert.class)) {
+            return;
+        }
+
+        Class<?>[] parameterTypes = proxyMethod.getParameterTypes();
+        if (parameterTypes.length != 2) {
+            throw new IllegalArgumentException(
+                String.format(
+                    "Proxy methods annotated with @%s must have 2 parameters.", 
+                    Convert.class.getSimpleName()
+                )
+            );
+        }
+
+        Class<?> firstParamType = parameterTypes[0];
+        if (!String.class.equals(firstParamType)) {
+            throw new IllegalArgumentException(
+                String.format(
+                    "Proxy methods annotated with @%s must have " + 
+                    "%s as first parameter.", 
+                    Convert.class.getSimpleName(),
+                    String.class.getName()
+                )
+            );
+        }
+
+        Class<?> secondParamType = parameterTypes[1];
+        if (!TypeReference.class.equals(secondParamType) &&
+                !Class.class.equals(secondParamType) &&
+                !Type.class.equals(secondParamType)) {
+            throw new IllegalArgumentException(
+                String.format(
+                    "Proxy methods annotated with @%s must have one of the following " + 
+                    "as second parameter: %s", 
+                    Convert.class.getSimpleName(),
+                    Arrays.asList(
+                        TypeReference.class.getName(),
+                        Class.class.getName(),
+                        Type.class.getName()
+                    )
+                )
             );
         }
     }

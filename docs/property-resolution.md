@@ -20,6 +20,8 @@ public interface ApplicationProperties {
 }
 ```
 
+(Kindly see [@ExternalizedProperty](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java) documentation to learn more about the rules of defining an externalized property method.)
+
 We can initialize and start resolving external configurations/properties by:
 
 ```java
@@ -27,7 +29,7 @@ public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = buildExternalizedProperties();
 
     // Proxied interface.
-    ApplicationProperties props = externalizedProperties.proxy(ApplicationProperties.class);
+    ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
 
     // Use properties.
     String javaHome = props.javaHome();
@@ -37,10 +39,10 @@ public static void main(String[] args) {
 private static ExternalizedProperties buildExternalizedProperties() {
     // Default resolvers include system properties and environment variable resolvers.
     return ExternalizedProperties.builder()
-        .withDefaults() 
+        .defaults() 
         .resolvers(
-            ResourceResolver.provider(getClass().getResource("/app.properties")),
-            ResolverProvider.of(new CustomAwsSsmResolver(buildAwsSsmClient()))
+            new ResourceResolver(getClass().getResource("/app.properties")),
+            new CustomAwsSsmResolver(buildAwsSsmClient())
         ) 
         .build();
 }
@@ -68,7 +70,7 @@ public interface ApplicationProperties {
 }
 ```
 
-## 🌟 Non-static Property Names
+## 🌟 Non-static/Dynamic Property Names
 
 Externalized Properties supports resolution of properties whose names are not known at compile time e.g.
 
@@ -109,14 +111,14 @@ If custom variable expansion is required, the default variable expander can be o
 ```java
 public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .withDefaults() 
+        .defaults() 
         .variableExpander(
             // Format: #(variable)
-            SimpleVariableExpander.provider("#(", ")")
+            new SimpleVariableExpander("#(", ")")
         )
         .build();
     
-    ApplicationProperties appProperties = externalizedProperties.proxy(ApplicationProperties.class);
+    ApplicationProperties appProperties = externalizedProperties.initialize(ApplicationProperties.class);
 }
 ```
 
@@ -133,17 +135,17 @@ Caching is enabled by default, but when not using defaults, it can be enabled vi
 ```java
 public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .withDefaults() 
+        .defaults() 
+        // Cache initialized proxy instances.
+        .enableInitializeCaching()
         // Cache results of proxy method invocations.
-        .withProxyInvocationCaching()
-        // Cache proxy instances.
-        .withProxyCaching()
+        .enableInvocationCaching()
         // Default is 30 minutes.
-        .withCacheDuration(Duration.ofMinutes(10))
+        .cacheDuration(Duration.ofMinutes(10))
         .build();
     
     // This proxy will cache any resolved properties.
-    ApplicationProperties appProperties = externalizedProperties.proxy(ApplicationProperties.class);
+    ApplicationProperties appProperties = externalizedProperties.initialize(ApplicationProperties.class);
 }
 ```
 
@@ -154,14 +156,14 @@ Eager loading is opt-in and can be enabled via `ExternalizedProperties.Builder`.
 ```java
 private static void main(String[] args) {
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .withDefaults() 
+        .defaults() 
         // Eager load properties.
-        .withProxyEagerLoading()
+        .enableEagerLoading()
         // Default is 30 minutes.
-        .withCacheDuration(Duration.ofMinutes(10))
+        .cacheDuration(Duration.ofMinutes(10))
         .build();
 
     // This proxy should already have its properties loaded.
-    ApplicationProperties appProperties = externalizedProperties.proxy(ApplicationProperties.class);
+    ApplicationProperties appProperties = externalizedProperties.initialize(ApplicationProperties.class);
 }
 ```

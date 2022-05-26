@@ -25,35 +25,48 @@ import java.util.List;
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * The core API for Externalized Properties.
+ * The core API for Externalized Properties. This provides methods to initialize proxies that
+ * will redirect method invocations to Externalized Properties. The annotation provided by
+ * Externalized Properties will define how certain method invocations will be handled.
+ * 
+ * @see ExternalizedProperty
+ * @see Convert
  */
 public interface ExternalizedProperties {
     /**
-     * Create a proxy that handles property resolution according to the invoked method.
+     * Initialize a proxy whose method invocations will be redirected to Externalized Properties.
      * 
-     * @param <T> The type of the proxy interface.
-     * @param proxyInterface The proxy interface whose methods are annotated with 
-     * {@link ExternalizedProperty}. Only interfaces will be accepted. 
-     * If a non-interface class is given, an exception will be thrown. 
-     * @return The proxy instance implementing the specified interface.
-     */
-    <T> T proxy(Class<T> proxyInterface);
-
-    /**
-     * Create a proxy that handles property resolution according to the invoked method.
+     * @implNote Only interface types will be accepted. If a non-interface type is provided, 
+     * an exception will be thrown. 
      * 
      * @implNote The names specified in the {@link ExternalizedProperty} supports variables
-     * e.g. "${my.variable}.property". These variables will be expanded accordingly.
+     * e.g. <code>"${my.variable}.property"</code>. These variables will be expanded accordingly.
      * 
-     * @param <T> The type of the proxy interface.
-     * @param proxyInterface The interface whose methods are annotated with 
-     * {@link ExternalizedProperty}. Only an interface will be accepted. 
-     * If a non-interface is given, an exception will be thrown. 
-     * 
-     * @param classLoader The class loader to define the proxy class in.
-     * @return The proxy instance implementing the specified interface.
+     * @param <T> The type to create a proxy for.
+     * @param proxyInterface The type to create a proxy for. The initialized proxy's method 
+     * invocations will be redirected to Externalized Properties.
+     * @return The initialized proxy whose method invocations will be redirected to 
+     * Externalized Properties.
      */
-    <T> T proxy(Class<T> proxyInterface, ClassLoader classLoader);
+    <T> T initialize(Class<T> proxyInterface);
+
+    /**
+     * Initialize a proxy whose method invocations will be redirected to Externalized Properties.
+     * 
+     * @implNote Only interface types will be accepted. If a non-interface type is provided, 
+     * an exception will be thrown. 
+     * 
+     * @implNote The names specified in the {@link ExternalizedProperty} supports variables
+     * e.g. <code>"${my.variable}.property"</code>. These variables will be expanded accordingly.
+     * 
+     * @param <T> The type to create a proxy for.
+     * @param proxyInterface The type to create a proxy for. The initialized proxy's method 
+     * invocations will be redirected to Externalized Properties.
+     * @param classLoader The class loader to define the generated class in.
+     * @return The initialized proxy whose method invocations will be redirected to 
+     * Externalized Properties.
+     */
+    <T> T initialize(Class<T> proxyInterface, ClassLoader classLoader);
 
     /**
      * Create a new {@link Builder} to facilitate building of an
@@ -69,61 +82,60 @@ public interface ExternalizedProperties {
      * Builder for {@link ExternalizedProperties}.
      */
     public static class Builder {
-        private final List<ResolverProvider<?>> resolverProviders = new ArrayList<>();
-        private final List<ConverterProvider<?>> converterProviders = new ArrayList<>();
-        private final List<ProcessorProvider<?>> processorProviders = new ArrayList<>();
-        private VariableExpanderProvider<?> variableExpanderProvider = 
-            SimpleVariableExpander.provider();
+        private final List<Converter<?>> converters = new ArrayList<>();
+        private final List<Processor> processors = new ArrayList<>();
+        private final List<Resolver> resolvers = new ArrayList<>();
+        private VariableExpander variableExpander = new SimpleVariableExpander();
         
         // Caching settings.
         private Duration cacheDuration = getDefaultCacheDuration();
-        private boolean withProxyEagerLoading = false;
-        private boolean withProxyCaching = false;
-        private boolean withProxyInvocationCaching = false;
+        private boolean enableEagerLoading = false;
+        private boolean enableInitializeCaching = false;
+        private boolean enableInvocationCaching = false;
 
         // Default settings.
-        private boolean withDefaultResolvers = false;
-        private boolean withDefaultConverters = false;
+        private boolean enableDefaultResolvers = false;
+        private boolean enableDefaultConverters = false;
 
         /**
          * Enable default configurations.
          * 
          * @return This builder.
          */
-        public Builder withDefaults() {
-            return withDefaultResolvers()
-                .withDefaultConverters()
-                .withProxyCaching()
-                .withProxyInvocationCaching();
+        public Builder defaults() {
+            return enableDefaultResolvers()
+                .enableDefaultConverters()
+                .enableInitializeCaching()
+                .enableInvocationCaching();
         }
 
         /**
-         * Adds the default resolvers to the registered {@link Resolver}s.
+         * Enable the default resolvers.
          * 
          * @return This builder.
          */
-        public Builder withDefaultResolvers() {
-            this.withDefaultResolvers = true;
+        public Builder enableDefaultResolvers() {
+            this.enableDefaultResolvers = true;
             return this;
         }
 
         /**
-         * Adds the default converters to the registered {@link Converter}s.
+         * Enable the default converters.
          * 
          * @return This builder.
          */
-        public Builder withDefaultConverters() {
-            this.withDefaultConverters = true;
+        public Builder enableDefaultConverters() {
+            this.enableDefaultConverters = true;
             return this;
         }
 
         /**
-         * Enable caching of proxy instances (per proxy interface).
+         * Enable caching of initialized instances (per proxy interface).
          * 
          * @return This builder.
          */
-        public Builder withProxyCaching() {
-            this.withProxyCaching = true;
+        public Builder enableInitializeCaching() {
+            this.enableInitializeCaching = true;
             return this;
         }
 
@@ -132,19 +144,18 @@ public interface ExternalizedProperties {
          * 
          * @return This builder.
          */
-        public Builder withProxyInvocationCaching() {
-            this.withProxyInvocationCaching = true;
+        public Builder enableInvocationCaching() {
+            this.enableInvocationCaching = true;
             return this;
         }
 
         /**
-         * Eagerly resolve property values of proxy interface methods marked with 
-         * {@link ExternalizedProperty} annotation.
+         * Eagerly resolve property values for candidate proxy methods.
          * 
          * @return This builder.
          */
-        public Builder withProxyEagerLoading() {
-            this.withProxyEagerLoading = true;
+        public Builder enableEagerLoading() {
+            this.enableEagerLoading = true;
             return this;
         }
 
@@ -154,101 +165,90 @@ public interface ExternalizedProperties {
          * @param cacheDuration The duration of caches before being reloaded.
          * @return This builder.
          */
-        public Builder withCacheDuration(Duration cacheDuration) {
+        public Builder cacheDuration(Duration cacheDuration) {
             this.cacheDuration = requireNonNull(cacheDuration, "cacheDuration");
             return this;
         }
 
         /**
-         * The array of {@link ResolverProvider}s to provide resolver instances
+         * The array of {@link Resolver}s to provide resolver instances
          * to resolve properties from.
          * 
-         * @param resolverProviders The resolver providers.
+         * @param resolvers The resolvers to resolve properties from.
          * @return This builder.
          */
-        public Builder resolvers(ResolverProvider<?>... resolverProviders) {
-            requireNonNull(resolverProviders, "resolverProviders");
-            return resolvers(Arrays.asList(resolverProviders));
+        public Builder resolvers(Resolver... resolvers) {
+            requireNonNull(resolvers, "resolvers");
+            return resolvers(Arrays.asList(resolvers));
         }
 
         /**
-         * The collection of {@link ResolverProvider}s to provide resolver instances
-         * to resolve properties from.
+         * The collection of {@link Resolver}s to resolve properties from.
          * 
-         * @param resolverProviders The resolver providers.
+         * @param resolvers The resolvers to resolve properties from.
          * @return This builder.
          */
-        public Builder resolvers(Collection<ResolverProvider<?>> resolverProviders) {
-            requireNonNull(resolverProviders, "resolverProviders");
-            this.resolverProviders.addAll(resolverProviders);
+        public Builder resolvers(Collection<Resolver> resolvers) {
+            requireNonNull(resolvers, "resolvers");
+            this.resolvers.addAll(resolvers);
             return this;
         }
 
         /**
-         * The array of {@link ConverterProvider}s to provide converters.
+         * The array of {@link Converter}s to register.
          * 
-         * @param converterProviders The converter providers.
+         * @param converters The converters to register.
          * @return This builder.
          */
-        public Builder converters(
-                ConverterProvider<?>... converterProviders
-        ) {
-            requireNonNull(converterProviders, "converterProviders");
-            return converters(Arrays.asList(converterProviders));
+        public Builder converters(Converter<?>... converters) {
+            requireNonNull(converters, "converters");
+            return converters(Arrays.asList(converters));
         }
 
         /**
-         * The collection of {@link ConverterProvider}s to provide converters.
+         * The collection of {@link Converter}s to register.
          * 
-         * @param converterProviders The converter providers.
+         * @param converters The converter providers.
          * @return This builder.
          */
-        public Builder converters(
-                Collection<ConverterProvider<?>> converterProviders
-        ) {
-            requireNonNull(converterProviders, "converterProviders");
-            this.converterProviders.addAll(converterProviders);
+        public Builder converters(Collection<Converter<?>> converters) {
+            requireNonNull(converters, "converters");
+            this.converters.addAll(converters);
             return this;
         }
 
         /**
-         * The array of {@link ProcessorProvider}s to register.
+         * The array of {@link Processor}s to register.
          * 
-         * @param processorProviders The processor providers to register.
+         * @param processors The processor to register.
          * @return This builder.
          */
-        public Builder processors(
-                ProcessorProvider<?>... processorProviders
-        ) {
-            requireNonNull(processorProviders, "processorProviders");
-            return processors(Arrays.asList(processorProviders));
+        public Builder processors(Processor... processors) {
+            requireNonNull(processors, "processors");
+            return processors(Arrays.asList(processors));
         }
 
         /**
-         * The collection of {@link ProcessorProvider}s to register.
+         * The collection of {@link Processor}s to register.
          * 
-         * @param processorProviders The processors to register.
+         * @param processors The processors to register.
          * @return This builder.
          */
-        public Builder processors(
-                Collection<ProcessorProvider<?>> processorProviders
-        ) {
-            requireNonNull(processorProviders, "processorProviders");
-            this.processorProviders.addAll(processorProviders);
+        public Builder processors(Collection<Processor> processors) {
+            requireNonNull(processors, "processors");
+            this.processors.addAll(processors);
             return this;
         }
 
         /**
-         * The {@link VariableExpanderProvider} to register.
+         * The {@link VariableExpander} to register.
          * 
-         * @param variableExpanderProvider The variable expander provider to register.
+         * @param variableExpander The {@link VariableExpander} to register.
          * @return This builder.
          */
-        public Builder variableExpander(
-                VariableExpanderProvider<?> variableExpanderProvider
-        ) {
-            requireNonNull(variableExpanderProvider, "variableExpanderProvider");
-            this.variableExpanderProvider = variableExpanderProvider;
+        public Builder variableExpander(VariableExpander variableExpander) {
+            requireNonNull(variableExpander, "variableExpander");
+            this.variableExpander = variableExpander;
             return this;
         }
 
@@ -258,17 +258,17 @@ public interface ExternalizedProperties {
          * @return The built {@link InternalExternalizedProperties} instance.
          */
         public ExternalizedProperties build() {
-            ResolverProvider<RootResolver> rootResolverProvider = buildRootResolverProvider();
-            RootConverter.Provider rootConverterProvider = buildRootConverterProvider();
-            InvocationHandlerFactory<?> invocationHandlerFactory = buildInvocationHandlerFactory();
+            RootResolver rootResolver = buildRootResolver();
+            RootConverter rootConverter = buildRootConverter();
+            InvocationHandlerFactory invocationHandlerFactory = buildInvocationHandlerFactory();
 
             ExternalizedProperties externalizedProperties = new InternalExternalizedProperties(
-                rootResolverProvider, 
-                rootConverterProvider,
+                rootResolver, 
+                rootConverter,
                 invocationHandlerFactory
             );
 
-            if (withProxyCaching) {
+            if (enableInitializeCaching) {
                 return new CachingExternalizedProperties(
                     externalizedProperties,
                     new ExpiringCacheStrategy<>(
@@ -281,18 +281,18 @@ public interface ExternalizedProperties {
             return externalizedProperties;
         }
 
-        private InvocationHandlerFactory<?> buildInvocationHandlerFactory() {
+        private InvocationHandlerFactory buildInvocationHandlerFactory() {
             // Default invocation handler factory.
-            InvocationHandlerFactory<?> base = 
+            InvocationHandlerFactory base = 
                 new ExternalizedPropertiesInvocationHandlerFactory();
 
-            InvocationHandlerFactory<?> factory = base;
+            InvocationHandlerFactory factory = base;
 
             // Shared cache strategy.
             CacheStrategy<Method, Object> propertiesByMethodCache =
                 new WeakConcurrentHashMapCacheStrategy<>();
             
-            if (withProxyEagerLoading) {
+            if (enableEagerLoading) {
                 // Decorate with EagerLoadingInvocationHandler.
                 factory = new EagerLoadingInvocationHandlerFactory(
                     factory, 
@@ -303,7 +303,7 @@ public interface ExternalizedProperties {
                 );
             }
 
-            if (withProxyInvocationCaching) {
+            if (enableInvocationCaching) {
                 // Decorate with CachingInvocationHandler.
                 factory = new CachingInvocationHandlerFactory(
                     factory, 
@@ -317,36 +317,36 @@ public interface ExternalizedProperties {
             return factory;
         }
 
-        private ResolverProvider<RootResolver> buildRootResolverProvider() {
+        private RootResolver buildRootResolver() {
             // Add default resolvers last.
             // Custom resolvers always take precedence.
-            if (withDefaultResolvers) {
-                resolvers(DefaultResolver.provider());
+            if (enableDefaultResolvers) {
+                resolvers(new DefaultResolver());
             }
 
-            if (resolverProviders.isEmpty()) {
+            if (resolvers.isEmpty()) {
                 throw new IllegalStateException("At least one resolver is required.");
             }
 
-            return RootResolver.provider(
-                resolverProviders, 
-                buildRootProcessorProvider(), 
-                variableExpanderProvider
+            return new RootResolver(
+                resolvers, 
+                buildRootProcessor(), 
+                variableExpander
             );
         }
 
-        private RootConverter.Provider buildRootConverterProvider() {
+        private RootConverter buildRootConverter() {
             // Add default converters last.
             // Custom converters always take precedence.
-            if (withDefaultConverters) {
-                converters(DefaultConverter.provider());
+            if (enableDefaultConverters) {
+                converters(new DefaultConverter());
             }
             
-            return RootConverter.provider(converterProviders);
+            return new RootConverter(converters);
         }
 
-        private ProcessorProvider<RootProcessor> buildRootProcessorProvider() {
-            return RootProcessor.provider(processorProviders);
+        private RootProcessor buildRootProcessor() {
+            return new RootProcessor(processors);
         }
 
         private Duration getDefaultCacheDuration() {

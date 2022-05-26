@@ -37,21 +37,21 @@ public abstract class VariableExpansionBenchmarks {
     
             ExternalizedProperties withSimpleVariableExpander = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(propertySource))
-                    .variableExpander(SimpleVariableExpander.provider())
+                    .resolvers(new MapResolver(propertySource))
+                    .variableExpander(new SimpleVariableExpander())
                     .build();
 
             proxyWithSimpleVariableExpander = 
-                withSimpleVariableExpander.proxy(VariableExpansionProxyInterface.class);
+                withSimpleVariableExpander.initialize(VariableExpansionProxyInterface.class);
 
             ExternalizedProperties withPatternVariableExpander = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(propertySource))
-                    .variableExpander(PatternVariableExpander.provider())
+                    .resolvers(new MapResolver(propertySource))
+                    .variableExpander(new PatternVariableExpander())
                     .build();
 
             proxyWithPatternVariableExpander = 
-                withPatternVariableExpander.proxy(VariableExpansionProxyInterface.class);
+                withPatternVariableExpander.initialize(VariableExpansionProxyInterface.class);
         }
     }
 

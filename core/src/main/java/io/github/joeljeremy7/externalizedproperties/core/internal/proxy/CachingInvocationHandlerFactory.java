@@ -15,9 +15,9 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  * The factory for {@link CachingInvocationHandler}.
  */
 public class CachingInvocationHandlerFactory 
-    implements InvocationHandlerFactory<CachingInvocationHandler> {
+    implements InvocationHandlerFactory {
 
-    private final InvocationHandlerFactory<?> decorated;
+    private final InvocationHandlerFactory decorated;
     private final CacheStrategy<Method, Object> cacheStrategy;
 
     /**
@@ -33,7 +33,7 @@ public class CachingInvocationHandlerFactory
      * @see WeakHashMapCacheStrategy
      */
     public CachingInvocationHandlerFactory(
-            InvocationHandlerFactory<?> decorated,
+            InvocationHandlerFactory decorated,
             CacheStrategy<Method, Object> cacheStrategy
     ) {
         this.decorated = requireNonNull(decorated, "decorated");
@@ -43,15 +43,20 @@ public class CachingInvocationHandlerFactory
     /** {@inheritDoc} */
     @Override
     public CachingInvocationHandler create(
-            Resolver resolver, 
-            Converter<?> converter,
-            Class<?> proxyInterface
+            Class<?> proxyInterface,
+            Resolver rootResolver,
+            Converter<?> rootConverter,
+            ProxyMethodFactory proxyMethodFactory
     ) { 
         return new CachingInvocationHandler(
-            decorated.create(resolver, converter, proxyInterface),
+            decorated.create(
+                proxyInterface, 
+                rootResolver, 
+                rootConverter, 
+                proxyMethodFactory
+            ),
             cacheStrategy,
             proxyInterface
         );
     }
-    
 }

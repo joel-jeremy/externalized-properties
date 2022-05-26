@@ -1,12 +1,8 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal.resolvers;
 
-import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
-import io.github.joeljeremy7.externalizedproperties.core.ProcessorProvider;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
-import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderProvider;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.CompositeResolver;
@@ -26,10 +22,9 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  * registered resolvers, and processing resolved properties via the registered processors.
  */
 public class RootResolver implements Resolver {
-    private final ExternalizedProperties externalizedProperties;
-    private final ResolverProvider<?> resolverProvider;
-    private final ProcessorProvider<?> rootProcessorProvider;
-    private final VariableExpanderProvider<?> variableExpanderProvider;
+    private final Resolver resolver;
+    private final RootProcessor rootProcessor;
+    private final VariableExpander variableExpander;
 
     /**
      * Constructor.
@@ -37,56 +32,22 @@ public class RootResolver implements Resolver {
      * @apiNote If ordering of resolvers is important, callers of this constructor must use a 
      * {@link Collection} implementation that supports ordering such as {@link List}.
      * 
-     * @param externalizedProperties The {@link ExternalizedProperties} instance.
-     * @param resolverProviders The collection of {@link ResolverProvider}s to provide resolver
-     * instances to resolve properties from.
-     * @param rootProcessorProvider The root processor provider.
-     * @param variableExpanderProvider The variable expander provider.
+     * @param resolvers The collection of {@link Resolver}s to resolve properties from.
+     * @param rootProcessor The root processor.
+     * @param variableExpander The variable expander.
      */
     public RootResolver(
-            ExternalizedProperties externalizedProperties,
-            Collection<ResolverProvider<?>> resolverProviders,
-            ProcessorProvider<RootProcessor> rootProcessorProvider,
-            VariableExpanderProvider<?> variableExpanderProvider
+            Collection<Resolver> resolvers,
+            RootProcessor rootProcessor,
+            VariableExpander variableExpander
     ) {
-        requireNonNull(externalizedProperties, "externalizedProperties");
-        requireNonNull(resolverProviders, "resolverProviders");
-        requireNonNull(rootProcessorProvider, "rootProcessorProvider");
-        requireNonNull(variableExpanderProvider, "variableExpanderProvider");
+        requireNonNull(resolvers, "resolvers");
+        requireNonNull(rootProcessor, "rootProcessor");
+        requireNonNull(variableExpander, "variableExpander");
         
-        this.externalizedProperties = externalizedProperties;
-        this.resolverProvider = ResolverProvider.memoize(
-            initializeResolverProvider(resolverProviders)
-        );
-        this.rootProcessorProvider = ProcessorProvider.memoize(rootProcessorProvider);
-        this.variableExpanderProvider = VariableExpanderProvider.memoize(
-            variableExpanderProvider
-        );
-    }
-
-    /**
-     * The {@link ResolverProvider} for {@link RootResolver}.
-     * 
-     * @param resolverProviders The registered {@link ResolverProvider}s which provide 
-     * {@link Resolver} instances.
-     * @param rootProcessorProvider The registerd {@link RootProcessor} provider.
-     * @param variableExpanderProvider The registered {@link VariableExpander} provider.
-     * @return The {@link ResolverProvider} for {@link RootResolver}.
-     */
-    public static ResolverProvider<RootResolver> provider(
-            Collection<ResolverProvider<?>> resolverProviders,
-            ProcessorProvider<RootProcessor> rootProcessorProvider,
-            VariableExpanderProvider<?> variableExpanderProvider
-    ) {
-        requireNonNull(resolverProviders, "resolverProviders");
-        requireNonNull(rootProcessorProvider, "rootProcessorProvider");
-        requireNonNull(variableExpanderProvider, "variableExpanderProvider");
-        return externalizedProperties -> new RootResolver(
-            externalizedProperties, 
-            resolverProviders, 
-            rootProcessorProvider, 
-            variableExpanderProvider
-        );
+        this.resolver = CompositeResolver.flatten(resolvers);
+        this.rootProcessor = rootProcessor;
+        this.variableExpander = variableExpander;
     }
 
     /** {@inheritDoc} */
@@ -95,26 +56,8 @@ public class RootResolver implements Resolver {
         requireNonNull(proxyMethod, "proxyMethod");
         requireNonNullOrEmptyString(propertyName, "propertyName");
 
-        String expanded = variableExpander().expandVariables(proxyMethod, propertyName);
-        return resolver().resolve(proxyMethod, expanded)
-            .map(resolved -> processor().process(proxyMethod, resolved));
-    }
-
-    private Resolver resolver() {
-        return resolverProvider.get(externalizedProperties);
-    }
-
-    private Processor processor() {
-        return rootProcessorProvider.get(externalizedProperties);
-    }
-
-    private VariableExpander variableExpander() {
-        return variableExpanderProvider.get(externalizedProperties);
-    }
-    
-    private static ResolverProvider<?> initializeResolverProvider(
-            Collection<ResolverProvider<?>> resolverProviders
-    ) {
-        return CompositeResolver.flattenedProvider(resolverProviders);
+        String expanded = variableExpander.expandVariables(proxyMethod, propertyName);
+        return resolver.resolve(proxyMethod, expanded)
+            .map(resolved -> rootProcessor.process(proxyMethod, resolved));
     }
 }

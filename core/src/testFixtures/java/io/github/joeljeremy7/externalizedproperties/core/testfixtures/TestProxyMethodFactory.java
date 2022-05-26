@@ -1,12 +1,13 @@
 package io.github.joeljeremy7.externalizedproperties.core.testfixtures;
 
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
-public class ProxyMethodFactory<TProxyInterface> {
+public class TestProxyMethodFactory<TProxyInterface> {
 
     private final Class<TProxyInterface> proxyInterface;
 
-    public ProxyMethodFactory(Class<TProxyInterface> proxyInterface) {
+    public TestProxyMethodFactory(Class<TProxyInterface> proxyInterface) {
         this.proxyInterface = proxyInterface;
     }
 
@@ -27,12 +28,14 @@ public class ProxyMethodFactory<TProxyInterface> {
      * 
      * @param <R> The method reference return type.
      * @param methodReference The method reference to extract the method from.
+     * @param externalizedProperties The {@link ExternalizedProperties} instance.
      * @return The {@link ProxyMethod} instance.
      */
     public <R> ProxyMethod fromMethodReference(
-            ProxyMethodReference<TProxyInterface, R> methodReference
+            ProxyMethodReference<TProxyInterface, R> methodReference,
+            ExternalizedProperties externalizedProperties
     ) {
-        return ProxyMethodUtils.fromMethodReference(proxyInterface, methodReference);
+        return ProxyMethodUtils.fromMethodReference(proxyInterface, methodReference, externalizedProperties);
     }
 
     /**
@@ -54,12 +57,14 @@ public class ProxyMethodFactory<TProxyInterface> {
      * @param <TArg1> The type of first argument of the method reference.
      * @param <R> The method reference return type.
      * @param methodReference The method reference to extract the method from.
+     * @param externalizedProperties The {@link ExternalizedProperties} instance.
      * @return The {@link ProxyMethod} instance.
      */
     public <TArg1, R> ProxyMethod fromMethodReference(
-            ProxyMethodReference.WithOneArg<TProxyInterface, TArg1, R> methodReference
+            ProxyMethodReference.WithOneArg<TProxyInterface, TArg1, R> methodReference,
+            ExternalizedProperties externalizedProperties
     ) {
-        return ProxyMethodUtils.fromMethodReference(proxyInterface, methodReference);
+        return ProxyMethodUtils.fromMethodReference(proxyInterface, methodReference, externalizedProperties);
     }
 
     /**
@@ -82,12 +87,14 @@ public class ProxyMethodFactory<TProxyInterface> {
      * @param <TArg2> The type of second argument of the method reference.
      * @param <R> The method reference return type.
      * @param methodReference The method reference to extract the method from.
+     * @param externalizedProperties The {@link ExternalizedProperties} instance.
      * @return The {@link ProxyMethod} instance.
      */
     public <TArg1, TArg2, R> ProxyMethod fromMethodReference(
-            ProxyMethodReference.WithTwoArgs<TProxyInterface, TArg1, TArg2, R> methodReference
+            ProxyMethodReference.WithTwoArgs<TProxyInterface, TArg1, TArg2, R> methodReference,
+            ExternalizedProperties externalizedProperties
     ) {
-        return ProxyMethodUtils.fromMethodReference(proxyInterface, methodReference);
+        return ProxyMethodUtils.fromMethodReference(proxyInterface, methodReference, externalizedProperties);
     }
 
     /**
@@ -111,11 +118,13 @@ public class ProxyMethodFactory<TProxyInterface> {
      * @param <TArg3> The type of third argument of the method reference.
      * @param <R> The method reference return type.
      * @param methodReference The method reference to extract the method from.
+     * @param externalizedProperties The {@link ExternalizedProperties} instance.
      * @return The {@link ProxyMethod} instance.
      */
     public <TArg1, TArg2, TArg3, R> ProxyMethod fromMethodReference(
-            ProxyMethodReference.WithThreeArgs<TProxyInterface, TArg1, TArg2, TArg3, R> methodReference
+            ProxyMethodReference.WithThreeArgs<TProxyInterface, TArg1, TArg2, TArg3, R> methodReference,
+            ExternalizedProperties externalizedProperties
     ) {
-        return ProxyMethodUtils.fromMethodReference(proxyInterface, methodReference);
+        return ProxyMethodUtils.fromMethodReference(proxyInterface, methodReference, externalizedProperties);
     }
 }

@@ -2,9 +2,8 @@ package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,103 +11,26 @@ import org.junit.jupiter.api.Test;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PatternVariableExpanderTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES = 
+        ExternalizedProperties.builder().defaults().build();
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
     // Variable pattern: #[variable]
     private static final Pattern CUSTOM_VARIABLE_PATTERN = Pattern.compile("#\\[(.+?)\\]");
-
-    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES = 
-        ExternalizedProperties.builder().withDefaults().build();
 
     @Nested
     class Constructor {
         @Test
-        @DisplayName("should throw when externalized properties argument is null")
-        void test1() {
-            assertThrows(
-                IllegalArgumentException.class,
-                () -> new PatternVariableExpander(null)
-            );
-        }
-
-        @Test
         @DisplayName("should throw when variable pattern argument is null")
-        void test2() {
+        void test1() {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> new PatternVariableExpander(
-                    EXTERNALIZED_PROPERTIES,
                     null
-                )
-            );
-        }
-    }
-
-    @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            VariableExpanderProvider<PatternVariableExpander> provider = 
-                PatternVariableExpander.provider();
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            VariableExpanderProvider<PatternVariableExpander> provider = 
-                PatternVariableExpander.provider();
-
-            assertNotNull(
-                provider.get(
-                    ExternalizedProperties.builder()
-                        .withDefaultResolvers()
-                        .variableExpander(provider)
-                        .build()
-                )
-            );
-        }
-    }
-
-    @Nested
-    class ProviderMethodWithVariablePatternOverload {
-        @Test
-        @DisplayName("should throw when variable suffix is null.")
-        void test1() {
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> PatternVariableExpander.provider(null)
-            );
-        }
-
-        @Test
-        @DisplayName("should not return null.")
-        void test2() {
-            VariableExpanderProvider<PatternVariableExpander> provider = 
-                PatternVariableExpander.provider(Pattern.compile("\\$\\{(.+?)\\}"));
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test3() {
-            VariableExpanderProvider<PatternVariableExpander> provider = 
-                PatternVariableExpander.provider(Pattern.compile("\\$\\{(.+?)\\}"));
-
-            assertNotNull(
-                provider.get(
-                    ExternalizedProperties.builder()
-                        .withDefaultResolvers()
-                        .variableExpander(provider)
-                        .build()
                 )
             );
         }
@@ -122,7 +44,8 @@ public class PatternVariableExpanderTests {
             PatternVariableExpander variableExpander = variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyJavaVersion
+                ProxyInterface::propertyJavaVersion,
+                EXTERNALIZED_PROPERTIES
             );
 
             String nullResult = variableExpander.expandVariables(
@@ -144,7 +67,8 @@ public class PatternVariableExpanderTests {
             PatternVariableExpander variableExpander = variableExpander();
             
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyJavaVersion
+                ProxyInterface::propertyJavaVersion,
+                EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
@@ -153,7 +77,7 @@ public class PatternVariableExpanderTests {
             );
 
             ResolverProxy resolverProxy = 
-                EXTERNALIZED_PROPERTIES.proxy(ResolverProxy.class);
+                EXTERNALIZED_PROPERTIES.initialize(ResolverProxy.class);
             
             String propertyValue = resolverProxy.resolve("java.version");
 
@@ -169,7 +93,8 @@ public class PatternVariableExpanderTests {
             PatternVariableExpander variableExpander =  variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyNoVariables
+                ProxyInterface::propertyNoVariables,
+                EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
@@ -189,7 +114,8 @@ public class PatternVariableExpanderTests {
             PatternVariableExpander variableExpander = variableExpander();
             
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyNonExistent
+                ProxyInterface::propertyNonExistent,
+                EXTERNALIZED_PROPERTIES
             );
 
             assertThrows(
@@ -211,7 +137,8 @@ public class PatternVariableExpanderTests {
             );
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::customPrefixSuffix
+                ProxyInterface::customPrefixSuffix,
+                EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
@@ -220,7 +147,7 @@ public class PatternVariableExpanderTests {
             );
 
             ResolverProxy resolverProxy = 
-                EXTERNALIZED_PROPERTIES.proxy(ResolverProxy.class);
+                EXTERNALIZED_PROPERTIES.initialize(ResolverProxy.class);
             
             String propertyValue = resolverProxy.resolve("java.version");
 
@@ -231,35 +158,17 @@ public class PatternVariableExpanderTests {
         }
     }
 
-    private PatternVariableExpander variableExpander() {
-        VariableExpanderProvider<PatternVariableExpander> provider = 
-            PatternVariableExpander.provider();
-
-        ExternalizedProperties externalizedProperties =
-            ExternalizedProperties.builder()
-                .withDefaultResolvers()
-                .variableExpander(provider)
-                .build();
-
-        return provider.get(externalizedProperties);
+    private static PatternVariableExpander variableExpander() {
+        return new PatternVariableExpander();
     }
 
-    private PatternVariableExpander variableExpander(
+    private static PatternVariableExpander variableExpander(
             Pattern variablePattern
     ) {
-        VariableExpanderProvider<PatternVariableExpander> provider = 
-            PatternVariableExpander.provider(variablePattern);
-
-        ExternalizedProperties externalizedProperties =
-            ExternalizedProperties.builder()
-                .withDefaultResolvers()
-                .variableExpander(provider)
-                .build();
-
-        return provider.get(externalizedProperties);
+        return new PatternVariableExpander(variablePattern);
     }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("property-${java.version}")
         String propertyJavaVersion();
 
@@ -273,7 +182,7 @@ public class PatternVariableExpanderTests {
         String customPrefixSuffix();
     }
 
-    static interface ResolverProxy {
+    private static interface ResolverProxy {
         @ExternalizedProperty
         String resolve(String propertyName);
     }

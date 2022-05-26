@@ -1,13 +1,11 @@
 package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.EnumConverterTests.TestEnum;
-import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,40 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultConverterTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-    
-    @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ConverterProvider<DefaultConverter> provider = 
-                DefaultConverter.provider();
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ConverterProvider<DefaultConverter> provider = 
-                DefaultConverter.provider();
-            
-            ExternalizedProperties externalizedProperties = 
-                ExternalizedProperties.builder()
-                    .withDefaultResolvers()
-                    .converters(provider)
-                    .build();
-            
-            assertNotNull(
-                provider.get(
-                    externalizedProperties,
-                    new RootConverter(externalizedProperties, provider)
-                )
-            );
-        }
-    }
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
     
     @Nested
     class CanConvertToMethod {
@@ -305,7 +271,8 @@ public class DefaultConverterTests {
 
             // Not primitive, List/Collection, array or Optional.
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::customType // This method returns a CustomType.
+                ProxyInterface::customType, // This method returns a CustomType.
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> result = converter.convert(
@@ -321,11 +288,13 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::intWrapperProperty // This method returns a Integer wrapper class
+                ProxyInterface::intWrapperProperty, // This method returns a Integer wrapper class
+                externalizedProperties(converter)
             );
 
             ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::intPrimitiveProperty // This method returns an int primitive
+                ProxyInterface::intPrimitiveProperty, // This method returns an int primitive
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
@@ -359,11 +328,13 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::longWrapperProperty // This method returns a Long wrapper class
+                ProxyInterface::longWrapperProperty, // This method returns a Long wrapper class
+                externalizedProperties(converter)
             );
 
             ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::longPrimitiveProperty // This method returns an long primitive
+                ProxyInterface::longPrimitiveProperty, // This method returns an long primitive
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
@@ -397,11 +368,13 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::floatWrapperProperty // This method returns a Float wrapper class
+                ProxyInterface::floatWrapperProperty, // This method returns a Float wrapper class
+                externalizedProperties(converter)
             );
 
             ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::floatPrimitiveProperty // This method returns an float primitive
+                ProxyInterface::floatPrimitiveProperty, // This method returns an float primitive
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
@@ -435,11 +408,13 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::doubleWrapperProperty // This method returns a Double wrapper class
+                ProxyInterface::doubleWrapperProperty, // This method returns a Double wrapper class
+                externalizedProperties(converter)
             );
 
             ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::doublePrimitiveProperty // This method returns an double primitive
+                ProxyInterface::doublePrimitiveProperty, // This method returns an double primitive
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
@@ -473,11 +448,13 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::shortWrapperProperty // This method returns a Short wrapper class
+                ProxyInterface::shortWrapperProperty, // This method returns a Short wrapper class
+                externalizedProperties(converter)
             );
 
             ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::shortPrimitiveProperty // This method returns a short primitive
+                ProxyInterface::shortPrimitiveProperty, // This method returns a short primitive
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
@@ -511,11 +488,13 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::booleanWrapperProperty // This method returns a Boolean wrapper class
+                ProxyInterface::booleanWrapperProperty, // This method returns a Boolean wrapper class
+                externalizedProperties(converter)
             );
 
             ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::booleanPrimitiveProperty // This method returns a boolean primitive
+                ProxyInterface::booleanPrimitiveProperty, // This method returns a boolean primitive
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
@@ -549,11 +528,13 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::byteWrapperProperty // This method returns a Byte wrapper class
+                ProxyInterface::byteWrapperProperty, // This method returns a Byte wrapper class
+                externalizedProperties(converter)
             );
 
             ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::bytePrimitiveProperty // This method returns a byte primitive
+                ProxyInterface::bytePrimitiveProperty, // This method returns a byte primitive
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
@@ -587,11 +568,13 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod listProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::listProperty // This method returns a List.
+                ProxyInterface::listProperty, // This method returns a List.
+                externalizedProperties(converter)
             );
 
             ProxyMethod collectionProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::collectionProperty // This method returns a Collection.
+                ProxyInterface::collectionProperty, // This method returns a Collection.
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> listResult = converter.convert(
@@ -631,7 +614,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod setProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::setProperty // This method returns a Set.
+                ProxyInterface::setProperty, // This method returns a Set.
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> setResult = converter.convert(
@@ -654,7 +638,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::arrayProperty // This method returns a String[].
+                ProxyInterface::arrayProperty, // This method returns a String[].
+                externalizedProperties(converter)
             );
             
             ConversionResult<?> arrayResult = converter.convert(
@@ -679,7 +664,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::enumProperty
+                ProxyInterface::enumProperty,
+                externalizedProperties(converter)
             );
 
             ConversionResult<?> result = converter.convert(
@@ -698,7 +684,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::localDateTime
+                ProxyInterface::localDateTime,
+                externalizedProperties(converter)
             );
             
             LocalDateTime input = LocalDateTime.of(2022, 12, 19, 12, 30, 0);
@@ -721,7 +708,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::localDate
+                ProxyInterface::localDate,
+                externalizedProperties(converter)
             );
             LocalDate input = LocalDate.of(2022, 12, 19);
             String localDateString = input.toString();
@@ -744,7 +732,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::localTime
+                ProxyInterface::localTime,
+                externalizedProperties(converter)
             );
             
             LocalTime input = LocalTime.of(12, 30, 0);
@@ -767,7 +756,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::offsetDateTime
+                ProxyInterface::offsetDateTime,
+                externalizedProperties(converter)
             );
             
             OffsetDateTime input = OffsetDateTime.of(
@@ -794,7 +784,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::offsetTime
+                ProxyInterface::offsetTime,
+                externalizedProperties(converter)
             );
             
             OffsetTime input = OffsetTime.of( 
@@ -820,7 +811,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::zonedDateTime
+                ProxyInterface::zonedDateTime,
+                externalizedProperties(converter)
             );
             
             ZonedDateTime input = ZonedDateTime.of(
@@ -847,7 +839,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::instant
+                ProxyInterface::instant,
+                externalizedProperties(converter)
             );
             
             Instant input = Instant.now();
@@ -870,7 +863,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::dayOfWeek
+                ProxyInterface::dayOfWeek,
+                externalizedProperties(converter)
             );
             
             DayOfWeek input = DayOfWeek.SUNDAY;
@@ -893,7 +887,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::month
+                ProxyInterface::month,
+                externalizedProperties(converter)
             );
             
             Month input = Month.AUGUST;
@@ -916,7 +911,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::monthDay
+                ProxyInterface::monthDay,
+                externalizedProperties(converter)
             );
             
             MonthDay input = MonthDay.of(Month.DECEMBER, 19);
@@ -939,7 +935,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::year
+                ProxyInterface::year,
+                externalizedProperties(converter)
             );
             
             Year input = Year.of(2022);
@@ -962,7 +959,8 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::yearMonth
+                ProxyInterface::yearMonth,
+                externalizedProperties(converter)
             );
             
             YearMonth input = YearMonth.of(2022, Month.AUGUST);
@@ -980,23 +978,20 @@ public class DefaultConverterTests {
         }
     }
 
-    private DefaultConverter converterToTest() {
-        ConverterProvider<DefaultConverter> provider = DefaultConverter.provider();
-
-        ExternalizedProperties externalizedProperties = 
-            ExternalizedProperties.builder()
-                .withDefaultResolvers()
-                .converters(provider)
-                .build();
-        RootConverter rootConverter = new RootConverter(
-            externalizedProperties, 
-            provider
-        );
-        
-        return provider.get(externalizedProperties, rootConverter);
+    private static DefaultConverter converterToTest() {
+        return new DefaultConverter();
     }
 
-    public static interface ProxyInterface extends PrimitiveConverterTests.ProxyInterface, 
+    private static ExternalizedProperties externalizedProperties(
+            DefaultConverter converterToTest
+    ) {
+        return ExternalizedProperties.builder()
+            .enableDefaultResolvers()
+            .converters(converterToTest)
+            .build();
+    }
+
+    private static interface ProxyInterface extends PrimitiveConverterTests.ProxyInterface, 
             ArrayConverterTests.ProxyInterface,
             ListConverterTests.ProxyInterface, 
             SetConverterTests.ProxyInterface,
@@ -1008,5 +1003,5 @@ public class DefaultConverterTests {
         CustomType customType();
     }
 
-    public static class CustomType {}
+    private static class CustomType {}
 }

@@ -33,7 +33,7 @@ public class CachingExternalizedPropertiesTests {
         @DisplayName("should throw when resolved property cache strategy argument is null")
         void test2() {
             ExternalizedProperties decorated = ExternalizedProperties.builder()
-                .withDefaults()
+                .defaults()
                 .build();
 
             assertThrows(
@@ -47,12 +47,12 @@ public class CachingExternalizedPropertiesTests {
     }
 
     @Nested
-    class ProxyMethod {
+    class InitializeMethod {
         @Test
         @DisplayName("should delegate to decorated externalized properties")
         void test1() {
             ExternalizedProperties decorated = ExternalizedProperties.builder()
-                .withDefaults()
+                .defaults()
                 .build();
 
             // Empty cache.
@@ -62,7 +62,7 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            ProxyInterface proxy = cachingExternalizedProperties.proxy(
+            ProxyInterface proxy = cachingExternalizedProperties.initialize(
                 ProxyInterface.class
             );
 
@@ -75,7 +75,7 @@ public class CachingExternalizedPropertiesTests {
         )
         void test2() {
             ExternalizedProperties decorated = ExternalizedProperties.builder()
-                .withDefaults()
+                .defaults()
                 .build();
 
             // Empty cache.
@@ -85,10 +85,10 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            ProxyInterface proxy1 = cachingExternalizedProperties.proxy(
+            ProxyInterface proxy1 = cachingExternalizedProperties.initialize(
                 ProxyInterface.class
             );
-            ProxyInterface proxy2 = cachingExternalizedProperties.proxy(
+            ProxyInterface proxy2 = cachingExternalizedProperties.initialize(
                 ProxyInterface.class
             );
 
@@ -102,7 +102,7 @@ public class CachingExternalizedPropertiesTests {
         @DisplayName("should delegate to decorated externalized properties")
         void test1() {
             ExternalizedProperties decorated = ExternalizedProperties.builder()
-                .withDefaults()
+                .defaults()
                 .build();
 
             // Empty cache.
@@ -112,7 +112,7 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            ProxyInterface proxy = cachingExternalizedProperties.proxy(
+            ProxyInterface proxy = cachingExternalizedProperties.initialize(
                 ProxyInterface.class,
                 ProxyInterface.class.getClassLoader()
             );
@@ -126,7 +126,7 @@ public class CachingExternalizedPropertiesTests {
         )
         void test2() {
             ExternalizedProperties decorated = ExternalizedProperties.builder()
-                .withDefaults()
+                .defaults()
                 .build();
 
             // Empty cache.
@@ -136,12 +136,12 @@ public class CachingExternalizedPropertiesTests {
                     new StubCacheStrategy<>()
                 );
 
-            ProxyInterface proxy1 = cachingExternalizedProperties.proxy(
+            ProxyInterface proxy1 = cachingExternalizedProperties.initialize(
                 ProxyInterface.class,
                 ProxyInterface.class.getClassLoader()
             );
             
-            ProxyInterface proxy2 = cachingExternalizedProperties.proxy(
+            ProxyInterface proxy2 = cachingExternalizedProperties.initialize(
                 ProxyInterface.class,
                 ProxyInterface.class.getClassLoader()
             );
@@ -150,7 +150,7 @@ public class CachingExternalizedPropertiesTests {
         }
     }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("property")
         String property();
     }

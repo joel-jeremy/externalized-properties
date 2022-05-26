@@ -2,13 +2,11 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
-import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -29,62 +27,27 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
 public class SetConverter implements Converter<Set<?>> {
     private final SetFactory setFactory;
     /** Internal array converter. */
-    private final ArrayConverter arrayConverter;
+    private final ArrayConverter arrayConverter = new ArrayConverter();
 
     /**
      * Default constructor. 
      * Instances constructed via this constructor will use {@link LinkedHashSet} 
      * as {@link Set} implementation.
-     * 
-     * @param rootConverter The root converter.
      */
-    public SetConverter(Converter<?> rootConverter) {
+    public SetConverter() {
         // Prevent hashmap resizing.
         // 0.75 is HashMap's default load factor.
-        this(rootConverter, size -> new LinkedHashSet<>((int) (size/0.75f) + 1));
+        this(size -> new LinkedHashSet<>((int) (size/0.75f) + 1));
     }
 
     /**
      * Constructor.
      * 
-     * @param rootConverter The root converter.
      * @param setFactory The {@link Set} factory. This must return a mutable {@link Set} 
      * instance (optionally with given the capacity). This function must not return null.
      */
-    public SetConverter(
-            Converter<?> rootConverter,
-            SetFactory setFactory
-    ) {
-        this.arrayConverter = new ArrayConverter(
-            requireNonNull(rootConverter, "rootConverter")
-        );
+    public SetConverter(SetFactory setFactory) {
         this.setFactory = requireNonNull(setFactory, "setFactory");
-    }
-
-    /**
-     * The {@link ConverterProvider} for {@link SetConverter}.
-     * 
-     * @return The {@link ConverterProvider} for {@link SetConverter}.
-     */
-    public static ConverterProvider<SetConverter> provider() {
-        return (externalizedProperties, rootConverter) -> 
-            new SetConverter(rootConverter);
-    }
-
-    /**
-     * The {@link ConverterProvider} for {@link SetConverter}.
-     * 
-     * @param setFactory The {@link Set} factory. This must return a mutable {@link Set} 
-     * instance (optionally with given the capacity). This function must not return null.
-     * 
-     * @return The {@link ConverterProvider} for {@link SetConverter}.
-     */
-    public static ConverterProvider<SetConverter> provider(
-            SetFactory setFactory
-    ) {
-        requireNonNull(setFactory, "setFactory");
-        return (externalizedProperties, rootConverter) -> 
-            new SetConverter(rootConverter, setFactory);
     }
 
     /** {@inheritDoc} */
@@ -104,7 +67,7 @@ public class SetConverter implements Converter<Set<?>> {
             return ConversionResult.of(newSet(0));
         }
 
-        GenericArrayType targetArrayType = toTargetArrayType(targetType);
+        Type targetArrayType = toTargetArrayType(targetType);
 
         Object[] array = arrayConverter.convert(
             proxyMethod, 
@@ -143,7 +106,7 @@ public class SetConverter implements Converter<Set<?>> {
      * @return The array target type to pass to {@link ArrayConverter} when requesting 
      * to convert to an array.
      */
-    private static GenericArrayType toTargetArrayType(Type targetType) {
+    private static Type toTargetArrayType(Type targetType) {
         Type[] genericTypeParams = TypeUtilities.getTypeParameters(targetType);
 
         // Assume as Set<String> when target type has no generic type parameters.
@@ -154,12 +117,7 @@ public class SetConverter implements Converter<Set<?>> {
             targetSetType = String.class;
         }
 
-        return new GenericArrayType() {
-            @Override
-            public Type getGenericComponentType() {
-                return targetSetType;
-            }
-        };
+        return TypeUtilities.getArrayType(targetSetType);
     }
 
     /**

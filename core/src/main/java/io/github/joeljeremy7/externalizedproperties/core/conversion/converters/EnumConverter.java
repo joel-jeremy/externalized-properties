@@ -2,7 +2,6 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
@@ -13,15 +12,6 @@ import java.lang.reflect.Type;
  * Supports conversion of values to enums.
  */
 public class EnumConverter implements Converter<Enum<?>> {
-    /**
-     * The {@link ConverterProvider} for {@link EnumConverter}.
-     * 
-     * @return The {@link ConverterProvider} for {@link EnumConverter}.
-     */
-    public static ConverterProvider<EnumConverter> provider() {
-        return (externalizedProperties, rootConverter) -> new EnumConverter();
-    }
-
     /** {@inheritDoc} */
     @Override
     public boolean canConvertTo(Class<?> targetType) {

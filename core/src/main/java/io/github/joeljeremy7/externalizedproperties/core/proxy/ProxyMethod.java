@@ -1,5 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.proxy;
 
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 
 import java.lang.annotation.Annotation;
@@ -14,6 +15,15 @@ import java.util.Optional;
  * Represents a method which has been invoked via an Externalized Properties proxy.
  */
 public interface ProxyMethod {
+
+    /**
+     * The {@link ExternalizedProperties} instance which created the proxy declaring this 
+     * method.
+     * 
+     * @return The {@link ExternalizedProperties} instance which created the proxy declaring 
+     * this method.
+     */
+    ExternalizedProperties externalizedProperties();
 
     /**
      * The externalized property name. 
