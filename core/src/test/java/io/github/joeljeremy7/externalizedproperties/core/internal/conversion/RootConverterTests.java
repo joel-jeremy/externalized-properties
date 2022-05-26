@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -32,9 +33,7 @@ public class RootConverterTests {
     @Nested
     class Constructor {
         @Test
-        @DisplayName(
-            "should throw when converter collection argument is null."
-        )
+        @DisplayName("should throw when converter collection argument is null.")
         void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -45,9 +44,7 @@ public class RootConverterTests {
         }
 
         @Test
-        @DisplayName(
-            "should throw when converter varargs argument is null."
-        )
+        @DisplayName("should throw when converter varargs argument is null.")
         void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -100,9 +97,7 @@ public class RootConverterTests {
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName(
-            "should throw when proxy method argument is null."
-        )
+        @DisplayName("should throw when proxy method argument is null.")
         void test1() {
             Converter<?> converter = new PrimitiveConverter();
             RootConverter rootConverter = rootConverter(converter);
@@ -114,9 +109,7 @@ public class RootConverterTests {
         }
 
         @Test
-        @DisplayName(
-            "should throw when value to convert argument is null."
-        )
+        @DisplayName("should throw when value to convert argument is null.")
         void test2() {
             Converter<?> converter = new PrimitiveConverter();
             RootConverter rootConverter = rootConverter(converter);
@@ -133,9 +126,7 @@ public class RootConverterTests {
         }
 
         @Test
-        @DisplayName(
-            "should throw when value target type argument is null."
-        )
+        @DisplayName("should throw when value target type argument is null.")
         void test3() {
             Converter<?> converter = new PrimitiveConverter();
             RootConverter rootConverter = rootConverter(converter);
@@ -152,9 +143,7 @@ public class RootConverterTests {
         }
 
         @Test
-        @DisplayName(
-            "should correctly convert to target type."
-        )
+        @DisplayName("should correctly convert to target type.")
         void test4() {
             Converter<?> converter = new PrimitiveConverter();
             RootConverter rootConverter = rootConverter(converter);
@@ -176,10 +165,33 @@ public class RootConverterTests {
         }
 
         @Test
+        @DisplayName("should have out-of-the-box support for Optional.")
+        void test5() {
+            // No converters registered.
+            RootConverter rootConverter = rootConverter();
+
+            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                ProxyInterface::optionalProperty,
+                externalizedProperties()
+            );
+
+            String valueToConvert = "value";
+            ConversionResult<?> result = rootConverter.convert(
+                proxyMethod,
+                valueToConvert
+            );
+
+            Object convertedValue = result.value();
+            assertNotNull(convertedValue);
+            assertTrue(convertedValue instanceof Optional<?>);
+            assertEquals(Optional.of(valueToConvert), convertedValue);
+        }
+
+        @Test
         @DisplayName(
-            "should throw when there is no handler that can convert to target type."
+            "should throw when there is no converter can convert to target type."
         )
-        void tes54() {
+        void tes6() {
             Converter<?> converter = new PrimitiveConverter();
             RootConverter rootConverter = rootConverter(converter);
 
@@ -188,7 +200,7 @@ public class RootConverterTests {
                 externalizedProperties(converter)
             );
 
-            // No handler registered to convert to List.
+            // No converter registered to convert to List.
             assertThrows(
                 ConversionException.class, 
                 () -> rootConverter.convert(proxyMethod, "1,2,3")
@@ -196,10 +208,8 @@ public class RootConverterTests {
         }
 
         @Test
-        @DisplayName(
-            "should wrap and re-throw when handler has thrown an exception."
-        )
-        void test6() {
+        @DisplayName("should wrap and re-throw when converter has thrown an exception.")
+        void test7() {
             // Handler that can convert anything but always throws.
             Converter<?> throwingConverter = new Converter<Object>() {
                 @Override
@@ -233,10 +243,8 @@ public class RootConverterTests {
         }
 
         @Test
-        @DisplayName(
-            "should skip to next converter when skip result is returned."
-        )
-        void test7() throws InterruptedException {
+        @DisplayName("should skip to next converter when skip result is returned.")
+        void test8() throws InterruptedException {
             Converter<?> converter1 = new Converter<Object>() {
                 @Override
                 public boolean canConvertTo(Class<?> targetType) {
@@ -313,6 +321,9 @@ public class RootConverterTests {
     private static interface ProxyInterface {
         @ExternalizedProperty("property.int")
         int intProperty();
+
+        @ExternalizedProperty("property.optional")
+        Optional<String> optionalProperty();
 
         @ExternalizedProperty("no.registered.converter")
         List<String> noRegisteredConverter();

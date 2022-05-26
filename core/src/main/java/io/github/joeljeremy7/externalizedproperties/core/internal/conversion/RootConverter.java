@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -130,7 +131,7 @@ public class RootConverter implements Converter<Object> {
         ConvertersByTargetType(
                 Collection<Converter<?>> registeredConverters
         ) {
-            this.registeredConverters = setupNativeConverters(registeredConverters);
+            this.registeredConverters = setupOutOfTheBoxConverters(registeredConverters);
         }
 
         /**
@@ -157,18 +158,24 @@ public class RootConverter implements Converter<Object> {
             return supportsTargetType;
         }
 
-        private static List<Converter<?>> setupNativeConverters(
-                Collection<Converter<?>> converters
+        private static List<Converter<?>> setupOutOfTheBoxConverters(
+                Collection<Converter<?>> original
         ) {
-            List<Converter<?>> registered = new ArrayList<>(
-                converters.size() + 1
-            );
-            
-            registered.addAll(converters);
-            // Optional conversion is natively supported out of the box.
-            registered.add(new OptionalConverter());
+            List<Converter<?>> converters = new ArrayList<>(original);
+            registerOptionalConverterIfNecessary(converters);
+            return converters;
+        }
 
-            return registered;
+        private static void registerOptionalConverterIfNecessary(
+                List<Converter<?>> converters
+        ) {
+            // Add if no OptionalConverter was explicitly added.
+            if (converters.stream()
+                    .noneMatch(c -> c.canConvertTo(Optional.class))
+            ) {
+                // Optional conversion is natively supported out of the box.
+                converters.add(new OptionalConverter());
+            }
         }
     }
 }
