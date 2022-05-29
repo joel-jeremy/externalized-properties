@@ -440,13 +440,13 @@ public interface ExternalizedProperties {
         }
 
         /**
-         * Register a configurator if the set Externalized Properties profile is active.
+         * Apply the configurator if the set Externalized Properties profile is active.
          * 
          * @param profileConfigurator The profile configurator to apply if the
          * set Externalized Properties profile is active.
          * @return The builder.
          */
-        public Builder configure(ProfileConfigurator profileConfigurator) {
+        public Builder apply(ProfileConfigurator profileConfigurator) {
             requireNonNull(profileConfigurator, "profileConfigurator");
             // Wildcard profile. Apply regardless of the active profile.
             if (targetProfiles.length == 0) {

@@ -1,20 +1,18 @@
 # Profiles
 
-Externalized Properties has the concept of profiles. Applications typically are deployed to multiple environments and more often than not, these environment needs different configurations. This is where profiles can help. It allows applications to define different configurations per environment.
-
-Setting up profiles can be done while building [ExternalizedProperties](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) e.g.
+Externalized Properties has the concept of profiles. Applications typically are deployed to multiple environments and more often than not, these environment needs different configurations. This is where profiles can help. It allows applications to define different configurations per environment e.g.
 
 ```java
 public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
         .defaults()
-        .onProfiles("test").configure(new MyTestProfileConfigurator())
-        .onProfiles("staging").configure(new MyStagingProfileConfigurator())
-        .onProfiles("prod").configure(new MyProdProfileConfigurator())
+        .onProfiles("test").apply(new MyTestProfileConfigurator())
+        .onProfiles("staging").apply(new MyStagingProfileConfigurator())
+        .onProfiles("prod").apply(new MyProdProfileConfigurator())
         // This will be applied regardless of the active profile.
-        .onProfiles().configure(new MyWildcardProfileConfigurator())
+        .onProfiles().apply(new MyWildcardProfileConfigurator())
         // This will be applied to both test and staging.
-        .onProfiles("test", "staging").configure(new MyNonProdProfileConfigurator())
+        .onProfiles("test", "staging").apply(new MyNonProdProfileConfigurator())
         .build();
 }
 

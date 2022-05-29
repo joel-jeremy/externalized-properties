@@ -491,13 +491,14 @@ public class ExternalizedPropertiesTests {
     @Nested
     class ProfileConfigurationTests {
         @Nested
-        class ConfigureMethod {@Test
+        class ApplyMethod {
+            @Test
             @DisplayName("should throw when profile configurator argument is null")
             void test1() {
                 assertThrows(
                     IllegalArgumentException.class, 
                     () -> ExternalizedProperties.builder()
-                        .onProfiles().configure(null)
+                        .onProfiles().apply(null)
                 );
             }
 
@@ -510,12 +511,12 @@ public class ExternalizedPropertiesTests {
 
                 ExternalizedProperties externalizedProperties = 
                     ExternalizedProperties.builder()
-                        .onProfiles("test").configure((profile, builder) -> 
+                        .onProfiles("test").apply((profile, builder) -> 
                             builder.resolvers(new MapResolver(
                                 Collections.singletonMap("property", profile)
                             ))
                         )
-                        .onProfiles("prod").configure((profile, builder) ->
+                        .onProfiles("prod").apply((profile, builder) ->
                             builder.resolvers(new MapResolver(
                                 Collections.singletonMap("property", profile)
                             ))
@@ -543,7 +544,7 @@ public class ExternalizedPropertiesTests {
                 ExternalizedProperties externalizedProperties = 
                     ExternalizedProperties.builder()
                         // Wildcard profile.
-                        .onProfiles().configure((profile, builder) ->
+                        .onProfiles().apply((profile, builder) ->
                             builder.resolvers(new MapResolver(
                                 Collections.singletonMap("property", "wildcard")
                             ))
