@@ -75,6 +75,14 @@ module foo.bar {
 ✨ Generic Type Conversion  
 ✨ Converter Methods
 
+### 🔗 [Profiles](docs/profiles.md)
+
+✨ Profile-Specific Configurations
+
+### 🔗 [Ordinal Components](docs/ordincal-components.md)
+
+✨ Ordered Resolvers and Converters
+
 ## 🏎️ Quick Start
 
 Given an interface:

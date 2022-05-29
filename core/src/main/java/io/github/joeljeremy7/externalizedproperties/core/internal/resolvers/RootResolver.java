@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
-import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
+import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmpty;
 
 /**
  * The root {@link Resolver}. All requests to resolve properties are routed through this resolver
@@ -54,7 +54,7 @@ public class RootResolver implements Resolver {
     @Override
     public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
         requireNonNull(proxyMethod, "proxyMethod");
-        requireNonNullOrEmptyString(propertyName, "propertyName");
+        requireNonNullOrEmpty(propertyName, "propertyName");
 
         String expanded = variableExpander.expandVariables(proxyMethod, propertyName);
         return resolver.resolve(proxyMethod, expanded)

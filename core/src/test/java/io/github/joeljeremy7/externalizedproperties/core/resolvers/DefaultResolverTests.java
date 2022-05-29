@@ -42,26 +42,6 @@ public class DefaultResolverTests {
         }
 
         @Test
-        @DisplayName(
-            "should return empty Optional when system property is not found."
-        )
-        void systemPropertyTest2() {
-            DefaultResolver resolver = resolverToTest();
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::notFound,
-                externalizedProperties(resolver)
-            );
-
-            Optional<String> result = resolver.resolve(
-                proxyMethod, 
-                "not.found"
-            );
-            
-            assertNotNull(result);
-            assertFalse(result.isPresent());
-        }
-
-        @Test
         @DisplayName("should resolve property value from environment variables.")
         void environmentVariableTest1() {
             DefaultResolver resolver = resolverToTest();
@@ -85,9 +65,10 @@ public class DefaultResolverTests {
 
         @Test
         @DisplayName(
-            "should return empty Optional when environment variable is not found."
+            "should return empty Optional when property cannot be found " + 
+            "in any of the default resolvers."
         )
-        void environmentVariableTest2() {
+        void notFoundTest1() {
             DefaultResolver resolver = resolverToTest();
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
                 ProxyInterface::notFound,

@@ -54,7 +54,7 @@ public class SystemPropertyResolverTests {
 
             Optional<String> result = resolver.resolve(
                 proxyMethod, 
-                "property" // Not in system properties.
+                "not.found" // Not in system properties.
             );
             
             assertNotNull(result);

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -34,14 +35,14 @@ public class ArgumentsTests {
     }
 
     @Nested
-    class RequireNonNullOrEmptyStringMethod {
+    class RequireNonNullOrEmptyMethodWithStringOverload {
         @Test
         @DisplayName("should throw when arg argument is null.")
         void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> Arguments.requireNonNullOrEmptyString(
-                    null,
+                () -> Arguments.requireNonNullOrEmpty(
+                    (String)null,
                     "arg must not be null."
                 )
             );
@@ -51,7 +52,7 @@ public class ArgumentsTests {
         @DisplayName("should return non-null arg.")
         void test4() {
             String arg = "my-arg";
-            String result = Arguments.requireNonNullOrEmptyString(
+            String result = Arguments.requireNonNullOrEmpty(
                 arg,
                 "arg"
             );
@@ -61,14 +62,14 @@ public class ArgumentsTests {
     }
 
     @Nested
-    class RequireNonNullOrEmptyCollectionMethod {
+    class RequireNonNullOrEmptyMethodWithCollectionOverload {
         @Test
         @DisplayName("should throw when arg collection argument is null.")
         void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> Arguments.requireNonNullOrEmptyCollection(
-                    null,
+                () -> Arguments.requireNonNullOrEmpty(
+                    (Collection<?>)null,
                     "arg"
                 )
             );
@@ -80,7 +81,7 @@ public class ArgumentsTests {
             List<?> arg = Collections.emptyList();
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> Arguments.requireNonNullOrEmptyCollection(
+                () -> Arguments.requireNonNullOrEmpty(
                     arg,
                     "arg"
                 )
@@ -88,10 +89,10 @@ public class ArgumentsTests {
         }
 
         @Test
-        @DisplayName("should return non-null or empty collection arg.")
+        @DisplayName("should return valid collection.")
         void test5() {
             Collection<String> arg = Collections.singleton("my-arg");
-            Collection<String> result = Arguments.requireNonNullOrEmptyCollection(
+            Collection<String> result = Arguments.requireNonNullOrEmpty(
                 arg,
                 "arg"
             );
@@ -100,14 +101,14 @@ public class ArgumentsTests {
         }
 
         @Nested
-        class RequireNonNullOrEmptyArrayMethod {
+        class RequireNonNullOrEmptyMethodWithArrayOverload {
             @Test
             @DisplayName("should throw when arg array argument is null.")
             void test1() {
                 assertThrows(
                     IllegalArgumentException.class, 
-                    () -> Arguments.requireNonNullOrEmptyArray(
-                        null,
+                    () -> Arguments.requireNonNullOrEmpty(
+                        (Object[])null,
                         "arg"
                     )
                 );
@@ -118,7 +119,7 @@ public class ArgumentsTests {
             void test2() {
                 assertThrows(
                     IllegalArgumentException.class, 
-                    () -> Arguments.requireNonNullOrEmptyArray(
+                    () -> Arguments.requireNonNullOrEmpty(
                         new String[0],
                         "arg"
                     )
@@ -126,10 +127,88 @@ public class ArgumentsTests {
             }
 
             @Test
-            @DisplayName("should return non-null or empty collection arg.")
+            @DisplayName("should return valid array.")
             void test5() {
                 String[] arg = new String[] { "my-arg" };
-                String[] result = Arguments.requireNonNullOrEmptyArray(
+                String[] result = Arguments.requireNonNullOrEmpty(
+                    arg,
+                    "arg"
+                );
+
+                assertSame(arg, result);
+            }
+        }
+
+        @Nested
+        class RequireNoNullElementsMethodWithArrayOverload {
+            @Test
+            @DisplayName("should throw when arg array argument is null.")
+            void test1() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> Arguments.requireNoNullElements(
+                        (Object[])null,
+                        "arg"
+                    )
+                );
+            }
+            
+            @Test
+            @DisplayName("should throw when arg array argument has null values.")
+            void test2() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> Arguments.requireNoNullElements(
+                        new String[] { "test", null, "test" },
+                        "arg"
+                    )
+                );
+            }
+
+            @Test
+            @DisplayName("should return valid array.")
+            void test5() {
+                String[] arg = new String[] { "my-arg" };
+                String[] result = Arguments.requireNonNullOrEmpty(
+                    arg,
+                    "arg"
+                );
+
+                assertSame(arg, result);
+            }
+        }
+
+        @Nested
+        class RequireNoNullElementsMethodWithCollectionOverload {
+            @Test
+            @DisplayName("should throw when arg collection argument is null.")
+            void test1() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> Arguments.requireNoNullElements(
+                        (Collection<?>)null,
+                        "arg"
+                    )
+                );
+            }
+            
+            @Test
+            @DisplayName("should throw when arg array argument has null values.")
+            void test2() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> Arguments.requireNoNullElements(
+                        Arrays.asList("test", null, "test"),
+                        "arg"
+                    )
+                );
+            }
+
+            @Test
+            @DisplayName("should return valid array.")
+            void test5() {
+                Collection<String> arg = Collections.singleton("my-arg");
+                Collection<String> result = Arguments.requireNoNullElements(
                     arg,
                     "arg"
                 );

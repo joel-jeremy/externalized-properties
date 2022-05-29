@@ -287,6 +287,47 @@ public class ResourceResolver extends MapResolver {
 		return flattened;
 	}
 
+    /**
+     * Flatten the source map to a String-based flat map.
+     * 
+     * <p>Example:</p>
+     * 
+     * For collections, it will be converted to indexed keys. Given the YAML:
+     * <blockquote><pre>
+     * my-list-property:
+     *   - value1
+     *   - value2
+     *   - value3
+     * </pre></blockquote>
+     * 
+     * It will be converted to a flat map with the following mapping:
+     * 
+     * <blockquote><pre>
+     * "my-list-property[0]"="value1"
+     * "my-list-property[1]"="value2"
+     * "my-list-property[2]"="value3"
+     * <pre></blockquote>
+     * 
+     * For maps, it will be converted to nested keys. Given the YAML:
+     * <blockquote><pre>
+     * my-map-property:
+     *   nested:
+     *     property: 
+     *       item: item-value
+     *     name: name-value
+     * </pre></blockquote>
+     * 
+     * It will be converted to a flat map with the following mapping:
+     * 
+     * <blockquote><pre>
+     * "my-map-property.nested.property.item"="item-value"
+     * "my-map-property.nested.name"="name-value"
+     * </pre></blockquote>
+     * 
+     * @param result The result map to put flattened entries to.
+     * @param source The source map.
+     * @param parentPath The parent path to prepend to a key. Can be {@code null}.
+     */
 	private static void buildFlattenedMap(
             Map<String, String> result, 
             Map<String, Object> source, 
@@ -344,7 +385,7 @@ public class ResourceResolver extends MapResolver {
     ) {
         if (parentPath != null) {
             // Means this is nested.
-            if (key.startsWith("[")) {
+            if (key.charAt(0) == '[') {
                 return parentPath + key;
             }
 

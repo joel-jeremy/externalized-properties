@@ -2,10 +2,12 @@ package io.github.joeljeremy7.externalizedproperties.core;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Objects;
+
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * The conversion result object containing the result of conversion handling.
+ * The conversion result object containing the result of conversion.
  * 
  * This can either contain a result containing a converted value created via 
  * {@link ConversionResult#of(Object)} factory method, or a skip result created 
@@ -13,7 +15,7 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  * 
  * A result can be determined as a skip result by checking reference against 
  * {@link ConversionResult#skip()} e.g. {@code ConversionResult.skip() == 
- * conversionResult} or {@code Conversion.skip().equals(conversionResult)}.
+ * conversionResult} or {@code ConversionResult.skip().equals(conversionResult)}.
  */
 public class ConversionResult<T> {
     /**
@@ -36,30 +38,6 @@ public class ConversionResult<T> {
      */
     private ConversionResult(T value) {
         this.value = requireNonNull(value, "value");
-    }
-
-    /**
-     * The conversion result value. 
-     * 
-     * @apiNote If invoked in an instance that was obtained from 
-     * {@link ConversionResult#skip()} factory method, this method will throw an 
-     * {@link IllegalStateException}. One can check if instance is a skip result by 
-     * checking reference against {@link ConversionResult#skip()} e.g. 
-     * {@code ConversionResult.skip() == conversionResult} or 
-     * {@code ConversionResult.skip().equals(conversionResult)}.
-     * 
-     * @return The conversion result value. Otherwise, an {@link IllegalStateException} 
-     * is thrown.
-     * @throws IllegalStateException if instance was obtained from 
-     * {@link ConversionResult#skip()} factory method and have no value.
-     */
-    public T value() {
-        if (value == null) {
-            throw new IllegalStateException(
-                "Conversion result does not contain a valid value."
-            );
-        }
-        return value;
     }
 
     /**
@@ -91,5 +69,50 @@ public class ConversionResult<T> {
         @SuppressWarnings("unchecked")
         ConversionResult<T> skipResult = (ConversionResult<T>)SKIP;
         return skipResult;
+    }
+
+    /**
+     * The conversion result value. 
+     * 
+     * @apiNote If invoked in an instance that was obtained from 
+     * {@link ConversionResult#skip()} factory method, this method will throw an 
+     * {@link IllegalStateException}. One can check if instance is a skip result by 
+     * checking reference against {@link ConversionResult#skip()} e.g. 
+     * {@code ConversionResult.skip() == conversionResult} or 
+     * {@code ConversionResult.skip().equals(conversionResult)}.
+     * 
+     * @return The conversion result value. Otherwise, an {@link IllegalStateException} 
+     * is thrown.
+     * @throws IllegalStateException if instance was obtained from 
+     * {@link ConversionResult#skip()} factory method and have no value.
+     */
+    public T value() {
+        if (value == null) {
+            throw new IllegalStateException(
+                "Conversion result does not contain a valid value."
+            );
+        }
+        return value;
+    }
+
+    /** {@inheritDoc}} */
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(value);
+    }
+
+    /** {@inheritDoc}} */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        
+        if(!(obj instanceof ConversionResult<?>)) {
+            return false;
+        }
+
+        ConversionResult<?> other = (ConversionResult<?>)obj;
+        return Objects.equals(this.value, other.value);
     }
 }

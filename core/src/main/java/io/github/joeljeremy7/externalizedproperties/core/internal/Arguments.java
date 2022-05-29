@@ -34,7 +34,7 @@ public class Arguments {
      * {@link IllegalArgumentException} message if the argument failed validation.
      * @return The {@link String} argument.
      */
-    public static String requireNonNullOrEmptyString(@Nullable String arg, String argName) {
+    public static String requireNonNullOrEmpty(@Nullable String arg, String argName) {
         if (arg == null || "".equals(arg)) {
             throw new IllegalArgumentException(argName + " must not be null or empty.");
         }
@@ -50,7 +50,7 @@ public class Arguments {
      * {@link IllegalArgumentException} message if the argument failed validation.
      * @return The {@link Collection} argument.
      */
-    public static <T> Collection<T> requireNonNullOrEmptyCollection(
+    public static <T> Collection<T> requireNonNullOrEmpty(
             @Nullable Collection<T> arg, 
             String argName
     ) {
@@ -61,20 +61,68 @@ public class Arguments {
     }
 
     /**
-     * Require argument to not be {@code null} or an empty {@link Collection}.
+     * Require argument to not be {@code null} or an empty array.
      * 
-     * @param <T> The type of the collection argument.
-     * @param arg The {@link Collection} argument.
-     * @param argName The name of the {@link Collection} argument to be used in building the 
+     * @param <T> The type of the array argument.
+     * @param arg The array argument.
+     * @param argName The name of the array argument to be used in building the 
      * {@link IllegalArgumentException} message if the argument failed validation.
-     * @return The {@link Collection} argument.
+     * @return The array argument.
      */
-    public static <T> T[] requireNonNullOrEmptyArray(
+    public static <T> T[] requireNonNullOrEmpty(
             @Nullable T[] arg, 
             String argName
     ) {
         if (arg == null || arg.length == 0) {
             throw new IllegalArgumentException(argName + " must not be null or empty.");
+        }
+        return arg;
+    }
+
+    /**
+     * Require array argument have no {@code null} elements.
+     * 
+     * @param <T> The type of the array argument.
+     * @param arg The array argument.
+     * @param argName The name of the array argument to be used in building the 
+     * {@link IllegalArgumentException} message if the argument failed validation.
+     * @return The array argument.
+     */
+    public static <T> T[] requireNoNullElements(
+            @Nullable T[] arg, 
+            String argName
+    ) {
+        if (arg == null) {
+            throw new IllegalArgumentException(argName + " must not be null.");
+        }
+        for (T element : arg) {
+            if (element == null) {
+                throw new IllegalArgumentException(argName + " must not have null elements.");
+            }
+        }
+        return arg;
+    }
+
+    /**
+     * Require {@link Collection} argument to have no {@code null} elements.
+     * 
+     * @param <T> The type of the collection argument.
+     * @param arg The {@link Collection} argument.
+     * @param argName The name of the {@link Collection} argument to be used in building 
+     * the {@link IllegalArgumentException} message if the argument failed validation.
+     * @return The {@link Collection} argument.
+     */
+    public static <T> Collection<T> requireNoNullElements(
+            @Nullable Collection<T> arg, 
+            String argName
+    ) {
+        if (arg == null) {
+            throw new IllegalArgumentException(argName + " must not be null.");
+        }
+        for (T element : arg) {
+            if (element == null) {
+                throw new IllegalArgumentException(argName + " must not have null elements.");
+            }
         }
         return arg;
     }

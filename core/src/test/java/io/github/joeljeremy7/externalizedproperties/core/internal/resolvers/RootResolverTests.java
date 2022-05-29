@@ -236,7 +236,7 @@ public class RootResolverTests {
             Processor... processors
     ) {
         return ExternalizedProperties.builder()
-            .resolvers(resolvers)
+            .resolvers(resolvers.toArray(Resolver[]::new))
             .processors(processors)
             .build();
     }

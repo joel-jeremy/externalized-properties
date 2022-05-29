@@ -18,10 +18,11 @@ import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.Simpl
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
+import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNoNullElements;
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
@@ -81,10 +82,10 @@ public interface ExternalizedProperties {
     /**
      * Builder for {@link ExternalizedProperties}.
      */
-    public static class Builder {
-        private final List<Converter<?>> converters = new ArrayList<>();
-        private final List<Processor> processors = new ArrayList<>();
+    public static class Builder implements BuilderConfiguration {
         private final List<Resolver> resolvers = new ArrayList<>();
+        private final List<Processor> processors = new ArrayList<>();
+        private final List<Converter<?>> converters = new ArrayList<>();
         private VariableExpander variableExpander = new SimpleVariableExpander();
         
         // Caching settings.
@@ -98,10 +99,12 @@ public interface ExternalizedProperties {
         private boolean enableDefaultConverters = false;
 
         /**
-         * Enable default configurations.
-         * 
-         * @return This builder.
+         * Private constructor.
          */
+        private Builder() {}
+
+        /** {@inheritDoc} */
+        @Override
         public Builder defaults() {
             return enableDefaultResolvers()
                 .enableDefaultConverters()
@@ -109,146 +112,86 @@ public interface ExternalizedProperties {
                 .enableInvocationCaching();
         }
 
-        /**
-         * Enable the default resolvers.
-         * 
-         * @return This builder.
-         */
+        /** {@inheritDoc} */
+        @Override
         public Builder enableDefaultResolvers() {
             this.enableDefaultResolvers = true;
             return this;
         }
 
-        /**
-         * Enable the default converters.
-         * 
-         * @return This builder.
-         */
+        /** {@inheritDoc} */
+        @Override
         public Builder enableDefaultConverters() {
             this.enableDefaultConverters = true;
             return this;
         }
 
-        /**
-         * Enable caching of initialized instances (per proxy interface).
-         * 
-         * @return This builder.
-         */
+        /** {@inheritDoc} */
+        @Override
         public Builder enableInitializeCaching() {
             this.enableInitializeCaching = true;
             return this;
         }
 
-        /**
-         * Enable caching of proxy invocation results.
-         * 
-         * @return This builder.
-         */
+        /** {@inheritDoc} */
+        @Override
         public Builder enableInvocationCaching() {
             this.enableInvocationCaching = true;
             return this;
         }
 
-        /**
-         * Eagerly resolve property values for candidate proxy methods.
-         * 
-         * @return This builder.
-         */
+        /** {@inheritDoc} */
+        @Override
         public Builder enableEagerLoading() {
             this.enableEagerLoading = true;
             return this;
         }
 
-        /**
-         * Sets the global cache duration.
-         * 
-         * @param cacheDuration The duration of caches before being reloaded.
-         * @return This builder.
-         */
+        /** {@inheritDoc} */
+        @Override
         public Builder cacheDuration(Duration cacheDuration) {
             this.cacheDuration = requireNonNull(cacheDuration, "cacheDuration");
             return this;
         }
 
-        /**
-         * The array of {@link Resolver}s to provide resolver instances
-         * to resolve properties from.
-         * 
-         * @param resolvers The resolvers to resolve properties from.
-         * @return This builder.
-         */
+        /** {@inheritDoc} */
+        @Override
+        public ProfileConfiguration onProfiles(String... targetProfiles) {
+            requireNonNull(targetProfiles, "targetProfiles");
+            return new ProfileConfiguration(this, targetProfiles);
+        }
+
+        /** {@inheritDoc} */
+        @Override
         public Builder resolvers(Resolver... resolvers) {
-            requireNonNull(resolvers, "resolvers");
-            return resolvers(Arrays.asList(resolvers));
-        }
-
-        /**
-         * The collection of {@link Resolver}s to resolve properties from.
-         * 
-         * @param resolvers The resolvers to resolve properties from.
-         * @return This builder.
-         */
-        public Builder resolvers(Collection<Resolver> resolvers) {
-            requireNonNull(resolvers, "resolvers");
-            this.resolvers.addAll(resolvers);
+            requireNoNullElements(resolvers, "resolvers");
+            Collections.addAll(this.resolvers, resolvers);
             return this;
         }
 
-        /**
-         * The array of {@link Converter}s to register.
-         * 
-         * @param converters The converters to register.
-         * @return This builder.
-         */
+        /** {@inheritDoc} */
+        @Override
         public Builder converters(Converter<?>... converters) {
-            requireNonNull(converters, "converters");
-            return converters(Arrays.asList(converters));
-        }
-
-        /**
-         * The collection of {@link Converter}s to register.
-         * 
-         * @param converters The converter providers.
-         * @return This builder.
-         */
-        public Builder converters(Collection<Converter<?>> converters) {
-            requireNonNull(converters, "converters");
-            this.converters.addAll(converters);
+            requireNoNullElements(converters, "converters");
+            Collections.addAll(this.converters, converters);
             return this;
         }
 
-        /**
-         * The array of {@link Processor}s to register.
-         * 
-         * @param processors The processor to register.
-         * @return This builder.
-         */
+        /** {@inheritDoc} */
+        @Override
         public Builder processors(Processor... processors) {
-            requireNonNull(processors, "processors");
-            return processors(Arrays.asList(processors));
-        }
-
-        /**
-         * The collection of {@link Processor}s to register.
-         * 
-         * @param processors The processors to register.
-         * @return This builder.
-         */
-        public Builder processors(Collection<Processor> processors) {
-            requireNonNull(processors, "processors");
-            this.processors.addAll(processors);
+            requireNoNullElements(processors, "processors");
+            Collections.addAll(this.processors, processors);
             return this;
         }
 
-        /**
-         * The {@link VariableExpander} to register.
-         * 
-         * @param variableExpander The {@link VariableExpander} to register.
-         * @return This builder.
-         */
+        /** {@inheritDoc} */
+        @Override
         public Builder variableExpander(VariableExpander variableExpander) {
-            requireNonNull(variableExpander, "variableExpander");
-            this.variableExpander = variableExpander;
+            this.variableExpander = requireNonNull(
+                variableExpander, 
+                "variableExpander"
+            );
             return this;
         }
 
@@ -269,7 +212,7 @@ public interface ExternalizedProperties {
             );
 
             if (enableInitializeCaching) {
-                return new CachingExternalizedProperties(
+                externalizedProperties = new CachingExternalizedProperties(
                     externalizedProperties,
                     new ExpiringCacheStrategy<>(
                         new WeakConcurrentHashMapCacheStrategy<>(),
@@ -329,7 +272,7 @@ public interface ExternalizedProperties {
             }
 
             return new RootResolver(
-                resolvers, 
+                Ordinals.sortResolvers(resolvers), 
                 buildRootProcessor(), 
                 variableExpander
             );
@@ -342,7 +285,9 @@ public interface ExternalizedProperties {
                 converters(new DefaultConverter());
             }
             
-            return new RootConverter(converters);
+            return new RootConverter(
+                Ordinals.sortConverters(converters)
+            );
         }
 
         private RootProcessor buildRootProcessor() {
@@ -357,5 +302,184 @@ public interface ExternalizedProperties {
                 )
             ));
         }
+    }
+
+    /**
+     * Builder configurations for {@link ExternalizedProperties}.
+     */
+    public static interface BuilderConfiguration {
+        /**
+         * Enable default configurations.
+         * 
+         * @return This builder.
+         */
+        Builder defaults();
+
+        /**
+         * Enable the default resolvers.
+         * 
+         * @return This builder.
+         */
+        Builder enableDefaultResolvers();
+
+        /**
+         * Enable the default converters.
+         * 
+         * @return This builder.
+         */
+        Builder enableDefaultConverters();
+
+        /**
+         * Enable caching of initialized instances (per proxy interface).
+         * 
+         * @return This builder.
+         */
+        Builder enableInitializeCaching();
+
+        /**
+         * Enable caching of proxy invocation results.
+         * 
+         * @return This builder.
+         */
+        Builder enableInvocationCaching();
+
+        /**
+         * Eagerly resolve property values for candidate proxy methods.
+         * 
+         * @return This builder.
+         */
+        Builder enableEagerLoading();
+
+        /**
+         * Sets the global cache duration.
+         * 
+         * @param cacheDuration The duration of caches before being reloaded.
+         * @return This builder.
+         */
+        Builder cacheDuration(Duration cacheDuration);
+
+        /**
+         * Profile-specific configurations that gets applied depending on the active profile. 
+         * If no target profiles are specified, the configuration will be treated as a wildcard 
+         * configuration such that it will be applied regardless of what the active profile is.
+         * 
+         * @param targetProfiles The profiles in which the configurations should be applied to.
+         * If no target profiles are specified, the configuration will be treated as a wildcard
+         * configuration such that it will be applied regardless of what the active profile is.
+         * @return The profile configuration.
+         */
+        ProfileConfiguration onProfiles(String... targetProfiles);
+
+        /**
+         * Register {@link Resolver}s on which {@link ExternalizedProperties} will resolve 
+         * properties from.
+         * 
+         * @apiNote If ordering is desired, resolvers can be given an ordinal
+         * by using the {@link Ordinals#ordinalResolver(int, Resolver)} decorator method.
+         * The lower the ordinal, the earlier the resolver will be put in the resolver sequence.
+         * 
+         * @param resolvers The {@link Resolver}s to resolve properties from.
+         * @return This builder.
+         */
+        Builder resolvers(Resolver... resolvers);
+
+        /**
+         * Register {@link Converter}s to be used by {@link ExternalizedProperties} for conversions.
+         * 
+         * @apiNote If ordering is desired, converters can be given an ordinal
+         * by using the {@link Ordinals#ordinalConverter(int, Converter)} decorator method.
+         * The lower the ordinal, the earlier the converter will be put in the converter sequence.
+         * 
+         * @param converters The {@link Converter}s to register.
+         * @return This builder.
+         */
+        Builder converters(Converter<?>... converters);
+
+        /**
+         * Register {@link Processor}s to be used by {@link ExternalizedProperties} for 
+         * post-processing.
+         * 
+         * @param processors The {@link Processor}s to register.
+         * @return This builder.
+         */
+        Builder processors(Processor... processors);
+
+        /**
+         * Register the {@link VariableExpander} to be used by {@link ExternalizedProperties} for
+         * variable expansions.
+         * 
+         * @param variableExpander The {@link VariableExpander} to register.
+         * @return This builder.
+         */
+        Builder variableExpander(VariableExpander variableExpander);
+    }
+
+    /**
+     * Profile-specific configurations.
+     */
+    public static class ProfileConfiguration {
+        private static final String ACTIVE_PROFILE_SYSTEM_PROPERTY = 
+            "externalizedproperties.profile";
+        private static final String ACTIVE_PROFILE_ENV_VARIABLE = 
+            "EXTERNALIZEDPROPERTIES_PROFILE";
+        
+        private final Builder builder;
+        private final String[] targetProfiles;
+
+        /**
+         * Private constructor.
+         * 
+         * @param builder The {@link ExternalizedProperties} builder.
+         * @param targetProfiles The profiles in which this configuration should be applied to.
+         * If no target profiles are specified, the configuration will be treated as a wildcard
+         * configuration such that it will be applied regardless of what the active profile is.
+         */
+        private ProfileConfiguration(Builder builder, String... targetProfiles) {
+            this.builder = builder;   
+            this.targetProfiles = targetProfiles;
+        }
+
+        /**
+         * Register a configurator if the set Externalized Properties profile is active.
+         * 
+         * @param profileConfigurator The profile configurator to apply if the
+         * set Externalized Properties profile is active.
+         * @return The builder.
+         */
+        public Builder configure(ProfileConfigurator profileConfigurator) {
+            requireNonNull(profileConfigurator, "profileConfigurator");
+            // Wildcard profile. Apply regardless of the active profile.
+            if (targetProfiles.length == 0) {
+                profileConfigurator.configure(activeProfile(), builder);
+            } 
+            else {
+                for (String profile : targetProfiles) {
+                    if (Objects.equals(profile, activeProfile())) {
+                        profileConfigurator.configure(activeProfile(), builder);
+                    }
+                }
+            }
+            return builder;
+        }
+
+        private static String activeProfile() {
+            return System.getProperty(
+                ACTIVE_PROFILE_SYSTEM_PROPERTY,
+                System.getenv().getOrDefault(ACTIVE_PROFILE_ENV_VARIABLE, "")
+            );
+        }
+    }
+
+    /**
+     * Profile configurator.
+     */
+    public static interface ProfileConfigurator {
+        /**
+         * Configure based on the active Externalized Properties profile.
+         * 
+         * @param activeProfile The active Externalized Properties profile.
+         * @param builder The Externalized Properties builder configuration.
+         */
+        void configure(String activeProfile, BuilderConfiguration builder);
     }
 }

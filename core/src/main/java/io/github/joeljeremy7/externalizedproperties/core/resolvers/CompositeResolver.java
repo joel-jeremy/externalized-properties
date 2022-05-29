@@ -11,7 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyCollection;
+import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmpty;
 
 /**
  * A {@link Resolver} decorator which resolves requested properties 
@@ -30,7 +30,7 @@ public class CompositeResolver implements Resolver, Iterable<Resolver> {
      * @param resolvers The collection of {@link Resolver}s to resolve properties from.
      */
     protected CompositeResolver(Collection<Resolver> resolvers) {
-        this.resolvers = requireNonNullOrEmptyCollection(resolvers, "resolvers");
+        this.resolvers = requireNonNullOrEmpty(resolvers, "resolvers");
     }
 
     /**
@@ -124,7 +124,7 @@ public class CompositeResolver implements Resolver, Iterable<Resolver> {
      * @return The flattened {@link Resolver} instance.
      */
     public static Resolver flatten(Collection<Resolver> resolvers) {
-        requireNonNullOrEmptyCollection(resolvers, "resolvers");
+        requireNonNullOrEmpty(resolvers, "resolvers");
        
         List<Resolver> flattened = flattenResolvers(resolvers);
         if (flattened.size() == 1) {

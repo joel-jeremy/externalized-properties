@@ -113,7 +113,7 @@ public class RootConverter implements Converter<Object> {
     // Skip conversion result is a singleton, cache it here to avoid internal casting.
     private static final ConversionResult<?> SKIP_RESULT = ConversionResult.skip();
     private static boolean skipped(ConversionResult<?> result) {
-        return result == SKIP_RESULT;
+        return result.equals(SKIP_RESULT);
     }
 
     /**

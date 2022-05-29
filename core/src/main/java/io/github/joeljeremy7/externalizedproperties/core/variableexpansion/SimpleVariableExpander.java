@@ -4,7 +4,7 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
-import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
+import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmpty;
 
 /**
  * A simple {@link VariableExpander} implementation.
@@ -38,11 +38,11 @@ public class SimpleVariableExpander implements VariableExpander {
             String variablePrefix,
             String variableSuffix
     ) {
-        this.variablePrefix = requireNonNullOrEmptyString(
+        this.variablePrefix = requireNonNullOrEmpty(
             variablePrefix, 
             "variablePrefix"
         );
-        this.variableSuffix = requireNonNullOrEmptyString(
+        this.variableSuffix = requireNonNullOrEmpty(
             variableSuffix, 
             "variableSuffix"
         );

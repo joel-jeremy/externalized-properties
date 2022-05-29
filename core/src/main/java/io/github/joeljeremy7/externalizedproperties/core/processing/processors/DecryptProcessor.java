@@ -31,8 +31,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
-import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyCollection;
-import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmptyString;
+import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmpty;
 
 /**
  * Processor to apply decryption to a property.
@@ -56,7 +55,7 @@ public class DecryptProcessor implements Processor {
      * @param decryptors The {@link Decryptor}s to do the decrypting.
      */
     public DecryptProcessor(Collection<Decryptor> decryptors) {
-        requireNonNullOrEmptyCollection(decryptors, "decryptors");
+        requireNonNullOrEmpty(decryptors, "decryptors");
         this.decryptorsByName = decryptors.stream().collect(
             Collectors.toMap(
                 Decryptor::name, 
@@ -198,7 +197,7 @@ public class DecryptProcessor implements Processor {
          * this processor may result in unexpected behaviors.
          */
         public JceDecryptor(String name, Cipher initializedCipher) {
-            this.name = requireNonNullOrEmptyString(name, "name");
+            this.name = requireNonNullOrEmpty(name, "name");
             this.initializedCipher = requireNonNull(initializedCipher, "initializedCipher");
         }
 

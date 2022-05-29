@@ -122,7 +122,7 @@ public class CachingResolverTests {
                 externalizedProperties(resolver)
             );
             // Not in system properties.
-            Optional<String> result = resolver.resolve(proxyMethod, "property");
+            Optional<String> result = resolver.resolve(proxyMethod, "non.existent");
             
             assertNotNull(result);
             assertFalse(result.isPresent());
@@ -173,14 +173,14 @@ public class CachingResolverTests {
             // Property is not in system properties.
             Optional<String> result = resolver.resolve(
                 proxyMethod,
-                "property"
+                "not.found"
             );
 
             assertNotNull(result);
             assertFalse(result.isPresent());
 
             // Check if property was cached via strategy.
-            assertFalse(cacheStrategy.getCache().containsKey("property"));
+            assertFalse(cacheStrategy.getCache().containsKey("not.found"));
         }
 
         @Test
