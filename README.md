@@ -79,7 +79,7 @@ module foo.bar {
 
 ✨ Profile-Specific Configurations
 
-### 🔗 [Ordinal Components](docs/ordincal-components.md)
+### 🔗 [Ordinal Components](docs/ordinal-components.md)
 
 ✨ Ordered Resolvers and Converters
 
