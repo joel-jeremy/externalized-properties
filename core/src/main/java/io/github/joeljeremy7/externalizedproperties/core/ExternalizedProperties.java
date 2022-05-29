@@ -376,7 +376,7 @@ public interface ExternalizedProperties {
          * 
          * @apiNote If ordering is desired, resolvers can be given an ordinal
          * by using the {@link Ordinals#ordinalResolver(int, Resolver)} decorator method.
-         * The lower the ordinal, the earlier the resolver will be put in the resolver sequence.
+         * The lower the ordinal, the earlier the resolver will be placed in the resolver sequence.
          * 
          * @param resolvers The {@link Resolver}s to resolve properties from.
          * @return This builder.
@@ -388,7 +388,7 @@ public interface ExternalizedProperties {
          * 
          * @apiNote If ordering is desired, converters can be given an ordinal
          * by using the {@link Ordinals#ordinalConverter(int, Converter)} decorator method.
-         * The lower the ordinal, the earlier the converter will be put in the converter sequence.
+         * The lower the ordinal, the earlier the converter will be placed in the converter sequence.
          * 
          * @param converters The {@link Converter}s to register.
          * @return This builder.

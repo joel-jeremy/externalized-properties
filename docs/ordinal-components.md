@@ -33,4 +33,4 @@ The resulting converter order will be:
 2. SomeLegacyPrimitiveConverter
 3. ListConverter
 
-Note: Resolvers/converters that were not assigned an ordinal will have lower priority than those that were assigned one.
+Note: Resolvers/converters that were assigned an ordinal will be placed earlier in the sequence than those that were not assigned one. In other words, Ordinal resolvers/converters will be given higher priority.

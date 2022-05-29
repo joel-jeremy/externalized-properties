@@ -246,13 +246,13 @@ public class OrdinalsTests {
     }
 
     @Nested
-    class OrdinalCompareMethod {
+    class CompareOrdinalMethod {
         @Test
         @DisplayName("should throw when first argument is null")
         void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> Ordinals.ordinalCompare(null, new StubResolver())
+                () -> Ordinals.compareOrdinal(null, new StubResolver())
             );
         }
 
@@ -261,7 +261,7 @@ public class OrdinalsTests {
         void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> Ordinals.ordinalCompare(new StubConverter<>(), null)
+                () -> Ordinals.compareOrdinal(new StubConverter<>(), null)
             );
         }
 
@@ -280,7 +280,7 @@ public class OrdinalsTests {
                 public int ordinal() { return 2; }
             };
             
-            int result = Ordinals.ordinalCompare(ordinal1, ordinal2);
+            int result = Ordinals.compareOrdinal(ordinal1, ordinal2);
 
             assertTrue(result < 0);
         }
@@ -300,7 +300,7 @@ public class OrdinalsTests {
                 public int ordinal() { return 2; }
             };
             
-            int result = Ordinals.ordinalCompare(ordinal2, ordinal1);
+            int result = Ordinals.compareOrdinal(ordinal2, ordinal1);
 
             assertTrue(result > 0);
         }
@@ -317,7 +317,7 @@ public class OrdinalsTests {
                 public int ordinal() { return 1; }
             };
             
-            int result = Ordinals.ordinalCompare(ordinal1, ordinal2);
+            int result = Ordinals.compareOrdinal(ordinal1, ordinal2);
 
             assertEquals(0, result);
         }
@@ -331,7 +331,7 @@ public class OrdinalsTests {
             Resolver ordinal = Ordinals.ordinalResolver(1, new StubResolver());
             Resolver nonOrdinal = new StubResolver();
             
-            int result = Ordinals.ordinalCompare(ordinal, nonOrdinal);
+            int result = Ordinals.compareOrdinal(ordinal, nonOrdinal);
 
             assertTrue(result < 0);
         }
@@ -345,7 +345,7 @@ public class OrdinalsTests {
             Resolver ordinal = Ordinals.ordinalResolver(1, new StubResolver());
             Resolver nonOrdinal = new StubResolver();
             
-            int result = Ordinals.ordinalCompare(nonOrdinal, ordinal);
+            int result = Ordinals.compareOrdinal(nonOrdinal, ordinal);
 
             assertTrue(result > 0);
         }
@@ -356,7 +356,7 @@ public class OrdinalsTests {
             Resolver nonOrdinal1 = new StubResolver();
             Resolver nonOrdinal2 = new StubResolver();
             
-            int result = Ordinals.ordinalCompare(nonOrdinal1, nonOrdinal2);
+            int result = Ordinals.compareOrdinal(nonOrdinal1, nonOrdinal2);
 
             assertEquals(0, result);
         }

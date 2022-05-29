@@ -20,7 +20,7 @@ public class Ordinals {
      * Create an ordinal resolver.
      * 
      * @param ordinal The ordinal in which this resolver should be placed in the 
-     * resolver sequence. The lower the value, the earlier the resolver will be put
+     * resolver sequence. The lower the value, the earlier the resolver will be placed
      * in the resolver sequence.
      * @param resolver The decorated resolver.
      * @return The ordinal resolver.
@@ -34,7 +34,7 @@ public class Ordinals {
      * 
      * @param <T> The target type of the decorated converter.
      * @param ordinal The ordinal in which this converter should be placed in the 
-     * converter sequence. The lower the value, the earlier the converter will be put
+     * converter sequence. The lower the value, the earlier the converter will be placed
      * in the converter sequence.
      * @param converter The decorated converter.
      * @return The ordinal converter.
@@ -45,7 +45,8 @@ public class Ordinals {
 
     /**
      * Sort the resolver sequence and unwrap any instances of {@link OrdinalResolver}
-     * to the actual decorated resolvers.
+     * to the actual decorated resolvers. This follows the sorting rules used by the 
+     * {@link #compareOrdinal} method.
      * 
      * @param resolvers The resolvers to sort.
      * @return The ordered resolvers.
@@ -54,7 +55,7 @@ public class Ordinals {
         requireNonNull(resolvers, "resolvers");
 
         return resolvers.stream()
-            .sorted(Ordinals::ordinalCompare)
+            .sorted(Ordinals::compareOrdinal)
             .map(resolver -> {
                 // Discard the OrdinalResolver. The resolver sequence has
                 // already been sorted.
@@ -68,7 +69,8 @@ public class Ordinals {
 
     /**
      * Sort the converter sequence and unwrap any instances of {@link OrdinalConverter}
-     * to the actual decorated converters.
+     * to the actual decorated converters. This follows the sorting rules used by the 
+     * {@link #compareOrdinal} method.
      * 
      * @param converters The converters to sort.
      * @return The ordered converters.
@@ -77,9 +79,9 @@ public class Ordinals {
         requireNonNull(converters, "converters");
 
         return converters.stream()
-            .sorted(Ordinals::ordinalCompare)
+            .sorted(Ordinals::compareOrdinal)
             .map(converter -> {
-                // Discard the OrdinalConverter. The resolver sequence has
+                // Discard the OrdinalConverter. The converter sequence has
                 // already been sorted.
                 if (converter instanceof OrdinalConverter<?>) {
                     return ((OrdinalConverter<?>)converter).unwrap();
@@ -90,7 +92,8 @@ public class Ordinals {
     }
 
     /**
-     * Compare objects based on their ordinals.
+     * Compare objects based on their ordinals. The lower the ordinal, the earlier the 
+     * object will be placed in the sequence.
      * 
      * @param <T> The type of the objects to compare.
      * @param first The first object.
@@ -98,7 +101,7 @@ public class Ordinals {
      * @return The result by comparing the ordinals through the 
      * {@link Integer#compare(int, int)} method.
      */
-    static <T> int ordinalCompare(T first, T second) {
+    static <T> int compareOrdinal(T first, T second) {
         requireNonNull(first, "first");
         requireNonNull(second, "second");
 
@@ -134,11 +137,11 @@ public class Ordinals {
     static interface Ordinal {
         /**
          * The ordinal in which this object should be placed in an 
-         * ordered sequence. The lower the value, the earlier the object will be put
+         * ordered sequence. The lower the value, the earlier the object will be placed
          * in the sequence.
          * 
          * @return The ordinal in which this object should be placed in an 
-         * ordered sequence. The lower the value, the earlier the object will be put
+         * ordered sequence. The lower the value, the earlier the object will be placed
          * in the sequence.
          */
         int ordinal();
@@ -156,7 +159,7 @@ public class Ordinals {
          * Constructor.
          * 
          * @param ordinal The ordinal in which this resolver should be placed in the 
-         * resolver sequence. The lower the value, the earlier the resolver will be put
+         * resolver sequence. The lower the value, the earlier the resolver will be placed
          * in the resolver sequence.
          * @param decorated The decorated resolver.
          */
@@ -175,7 +178,7 @@ public class Ordinals {
          * The ordinal in which this resolver should be placed in the resolver sequence.
          * 
          * @return The ordinal in which this resolver should be placed in the resolver 
-         * sequence. The lower the value, the earlier the resolver will be put
+         * sequence. The lower the value, the earlier the resolver will be placed
          * in the resolver sequence.
          */
         @Override
@@ -202,7 +205,7 @@ public class Ordinals {
          * Constructor.
          * 
          * @param ordinal The ordinal in which this resolver should be placed in the 
-         * converter sequence. The lower the value, the earlier the resolver will be put
+         * converter sequence. The lower the value, the earlier the resolver will be placed
          * in the converter sequence.
          * @param decorated The decorated converter.
          */
@@ -231,7 +234,7 @@ public class Ordinals {
          * The ordinal in which this converter should be placed in the converter sequence.
          * 
          * @return The ordinal in which this converter should be placed in the converter 
-         * sequence. The lower the value, the earlier the converter will be put
+         * sequence. The lower the value, the earlier the converter will be placed
          * in the converter sequence.
          */
         @Override
