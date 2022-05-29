@@ -9,6 +9,7 @@ public static void main(String[] args) {
         .onProfiles("staging").apply(new MyStagingProfileConfigurator())
         .onProfiles("prod").apply(new MyProdProfileConfigurator())
         // This will be applied regardless of the active profile.
+        // However, if an active profile is not set, this will not be applied.
         .onProfiles().apply(new MyWildcardProfileConfigurator())
         // This will be applied to both test and staging.
         .onProfiles("test", "staging").apply(new MyNonProdProfileConfigurator())
