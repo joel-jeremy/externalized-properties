@@ -41,10 +41,32 @@ public class MapResolverTests {
         @DisplayName("should throw when unresolved property handler argument is null.")
         void test2() {
             Map<String, String> map = new HashMap<>();
-
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new MapResolver(map, null)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when singleton map key is null or empty.")
+        void singletonMapTest1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> new MapResolver(null, "value")
+            );
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> new MapResolver("", "value")
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when singleton map value is null.")
+        void singletonMapTest2() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> new MapResolver("key", null)
             );
         }
     }
@@ -162,7 +184,7 @@ public class MapResolverTests {
     private static MapResolver resolverToTest(Map<String, String> map) {
         return new MapResolver(map);
     }
-
+    
     private static MapResolver resolverToTest(
             Map<String, String> map,
             UnresolvedPropertyHandler unresolverPropertyHandler

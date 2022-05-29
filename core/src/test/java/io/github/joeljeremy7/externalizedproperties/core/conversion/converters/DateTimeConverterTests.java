@@ -729,7 +729,6 @@ public class DateTimeConverterTests {
             DateTimeConverter converterToTest
     ) {
         return ExternalizedProperties.builder()
-            .enableDefaultResolvers()
             .converters(converterToTest)
             .build();
     }

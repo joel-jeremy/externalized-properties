@@ -600,7 +600,6 @@ public class PrimitiveConverterTests {
             PrimitiveConverter converterToTest
     ) {
         return ExternalizedProperties.builder()
-            .enableDefaultResolvers()
             .converters(converterToTest)
             .build();
     }

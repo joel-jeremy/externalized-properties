@@ -4,11 +4,13 @@ import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
+import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmpty;
 
 /**
  * A {@link Resolver} implementation which resolves requested properties 
@@ -24,10 +26,7 @@ public class MapResolver implements Resolver {
      * @param propertySource The source map where requested properties will be derived from.
      */
     public MapResolver(Map<String, String> propertySource) {
-        this(
-            propertySource, 
-            propertyName -> null
-        );
+        this(propertySource, propertyName -> null);
     }
 
     /**
@@ -50,6 +49,19 @@ public class MapResolver implements Resolver {
             unresolvedPropertyHandler,
             "unresolvedPropertyHandler"
         );
+    }
+
+    /**
+     * Constructor for a singleton map.
+     * 
+     * @param key The singleton map key.
+     * @param value The singleton map value.
+     */
+    public MapResolver(String key, String value) {
+        requireNonNullOrEmpty(key, "key");
+        requireNonNull(value, "value");
+        this.propertySource = Collections.singletonMap(key, value);
+        this.unresolvedPropertyHandler = propertyName -> null;
     }
     
     /**

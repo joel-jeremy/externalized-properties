@@ -149,7 +149,6 @@ public class RootProcessorTests {
             Processor... processors
     ) {
         return ExternalizedProperties.builder()
-            .enableDefaultResolvers()
             .processors(processors)
             .build();
     }

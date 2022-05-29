@@ -302,7 +302,6 @@ public class OptionalConverterTests {
             Converter<?>... additionalConverters
     ) {
         return ExternalizedProperties.builder()
-            .enableDefaultResolvers()
             .converters(converterToTest)
             .converters(additionalConverters)
             .build();

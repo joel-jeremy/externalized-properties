@@ -15,8 +15,6 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,11 +31,9 @@ public abstract class VariableExpansionBenchmarks {
 
         @Setup
         public void setup() {
-            Map<String, String> propertySource = Collections.singletonMap("test", "test");
-    
             ExternalizedProperties withSimpleVariableExpander = 
                 ExternalizedProperties.builder()
-                    .resolvers(new MapResolver(propertySource))
+                    .resolvers(new MapResolver("test", "test"))
                     .variableExpander(new SimpleVariableExpander())
                     .build();
 
@@ -46,7 +42,7 @@ public abstract class VariableExpansionBenchmarks {
 
             ExternalizedProperties withPatternVariableExpander = 
                 ExternalizedProperties.builder()
-                    .resolvers(new MapResolver(propertySource))
+                    .resolvers(new MapResolver("test", "test"))
                     .variableExpander(new PatternVariableExpander())
                     .build();
 

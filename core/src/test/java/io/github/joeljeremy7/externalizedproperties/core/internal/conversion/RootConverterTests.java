@@ -313,7 +313,6 @@ public class RootConverterTests {
             Converter<?>... converters
     ) {
         return ExternalizedProperties.builder()
-            .enableDefaultResolvers()
             .converters(converters)
             .build();
     }

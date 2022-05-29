@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SimpleVariableExpanderTests {
     private static final ExternalizedProperties EXTERNALIZED_PROPERTIES = 
-        ExternalizedProperties.builder().enableDefaultResolvers().build();
+        ExternalizedProperties.builder().defaults().build();
 
     private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
         new TestProxyMethodFactory<>(ProxyInterface.class);
@@ -183,7 +183,7 @@ public class SimpleVariableExpanderTests {
                 VariableExpansionException.class, 
                 () -> variableExpander.expandVariables(
                     proxyMethod,
-                    "property-${nonexistent}"
+                    "property-${non.existent}"
                 )
             );
         }

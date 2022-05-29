@@ -986,7 +986,6 @@ public class DefaultConverterTests {
             DefaultConverter converterToTest
     ) {
         return ExternalizedProperties.builder()
-            .enableDefaultResolvers()
             .converters(converterToTest)
             .build();
     }

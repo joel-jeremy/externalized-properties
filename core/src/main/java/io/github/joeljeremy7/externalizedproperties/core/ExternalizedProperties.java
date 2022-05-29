@@ -3,6 +3,7 @@ package io.github.joeljeremy7.externalizedproperties.core;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.CachingExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.internal.InternalExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.internal.ProfileSelector;
 import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.ExpiringCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
@@ -12,7 +13,9 @@ import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.EagerLoa
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.ExternalizedPropertiesInvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandlerFactory;
+import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.DefaultResolver;
+import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.NoOpVariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 
 import java.lang.reflect.Method;
@@ -21,6 +24,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNoNullElements;
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
@@ -83,6 +91,8 @@ public interface ExternalizedProperties {
      * Builder for {@link ExternalizedProperties}.
      */
     public static class Builder implements BuilderConfiguration {
+        private final List<ProfileConfiguration> profileConfigurations =
+            new ArrayList<>();
         private final List<Resolver> resolvers = new ArrayList<>();
         private final List<Processor> processors = new ArrayList<>();
         private final List<Converter<?>> converters = new ArrayList<>();
@@ -201,14 +211,16 @@ public interface ExternalizedProperties {
          * @return The built {@link InternalExternalizedProperties} instance.
          */
         public ExternalizedProperties build() {
-            RootResolver rootResolver = buildRootResolver();
-            RootConverter rootConverter = buildRootConverter();
-            InvocationHandlerFactory invocationHandlerFactory = buildInvocationHandlerFactory();
+            Optional<String> activeProfile = resolveActiveProfile();
+            if (activeProfile.isPresent()) {
+                applyProfileConfigurations(activeProfile.get());
+            }
 
+            // At this point newly added configurations will have been applied.
             ExternalizedProperties externalizedProperties = new InternalExternalizedProperties(
-                rootResolver, 
-                rootConverter,
-                invocationHandlerFactory
+                buildRootResolver(resolvers, processors, variableExpander), 
+                buildRootConverter(converters),
+                buildInvocationHandlerFactory()
             );
 
             if (enableInitializeCaching) {
@@ -222,6 +234,47 @@ public interface ExternalizedProperties {
             }
 
             return externalizedProperties;
+        }
+
+        /**
+         * Resolve the active Externalized Properties profile using the non-profile-specific 
+         * resolvers.
+         * 
+         * @return The active Externalized Properties profile. Otherwise, an empty 
+         * {@link Optional}.
+         */
+        private Optional<String> resolveActiveProfile() {
+            // At this point, profile-specific configurations are not yet applied.
+            // We are only determining the active profile at this point to know
+            // which configurations should be applied.
+
+            // Add a temporary default resolver to resolve active profile from.
+            List<Resolver> profileResolvers = 
+                Stream.concat(resolvers.stream(), Stream.of(new DefaultResolver()))
+                    // Ignore exceptions since we are only using these to resolve 
+                    // the active profile.
+                    .map(ExceptionIgnoringResolver::new)
+                    .collect(Collectors.toList());
+            
+            // We don't need processors/converters/variable expanders here
+            // as we only need to use this to resolve the active profile which is a String.
+            ExternalizedProperties resolverOnlyExternalizedProperties = 
+                new InternalExternalizedProperties(
+                    buildRootResolver(
+                        profileResolvers, 
+                        Collections.emptyList(),
+                        NoOpVariableExpander.INSTANCE
+                    ), 
+                    buildRootConverter(Collections.emptyList()),
+                    buildInvocationHandlerFactory()
+                );
+
+            ProfileSelector profileSelector = 
+                resolverOnlyExternalizedProperties.initialize(ProfileSelector.class);
+            
+            // Treat blank profile as no profile.
+            return profileSelector.activeProfile()
+                .filter(p -> !p.trim().isEmpty());
         }
 
         private InvocationHandlerFactory buildInvocationHandlerFactory() {
@@ -260,47 +313,88 @@ public interface ExternalizedProperties {
             return factory;
         }
 
-        private RootResolver buildRootResolver() {
+        private RootResolver buildRootResolver(
+                List<Resolver> resolvers,
+                List<Processor> processors,
+                VariableExpander variableExpander
+        ) {
             // Add default resolvers last.
             // Custom resolvers always take precedence.
             if (enableDefaultResolvers) {
                 resolvers(new DefaultResolver());
             }
 
-            if (resolvers.isEmpty()) {
-                throw new IllegalStateException("At least one resolver is required.");
-            }
-
             return new RootResolver(
                 Ordinals.sortResolvers(resolvers), 
-                buildRootProcessor(), 
+                buildRootProcessor(processors), 
                 variableExpander
             );
         }
 
-        private RootConverter buildRootConverter() {
+        private RootConverter buildRootConverter(List<Converter<?>> converters) {
             // Add default converters last.
             // Custom converters always take precedence.
             if (enableDefaultConverters) {
                 converters(new DefaultConverter());
             }
             
-            return new RootConverter(
-                Ordinals.sortConverters(converters)
-            );
+            return new RootConverter(Ordinals.sortConverters(converters));
         }
 
-        private RootProcessor buildRootProcessor() {
+        private RootProcessor buildRootProcessor(List<Processor> processors) {
             return new RootProcessor(processors);
         }
 
-        private Duration getDefaultCacheDuration() {
+        public Builder addProfileConfiguration(
+                ProfileConfiguration profileConfiguration
+        ) {
+            profileConfigurations.add(profileConfiguration);
+            return this;
+        }
+
+        public Builder applyProfileConfigurations(String activeProfile) {
+            profileConfigurations.forEach(c -> c.applyProfile(activeProfile));
+            return this;
+        }
+
+        private static Duration getDefaultCacheDuration() {
             return Duration.ofMinutes(Integer.parseInt(
                 System.getProperty(
                     ExternalizedProperties.class.getName() + ".default-cache-duration", 
                     "30"
                 )
             ));
+        }
+
+        /**
+         * Only used when resolving the active Externalized Properties profile.
+         * We will ignore any exceptions from resolvers and move to the next one until 
+         * we reach the first available resolver which has the active profile property.
+         */
+        private static class ExceptionIgnoringResolver implements Resolver {
+            private static final Logger LOGGER = 
+                Logger.getLogger(ExceptionIgnoringResolver.class.getName());
+            
+            private final Resolver decorated;
+        
+            private ExceptionIgnoringResolver(Resolver decorated) {
+                this.decorated = requireNonNull(decorated, "decorated");
+            }
+        
+            @Override
+            public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
+                try {
+                    return decorated.resolve(proxyMethod, propertyName);
+                } catch (Throwable ex) {
+                    // Ignore exception, but leave a log so user is made aware.
+                    LOGGER.log(
+                        Level.WARNING, 
+                        "Exception occurred while resolving property: " + propertyName, 
+                        ex
+                    );
+                    return Optional.empty();
+                }
+            }
         }
     }
 
@@ -418,13 +512,10 @@ public interface ExternalizedProperties {
      * Profile-specific configurations.
      */
     public static class ProfileConfiguration {
-        private static final String ACTIVE_PROFILE_SYSTEM_PROPERTY = 
-            "externalizedproperties.profile";
-        private static final String ACTIVE_PROFILE_ENV_VARIABLE = 
-            "EXTERNALIZEDPROPERTIES_PROFILE";
-        
         private final Builder builder;
         private final String[] targetProfiles;
+        private final List<ProfileConfigurator> profileConfigurators = 
+            new ArrayList<>();
 
         /**
          * Private constructor.
@@ -435,7 +526,8 @@ public interface ExternalizedProperties {
          * configuration such that it will be applied regardless of what the active profile is.
          */
         private ProfileConfiguration(Builder builder, String... targetProfiles) {
-            this.builder = builder;   
+            // Self-register to builder.
+            this.builder = builder.addProfileConfiguration(this);   
             this.targetProfiles = targetProfiles;
         }
 
@@ -448,25 +540,23 @@ public interface ExternalizedProperties {
          */
         public Builder apply(ProfileConfigurator profileConfigurator) {
             requireNonNull(profileConfigurator, "profileConfigurator");
+            this.profileConfigurators.add(profileConfigurator);
+            return builder;
+        }
+
+        private Builder applyProfile(String activeProfile) {
             // Wildcard profile. Apply regardless of the active profile.
             if (targetProfiles.length == 0) {
-                profileConfigurator.configure(activeProfile(), builder);
+                profileConfigurators.forEach(c -> c.configure(activeProfile, builder));
             } 
             else {
                 for (String profile : targetProfiles) {
-                    if (Objects.equals(profile, activeProfile())) {
-                        profileConfigurator.configure(activeProfile(), builder);
+                    if (Objects.equals(profile, activeProfile)) {
+                        profileConfigurators.forEach(c -> c.configure(activeProfile, builder));
                     }
                 }
             }
             return builder;
-        }
-
-        private static String activeProfile() {
-            return System.getProperty(
-                ACTIVE_PROFILE_SYSTEM_PROPERTY,
-                System.getenv().getOrDefault(ACTIVE_PROFILE_ENV_VARIABLE, "")
-            );
         }
     }
 

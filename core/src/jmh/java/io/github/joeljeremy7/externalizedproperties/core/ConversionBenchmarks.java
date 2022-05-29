@@ -16,7 +16,6 @@ import org.openjdk.jmh.annotations.Warmup;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -51,9 +50,7 @@ public abstract class ConversionBenchmarks {
              */
             ExternalizedProperties externalizedProperties =     
                 ExternalizedProperties.builder()
-                    .resolvers(new MapResolver(
-                        Collections.singletonMap(key, "1")
-                    ))
+                    .resolvers(new MapResolver(key, "1"))
                     .converters(new IntegerConverter())
                     .build();
 
@@ -64,9 +61,7 @@ public abstract class ConversionBenchmarks {
              */
             ExternalizedProperties externalizedPropertiesWithEagerLoading = 
                 ExternalizedProperties.builder()
-                    .resolvers(new MapResolver(
-                        Collections.singletonMap(key, "1")
-                    ))
+                    .resolvers(new MapResolver(key, "1"))
                     .enableEagerLoading()
                     .cacheDuration(Duration.ofHours(24))
                     .converters(new IntegerConverter())
@@ -82,9 +77,7 @@ public abstract class ConversionBenchmarks {
              */
             ExternalizedProperties externalizedPropertiesWithInvocationCaching = 
                 ExternalizedProperties.builder()
-                    .resolvers(new MapResolver(
-                        Collections.singletonMap(key, "1")
-                    ))
+                    .resolvers(new MapResolver(key, "1"))
                     .enableInvocationCaching()
                     .cacheDuration(Duration.ofHours(24))
                     .converters(new IntegerConverter())

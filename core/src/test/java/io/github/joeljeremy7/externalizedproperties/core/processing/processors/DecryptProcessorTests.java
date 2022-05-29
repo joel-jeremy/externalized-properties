@@ -2003,7 +2003,6 @@ public class DecryptProcessorTests {
     
     private static ExternalizedProperties externalizedProperties(Processor... processors) {
         return ExternalizedProperties.builder()
-            .enableDefaultResolvers()
             .processors(processors)
             .build();
     }

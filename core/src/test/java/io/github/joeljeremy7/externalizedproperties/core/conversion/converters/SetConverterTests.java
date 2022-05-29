@@ -584,7 +584,6 @@ public class SetConverterTests {
             Converter<?>... additionalConverters
     ) {
         return ExternalizedProperties.builder()
-            .enableDefaultResolvers()
             .converters(converterToTest)
             .converters(additionalConverters)
             .build();

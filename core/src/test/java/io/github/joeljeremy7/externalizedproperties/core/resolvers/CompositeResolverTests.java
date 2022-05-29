@@ -27,9 +27,31 @@ public class CompositeResolverTests {
         new TestProxyMethodFactory<>(ProxyInterface.class);
 
     @Nested
-    class FromMethod {
+    class FromMethodWithVarargsOverload {
         @Test
-        @DisplayName("should throw when resolvers collection argument is null or empty.")
+        @DisplayName("should throw when resolvers varargs argument is null.")
+        void test1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> CompositeResolver.from(
+                    (Resolver[])null
+                )
+            );
+        }
+        
+        @Test
+        @DisplayName(
+            "should return empty composite resolver when resolvers argument is empty"
+        )
+        void test2() {
+            CompositeResolver compositeResolver = CompositeResolver.from();
+            assertEquals(CompositeResolver.EMPTY, compositeResolver);
+        }
+    }
+    @Nested
+    class FromMethodWithCollectionOverload {
+        @Test
+        @DisplayName("should throw when resolvers collection argument is null.")
         void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -37,71 +59,36 @@ public class CompositeResolverTests {
                     (Collection<Resolver>)null
                 )
             );
-
-            List<Resolver> emptyResolvers = Collections.emptyList();
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> CompositeResolver.from(emptyResolvers)
-            );
         }
 
         @Test
-        @DisplayName("should throw when resolvers varargs argument is null or empty.")
+        @DisplayName(
+            "should return empty composite resolver when resolvers argument is empty"
+        )
         void test2() {
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> CompositeResolver.from(
-                    (Resolver[])null
-                )
+            CompositeResolver compositeResolver = CompositeResolver.from(
+                Collections.emptyList()
             );
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> CompositeResolver.from(new Resolver[0])
-            );
+            assertEquals(CompositeResolver.EMPTY, compositeResolver);
         }
     }
 
     @Nested
-    class FlattenMethod {
+    class FlattenMethodWithVarargsOverload {
         @Test
-        @DisplayName("should throw when resolvers collection argument is null or empty.")
+        @DisplayName("should throw when resolvers varargs argument is null.")
         void test1() {
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> CompositeResolver.flatten(
-                    (Collection<Resolver>)null
-                )
-            );
-
-            List<Resolver> emptyResolvers = Collections.emptyList();
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> CompositeResolver.flatten(emptyResolvers)
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when resolvers varargs argument is null or empty.")
-        void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> CompositeResolver.flatten(
                     (Resolver[])null
                 )
-            );
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> CompositeResolver.flatten(new Resolver[0])
             );
         }
 
         @Test
         @DisplayName("should discard any nested composite property resolvers.")
-        void test3() {
+        void test2() {
             CompositeResolver resolver1 = 
                 CompositeResolver.from(new SystemPropertyResolver());
             CompositeResolver resolver2 =
@@ -111,9 +98,7 @@ public class CompositeResolverTests {
             CompositeResolver resolver4 =
                 CompositeResolver.from(resolver3);
 
-            Resolver flattenedResolver =   
-                CompositeResolver.flatten(resolver2, resolver4);
-            
+            Resolver flattenedResolver = CompositeResolver.flatten(resolver2, resolver4);
             assertTrue(flattenedResolver instanceof CompositeResolver);
             
             CompositeResolver compositeResolver = 
@@ -137,17 +122,100 @@ public class CompositeResolverTests {
 
         @Test
         @DisplayName(
-            "should return the resolver instance " + 
-            "when only one resolver remained after the flattening operation."
+            "should return the only remaining resolver instance " + 
+            "when only one resolver remains after the flattening operation."
         )
-        void test4() {
+        void test3() {
             CompositeResolver resolver = 
                 CompositeResolver.from(new SystemPropertyResolver());
 
-            Resolver flattenedResolver =   
-                CompositeResolver.flatten(resolver);
-            
+            Resolver flattenedResolver = CompositeResolver.flatten(resolver);
             assertTrue(flattenedResolver instanceof SystemPropertyResolver);
+        }
+
+        @Test
+        @DisplayName(
+            "should return an empty composite resolver when resolvers argument is empty"
+        )
+        void test4() {
+            Resolver flattenedResolver = CompositeResolver.flatten();
+            assertTrue(flattenedResolver instanceof CompositeResolver);
+            assertEquals(CompositeResolver.EMPTY, flattenedResolver);
+        }
+    }
+
+    @Nested
+    class FlattenMethodWithCollectionOverload {
+        @Test
+        @DisplayName("should throw when resolvers collection argument is null.")
+        void test1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> CompositeResolver.flatten(
+                    (Collection<Resolver>)null
+                )
+            );
+        }
+
+        @Test
+        @DisplayName("should discard any nested composite property resolvers.")
+        void test2() {
+            CompositeResolver resolver1 = 
+                CompositeResolver.from(new SystemPropertyResolver());
+            CompositeResolver resolver2 =
+                CompositeResolver.from(resolver1);
+            CompositeResolver resolver3 =
+                CompositeResolver.from(new EnvironmentVariableResolver());
+            CompositeResolver resolver4 =
+                CompositeResolver.from(resolver3);
+
+            Resolver flattenedResolver = CompositeResolver.flatten(
+                Arrays.asList(resolver2, resolver4)
+            );
+            assertTrue(flattenedResolver instanceof CompositeResolver);
+            
+            CompositeResolver compositeResolver = 
+                (CompositeResolver)flattenedResolver;
+
+            // Should discard other composite property resolvers but
+            // maintain original resolver order.
+            int resolverCount = 0;
+            for (Resolver resolver : compositeResolver) {
+                if (resolverCount == 0) {
+                    assertTrue(resolver instanceof SystemPropertyResolver);
+                } else if (resolverCount == 1) {
+                    assertTrue(resolver instanceof EnvironmentVariableResolver);
+                }
+                resolverCount++;
+            }
+
+            // There must be only SystemPropertyResolver and EnvironmentPropertyResolver.
+            assertEquals(2, resolverCount);
+        }
+
+        @Test
+        @DisplayName(
+            "should return the only remaining resolver instance " + 
+            "when only one resolver remains after the flattening operation."
+        )
+        void test3() {
+            CompositeResolver resolver = 
+                CompositeResolver.from(new SystemPropertyResolver());
+
+            Resolver flattenedResolver = CompositeResolver.flatten(
+                Collections.singletonList(resolver)
+            );
+            assertTrue(flattenedResolver instanceof SystemPropertyResolver);
+        }
+
+        @Test
+        @DisplayName(
+            "should return an empty composite resolver when resolvers argument is empty"
+        )
+        void test4() {
+            Resolver flattenedResolver = CompositeResolver.flatten(Collections.emptyList());
+            assertTrue(flattenedResolver instanceof CompositeResolver);
+            assertEquals(CompositeResolver.EMPTY, flattenedResolver);
         }
     }
 

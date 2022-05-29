@@ -26,7 +26,6 @@ import java.time.YearMonth;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -37,6 +36,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -151,19 +151,150 @@ public class ExternalizedPropertiesTests {
 
         @Nested
         class BuildMethod {
-            @Test
-            @DisplayName("should throw on build when there are no resolvers")
-            void test1() {
-                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
-                assertThrows(
-                    IllegalStateException.class,
-                    () -> builder.build()
+            @ParameterizedTest
+            @ValueSource(strings = { "test", "prod" })
+            @DisplayName("should apply active profile configuration")
+            void profilesTest1(String activeProfile) {
+                MapResolver activeProfileResolver = new MapResolver(
+                    "externalizedproperties.profile", 
+                    activeProfile
                 );
+
+                ExternalizedProperties externalizedProperties = 
+                    ExternalizedProperties.builder()
+                        .resolvers(activeProfileResolver)
+                        .onProfiles("test").apply((profile, builder) -> 
+                            builder.resolvers(new MapResolver(
+                                "property", 
+                                profile
+                            ))
+                        )
+                        .onProfiles("prod").apply((profile, builder) ->
+                            builder.resolvers(new MapResolver(
+                                "property", 
+                                profile
+                            ))
+                        )
+                        .build();
+                
+                ProxyInterface proxyInterface = 
+                    externalizedProperties.initialize(ProxyInterface.class);
+
+                assertEquals(activeProfile, proxyInterface.property());
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = { "test", "prod" })
+            @DisplayName(
+                "should apply wildcard profile configuration regardless of the active profile"
+            )
+            void profilesTest2(String activeProfile) {
+                MapResolver activeProfileResolver = new MapResolver(
+                    "externalizedproperties.profile", 
+                    activeProfile
+                );
+
+                ExternalizedProperties externalizedProperties = 
+                    ExternalizedProperties.builder()
+                        .resolvers(activeProfileResolver)
+                        // Wildcard profile.
+                        .onProfiles().apply((profile, builder) ->
+                            builder.resolvers(new MapResolver(
+                                "property", 
+                                "wildcard"
+                            ))
+                        )
+                        .build();
+                
+                ProxyInterface proxyInterface = 
+                    externalizedProperties.initialize(ProxyInterface.class);
+
+                assertEquals("wildcard", proxyInterface.property());
+            }
+
+            @Test
+            @DisplayName(
+                "should not apply profile configurations when no active profile can be resolved"
+            )
+            void profilesTest3() {
+                // No resolver defines the active profile.
+
+                ExternalizedProperties externalizedProperties = 
+                    ExternalizedProperties.builder()
+                        // Wildcard profile.
+                        .onProfiles().apply((profile, builder) ->
+                            builder.resolvers(new MapResolver(
+                                "property.optional", 
+                                "wildcard"
+                            ))
+                        )
+                        .build();
+                
+                ProxyInterface proxyInterface = 
+                    externalizedProperties.initialize(ProxyInterface.class);
+
+                assertFalse(proxyInterface.optionalProperty().isPresent());
+            }
+
+            @Test
+            @DisplayName(
+                "should not apply profile configurations when active profile is empty"
+            )
+            void profilesTest4() {
+                MapResolver activeProfileResolver = new MapResolver(
+                    "externalizedproperties.profile", 
+                    "" // Empty profile.
+                );
+
+                ExternalizedProperties externalizedProperties = 
+                    ExternalizedProperties.builder()
+                        .resolvers(activeProfileResolver)
+                        // Wildcard profile.
+                        .onProfiles().apply((profile, builder) ->
+                            builder.resolvers(new MapResolver(
+                                "property.optional", 
+                                "wildcard"
+                            ))
+                        )
+                        .build();
+                
+                ProxyInterface proxyInterface = 
+                    externalizedProperties.initialize(ProxyInterface.class);
+
+                assertFalse(proxyInterface.optionalProperty().isPresent());
+            }
+
+            @Test
+            @DisplayName(
+                "should not apply profile configurations when active profile is blank"
+            )
+            void profilesTest5() {
+                MapResolver activeProfileResolver = new MapResolver(
+                    "externalizedproperties.profile", 
+                    "   " // Blank profile.
+                );
+
+                ExternalizedProperties externalizedProperties = 
+                    ExternalizedProperties.builder()
+                        .resolvers(activeProfileResolver)
+                        // Wildcard profile.
+                        .onProfiles().apply((profile, builder) ->
+                            builder.resolvers(new MapResolver(
+                                "property.optional", 
+                                "wildcard"
+                            ))
+                        )
+                        .build();
+                
+                ProxyInterface proxyInterface = 
+                    externalizedProperties.initialize(ProxyInterface.class);
+
+                assertFalse(proxyInterface.optionalProperty().isPresent());
             }
 
             @Test
             @DisplayName("should sort registered resolvers based on ordinal")
-            void test2() {
+            void ordinalTest1() {
                 StubResolver resolver1 = new StubResolver(
                     pn -> "property".equals(pn) ? "ordinal-1" : null
                 );
@@ -229,7 +360,7 @@ public class ExternalizedPropertiesTests {
 
             @Test
             @DisplayName("should sort registered converters based on ordinal")
-            void test3() {
+            void ordinalTest2() {
                 StubConverter<Integer> converter1 = new StubConverter<>(
                     (pm, value, targetType) -> "1".equals(value) ? 
                         ConversionResult.of(Integer.parseInt(value)) : ConversionResult.skip()
@@ -245,7 +376,6 @@ public class ExternalizedPropertiesTests {
                 // c1o1 = converter1 as ordinal 1
                 ExternalizedProperties c1o1 = 
                     ExternalizedProperties.builder()
-                        .enableDefaultResolvers()
                         .converters(converter3)
                         .converters(Ordinals.ordinalConverter(1, converter1))
                         .converters(Ordinals.ordinalConverter(2, converter2))
@@ -254,7 +384,6 @@ public class ExternalizedPropertiesTests {
                 // c2o1 = converter2 as ordinal 1
                 ExternalizedProperties c2o1 = 
                     ExternalizedProperties.builder()
-                        .enableDefaultResolvers()
                         .converters(converter3)
                         // Switched up ordinals.
                         .converters(Ordinals.ordinalConverter(2, converter1))
@@ -404,25 +533,20 @@ public class ExternalizedPropertiesTests {
             void test1() {
                 Map<String, String> testProps = testProperties();
                 StubResolver mapResolver = new StubResolver(testProps::get);
-                StubResolver systemProps = new StubResolver(System::getProperty);
 
                 ExternalizedProperties externalizedProperties = 
                     ExternalizedProperties.builder()
-                        .enableDefaultResolvers()
-                        .resolvers(mapResolver, systemProps)
+                        .resolvers(mapResolver)
                         .enableDefaultConverters()
                         .enableEagerLoading()
                         .build();
 
-                ProxyInterface proxy = 
-                    externalizedProperties.initialize(ProxyInterface.class);
+                EagerLoadingProxyInterface proxy = 
+                    externalizedProperties.initialize(EagerLoadingProxyInterface.class);
 
                 assertNotNull(proxy);
-                testProps.forEach((key, expectedValue) -> {
-                    assertEquals(expectedValue, mapResolver.resolvedProperties().get(key));
-                });
-                systemProps.resolvedProperties().forEach((key, value) -> {
-                    assertEquals(System.getProperty(key), value);
+                mapResolver.resolvedProperties().forEach((key, expectedValue) -> {
+                    assertEquals(testProps.get(key), expectedValue);
                 });
             }
         }
@@ -500,64 +624,6 @@ public class ExternalizedPropertiesTests {
                     () -> ExternalizedProperties.builder()
                         .onProfiles().apply(null)
                 );
-            }
-
-            @ParameterizedTest
-            @ValueSource(strings = { "test", "prod" })
-            @DisplayName("should apply active profile configuration")
-            void test2(String activeProfile) {
-                // Set profile.
-                System.setProperty("externalizedproperties.profile", activeProfile);
-
-                ExternalizedProperties externalizedProperties = 
-                    ExternalizedProperties.builder()
-                        .onProfiles("test").apply((profile, builder) -> 
-                            builder.resolvers(new MapResolver(
-                                Collections.singletonMap("property", profile)
-                            ))
-                        )
-                        .onProfiles("prod").apply((profile, builder) ->
-                            builder.resolvers(new MapResolver(
-                                Collections.singletonMap("property", profile)
-                            ))
-                        )
-                        .build();
-                
-                ProxyInterface proxyInterface = 
-                    externalizedProperties.initialize(ProxyInterface.class);
-
-                assertEquals(activeProfile, proxyInterface.property());
-
-                // Cleanup profile system property.
-                System.clearProperty("externalizedproperties.profile");
-            }
-
-            @ParameterizedTest
-            @ValueSource(strings = { "test", "prod" })
-            @DisplayName(
-                "should apply wildcard profile configuration regardless of the active profile"
-            )
-            void test3(String activeProfile) {
-                // Set profile.
-                System.setProperty("externalizedproperties.profile", activeProfile);
-
-                ExternalizedProperties externalizedProperties = 
-                    ExternalizedProperties.builder()
-                        // Wildcard profile.
-                        .onProfiles().apply((profile, builder) ->
-                            builder.resolvers(new MapResolver(
-                                Collections.singletonMap("property", "wildcard")
-                            ))
-                        )
-                        .build();
-                
-                ProxyInterface proxyInterface = 
-                    externalizedProperties.initialize(ProxyInterface.class);
-
-                assertEquals("wildcard", proxyInterface.property());
-
-                // Cleanup profile system property.
-                System.clearProperty("externalizedproperties.profile");
             }
         }
     }
@@ -828,6 +894,17 @@ public class ExternalizedPropertiesTests {
     
         @ExternalizedProperty("property.yearmonth")
         YearMonth yearMonth();
+    }
+
+    public static interface EagerLoadingProxyInterface {
+        @ExternalizedProperty("property")
+        String property();
+
+        @ExternalizedProperty("property.int")
+        int intProperty();
+
+        @ExternalizedProperty("property.optional")
+        Optional<String> optionalProperty();
     }
 
     public static interface OrdinalProxyInterface {

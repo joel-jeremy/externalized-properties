@@ -122,7 +122,7 @@ public class PatternVariableExpanderTests {
                 VariableExpansionException.class, 
                 () -> variableExpander.expandVariables(
                     proxyMethod, 
-                    "property-${nonexistent}"
+                    "property-${non.existent}"
                 )
             );
         }

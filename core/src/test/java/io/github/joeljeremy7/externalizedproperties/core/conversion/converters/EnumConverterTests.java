@@ -117,7 +117,6 @@ public class EnumConverterTests {
             EnumConverter converterToTest
     ) {
         return ExternalizedProperties.builder()
-            .enableDefaultResolvers()
             .converters(converterToTest)
             .build();
     }
