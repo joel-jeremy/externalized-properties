@@ -5,7 +5,6 @@ Externalized Properties has the concept of profiles. Applications typically are 
 ```java
 public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .defaults()
         .onProfiles("test").apply(new MyTestProfileConfigurator())
         .onProfiles("staging").apply(new MyStagingProfileConfigurator())
         .onProfiles("prod").apply(new MyProdProfileConfigurator())
@@ -86,7 +85,8 @@ public class MyWildcardProfileConfigurator implements ProfileConfigurator {
 
 ## Activating an Externalized Properties Profile
 
-The active Externalized Properties profile can be set via:
+The active Externalized Properties profile can be set via a property with the name: `externalizedproperties.profile`.  
 
-- System properties (`externalizedproperties.profile`)
-- Environment variables (`EXTERNALIZEDPROPERTIES_PROFILE`).
+Externalized Properties will look for the profile property in all the registered non-profile-specific resolvers and the default resolvers.
+
+If the profile property is found, all the applicable profile configurations will then be applied. Otherwise, they will be ignored.
