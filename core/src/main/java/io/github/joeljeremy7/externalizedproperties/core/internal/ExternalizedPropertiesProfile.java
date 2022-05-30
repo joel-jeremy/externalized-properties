@@ -7,7 +7,7 @@ import java.util.Optional;
 /**
  * Proxy interface to query for the active Externalized Properties profile.
  */
-public interface ProfileSelector {
+public interface ExternalizedPropertiesProfile {
     /**
      * The active Externalized Properties profile.
      * 

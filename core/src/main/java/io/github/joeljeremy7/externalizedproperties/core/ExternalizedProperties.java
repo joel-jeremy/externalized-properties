@@ -3,7 +3,7 @@ package io.github.joeljeremy7.externalizedproperties.core;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.CachingExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.internal.InternalExternalizedProperties;
-import io.github.joeljeremy7.externalizedproperties.core.internal.ProfileSelector;
+import io.github.joeljeremy7.externalizedproperties.core.internal.ExternalizedPropertiesProfile;
 import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.ExpiringCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
@@ -269,12 +269,11 @@ public interface ExternalizedProperties {
                     buildInvocationHandlerFactory()
                 );
 
-            ProfileSelector profileSelector = 
-                resolverOnlyExternalizedProperties.initialize(ProfileSelector.class);
+            ExternalizedPropertiesProfile activeProfileProxy = 
+                resolverOnlyExternalizedProperties.initialize(ExternalizedPropertiesProfile.class);
             
             // Treat blank profile as no profile.
-            return profileSelector.activeProfile()
-                .filter(p -> !p.trim().isEmpty());
+            return activeProfileProxy.activeProfile().filter(p -> !p.trim().isEmpty());
         }
 
         private InvocationHandlerFactory buildInvocationHandlerFactory() {
@@ -389,7 +388,7 @@ public interface ExternalizedProperties {
                     // Ignore exception, but leave a log so user is made aware.
                     LOGGER.log(
                         Level.WARNING, 
-                        "Exception occurred while resolving property: " + propertyName, 
+                        "Exception occurred while resolving " + propertyName + ". Ignoring...", 
                         ex
                     );
                     return Optional.empty();

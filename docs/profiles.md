@@ -8,18 +8,19 @@ public static void main(String[] args) {
         .onProfiles("test").apply(new MyTestProfileConfigurator())
         .onProfiles("staging").apply(new MyStagingProfileConfigurator())
         .onProfiles("prod").apply(new MyProdProfileConfigurator())
-        // This will be applied regardless of the active profile.
-        // However, if an active profile is not set, this will not be applied.
-        .onProfiles().apply(new MyWildcardProfileConfigurator())
         // This will be applied to both test and staging.
         .onProfiles("test", "staging").apply(new MyNonProdProfileConfigurator())
+        // If there are no specified profiles, this will treated as a wildcard 
+        // profile configuration and will be applied to any profiles. 
+        // However, if no active profile is set, this will not be applied.
+        .onProfiles().apply(new MyWildcardProfileConfigurator())
         .build();
 }
 
 public class MyTestProfileConfigurator implements ProfileConfigurator {
     @Override
-    public void configure(String profile, BuilderConfiguration builder) {
-        // profile is "test".
+    public void configure(String activeProfile, BuilderConfiguration builder) {
+        // activeProfile is "test".
 
         builder.resolvers(...)
             .converters(...)
@@ -69,12 +70,10 @@ public class MyWildcardProfileConfigurator implements ProfileConfigurator {
 
     private ResourceResolver applicationProperties(String activeProfile) {
         // Changes based on the active profile:
-        // application.properties
         // application-test.properties
         // application-staging.properties
         // application-prod.properties
-        String resourceNameSuffix = !profile.isEmpty() ? ("-" + activeProfile) : "";
-        String resourceName = "/application" + resourceNameSuffix + ".properties";
+        String resourceName = "/application-" + activeProfile + ".properties";
         try {
             return ResourceResolver.fromUrl(getClass().getResource(resourceName))
         } catch (IOException ex) {
