@@ -1,6 +1,8 @@
 # Profiles
 
-Externalized Properties has the concept of profiles. Applications typically are deployed to multiple environments and more often than not, these environment needs different configurations. This is where profiles can help. It allows applications to define different configurations per environment e.g.
+Externalized Properties has the concept of profiles. Applications typically are deployed to multiple environments and more often than not, these environment needs different configurations. 
+
+This is where profiles can help. It allows applications to define different configurations per environment e.g.
 
 ```java
 public static void main(String[] args) {
@@ -89,4 +91,4 @@ The active Externalized Properties profile can be set via a property with the na
 
 Externalized Properties will look for the profile property in all the registered non-profile-specific resolvers and the default resolvers.
 
-If the profile property is found, all the applicable profile configurations will then be applied. Otherwise, they will be ignored.
+If the active profile is found, all the applicable profile configurations will then be applied. Otherwise, they will be ignored.
