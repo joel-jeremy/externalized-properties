@@ -91,4 +91,4 @@ The active Externalized Properties profile can be set via a property with the na
 
 Externalized Properties will look for the profile property in all the registered non-profile-specific resolvers and the default resolvers.
 
-If the active profile is found, all the applicable profile configurations will then be applied. Otherwise, they will be ignored.
+If an active profile is found, all the applicable profile configurations will then be applied. Otherwise, they will be ignored.
