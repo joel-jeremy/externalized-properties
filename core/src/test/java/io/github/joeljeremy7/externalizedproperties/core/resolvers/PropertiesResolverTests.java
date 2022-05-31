@@ -2,10 +2,10 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
+import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver.UnresolvedPropertyHandler;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,10 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PropertiesResolverTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
-        ExternalizedProperties.builder().withDefaults().build();
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
     private static final Properties EMPTY_PROPERTIES = new Properties();
 
     @Nested
@@ -57,10 +55,12 @@ public class PropertiesResolverTests {
 
             PropertiesResolver resolver = resolverToTest(props);
             ProxyMethod intPropertyProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyNonString
+                ProxyInterface::propertyNonString,
+                externalizedProperties(resolver)
             );
             ProxyMethod propertyProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
 
             Optional<String> nonStringResult = 
@@ -79,55 +79,6 @@ public class PropertiesResolverTests {
     }
 
     @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ResolverProvider<PropertiesResolver> provider = 
-                PropertiesResolver.provider(new Properties());
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ResolverProvider<PropertiesResolver> provider = 
-                PropertiesResolver.provider(new Properties());
-
-            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
-        }
-    }
-
-
-    @Nested
-    class ProviderMethodWithUnresolvedPropertyHandlerOverload {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ResolverProvider<PropertiesResolver> provider = 
-                PropertiesResolver.provider(
-                    new Properties(),
-                    System::getProperty
-                );
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ResolverProvider<PropertiesResolver> provider = 
-                PropertiesResolver.provider(
-                    new Properties(),
-                    System::getProperty
-                );
-
-            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
-        }
-    }
-
-    @Nested
     class ResolveMethod {
         @Test
         @DisplayName("should resolve property value from the given properties.")
@@ -137,7 +88,8 @@ public class PropertiesResolverTests {
             
             PropertiesResolver resolver = resolverToTest(props);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
@@ -161,7 +113,8 @@ public class PropertiesResolverTests {
         void test2() {
             PropertiesResolver resolver = resolverToTest(EMPTY_PROPERTIES);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
@@ -192,7 +145,8 @@ public class PropertiesResolverTests {
                 unresolvedPropertyHandler
             );
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result = 
@@ -207,18 +161,22 @@ public class PropertiesResolverTests {
         }
     }
 
-    private PropertiesResolver resolverToTest(Properties properties) {
+    private static PropertiesResolver resolverToTest(Properties properties) {
         return new PropertiesResolver(properties);
     }
 
-    private PropertiesResolver resolverToTest(
+    private static PropertiesResolver resolverToTest(
             Properties properties,
             UnresolvedPropertyHandler unresolverPropertyHandler
     ) {
         return new PropertiesResolver(properties, unresolverPropertyHandler);
     }
+    
+    private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+        return ExternalizedProperties.builder().resolvers(resolvers).build();
+    }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("property")
         String property();
 

@@ -16,7 +16,6 @@ import org.openjdk.jmh.annotations.Warmup;
 
 import java.lang.reflect.Type;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -51,29 +50,25 @@ public abstract class ConversionBenchmarks {
              */
             ExternalizedProperties externalizedProperties =     
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(
-                        Collections.singletonMap(key, "1")
-                    ))
-                    .converters((ep, rc) -> new IntegerConverter())
+                    .resolvers(new MapResolver(key, "1"))
+                    .converters(new IntegerConverter())
                     .build();
 
-            proxyInterface = externalizedProperties.proxy(ConversionProxyInterface.class);
+            proxyInterface = externalizedProperties.initialize(ConversionProxyInterface.class);
 
             /**
              * Setup with eager loading.
              */
             ExternalizedProperties externalizedPropertiesWithEagerLoading = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(
-                        Collections.singletonMap(key, "1")
-                    ))
-                    .withProxyEagerLoading()
-                    .withCacheDuration(Duration.ofHours(24))
-                    .converters((ep, rc) -> new IntegerConverter())
+                    .resolvers(new MapResolver(key, "1"))
+                    .enableEagerLoading()
+                    .cacheDuration(Duration.ofHours(24))
+                    .converters(new IntegerConverter())
                     .build();
 
             proxyInterfaceWithEagerLoading = 
-                externalizedPropertiesWithEagerLoading.proxy(
+                externalizedPropertiesWithEagerLoading.initialize(
                     ConversionProxyInterface.class
                 );
             
@@ -82,16 +77,14 @@ public abstract class ConversionBenchmarks {
              */
             ExternalizedProperties externalizedPropertiesWithInvocationCaching = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(
-                        Collections.singletonMap(key, "1")
-                    ))
-                    .withProxyInvocationCaching()
-                    .withCacheDuration(Duration.ofHours(24))
-                    .converters((ep, rc) -> new IntegerConverter())
+                    .resolvers(new MapResolver(key, "1"))
+                    .enableInvocationCaching()
+                    .cacheDuration(Duration.ofHours(24))
+                    .converters(new IntegerConverter())
                     .build();
 
             proxyInterfaceWithInvocationCaching = 
-                externalizedPropertiesWithInvocationCaching.proxy(
+                externalizedPropertiesWithInvocationCaching.initialize(
                     ConversionProxyInterface.class
                 );
         }

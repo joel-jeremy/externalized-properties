@@ -2,6 +2,7 @@ package io.github.joeljeremy7.externalizedproperties.core;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 /**
  * This class is used to reference a type (possibly a generic type).
@@ -49,5 +50,28 @@ public abstract class TypeReference<T> {
      */
     public Type[] genericTypeParameters() {
         return TypeUtilities.getTypeParameters(type);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(type);
+    }
+
+    /**
+     * Two {@link TypeReference}s with the same {@link Type} value 
+     * are considered equal.
+     * 
+     * @param obj The other object to compare with.
+     * @return {@code true} if both {@link TypeReference}s have the 
+     * same {@link Type} value. Otherwise, {@code false}.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TypeReference<?>) {
+            TypeReference<?> other = (TypeReference<?>)obj;
+            return Objects.equals(type, other.type);
+        }
+        return false;
     }
 }

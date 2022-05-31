@@ -2,7 +2,6 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.DateTimeFormat;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -44,15 +43,6 @@ import java.time.temporal.TemporalAccessor;
  * format/pattern to use when converting to date/time types.
  */
 public class DateTimeConverter implements Converter<TemporalAccessor> {
-    /**
-     * The {@link ConverterProvider} for {@link DateTimeConverter}.
-     * 
-     * @return The {@link ConverterProvider} for {@link DateTimeConverter}.
-     */
-    public static ConverterProvider<DateTimeConverter> provider() {
-        return (externalizedProperties, rootConverter) -> new DateTimeConverter();
-    }
-
     /** {@inheritDoc} */
     @Override
     public boolean canConvertTo(Class<?> targetType) {
@@ -81,7 +71,7 @@ public class DateTimeConverter implements Converter<TemporalAccessor> {
             return ConversionResult.of(
                 parseLocalDateTime(proxyMethod, valueToConvert)
             );
-        } 
+        }
         else if (OffsetDateTime.class.equals(targetType)) {
             return ConversionResult.of(
                 parseOffsetDateTime(proxyMethod, valueToConvert)
@@ -96,17 +86,17 @@ public class DateTimeConverter implements Converter<TemporalAccessor> {
             return ConversionResult.of(
                 parseLocalDate(proxyMethod, valueToConvert)
             );
-        } 
+        }
         else if (LocalTime.class.equals(targetType)) {
             return ConversionResult.of(
                 parseLocalTime(proxyMethod, valueToConvert)
             );
-        }  
+        }
         else if (OffsetTime.class.equals(targetType)) {
             return ConversionResult.of(
                 parseOffsetTime(proxyMethod, valueToConvert)
             );
-        } 
+        }
         else if (Instant.class.equals(targetType)) {
             return ConversionResult.of(
                 Instant.parse(valueToConvert)
@@ -116,22 +106,22 @@ public class DateTimeConverter implements Converter<TemporalAccessor> {
             return ConversionResult.of(
                 DayOfWeek.valueOf(valueToConvert)
             );
-        } 
+        }
         else if (Month.class.equals(targetType)) {
             return ConversionResult.of(
                 Month.valueOf(valueToConvert)
             );
-        } 
+        }
         else if (MonthDay.class.equals(targetType)) {
             return ConversionResult.of(
                 parseMonthDay(proxyMethod, valueToConvert)
             );
-        } 
+        }
         else if (Year.class.equals(targetType)) {
             return ConversionResult.of(
                 parseYear(proxyMethod, valueToConvert)
             );
-        } 
+        }
         else if (YearMonth.class.equals(targetType)) {
             return ConversionResult.of(
                 parseYearMonth(proxyMethod, valueToConvert)

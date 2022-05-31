@@ -52,7 +52,8 @@ public class TypeUtilities {
         
         GenericArrayType gat = asGenericArrayType(type);
         if (gat != null) {
-            // Return generic component type of array.
+            // Return raw component type of array.
+            // For example, if type is List<String>[], raw List[] shall be returned.
             Type genericArrayComponentType = gat.getGenericComponentType();
             return getRawArrayType(genericArrayComponentType);
         }
@@ -77,12 +78,13 @@ public class TypeUtilities {
             // Only get first of the bounds because Java doesn't allow multiple extends/super
             // as of writing.
 
-            // Return lower bounds i.e for <? super String>, return String.
+            // Return lower bound i.e for <? super String>, return String.
             if (wt.getLowerBounds().length > 0) {
                 return getRawType(wt.getLowerBounds()[0]);
             }
 
-            // Return upper bounds i.e for <? extends String>, return String.
+            // Return upper bound i.e for <? extends String>, return String.
+            // If no upper bound is explicitly declared, the upper bound is Object.
             return getRawType(wt.getUpperBounds()[0]);
         }
 
@@ -233,13 +235,58 @@ public class TypeUtilities {
     }
 
     /**
-     * Extract raw array class of the given type.
+     * Get array type of the given type.
+     * 
+     * @param type The type to derive the type from.
+     * @return The array type of the given type.
+     * @throws IllegalArgumentException if the type is unsupported.
+     */
+    public static Type getArrayType(Type type) {
+        requireNonNull(type, "type");
+
+        if (isParameterizedType(type) ||
+            isTypeVariable(type) ||
+            isGenericArrayType(type)
+        ) {
+            return new GenericArrayType() {
+                @Override
+                public Type getGenericComponentType() {
+                    return type;
+                }
+            };
+        }
+
+        // Wildcards cannot be arrays, so we use its upper/lower bounds to 
+        // determine the array type.
+        WildcardType wildcardType = asWildcardType(type);
+        if (wildcardType != null) {
+            // Only get first of the bounds because Java doesn't allow multiple 
+            // extends/super as of writing.
+            if (wildcardType.getLowerBounds().length > 0) {
+                // For example, if wildcard type is <? super List<String>>,
+                // array type should be List<String>[].
+                return getArrayType(wildcardType.getLowerBounds()[0]);
+            }
+
+            // For example, if wildcard type is <? extends List<String>>,
+            // array type should be List<String>[].
+            // If no upper bound is explicitly declared, the upper bound is Object.
+            return getArrayType(wildcardType.getUpperBounds()[0]);
+        }
+
+        return getRawArrayType(type);
+    }
+
+    /**
+     * Get raw array class of the given type.
      * 
      * @param type The type to derive the raw class from.
      * @return The raw array class of the given type.
      * @throws IllegalArgumentException if the type is unsupported.
      */
-    private static Class<?> getRawArrayType(Type type) {
+    public static Class<?> getRawArrayType(Type type) {
+        requireNonNull(type, "type");
+
         Class<?> rawType = getRawType(type);
         return ARRAY_TYPE_CACHE.get(rawType);
     }

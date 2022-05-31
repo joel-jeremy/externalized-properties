@@ -3,9 +3,9 @@ package io.github.joeljeremy7.externalizedproperties.resolvers.database;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
+import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import io.github.joeljeremy7.externalizedproperties.resolvers.database.queryexecutors.AbstractNameValueQueryExecutor;
 import io.github.joeljeremy7.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
 import io.github.joeljeremy7.externalizedproperties.resolvers.database.testentities.H2Utils;
@@ -24,10 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DatabaseResolverTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
-        ExternalizedProperties.builder().withDefaults().build();
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
 
     private static final int NUMBER_OF_TEST_ENTRIES = 2;
     private static final String H2_CONNECTION_STRING = 
@@ -58,89 +56,6 @@ public class DatabaseResolverTests {
             assertThrows(IllegalArgumentException.class, () -> {
                 new DatabaseResolver(CONNECTION_PROVIDER, null);
             });
-        }
-    }
-
-    @Nested
-    class ProviderMethodWithConnectionProviderOverload {
-        @Test
-        @DisplayName("should throw when connection provider argument is null.")
-        void test1() {
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> DatabaseResolver.provider(null)
-            );
-        }
-
-        @Test
-        @DisplayName("should not return null.")
-        void test2() {
-            ResolverProvider<DatabaseResolver> provider = 
-                DatabaseResolver.provider(CONNECTION_PROVIDER);
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test3() {
-            ResolverProvider<DatabaseResolver> provider = 
-                DatabaseResolver.provider(CONNECTION_PROVIDER);
-
-            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
-        }
-    }
-
-    @Nested
-    class ProviderMethodWithConnectionProviderAndQueryExecutorOverload {
-        @Test
-        @DisplayName("should throw when connection provider argument is null.")
-        void test1() {
-            QueryExecutor queryExecutor = new SimpleNameValueQueryExecutor();
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> DatabaseResolver.provider(
-                    null,
-                    queryExecutor
-                )
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when query executor argument is null.")
-        void test2() {
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> DatabaseResolver.provider(
-                    CONNECTION_PROVIDER,
-                    null
-                )
-            );
-        }
-
-        @Test
-        @DisplayName("should not return null.")
-        void test3() {
-            ResolverProvider<DatabaseResolver> provider = 
-                DatabaseResolver.provider(
-                    CONNECTION_PROVIDER, 
-                    new SimpleNameValueQueryExecutor()
-                );
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test4() {
-            ResolverProvider<DatabaseResolver> provider = 
-                DatabaseResolver.provider(
-                    CONNECTION_PROVIDER,
-                    new SimpleNameValueQueryExecutor()
-                );
-
-            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
         }
     }
 
@@ -191,7 +106,8 @@ public class DatabaseResolverTests {
             DatabaseResolver databaseResolver = 
                 new DatabaseResolver(CONNECTION_PROVIDER);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property1
+                ProxyInterface::property1,
+                externalizedProperties(databaseResolver)
             );
             
             String propertyName = "test.property.1";
@@ -208,7 +124,8 @@ public class DatabaseResolverTests {
             DatabaseResolver databaseResolver = 
                 new DatabaseResolver(CONNECTION_PROVIDER);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::nonExistentProperty
+                ProxyInterface::nonExistentProperty,
+                externalizedProperties(databaseResolver)
             );
 
             String propertyName = "non.existent.property";
@@ -242,7 +159,8 @@ public class DatabaseResolverTests {
                     }
                 );
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property1
+                ProxyInterface::property1,
+                externalizedProperties(databaseResolver)
             );
 
             String propertyName = "test.property.1";
@@ -267,7 +185,8 @@ public class DatabaseResolverTests {
             DatabaseResolver databaseResolver = 
                 new DatabaseResolver(invalidConnectionProvider);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property1
+                ProxyInterface::property1,
+                externalizedProperties(databaseResolver)
             );
 
             String propertyName = "test.property.1";
@@ -299,8 +218,12 @@ public class DatabaseResolverTests {
             connection.commit();
         }
     }
+    
+    private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+        return ExternalizedProperties.builder().resolvers(resolvers).build();
+    }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("test.property.1")
         String property1();
     

@@ -60,19 +60,34 @@ module foo.bar {
 ### 🔗 [Property Resolution via Java Dynamic Proxies](docs/property-resolution.md) ([Why Dynamic Proxies?](docs/why-dynamic-proxies.md))
 
 ✨ Default/Fallback Values  
-✨ Non-static Property Names  
-✨ Variable Expansion  
+✨ Non-Static/Dynamic Property Names (via [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
 ✨ Caching  
 ✨ Eager Loading  
 ✨ Automatic Cache Reload  
 
-### 🔗 [Property Post-Processing](docs/property-post-processing.md)
+### 🔗 [Conversion](docs/conversion.md)
 
-✨ Symmetric/Asymmetric Decryption
+✨ Automatic Property Conversion  
+✨ Generic Type Conversion  
+✨ Dynamic Value Conversion (via [@ConverterFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java))
 
-### 🔗 [Property Conversion](docs/property-conversion.md)
+### 🔗 [Variable Expansion](docs/variable-expansion.md)
 
-✨ Generic Type Conversion
+✨ Automatic Variable Expansion in Property Names  
+✨ Dynamic Variable Expansion (via [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
+
+### 🔗 [Processing](docs/processing.md)
+
+✨ Targeted Processing
+
+### 🔗 [Profiles](docs/profiles.md)
+
+✨ Profile-Specific Configurations
+
+### 🔗 [Ordinal Components](docs/ordinal-components.md)
+
+✨ Ordinal Resolvers  
+✨ Ordinal Converters
 
 ## 🏎️ Quick Start
 
@@ -99,7 +114,7 @@ public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = buildExternalizedProperties();
 
     // Proxied interface.
-    ApplicationProperties props = externalizedProperties.proxy(ApplicationProperties.class);
+    ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
 
     // Use properties.
     String javaHome = props.javaHome();
@@ -109,7 +124,7 @@ public static void main(String[] args) {
 
 private static ExternalizedProperties buildExternalizedProperties() {
     return ExternalizedProperties.builder()
-        .withDefaults() 
+        .defaults() 
         .resolvers(...)
         .processors(...)
         .converters(...) 

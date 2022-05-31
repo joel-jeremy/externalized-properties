@@ -6,11 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation is used to specify which externalized property should be mapped to 
- * the annotated method. The name of the externalized property will be derived from 
- * {@link #value()}, if it is specified. Otherwise, the property name will be derived 
- * from the annotated method's arguments. Specifically, the first argument of the 
- * annotated method (the method must only have one {@code String} argument).
+ * This annotation is used to specify which externalized property should be 
+ * mapped to the target method.
  * 
  * <p>Examples:</p>
  * 
@@ -31,24 +28,6 @@ import java.lang.annotation.Target;
  *     default int intPropertyOrElse(int someDefaultValue) {
  *         return someDefaultValue;
  *     }
- * 
- *     {@code // Property name not specified in ExternalizedProperty annotation.}
- *     {@code // It will be derived from the method parameters.}
- *     {@code @}ExternalizedProperty
- *     String resolve(String propertyName);
- *     
- *     {@code // Property name not specified in ExternalizedProperty annotation.}
- *     {@code // It will be derived from the method parameters.}
- *     {@code @}ExternalizedProperty
- *     int resolveInt(String propertyName);
- * 
- *     {@code // Invalid method signature. Method must only accept 1 String argument.}
- *     {@code @}ExternalizedProperty
- *     String resolve(int mustBeString);
- *
- *     {@code // Invalid method signature. Method must only accept 1 String argument.}
- *     {@code @}ExternalizedProperty
- *     String resolve(String propertyName, String anotherArg); 
  * }
  * </pre></blockquote>
  */
@@ -56,17 +35,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface ExternalizedProperty {
     /**
-     * The name of the externalized property. If a {@link #value()} is not specified or
-     * is empty ({@code ""}), the property name will be derived from the annotated method's 
-     * arguments. Specifically, the first argument of the annotated method (the method must 
-     * only have one {@code String} argument) e.g. 
-     * <blockquote><pre>String resolve(String propertyName)</pre></blockquote>
+     * The name of the externalized property.
      * 
-     * @return The name of the externalized property. If a {@link #value()} is not specified
-     * or is empty ({@code ""}), the property name will be derived from the annotated method's 
-     * arguments. Specifically, the first argument of the annotated method (the method must 
-     * only have one {@code String} argument) e.g. 
-     * <blockquote><pre>String resolve(String propertyName)</pre></blockquote>
+     * @return The name of the externalized property.
      */
-    String value() default "";
+    String value();
 }

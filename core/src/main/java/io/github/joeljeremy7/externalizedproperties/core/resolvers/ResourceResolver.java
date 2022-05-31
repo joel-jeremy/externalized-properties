@@ -1,7 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.ByteArrayOutputStream;
@@ -259,199 +258,6 @@ public class ResourceResolver extends MapResolver {
         return fromUri(requireNonNull(path, "path").toUri(), reader);
     }
 
-    /**
-     * Create a {@link ResolverProvider} which provides a {@link ResourceResolver} that reads 
-     * and resolves properties from the given {@link URL}.
-     * 
-     * <p>Examples:</p>
-     * 
-     * <blockquote><pre>
-     * ResolverProvider{@code <}ResourceResolver{@code >} resourceResolver = 
-     *     ResourceResolver.provider(
-     *         getClass().getResource("/path/to/app.properties")
-     *     );
-     * </pre></blockquote>
-     * 
-     * <p>This expects the contents of {@link URL} resource to be in properties 
-     * file format. If the contents are of another format e.g. YAML, JSON, XML, please 
-     * provide a custom {@link ResourceReader} by using the {@link #provider(URL, ResourceReader)} 
-     * method instead.</p>
-     * 
-     * @see #provider(URL, ResourceReader)
-     * 
-     * @param url The URL resource to read properties from.
-     * @return A {@link ResolverProvider} which provides a {@link ResourceResolver} that reads 
-     * and resolves properties from the given {@link URL}.
-     * @throws IOException if an I/O exception occurs.
-     */
-    public static ResolverProvider<ResourceResolver> provider(URL url) throws IOException {
-        return ResolverProvider.of(fromUrl(url));
-    }
-
-    /**
-     * Create a {@link ResolverProvider} which provides a {@link ResourceResolver} that reads 
-     * and resolves properties from the given {@link URL}.
-     * 
-     * <p>Examples:</p>
-     * 
-     * <blockquote><pre>
-     * ResolverProvider{@code <}ResourceResolver{@code >} resourceResolver = 
-     *     ResourceResolver.provider(
-     *         getClass().getResource("/path/to/properties.yaml"),
-     *         new YamlReader()
-     *     );
-     * </pre></blockquote>
-     * 
-     * @param url The URL resource to read properties from.
-     * @param reader The reader which reads/parses properties from the URL resource into
-     * a {@link Map} instance.
-     * @return A {@link ResolverProvider} which provides a {@link ResourceResolver} that reads 
-     * and resolves properties from the given {@link URL}.
-     * @throws IOException if an I/O exception occurs.
-     */
-    public static ResolverProvider<ResourceResolver> provider(
-            URL url, 
-            ResourceReader reader
-    ) throws IOException {
-        return ResolverProvider.of(fromUrl(url, reader));
-    }
-
-    /**
-     * Create a {@link ResolverProvider} which provides a {@link ResourceResolver} that reads 
-     * and resolves properties from the given {@link URI}.
-     * 
-     * <p>Examples:</p>
-     * 
-     * <blockquote><pre>
-     * ResolverProvider{@code <}ResourceResolver{@code >} resourceResolver = 
-     *     ResourceResolver.provider(
-     *         URI.create("file:///path/to/app.properties")
-     *     );
-     * 
-     * ResolverProvider{@code <}ResourceResolver{@code >} resourceResolver = 
-     *     ResourceResolver.provider(
-     *         new File("/path/to/app.properties").toURI()
-     *     );
-     * </pre></blockquote>
-     * 
-     * <p>This expects the contents of {@link URI} resource to be in properties 
-     * file format. If the contents are of another format e.g. YAML, JSON, XML, please 
-     * provide a custom {@link ResourceReader} by using the {@link #provider(URI, ResourceReader)} 
-     * method instead.</p>
-     * 
-     * @see #provider(URI, ResourceReader)
-     * 
-     * @param uri The URI resource to read properties from.
-     * @return A {@link ResolverProvider} which provides a {@link ResourceResolver} that reads 
-     * and resolves properties from the given {@link URI}.
-     * @throws IOException if an I/O exception occurs.
-     */
-    public static ResolverProvider<ResourceResolver> provider(URI uri) throws IOException {
-        return ResolverProvider.of(fromUri(uri));
-    }
-
-    /**
-     * Create a {@link ResolverProvider} which provides a {@link ResourceResolver} that reads 
-     * and resolves properties from the given {@link URI}.
-     * 
-     * <p>Examples:</p>
-     * 
-     * <blockquote><pre>
-     * ResolverProvider{@code <}ResourceResolver{@code >} resourceResolver = 
-     *     ResourceResolver.provider(
-     *         URI.create("file:///path/to/properties.yaml"), 
-     *         new YamlReader()
-     *     );
-     * 
-     * ResolverProvider{@code <}ResourceResolver{@code >} resourceResolver = 
-     *     ResourceResolver.provider(
-     *         new File("/path/to/properties.yaml").toURI(),
-     *         new YamlReader()
-     *     );
-     * </pre></blockquote>
-     * 
-     * @param uri The URI resource to read properties from.
-     * @param reader The reader which reads/parses properties from the URI resource into
-     * a {@link Map} instance.
-     * @return A {@link ResolverProvider} which provides a {@link ResourceResolver} that reads 
-     * and resolves properties from the given {@link URI}.
-     * @throws IOException if an I/O exception occurs.
-     */
-    public static ResolverProvider<ResourceResolver> provider(
-            URI uri, 
-            ResourceReader reader
-    ) throws IOException {
-        return ResolverProvider.of(fromUri(uri, reader));
-    }
-
-    /**
-     * Create a {@link ResolverProvider} which provides a {@link ResourceResolver} that reads 
-     * and resolves properties from the given {@link Path}.
-     * 
-     * <p>Examples:</p>
-     * 
-     * <blockquote><pre>
-     * ResolverProvider{@code <}ResourceResolver{@code >} resourceResolver = 
-     *     ResourceResolver.provider(
-     *         Paths.get("path", "to", "app.properties")
-     *     );
-     * 
-     * ResolverProvider{@code <}ResourceResolver{@code >} resourceResolver = 
-     *     ResourceResolver.provider(
-     *         new File("/path/to/app.properties").toPath()
-     *     );
-     * </pre></blockquote>
-     * 
-     * <p>This expects the contents of {@link Path} resource to be in properties 
-     * file format. If the contents are of another format e.g. YAML, JSON, XML, please 
-     * provide a custom {@link ResourceReader} by using the {@link #provider(Path, ResourceReader)} 
-     * method instead.</p>
-     * 
-     * @see #provider(Path, ResourceReader)
-     * 
-     * @param path The path resource to read properties from.
-     * @return A {@link ResolverProvider} which provides a {@link ResourceResolver} that reads 
-     * and resolves properties from the given {@link URI}.
-     * @throws IOException if an I/O exception occurs.
-     */
-    public static ResolverProvider<ResourceResolver> provider(Path path) throws IOException {
-        return ResolverProvider.of(fromPath(path));
-    }
-
-    /**
-     * Create a {@link ResolverProvider} which provides a {@link ResourceResolver} that reads 
-     * and resolves properties from the given {@link Path}.
-     * 
-     * <p>Examples:</p>
-     * 
-     * <blockquote><pre>
-     * ResolverProvider{@code <}ResourceResolver{@code >} resourceResolver = 
-     *     ResourceResolver.provider(
-     *         Paths.get("path", "to", "properties.yaml"), 
-     *         new YamlReader()
-     *     );
-     * 
-     * ResolverProvider{@code <}ResourceResolver{@code >} resourceResolver = 
-     *     ResourceResolver.provider(
-     *         new File("/path/to/properties.yaml").toPath(),
-     *         new YamlReader()
-     *     );
-     * </pre></blockquote>
-     * 
-     * @param path The path resource to read properties from.
-     * @param reader The reader which reads/parses properties from the URI resource into
-     * a {@link Map} instance.
-     * @return A {@link ResolverProvider} which provides a {@link ResourceResolver} that reads 
-     * and resolves properties from the given {@link Path}.
-     * @throws IOException if an I/O exception occurs.
-     */
-    public static ResolverProvider<ResourceResolver> provider(
-            Path path, 
-            ResourceReader reader
-    ) throws IOException {
-        return ResolverProvider.of(fromPath(path, reader));
-    }
-
     private static Map<String, String> readFromUrl(URL url, ResourceReader reader) 
             throws IOException 
     {
@@ -481,6 +287,47 @@ public class ResourceResolver extends MapResolver {
 		return flattened;
 	}
 
+    /**
+     * Flatten the source map to a String-based flat map.
+     * 
+     * <p>Example:</p>
+     * 
+     * For collections, it will be converted to indexed keys. Given the YAML:
+     * <blockquote><pre>
+     * my-list-property:
+     *   - value1
+     *   - value2
+     *   - value3
+     * </pre></blockquote>
+     * 
+     * It will be converted to a flat map with the following mapping:
+     * 
+     * <blockquote><pre>
+     * "my-list-property[0]"="value1"
+     * "my-list-property[1]"="value2"
+     * "my-list-property[2]"="value3"
+     * <pre></blockquote>
+     * 
+     * For maps, it will be converted to nested keys. Given the YAML:
+     * <blockquote><pre>
+     * my-map-property:
+     *   nested:
+     *     property: 
+     *       item: item-value
+     *     name: name-value
+     * </pre></blockquote>
+     * 
+     * It will be converted to a flat map with the following mapping:
+     * 
+     * <blockquote><pre>
+     * "my-map-property.nested.property.item"="item-value"
+     * "my-map-property.nested.name"="name-value"
+     * </pre></blockquote>
+     * 
+     * @param result The result map to put flattened entries to.
+     * @param source The source map.
+     * @param parentPath The parent path to prepend to a key. Can be {@code null}.
+     */
 	private static void buildFlattenedMap(
             Map<String, String> result, 
             Map<String, Object> source, 
@@ -538,7 +385,7 @@ public class ResourceResolver extends MapResolver {
     ) {
         if (parentPath != null) {
             // Means this is nested.
-            if (key.startsWith("[")) {
+            if (key.charAt(0) == '[') {
                 return parentPath + key;
             }
 

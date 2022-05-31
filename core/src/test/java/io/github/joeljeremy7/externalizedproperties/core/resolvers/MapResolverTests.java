@@ -2,10 +2,10 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
+import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver.UnresolvedPropertyHandler;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,10 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MapResolverTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
-        ExternalizedProperties.builder().withDefaults().build();
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
     
     @Nested
     class Constructor {
@@ -43,56 +41,33 @@ public class MapResolverTests {
         @DisplayName("should throw when unresolved property handler argument is null.")
         void test2() {
             Map<String, String> map = new HashMap<>();
-
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new MapResolver(map, null)
             );
         }
-    }
 
-    @Nested
-    class ProviderMethod {
         @Test
-        @DisplayName("should not return null.")
-        void mapOverloadTest1() {
-            ResolverProvider<MapResolver> provider = 
-                MapResolver.provider(Collections.emptyMap());
+        @DisplayName("should throw when singleton map key is null or empty.")
+        void singletonMapTest1() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> new MapResolver(null, "value")
+            );
 
-            assertNotNull(provider);
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> new MapResolver("", "value")
+            );
         }
 
         @Test
-        @DisplayName("should return an instance on get.")
-        void mapOverloadTest2() {
-            ResolverProvider<MapResolver> provider = 
-                MapResolver.provider(Collections.emptyMap());
-
-            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
-        }
-
-        @Test
-        @DisplayName("should not return null.")
-        void mapAndUnresolvedPropertyHandlerOverloadTest1() {
-            ResolverProvider<MapResolver> provider = 
-                MapResolver.provider(
-                    Collections.emptyMap(),
-                    System::getProperty
-                );
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void mapAndUnresolvedPropertyHandlerOverloadTest2() {
-            ResolverProvider<MapResolver> provider = 
-                MapResolver.provider(
-                    Collections.emptyMap(),
-                    System::getProperty
-                );
-
-            assertNotNull(provider.get(EXTERNALIZED_PROPERTIES));
+        @DisplayName("should throw when singleton map value is null.")
+        void singletonMapTest2() {
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> new MapResolver("key", null)
+            );
         }
     }
 
@@ -133,7 +108,8 @@ public class MapResolverTests {
             
             MapResolver resolver = resolverToTest(map);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
@@ -157,7 +133,8 @@ public class MapResolverTests {
         void test2() {
             MapResolver resolver = resolverToTest(Collections.emptyMap());
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
@@ -188,7 +165,8 @@ public class MapResolverTests {
                 unresolvedPropertyHandler
             );
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property
+                ProxyInterface::property,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result = 
@@ -203,18 +181,22 @@ public class MapResolverTests {
         }
     }
 
-    private MapResolver resolverToTest(Map<String, String> map) {
+    private static MapResolver resolverToTest(Map<String, String> map) {
         return new MapResolver(map);
     }
-
-    private MapResolver resolverToTest(
+    
+    private static MapResolver resolverToTest(
             Map<String, String> map,
             UnresolvedPropertyHandler unresolverPropertyHandler
     ) {
         return new MapResolver(map, unresolverPropertyHandler);
     }
+    
+    private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+        return ExternalizedProperties.builder().resolvers(resolvers).build();
+    }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("property")
         String property();
     }

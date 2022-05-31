@@ -2,7 +2,6 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.Type;
@@ -11,15 +10,6 @@ import java.lang.reflect.Type;
  * Supports conversion of values to Java's primitive types.
  */
 public class PrimitiveConverter implements Converter<Object> {
-    /**
-     * The {@link ConverterProvider} for {@link PrimitiveConverter}.
-     * 
-     * @return The {@link ConverterProvider} for {@link PrimitiveConverter}.
-     */
-    public static ConverterProvider<PrimitiveConverter> provider() {
-        return (externalizedProperties, rootConverter) -> new PrimitiveConverter();
-    }
-
     /** {@inheritDoc} */
     @Override
     public boolean canConvertTo(Class<?> targetType) {

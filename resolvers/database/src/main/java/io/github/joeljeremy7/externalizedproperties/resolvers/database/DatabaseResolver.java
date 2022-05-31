@@ -2,7 +2,6 @@ package io.github.joeljeremy7.externalizedproperties.resolvers.database;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
 
@@ -48,46 +47,6 @@ public class DatabaseResolver implements Resolver {
         }
         this.connectionProvider = connectionProvider;
         this.queryExecutor = queryExecutor;
-    }
-
-    /**
-     * The {@link ResolverProvider} for {@link DatabaseResolver}.
-     * 
-     * @param connectionProvider The connection provider.
-     * @return The {@link ResolverProvider} for {@link DatabaseResolver}.
-     */
-    public static ResolverProvider<DatabaseResolver> provider(
-            ConnectionProvider connectionProvider
-    ) {
-        if (connectionProvider == null) {
-            throw new IllegalArgumentException("connectionProvider must not be null.");
-        }
-        return externalizedProperties -> new DatabaseResolver(
-            connectionProvider
-        );
-    }
-
-    /**
-     * The {@link ResolverProvider} for {@link DatabaseResolver}.
-     * 
-     * @param connectionProvider The connection provider.
-     * @param queryExecutor The query executor to resolve properties from the database.
-     * @return The {@link ResolverProvider} for {@link DatabaseResolver}.
-     */
-    public static ResolverProvider<DatabaseResolver> provider(
-            ConnectionProvider connectionProvider,
-            QueryExecutor queryExecutor
-    ) {
-        if (connectionProvider == null) {
-            throw new IllegalArgumentException("connectionProvider must not be null.");
-        }
-        if (queryExecutor == null) {
-            throw new IllegalArgumentException("queryExecutor must not be null.");
-        }
-        return externalizedProperties -> new DatabaseResolver(
-            connectionProvider,
-            queryExecutor
-        );
     }
 
     /**

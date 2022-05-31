@@ -2,14 +2,14 @@ package io.github.joeljeremy7.externalizedproperties.core.processing.processors;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.ProcessorProvider;
+import io.github.joeljeremy7.externalizedproperties.core.Processor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.Decrypt;
 import io.github.joeljeremy7.externalizedproperties.core.processing.ProcessingException;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.Decryptor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.JceDecryptor;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.testentities.EncryptionUtils;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -40,8 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DecryptProcessorTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY = 
-        new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY = 
+        new TestProxyMethodFactory<>(ProxyInterface.class);
 
     // AES constants.
     private static final String AES_ALGORITHM = EncryptionUtils.AES_ALGORITHM;
@@ -109,38 +109,6 @@ public class DecryptProcessorTests {
     }
 
     @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should throw when decryptor argument is null.")
-        void test1() {
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> DecryptProcessor.provider(null)
-            );
-        }
-
-        @Test
-        @DisplayName("should not return null.")
-        void test2() {
-            ProcessorProvider<DecryptProcessor> provider = 
-                DecryptProcessor.provider(AES_GCM_DECRYPTOR);
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get")
-        void test3() {
-            ProcessorProvider<DecryptProcessor> provider = 
-                DecryptProcessor.provider(AES_GCM_DECRYPTOR);
-
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
-        }
-    }
-
-    @Nested
     class ProcessMethod {
         @Test
         @DisplayName("should throw when decryptor with specified name is not registered")
@@ -148,7 +116,8 @@ public class DecryptProcessorTests {
             // AES decryptor is not registered.
             DecryptProcessor processor = processorToTest(RSA_DECRYPTOR);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::decryptAesGcm
+                ProxyInterface::decryptAesGcm,
+                externalizedProperties(processor)
             );
 
             String plainText = "plain-text";
@@ -167,7 +136,8 @@ public class DecryptProcessorTests {
         void test2() {
             DecryptProcessor processor = processorToTest(AES_GCM_DECRYPTOR);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::notAnnotatedWithDecrypt
+                ProxyInterface::notAnnotatedWithDecrypt,
+                externalizedProperties(processor)
             );
 
             String plainText = "plain-text";
@@ -186,7 +156,8 @@ public class DecryptProcessorTests {
         void test3() {
             DecryptProcessor processor = processorToTest(RSA_DECRYPTOR);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::decryptRsa
+                ProxyInterface::decryptRsa,
+                externalizedProperties(processor)
             );
 
             String plainText = "plain-text";
@@ -207,7 +178,8 @@ public class DecryptProcessorTests {
         void test4() {
             DecryptProcessor processor = processorToTest(RSA_DECRYPTOR);
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::decryptRsa
+                ProxyInterface::decryptRsa,
+                externalizedProperties(processor)
             );
 
             String plainText = "plain-text";
@@ -239,7 +211,8 @@ public class DecryptProcessorTests {
                 RSA_DECRYPTOR
             );
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::decryptAesGcm
+                ProxyInterface::decryptAesGcm,
+                externalizedProperties(processor)
             );
 
             String plainText = "plain-text";
@@ -262,7 +235,8 @@ public class DecryptProcessorTests {
                 RSA_DECRYPTOR
             );
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::decryptRsa
+                ProxyInterface::decryptRsa,
+                externalizedProperties(processor)
             );
 
             String plainText = "plain-text";
@@ -2026,6 +2000,12 @@ public class DecryptProcessorTests {
     private static DecryptProcessor processorToTest(Decryptor... decryptors) {
         return new DecryptProcessor(decryptors);
     }
+    
+    private static ExternalizedProperties externalizedProperties(Processor... processors) {
+        return ExternalizedProperties.builder()
+            .processors(processors)
+            .build();
+    }
 
     private static Decryptor createSymmetricDecryptor() {
         try {
@@ -2058,7 +2038,7 @@ public class DecryptProcessorTests {
         }
     }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("proeprty.aes.gcm.encrypted")
         @Decrypt(AES_GCM_ALGORITHM)
         String decryptAesGcm();

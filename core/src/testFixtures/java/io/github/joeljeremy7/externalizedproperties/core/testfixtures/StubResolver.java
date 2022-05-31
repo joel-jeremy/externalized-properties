@@ -1,7 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.testfixtures;
 
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.Collections;
@@ -40,16 +39,6 @@ public class StubResolver implements Resolver {
         this.valueResolver = valueResolver;
     }
 
-    public static ResolverProvider<StubResolver> provider() {
-        return ep -> new StubResolver();
-    }
-
-    public static ResolverProvider<StubResolver> provider(
-            Function<String, String> valueResolver
-    ) {
-        return ep -> new StubResolver(valueResolver);
-    }
-
     @Override
     public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
         String value = valueResolver.apply(propertyName);
@@ -60,6 +49,10 @@ public class StubResolver implements Resolver {
             return Optional.of(value);
         }
         return Optional.empty();
+    }
+
+    public Function<String, String> valueResolver() {
+        return valueResolver;
     }
 
     public Map<String, String> resolvedProperties() {

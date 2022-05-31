@@ -3,6 +3,7 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 import io.github.joeljeremy7.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.CachingInvocationHandler.InvocationCacheKey;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubInvocationHandler;
@@ -29,7 +30,7 @@ public class EagerLoadingInvocationHandlerTests {
         @Test
         @DisplayName("should throw when decorated invocation handler argument is null")
         void test1() {
-            StubCacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
+            StubCacheStrategy<InvocationCacheKey, Object> cacheStrategy = new StubCacheStrategy<>();
 
             assertThrows(
                 IllegalArgumentException.class,
@@ -60,7 +61,7 @@ public class EagerLoadingInvocationHandlerTests {
         @DisplayName("should throw when proxy interface argument is null")
         void test5() {
             StubInvocationHandler decorated = new StubInvocationHandler();
-            StubCacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
+            StubCacheStrategy<InvocationCacheKey, Object> cacheStrategy = new StubCacheStrategy<>();
 
             assertThrows(
                 IllegalArgumentException.class,
@@ -78,7 +79,7 @@ public class EagerLoadingInvocationHandlerTests {
             "are annotated with @ExternalizedProperty and have no arguments"
         )
         void test6() {
-            CacheStrategy<Method, Object> cacheStrategy = 
+            CacheStrategy<InvocationCacheKey, Object> cacheStrategy = 
                 new StubCacheStrategy<>();
 
             // Eager loads properties.
@@ -91,11 +92,11 @@ public class EagerLoadingInvocationHandlerTests {
                 proxyInterface
             );
 
-            for (Method method : proxyInterface.getDeclaredMethods()) {
+            for (Method proxyMethod : proxyInterface.getDeclaredMethods()) {
                 ExternalizedProperty externalizedProperty =
-                    method.getAnnotation(ExternalizedProperty.class);
+                    proxyMethod.getAnnotation(ExternalizedProperty.class);
                 if (externalizedProperty != null) {
-                    Optional<Object> cachedValue = cacheStrategy.get(method);
+                    Optional<Object> cachedValue = cacheStrategy.get(new InvocationCacheKey(proxyMethod));
                     assertTrue(cachedValue.isPresent());
                 }
             }
@@ -107,7 +108,7 @@ public class EagerLoadingInvocationHandlerTests {
             "are not annotated with @ExternalizedProperty but are default interface methods"
         )
         void test7() {
-            CacheStrategy<Method, Object> cacheStrategy = 
+            CacheStrategy<InvocationCacheKey, Object> cacheStrategy = 
                 new StubCacheStrategy<>();
 
             Class<EagerLoadingProxyInterface> proxyInterface = 
@@ -119,11 +120,11 @@ public class EagerLoadingInvocationHandlerTests {
                 proxyInterface
             );
 
-            Method method = ProxyMethodUtils.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface, 
                 EagerLoadingProxyInterface::propertyWithNoAnnotationButWithDefaultValue
             );
-            Optional<Object> cachedValue = cacheStrategy.get(method);
+            Optional<Object> cachedValue = cacheStrategy.get(new InvocationCacheKey(proxyMethod));
             assertTrue(cachedValue.isPresent());
         }
 
@@ -133,7 +134,7 @@ public class EagerLoadingInvocationHandlerTests {
             "have no @ExternalizedProperty annotation"
         )
         void test8() {
-            CacheStrategy<Method, Object> cacheStrategy = 
+            CacheStrategy<InvocationCacheKey, Object> cacheStrategy = 
                 new StubCacheStrategy<>();
 
             Class<NoEagerLoadingProxyInterface> proxyInterface =
@@ -146,12 +147,12 @@ public class EagerLoadingInvocationHandlerTests {
                 proxyInterface
             );
 
-            Method method = ProxyMethodUtils.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface, 
                 NoEagerLoadingProxyInterface::noAnnotation
             );
 
-            Optional<Object> cachedValue = cacheStrategy.get(method);
+            Optional<Object> cachedValue = cacheStrategy.get(new InvocationCacheKey(proxyMethod));
             assertFalse(cachedValue.isPresent());
         }
 
@@ -160,7 +161,7 @@ public class EagerLoadingInvocationHandlerTests {
             "should not eager load properties whose proxy interface methods have arguments"
         )
         void test9() {
-            CacheStrategy<Method, Object> cacheStrategy = 
+            CacheStrategy<InvocationCacheKey, Object> cacheStrategy = 
                 new StubCacheStrategy<>();
 
             Class<NoEagerLoadingProxyInterface> proxyInterface = 
@@ -173,12 +174,12 @@ public class EagerLoadingInvocationHandlerTests {
                 proxyInterface
             );
 
-            Method method = ProxyMethodUtils.getMethod(
+            Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface, 
                 NoEagerLoadingProxyInterface::withParameters
             );
 
-            Optional<Object> cachedValue = cacheStrategy.get(method);
+            Optional<Object> cachedValue = cacheStrategy.get(new InvocationCacheKey(proxyMethod));
             assertFalse(cachedValue.isPresent());
         }
 
@@ -196,7 +197,7 @@ public class EagerLoadingInvocationHandlerTests {
             );
 
             // No cached results.
-            CacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
+            CacheStrategy<InvocationCacheKey, Object> cacheStrategy = new StubCacheStrategy<>();
             
             assertThrows(
                 ExternalizedPropertiesException.class, 
@@ -222,9 +223,9 @@ public class EagerLoadingInvocationHandlerTests {
                 EagerLoadingProxyInterface::javaVersion
             );
 
-            StubCacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
+            StubCacheStrategy<InvocationCacheKey, Object> cacheStrategy = new StubCacheStrategy<>();
             // Add to cache.
-            cacheStrategy.cache(proxyMethod, "cached-value");
+            cacheStrategy.cache(new InvocationCacheKey(proxyMethod), "cached-value");
 
             // Always return the same string for any invoked proxy method.
             StubInvocationHandler decorated = new StubInvocationHandler(
@@ -242,13 +243,15 @@ public class EagerLoadingInvocationHandlerTests {
             Object result = invocationHandler.invoke(
                 stubProxy(proxyInterface, decorated), 
                 proxyMethod, 
+                // null because proxies give null instead of empty array
+                // when there are no arguments...
                 null
             );
 
             assertNotNull(result);
             assertEquals("cached-value", result);
             assertSame(
-                cacheStrategy.getCache().get(proxyMethod), 
+                cacheStrategy.getCache().get(new InvocationCacheKey(proxyMethod)), 
                 result
             );
         }
@@ -270,7 +273,7 @@ public class EagerLoadingInvocationHandlerTests {
             );
 
             // No cached results.
-            CacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
+            CacheStrategy<InvocationCacheKey, Object> cacheStrategy = new StubCacheStrategy<>();
 
             // Always return the same string for any invoked proxy method.
             StubInvocationHandler decorated = new StubInvocationHandler(
@@ -284,17 +287,18 @@ public class EagerLoadingInvocationHandlerTests {
                     proxyInterface
                 );
             
+            Object[] args = new Object[] { "will not eager load" };
             Object result = invocationHandler.invoke(
                 stubProxy(proxyInterface, decorated), 
                 proxyMethod, 
-                new Object[] { "will not eager load" }
+                args
             );
 
             assertNotNull(result);
             // Resolved from decorated invocation handler.
             assertEquals("value-from-decorated-handler", result);
             // Resolved value was cached.
-            assertTrue(cacheStrategy.get(proxyMethod).isPresent());
+            assertTrue(cacheStrategy.get(new InvocationCacheKey(proxyMethod, args)).isPresent());
         }
 
         @Test
@@ -319,7 +323,7 @@ public class EagerLoadingInvocationHandlerTests {
             );
 
             // No cached results.
-            CacheStrategy<Method, Object> cacheStrategy = new StubCacheStrategy<>();
+            CacheStrategy<InvocationCacheKey, Object> cacheStrategy = new StubCacheStrategy<>();
 
             EagerLoadingInvocationHandler invocationHandler = 
                 EagerLoadingInvocationHandler.eagerLoad(
@@ -331,12 +335,14 @@ public class EagerLoadingInvocationHandlerTests {
             Object result = invocationHandler.invoke(
                 stubProxy(proxyInterface, decorated), 
                 proxyMethod, 
+                // null because proxies give null instead of empty array
+                // when there are no arguments...
                 null
             );
 
             assertNull(result);
             // Not cached.
-            assertFalse(cacheStrategy.get(proxyMethod).isPresent());
+            assertFalse(cacheStrategy.get(new InvocationCacheKey(proxyMethod)).isPresent());
         }
 
         @SuppressWarnings("unchecked")

@@ -1,6 +1,5 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.Optional;
@@ -38,15 +37,6 @@ public class EnvironmentVariableResolver extends MapResolver {
     }
 
     /**
-     * The {@link ResolverProvider} for {@link EnvironmentVariableResolver}.
-     * 
-     * @return The {@link ResolverProvider} for {@link EnvironmentVariableResolver}.
-     */
-    public static ResolverProvider<EnvironmentVariableResolver> provider() {
-        return externalizedProperties -> new EnvironmentVariableResolver();
-    }
-
-    /**
      * Format property name to environment variables naming convention.
      * Such that:
      * <ul>
@@ -59,7 +49,6 @@ public class EnvironmentVariableResolver extends MapResolver {
      * @return The formatted property name.
      */
     private static String format(String propertyName) {
-
         // Avoid String allocations.
         char[] propertyNameChars = propertyName.toCharArray();
         for (int currentIndex = 0; currentIndex < propertyNameChars.length; currentIndex++) {

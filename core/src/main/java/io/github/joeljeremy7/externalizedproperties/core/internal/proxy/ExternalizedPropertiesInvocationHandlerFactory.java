@@ -2,24 +2,29 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
+import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandlerFactory;
 
 /**
  * The factory for {@link ExternalizedPropertiesInvocationHandler}.
  */
 public class ExternalizedPropertiesInvocationHandlerFactory 
-        implements InvocationHandlerFactory<ExternalizedPropertiesInvocationHandler> {
+        implements InvocationHandlerFactory {
 
     /** {@inheritDoc} */
     @Override
     public ExternalizedPropertiesInvocationHandler create(
-            Resolver resolver, 
-            Converter<?> converter,
-            Class<?> proxyInterface
+            Class<?> proxyInterface,
+            Resolver rootResolver,
+            Converter<?> rootConverter,
+            VariableExpander variableExpander,
+            ProxyMethodFactory proxyMethodFactory
     ) {
         return new ExternalizedPropertiesInvocationHandler(
-            resolver,
-            converter
+            rootResolver,
+            rootConverter,
+            variableExpander,
+            proxyMethodFactory
         );
     }
     

@@ -2,47 +2,32 @@ package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderProvider;
+import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SimpleVariableExpanderTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
+    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES = 
+        ExternalizedProperties.builder().defaults().build();
 
-    static ExternalizedProperties EXTERNALIZED_PROPERTIES = 
-        ExternalizedProperties.builder().withDefaultResolvers().build();
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
 
     @Nested
     class Constructor {
-        @Test
-        @DisplayName("should throw when externalized properties argument is null")
-        void test1() {
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> new SimpleVariableExpander(
-                    null,
-                    "${",
-                    "}"
-                )
-            );
-        }
-
         @Test
         @DisplayName("should throw when variable prefix argument is null")
         void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
-                    EXTERNALIZED_PROPERTIES,
                     null,
                     "}"
                 )
@@ -55,7 +40,6 @@ public class SimpleVariableExpanderTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
-                    EXTERNALIZED_PROPERTIES,
                     "",
                     "}"
                 )
@@ -68,7 +52,6 @@ public class SimpleVariableExpanderTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
-                    EXTERNALIZED_PROPERTIES,
                     "${",
                     null
                 )
@@ -81,90 +64,8 @@ public class SimpleVariableExpanderTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new SimpleVariableExpander(
-                    EXTERNALIZED_PROPERTIES,
                     "${",
                     ""
-                )
-            );
-        }
-    }
-
-    @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            VariableExpanderProvider<SimpleVariableExpander> provider = 
-                SimpleVariableExpander.provider();
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            VariableExpanderProvider<SimpleVariableExpander> provider = 
-                SimpleVariableExpander.provider();
-
-            assertNotNull(
-                provider.get(
-                    ExternalizedProperties.builder()
-                        .withDefaultResolvers()
-                        .variableExpander(provider)
-                        .build()
-                )
-            );
-        }
-    }
-
-    @Nested
-    class ProviderMethodWithVariablePrefixAndSuffixOverload {
-        @Test
-        @DisplayName("should throw when variable prefix is null or empty.")
-        void test1() {
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> SimpleVariableExpander.provider(null, "}")
-            );
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> SimpleVariableExpander.provider("", "}")
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when variable suffix is null or empty.")
-        void test2() {
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> SimpleVariableExpander.provider("${", null)
-            );
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> SimpleVariableExpander.provider("${", "")
-            );
-        }
-        @Test
-        @DisplayName("should not return null.")
-        void test3() {
-            VariableExpanderProvider<SimpleVariableExpander> provider = 
-                SimpleVariableExpander.provider("${", "}");
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test4() {
-            VariableExpanderProvider<SimpleVariableExpander> provider = 
-                SimpleVariableExpander.provider("${", "}");
-
-            assertNotNull(
-                provider.get(
-                    ExternalizedProperties.builder()
-                        .withDefaultResolvers()
-                        .variableExpander(provider)
-                        .build()
                 )
             );
         }
@@ -178,7 +79,8 @@ public class SimpleVariableExpanderTests {
             SimpleVariableExpander variableExpander = variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyJavaVersion
+                ProxyInterface::propertyJavaVersion,
+                EXTERNALIZED_PROPERTIES
             );
 
             String nullResult = variableExpander.expandVariables(
@@ -200,7 +102,8 @@ public class SimpleVariableExpanderTests {
             SimpleVariableExpander variableExpander = variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyJavaVersion
+                ProxyInterface::propertyJavaVersion,
+                EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
@@ -208,8 +111,8 @@ public class SimpleVariableExpanderTests {
                 "property-${java.version}"
             );
 
-            ResolverProxy resolverProxy = 
-                EXTERNALIZED_PROPERTIES.proxy(ResolverProxy.class);
+            ResolverFacadeProxyInterface resolverProxy = 
+                EXTERNALIZED_PROPERTIES.initialize(ResolverFacadeProxyInterface.class);
             
             String propertyValue = resolverProxy.resolve("java.version");
 
@@ -225,7 +128,8 @@ public class SimpleVariableExpanderTests {
             SimpleVariableExpander variableExpander = variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyMultipleVariables
+                ProxyInterface::propertyMultipleVariables,
+                EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
@@ -233,8 +137,8 @@ public class SimpleVariableExpanderTests {
                 "property-${java.version}-home-${java.home}"
             );
 
-            ResolverProxy resolverProxy = 
-                EXTERNALIZED_PROPERTIES.proxy(ResolverProxy.class);
+            ResolverFacadeProxyInterface resolverProxy = 
+                EXTERNALIZED_PROPERTIES.initialize(ResolverFacadeProxyInterface.class);
             
             String javaVersionProperty = resolverProxy.resolve("java.version");
             String javaHomeProperty = resolverProxy.resolve("java.home");
@@ -251,7 +155,8 @@ public class SimpleVariableExpanderTests {
             SimpleVariableExpander variableExpander = variableExpander();
             
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyNoVariables
+                ProxyInterface::propertyNoVariables,
+                EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
@@ -271,14 +176,15 @@ public class SimpleVariableExpanderTests {
             SimpleVariableExpander variableExpander = variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyNonExistent
+                ProxyInterface::propertyNonExistent,
+                EXTERNALIZED_PROPERTIES
             );
 
             assertThrows(
                 VariableExpansionException.class, 
                 () -> variableExpander.expandVariables(
                     proxyMethod,
-                    "property-${nonexistent}"
+                    "property-${non.existent}"
                 )
             );
         }
@@ -292,7 +198,8 @@ public class SimpleVariableExpanderTests {
             SimpleVariableExpander variableExpander = variableExpander();
             
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyNoVariableName
+                ProxyInterface::propertyNoVariableName,
+                EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
@@ -312,7 +219,8 @@ public class SimpleVariableExpanderTests {
             SimpleVariableExpander variableExpander = variableExpander();
 
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyNoVariableSuffix
+                ProxyInterface::propertyNoVariableSuffix,
+                EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
@@ -334,7 +242,8 @@ public class SimpleVariableExpanderTests {
             );
             
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::customPrefixSuffix
+                ProxyInterface::customPrefixSuffix,
+                EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
@@ -342,8 +251,8 @@ public class SimpleVariableExpanderTests {
                 "property-#[java.version]"
             );
 
-            ResolverProxy resolverProxy = 
-                EXTERNALIZED_PROPERTIES.proxy(ResolverProxy.class);
+            ResolverFacadeProxyInterface resolverProxy = 
+                EXTERNALIZED_PROPERTIES.initialize(ResolverFacadeProxyInterface.class);
             
             String propertyValue = resolverProxy.resolve("java.version");
 
@@ -354,36 +263,18 @@ public class SimpleVariableExpanderTests {
         }
     }
 
-    private SimpleVariableExpander variableExpander() {
-        VariableExpanderProvider<SimpleVariableExpander> provider = 
-            SimpleVariableExpander.provider();
-
-        ExternalizedProperties externalizedProperties =
-            ExternalizedProperties.builder()
-                .withDefaultResolvers()
-                .variableExpander(provider)
-                .build();
-
-        return provider.get(externalizedProperties);
+    private static SimpleVariableExpander variableExpander() {
+        return new SimpleVariableExpander();
     }
 
-    private SimpleVariableExpander variableExpander(
+    private static SimpleVariableExpander variableExpander(
             String variablePrefix,
             String variableSuffix
     ) {
-        VariableExpanderProvider<SimpleVariableExpander> provider = 
-            SimpleVariableExpander.provider(variablePrefix, variableSuffix);
-
-        ExternalizedProperties externalizedProperties =
-            ExternalizedProperties.builder()
-                .withDefaultResolvers()
-                .variableExpander(provider)
-                .build();
-
-        return provider.get(externalizedProperties);
+        return new SimpleVariableExpander(variablePrefix, variableSuffix);
     }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("property-${java.version}")
         String propertyJavaVersion();
 
@@ -406,8 +297,8 @@ public class SimpleVariableExpanderTests {
         String propertyNoVariableSuffix();
     }
 
-    static interface ResolverProxy {
-        @ExternalizedProperty
+    private static interface ResolverFacadeProxyInterface {
+        @ResolverFacade
         String resolve(String propertyName);
     }
 }

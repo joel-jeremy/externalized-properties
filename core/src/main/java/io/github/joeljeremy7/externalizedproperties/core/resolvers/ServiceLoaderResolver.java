@@ -1,7 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +17,6 @@ public class ServiceLoaderResolver extends CompositeResolver {
      */
     public ServiceLoaderResolver() {
         super(toList(ServiceLoader.load(Resolver.class)));
-    }
-
-    /**
-     * The {@link ResolverProvider} for {@link ServiceLoaderResolver}.
-     * 
-     * @return The {@link ResolverProvider} for {@link ServiceLoaderResolver}.
-     */
-    public static ResolverProvider<ServiceLoaderResolver> provider() {
-        return externalizedProperties -> new ServiceLoaderResolver();
     }
     
     private static List<Resolver> toList(ServiceLoader<Resolver> resolvers) {

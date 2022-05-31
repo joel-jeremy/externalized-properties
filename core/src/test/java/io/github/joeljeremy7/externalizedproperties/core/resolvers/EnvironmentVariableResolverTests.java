@@ -2,9 +2,9 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
+import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,31 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EnvironmentVariableResolverTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-    
-    @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ResolverProvider<EnvironmentVariableResolver> provider = 
-                EnvironmentVariableResolver.provider();
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ResolverProvider<EnvironmentVariableResolver> provider = 
-                EnvironmentVariableResolver.provider();
-
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
-        }
-    }
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
     
     @Nested
     class ResolveMethod {
@@ -50,7 +27,8 @@ public class EnvironmentVariableResolverTests {
         void test1() {
             EnvironmentVariableResolver resolver = resolverToTest();
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::path
+                ProxyInterface::path,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
@@ -73,7 +51,8 @@ public class EnvironmentVariableResolverTests {
         void test2() {
             EnvironmentVariableResolver resolver = resolverToTest();
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::notFound
+                ProxyInterface::notFound,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
@@ -93,7 +72,8 @@ public class EnvironmentVariableResolverTests {
         void test3() {
             EnvironmentVariableResolver resolver = resolverToTest();
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::javaHome
+                ProxyInterface::javaHome,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result1 = resolver.resolve(
@@ -117,11 +97,15 @@ public class EnvironmentVariableResolverTests {
         }
     }
 
-    private EnvironmentVariableResolver resolverToTest() {
+    private static EnvironmentVariableResolver resolverToTest() {
         return new EnvironmentVariableResolver();
     }
+    
+    private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+        return ExternalizedProperties.builder().resolvers(resolvers).build();
+    }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         /**
          * EnvironmentVariableResolver supports formatting of
          * property names such that path is converted to PATH.

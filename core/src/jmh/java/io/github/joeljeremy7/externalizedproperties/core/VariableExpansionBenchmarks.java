@@ -15,8 +15,6 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,25 +31,23 @@ public abstract class VariableExpansionBenchmarks {
 
         @Setup
         public void setup() {
-            Map<String, String> propertySource = Collections.singletonMap("test", "test");
-    
             ExternalizedProperties withSimpleVariableExpander = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(propertySource))
-                    .variableExpander(SimpleVariableExpander.provider())
+                    .resolvers(new MapResolver("test", "test"))
+                    .variableExpander(new SimpleVariableExpander())
                     .build();
 
             proxyWithSimpleVariableExpander = 
-                withSimpleVariableExpander.proxy(VariableExpansionProxyInterface.class);
+                withSimpleVariableExpander.initialize(VariableExpansionProxyInterface.class);
 
             ExternalizedProperties withPatternVariableExpander = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(propertySource))
-                    .variableExpander(PatternVariableExpander.provider())
+                    .resolvers(new MapResolver("test", "test"))
+                    .variableExpander(new PatternVariableExpander())
                     .build();
 
             proxyWithPatternVariableExpander = 
-                withPatternVariableExpander.proxy(VariableExpansionProxyInterface.class);
+                withPatternVariableExpander.initialize(VariableExpansionProxyInterface.class);
         }
     }
 

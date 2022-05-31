@@ -1,9 +1,7 @@
 package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
-import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
-import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
-import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.regex.Matcher;
@@ -19,59 +17,25 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  */
 public class PatternVariableExpander implements VariableExpander {
     /** Pattern: ${variable} */
-    private static final Pattern DEFAULT_VARIABLE_PATTERN = Pattern.compile("\\$\\{(.+?)\\}");
+    private static final Pattern DEFAULT_VARIABLE_PATTERN = 
+        Pattern.compile("\\$\\{(.+?)\\}");
     
-    private final ResolverProxy resolverProxy;
     private final Pattern variablePattern;
 
     /**
      * Constructor.
-     * 
-     * @param externalizedProperties The {@link ExternalizedProperties} instance.
      */
-    public PatternVariableExpander(ExternalizedProperties externalizedProperties) {
-        this(externalizedProperties, DEFAULT_VARIABLE_PATTERN);
+    public PatternVariableExpander() {
+        this(DEFAULT_VARIABLE_PATTERN);
     }
 
     /**
      * Constructor.
-     * 
-     * @param externalizedProperties The {@link ExternalizedProperties} instance.
+     *
      * @param variablePattern The pattern to look for when looking for variables to expand.
      */
-    public PatternVariableExpander(
-            ExternalizedProperties externalizedProperties,
-            Pattern variablePattern
-    ) {
-        requireNonNull(externalizedProperties, "externalizedProperties");
-        requireNonNull(variablePattern, "variablePattern");
-        this.resolverProxy = externalizedProperties.proxy(ResolverProxy.class);
-        this.variablePattern = variablePattern;
-    }
-
-    /**
-     * The {@link VariableExpanderProvider} for {@link PatternVariableExpander}.
-     * 
-     * @return The {@link VariableExpanderProvider} for {@link PatternVariableExpander}.
-     */
-    public static VariableExpanderProvider<PatternVariableExpander> provider() {
-        return PatternVariableExpander::new;
-    }
-
-    /**
-     * The {@link VariableExpanderProvider} for {@link PatternVariableExpander}.
-     * 
-     * @param variablePattern The pattern to look for when looking for variables to expand.
-     * @return The {@link VariableExpanderProvider} for {@link PatternVariableExpander}.
-     */
-    public static VariableExpanderProvider<PatternVariableExpander> provider(
-            Pattern variablePattern
-    ) {
-        requireNonNull(variablePattern, "variablePattern");
-        return externalizedProperties -> new PatternVariableExpander(
-            externalizedProperties,
-            variablePattern
-        );
+    public PatternVariableExpander(Pattern variablePattern) {
+        this.variablePattern = requireNonNull(variablePattern, "variablePattern");
     }
 
     /** {@inheritDoc} */
@@ -82,7 +46,7 @@ public class PatternVariableExpander implements VariableExpander {
         }
 
         try {
-            return replaceVariables(value);
+            return replaceVariables(proxyMethod, value);
         } catch (RuntimeException ex) {
             throw new VariableExpansionException(
                 "Exception occurred while trying to expand value: " + value,
@@ -91,7 +55,7 @@ public class PatternVariableExpander implements VariableExpander {
         }
     }
 
-    private String replaceVariables(String value) {
+    private String replaceVariables(ProxyMethod proxyMethod, String value) {
         StringBuffer output = new StringBuffer();
         Matcher matcher = variablePattern.matcher(value);
         
@@ -99,6 +63,7 @@ public class PatternVariableExpander implements VariableExpander {
             // Resolve property from variable.
             String propertyNameVariable = matcher.group(1);
             String propertyValue = resolvePropertyValueOrThrow(
+                proxyMethod,
                 propertyNameVariable
             );
             matcher.appendReplacement(output, propertyValue);
@@ -108,7 +73,13 @@ public class PatternVariableExpander implements VariableExpander {
         return matcher.appendTail(output).toString();
     }
 
-    private String resolvePropertyValueOrThrow(String variableName) {
+    private String resolvePropertyValueOrThrow(
+            ProxyMethod proxyMethod, 
+            String variableName
+    ) {
+        ResolverProxy resolverProxy = proxyMethod.externalizedProperties()
+            .initialize(ResolverProxy.class);
+        
         try {
             // Should throw if cannot be resolved.
             return resolverProxy.resolve(variableName);
@@ -122,7 +93,7 @@ public class PatternVariableExpander implements VariableExpander {
     }
 
     private static interface ResolverProxy {
-        @ExternalizedProperty
+        @ResolverFacade
         String resolve(String propertyName);
     }
 }

@@ -2,7 +2,6 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -17,8 +16,8 @@ import java.util.Collection;
  * <ol>
  *  <li>{@link PrimitiveConverter}</li>
  *  <li>{@link ListConverter}</li>
- *  <li>{@link SetConverter}</li>
  *  <li>{@link ArrayConverter}</li>
+ *  <li>{@link SetConverter}</li>
  *  <li>{@link EnumConverter}</li>
  *  <li>{@link DateTimeConverter}</li>
  * </ol>
@@ -33,36 +32,24 @@ public class DefaultConverter implements Converter<Object> {
      * <ol>
      *  <li>{@link PrimitiveConverter}</li>
      *  <li>{@link ListConverter}</li>
-     *  <li>{@link SetConverter}</li>
      *  <li>{@link ArrayConverter}</li>
+     *  <li>{@link SetConverter}</li>
      *  <li>{@link EnumConverter}</li>
      *  <li>{@link DateTimeConverter}</li>
      * </ol>
-     * 
-     * @param rootConverter The root converter.
      */
-    public DefaultConverter(Converter<?> rootConverter) {
+    public DefaultConverter() {
         convertersByTargetType = new ConvertersByTargetType(
             // In order.
             Arrays.asList(
                 new PrimitiveConverter(),
-                new ListConverter(rootConverter),
-                new SetConverter(rootConverter),
-                new ArrayConverter(rootConverter),
+                new ListConverter(),
+                new ArrayConverter(),
+                new SetConverter(),
                 new EnumConverter(),
                 new DateTimeConverter()
             )
         );
-    }
-
-    /**
-     * The {@link ConverterProvider} for {@link DefaultConverter}.
-     * 
-     * @return The {@link ConverterProvider} for {@link DefaultConverter}.
-     */
-    public static ConverterProvider<DefaultConverter> provider() {
-        return (externalizedProperties, rootConverter) -> 
-            new DefaultConverter(rootConverter);
     }
 
     /** {@inheritDoc} */

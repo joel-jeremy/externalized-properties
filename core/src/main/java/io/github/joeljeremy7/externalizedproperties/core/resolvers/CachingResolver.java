@@ -2,7 +2,6 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.Optional;
@@ -30,26 +29,6 @@ public class CachingResolver implements Resolver {
     ) {
         this.decorated = requireNonNull(decorated, "decorated");
         this.cacheStrategy = requireNonNull(cacheStrategy, "cacheStrategy");
-    }
-
-    /**
-     * The {@link ResolverProvider} for {@link CachingResolver}.
-     * 
-     * @param decorated The decorated {@link ResolverProvider}.
-     * @param cacheStrategy The cache strategy.
-     * @return The {@link ResolverProvider} for {@link CachingResolver}.
-     */
-    public static ResolverProvider<CachingResolver> provider(
-            ResolverProvider<?> decorated,
-            CacheStrategy<String, String> cacheStrategy
-    ) {
-        requireNonNull(decorated, "decorated");
-        requireNonNull(cacheStrategy, "cacheStrategy");
-
-        return externalizedProperties -> new CachingResolver(
-            decorated.get(externalizedProperties), 
-            cacheStrategy
-        );
     }
 
     /**

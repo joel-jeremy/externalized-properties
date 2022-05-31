@@ -2,9 +2,9 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.ResolverProvider;
+import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,31 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SystemPropertyResolverTests {
-    private static final ProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory<>(ProxyInterface.class);
-    
-    @Nested
-    class ProviderMethod {
-        @Test
-        @DisplayName("should not return null.")
-        void test1() {
-            ResolverProvider<SystemPropertyResolver> provider = 
-                SystemPropertyResolver.provider();
-
-            assertNotNull(provider);
-        }
-
-        @Test
-        @DisplayName("should return an instance on get.")
-        void test2() {
-            ResolverProvider<SystemPropertyResolver> provider = 
-                SystemPropertyResolver.provider();
-
-            assertNotNull(
-                provider.get(ExternalizedProperties.builder().withDefaults().build())
-            );
-        }
-    }
+    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
+        new TestProxyMethodFactory<>(ProxyInterface.class);
 
     @Nested
     class ResolveMethod {
@@ -50,7 +27,8 @@ public class SystemPropertyResolverTests {
         void test1() {
             SystemPropertyResolver resolver = resolverToTest();
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::javaVersion
+                ProxyInterface::javaVersion,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(proxyMethod, "java.version");
@@ -70,12 +48,13 @@ public class SystemPropertyResolverTests {
         void test2() {
             SystemPropertyResolver resolver = resolverToTest();
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::notFound
+                ProxyInterface::notFound,
+                externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
                 proxyMethod, 
-                "property" // Not in system properties.
+                "not.found" // Not in system properties.
             );
             
             assertNotNull(result);
@@ -83,11 +62,15 @@ public class SystemPropertyResolverTests {
         }
     }
 
-    private SystemPropertyResolver resolverToTest() {
+    private static SystemPropertyResolver resolverToTest() {
         return new SystemPropertyResolver();
     }
+    
+    private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+        return ExternalizedProperties.builder().resolvers(resolvers).build();
+    }
 
-    public static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("java.version")
         String javaVersion();
 

@@ -37,7 +37,7 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
 
     /** {@inheritDoc} */
     @Override
-    public <T> T proxy(Class<T> proxyInterface) {
+    public <T> T initialize(Class<T> proxyInterface) {
         // Use proxy interface's class loader as done by ExternalizedProperties.
         ClassLoader classLoader = proxyInterface.getClassLoader();
 
@@ -55,7 +55,7 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
 
     /** {@inheritDoc} */
     @Override
-    public <T> T proxy(Class<T> proxyInterface, ClassLoader classLoader) {
+    public <T> T initialize(Class<T> proxyInterface, ClassLoader classLoader) {
         ClassValue<?> proxyInterfaceClassValue = cacheStrategy.get(classLoader)
             .orElseGet(() -> {
                 ClassValue<?> picv = 
@@ -73,7 +73,7 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
         return new ClassValue<Object>() {
             @Override
             protected Object computeValue(Class<?> proxyInterface) {
-                return decorated.proxy(proxyInterface);
+                return decorated.initialize(proxyInterface);
             }
         };
     }
@@ -85,7 +85,7 @@ public class CachingExternalizedProperties implements ExternalizedProperties {
         return new ClassValue<Object>() {
             @Override
             protected Object computeValue(Class<?> proxyInterface) {
-                return decorated.proxy(proxyInterface, classLoader);
+                return decorated.initialize(proxyInterface, classLoader);
             }
         };
     }

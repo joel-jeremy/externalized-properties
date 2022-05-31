@@ -60,7 +60,7 @@ public abstract class ResolutionBenchmarks {
              */
             ExternalizedProperties externalizedProperties = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(propertySource))
+                    .resolvers(new MapResolver(propertySource))
                     .build();
                 
             /**
@@ -68,17 +68,17 @@ public abstract class ResolutionBenchmarks {
              */
             ExternalizedProperties externalizedPropertiesNoVariableExpansion = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(propertySource))
-                    .variableExpander(NoOpVariableExpander.provider())
+                    .resolvers(new MapResolver(propertySource))
+                    .variableExpander(NoOpVariableExpander.INSTANCE)
                     .build();
 
             proxyInterface = 
-                externalizedProperties.proxy(
+                externalizedProperties.initialize(
                     ResolutionProxyInterface.class
                 );
             
             proxyInterfaceNoVariableExpansion = 
-                externalizedPropertiesNoVariableExpansion.proxy(
+                externalizedPropertiesNoVariableExpansion.initialize(
                     ResolutionProxyInterface.class
                 );
 
@@ -87,13 +87,13 @@ public abstract class ResolutionBenchmarks {
              */
             ExternalizedProperties withInvocationCaching = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(propertySource))
-                    .withProxyInvocationCaching()
-                    .withCacheDuration(Duration.ofHours(24))
+                    .resolvers(new MapResolver(propertySource))
+                    .enableInvocationCaching()
+                    .cacheDuration(Duration.ofHours(24))
                     .build();
 
             proxyInterfaceWithInvocationCaching = 
-                withInvocationCaching.proxy(
+                withInvocationCaching.initialize(
                     ResolutionProxyInterface.class
                 );
 
@@ -102,14 +102,14 @@ public abstract class ResolutionBenchmarks {
              */
             ExternalizedProperties noVariableExpansionWithInvocationCaching = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(propertySource))
-                    .variableExpander(NoOpVariableExpander.provider())
-                    .withProxyInvocationCaching()
-                    .withCacheDuration(Duration.ofHours(24))
+                    .resolvers(new MapResolver(propertySource))
+                    .variableExpander(NoOpVariableExpander.INSTANCE)
+                    .enableInvocationCaching()
+                    .cacheDuration(Duration.ofHours(24))
                     .build();
 
             proxyInterfaceNoVariableExpansionWithInvocationCaching = 
-                noVariableExpansionWithInvocationCaching.proxy(
+                noVariableExpansionWithInvocationCaching.initialize(
                     ResolutionProxyInterface.class
                 );
             
@@ -118,27 +118,27 @@ public abstract class ResolutionBenchmarks {
              */
             ExternalizedProperties withEagerLoading = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(propertySource))
-                    .withProxyEagerLoading()
-                    .withCacheDuration(Duration.ofHours(24))
+                    .resolvers(new MapResolver(propertySource))
+                    .enableEagerLoading()
+                    .cacheDuration(Duration.ofHours(24))
                     .build();
 
             proxyInterfaceWithEagerLoading = 
-                withEagerLoading.proxy(ResolutionProxyInterface.class);
+                withEagerLoading.initialize(ResolutionProxyInterface.class);
 
             /**
              * Setup no variable expansion with proxy eager loading.
              */
             ExternalizedProperties noVariableExpansionWithEagerLoading = 
                 ExternalizedProperties.builder()
-                    .resolvers(MapResolver.provider(propertySource))
-                    .variableExpander(NoOpVariableExpander.provider())
-                    .withProxyInvocationCaching()
-                    .withCacheDuration(Duration.ofHours(24))
+                    .resolvers(new MapResolver(propertySource))
+                    .variableExpander(NoOpVariableExpander.INSTANCE)
+                    .enableInvocationCaching()
+                    .cacheDuration(Duration.ofHours(24))
                     .build();
 
             proxyInterfaceNoVariableExpansionWithEagerLoading = 
-                noVariableExpansionWithEagerLoading.proxy(
+                noVariableExpansionWithEagerLoading.initialize(
                     ResolutionProxyInterface.class
                 );
         }

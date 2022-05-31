@@ -2,15 +2,13 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
-import io.github.joeljeremy7.externalizedproperties.core.ConverterProvider;
+import io.github.joeljeremy7.externalizedproperties.core.ConverterFacade;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
-
-import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
  * Supports conversion of values to an {@link Optional} instance.
@@ -19,28 +17,6 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  * conversion to an Optional is natively supported.</p>
  */
 public class OptionalConverter implements Converter<Optional<?>> {
-
-    private final Converter<?> rootConverter;
-
-    /**
-     * Constructor.
-     * 
-     * @param rootConverter The root converter.
-     */
-    public OptionalConverter(Converter<?> rootConverter) {
-        this.rootConverter = requireNonNull(rootConverter, "rootConverter");
-    }
-
-    /**
-     * The {@link ConverterProvider} for {@link OptionalConverter}.
-     * 
-     * @return The {@link ConverterProvider} for {@link OptionalConverter}.
-     */
-    public static ConverterProvider<OptionalConverter> provider() {
-        return (externalizedProperties, rootConverter) -> 
-            new OptionalConverter(rootConverter);
-    }
-    
     /** {@inheritDoc} */
     @Override
     public boolean canConvertTo(Class<?> targetType) {
@@ -89,13 +65,15 @@ public class OptionalConverter implements Converter<Optional<?>> {
             String valueToConvert,
             Type optionalGenericTypeParameter
     ) {
-        ConversionResult<?> converted = rootConverter.convert(
-            proxyMethod, 
+        ConverterProxy rootConverter = proxyMethod.externalizedProperties()
+            .initialize(ConverterProxy.class);
+        
+        Object converted = rootConverter.convert(
             valueToConvert, 
             optionalGenericTypeParameter
         );
         // Convert property and wrap in Optional.
-        return Optional.ofNullable(converted.value());
+        return Optional.ofNullable(converted);
     }
 
     private Type throwIfTypeVariable(Type optionalGenericTypeParameter) {
@@ -106,5 +84,10 @@ public class OptionalConverter implements Converter<Optional<?>> {
         }
 
         return optionalGenericTypeParameter;
+    }
+
+    private static interface ConverterProxy {
+        @ConverterFacade
+        Object convert(String valueToConvert, Type targetType);
     }
 }
