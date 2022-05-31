@@ -59,9 +59,9 @@ module foo.bar {
 
 ### 🔗 [Property Resolution via Java Dynamic Proxies](docs/property-resolution.md) ([Why Dynamic Proxies?](docs/why-dynamic-proxies.md))
 
-✨ Proxy Interface Property Mapping (via [@ExternalizedProperty](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java))  
+✨ Proxy Interface Property Mapping (via [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java))  
 ✨ Default/Fallback Values  
-✨ Non-Static/Dynamic Property Names (via [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
+✨ Non-Static/Dynamic Property Names (via [@ResolverFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
 ✨ Caching  
 ✨ Eager Loading  
 ✨ Automatic Cache Reload  
@@ -70,12 +70,12 @@ module foo.bar {
 
 ✨ Automatic Property Conversion  
 ✨ Generic Type Conversion  
-✨ Dynamic Value Conversion (via [@ConverterFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java))
+✨ Dynamic Value Conversion (via [@ConverterFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java))
 
 ### 🔗 [Variable Expansion](docs/variable-expansion.md)
 
 ✨ Automatic Variable Expansion in Property Names  
-✨ Dynamic Variable Expansion (via [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
+✨ Dynamic Variable Expansion (via [@VariableExpanderFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
 
 ### 🔗 [Processing](docs/processing.md)
 
@@ -92,7 +92,7 @@ module foo.bar {
 
 ## 🏎️ Quick Start
 
-Properties are mapped to proxy interface methods by using the [@ExternalizedProperty](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java) annotation.
+Properties are mapped to proxy interface methods by using the [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java) annotation.
 
 (For more advanced scenarios, please see the feature documentations.)
 
