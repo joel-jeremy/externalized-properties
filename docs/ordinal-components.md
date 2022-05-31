@@ -4,7 +4,7 @@ Externalized Properties allows registration of custom components such as [Resolv
 
 This is where the [Ordinals](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Ordinals.java) class can help. It allows clients to assign resolver/converter instances with an ordinal. The ordinals will then be considered when building the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) instance to sort the registered resolvers and converters accordingly.
 
-## ✨ Ordinal Resolvers and Converters
+## ✨ Ordinal Resolvers
 
 Setting up ordinal resolvers can be done through the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
 
