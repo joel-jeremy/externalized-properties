@@ -8,6 +8,7 @@ import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategie
 import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
+import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.CachingInvocationHandler.InvocationCacheKey;
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.CachingInvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.EagerLoadingInvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.ExternalizedPropertiesInvocationHandlerFactory;
@@ -18,7 +19,6 @@ import io.github.joeljeremy7.externalizedproperties.core.resolvers.DefaultResolv
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.NoOpVariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -285,7 +285,7 @@ public interface ExternalizedProperties {
             InvocationHandlerFactory factory = base;
 
             // Shared cache strategy.
-            CacheStrategy<Method, Object> propertiesByMethodCache =
+            CacheStrategy<InvocationCacheKey, Object> propertiesByMethodCache =
                 new WeakConcurrentHashMapCacheStrategy<>();
             
             if (enableEagerLoading) {

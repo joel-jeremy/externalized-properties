@@ -28,21 +28,20 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
      * unloading issues. 
      * 
      * @param decorated The decorated {@link InvocationHandler} instance.
-     * @param cacheStrategy The cache strategy keyed by a {@link Method} and whose values
-     * are the eagerly resolved properties. It is recommended that the {@link CacheStrategy} 
-     * implementation only holds weak references to the {@link Method} key in order to avoid
-     * leaks and class unloading issues.
-     * @param proxyInterface The proxy interface.
+     * @param cacheStrategy The cache strategy keyed by a {@link InvocationCacheKey} and whose values
+     * are the resolved properties. It is recommended that the {@link CacheStrategy} 
+     * implementation only holds weak references to the {@link InvocationCacheKey} due to it holding a 
+     * reference to the invoked {@link Method}. This is in order to avoid leaks and class 
+     * unloading issues.
      * 
      * @see WeakConcurrentHashMapCacheStrategy
      * @see WeakHashMapCacheStrategy
      */
     private EagerLoadingInvocationHandler(
             InvocationHandler decorated,
-            CacheStrategy<Method, Object> cacheStrategy,
-            Class<?> proxyInterface
+            CacheStrategy<InvocationCacheKey, Object> cacheStrategy
     ) {
-        super(decorated, cacheStrategy, proxyInterface);
+        super(decorated, cacheStrategy);
     }
 
     /**
@@ -53,10 +52,11 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
      * unloading issues.
      * 
      * @param decorated The decorated {@link InvocationHandler} instance.
-     * @param cacheStrategy The cache strategy keyed by a {@link Method} and whose values
-     * are the eagerly resolved properties. It is recommended that the {@link CacheStrategy} 
-     * implementation only holds weak references to the {@link Method} key in order to avoid
-     * leaks and class unloading issues.
+     * @param cacheStrategy The cache strategy keyed by a {@link InvocationCacheKey} and whose values
+     * are the resolved properties. It is recommended that the {@link CacheStrategy} 
+     * implementation only holds weak references to the {@link InvocationCacheKey} due to it holding a 
+     * reference to the invoked {@link Method}. This is in order to avoid leaks and class 
+     * unloading issues.
      * @param proxyInterface The proxy interface.
      * @return An {@code EagerLoadingInvocationHandler} whose properties have been eagerly loaded.
      * 
@@ -65,7 +65,7 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
      */
     public static EagerLoadingInvocationHandler eagerLoad(
             InvocationHandler decorated,
-            CacheStrategy<Method, Object> cacheStrategy,
+            CacheStrategy<InvocationCacheKey, Object> cacheStrategy,
             Class<?> proxyInterface
     ) {
         loadPropertiesToCache(
@@ -76,14 +76,13 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
 
         return new EagerLoadingInvocationHandler(
             decorated, 
-            cacheStrategy,
-            proxyInterface
+            cacheStrategy
         );
     }
 
     private static void loadPropertiesToCache(
             InvocationHandler decorated,
-            CacheStrategy<Method, Object> cacheStrategy,
+            CacheStrategy<InvocationCacheKey, Object> cacheStrategy,
             Class<?> proxyInterface
     ) {
         List<Method> supportedMethods = getSupportedMethods(proxyInterface);
@@ -102,7 +101,9 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
             try {
                 Object result = method.invoke(proxy);
                 if (result != null) {
-                    cacheStrategy.cache(method, result);
+                    // Safe to not provide args here because methods with
+                    // parameters are not supported for eager loading.
+                    cacheStrategy.cache(new InvocationCacheKey(method), result);
                 }
             }
             catch (Exception ex) {

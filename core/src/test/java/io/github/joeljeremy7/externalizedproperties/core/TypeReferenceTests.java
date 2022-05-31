@@ -15,6 +15,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TypeReferenceTests {
@@ -188,6 +190,71 @@ public class TypeReferenceTests {
             TypeReference<T> listType = new TypeReference<T>(){};
 
             assertEquals(0, listType.genericTypeParameters().length);
+        }
+    }
+
+    @Nested
+    class HashCodeMethod {
+        @Test
+        @DisplayName("should return hash code of the type")
+        void test1() {
+            TypeReference<String> typeReference = new TypeReference<String>(){};
+            Type type = typeReference.type();
+            assertEquals(type.hashCode(), typeReference.hashCode());
+        }
+
+        @Test
+        @DisplayName("should return the same of hash code everytime")
+        void test2() {
+            TypeReference<String> typeReference = new TypeReference<String>(){};
+            int hashCode1 = typeReference.hashCode();
+            int hashCode2 = typeReference.hashCode();
+            assertEquals(hashCode1, hashCode2);
+        }
+
+        @Test
+        @DisplayName("should return different hash codes for different types")
+        void test3() {
+            TypeReference<String> typeReference1 = new TypeReference<String>(){};
+            TypeReference<Integer> typeReference2 = new TypeReference<Integer>(){};
+            assertNotEquals(typeReference1.hashCode(), typeReference2.hashCode());
+        }
+    }
+
+    @Nested
+    class EqualsMethod {
+        @Test
+        @DisplayName("should return true when types are equal")
+        void test1() {
+            TypeReference<Integer> typeReference1 = new TypeReference<Integer>(){};
+            TypeReference<Integer> typeReference2 = new TypeReference<Integer>(){};
+
+            assertTrue(typeReference1.equals(typeReference2));
+        }
+
+        @Test
+        @DisplayName("should return false when types are not equal")
+        void test2() {
+            TypeReference<String> typeReference1 = new TypeReference<String>(){};
+            TypeReference<Integer> typeReference2 = new TypeReference<Integer>(){};
+
+            assertFalse(typeReference1.equals(typeReference2));
+        }
+
+        @Test
+        @DisplayName("should return false when other object is not a type reference")
+        void test3() {
+            TypeReference<String> typeReference1 = new TypeReference<String>(){};
+
+            assertFalse(typeReference1.equals(new Object()));
+        }
+
+        @Test
+        @DisplayName("should return false when other object is null")
+        void test4() {
+            TypeReference<String> typeReference1 = new TypeReference<String>(){};
+
+            assertFalse(typeReference1.equals(null));
         }
     }
 
