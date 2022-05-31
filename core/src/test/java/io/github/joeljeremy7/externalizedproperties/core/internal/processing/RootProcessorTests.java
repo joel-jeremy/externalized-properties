@@ -22,6 +22,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
+import static io.github.joeljeremy7.externalizedproperties.core.testentities.EncryptionUtils.AES_GCM_ALGORITHM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -170,7 +171,7 @@ public class RootProcessorTests {
 
     private static interface ProxyInterface {
         @ExternalizedProperty("test.decrypt")
-        @Decrypt(EncryptionUtils.AES_GCM_ALGORITHM)
+        @Decrypt(AES_GCM_ALGORITHM)
         String decrypt();
     }
 }

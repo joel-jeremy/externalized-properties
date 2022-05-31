@@ -4,7 +4,6 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.Decrypt;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor;
@@ -15,7 +14,6 @@ import io.github.joeljeremy7.externalizedproperties.core.resolvers.DefaultResolv
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver;
 import io.github.joeljeremy7.externalizedproperties.core.testentities.EncryptionUtils;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
-import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static io.github.joeljeremy7.externalizedproperties.core.testentities.EncryptionUtils.AES_GCM_ALGORITHM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -47,14 +46,12 @@ public class RootResolverTests {
         @DisplayName("should throw when resolver provider argument is null")
         void test1() {
             RootProcessor rootProcessor = new RootProcessor();
-            VariableExpander variableExpander = new SimpleVariableExpander();
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootResolver(
                     null,
-                    rootProcessor,
-                    variableExpander
+                    rootProcessor
                 )
             );
         }
@@ -63,29 +60,11 @@ public class RootResolverTests {
         @DisplayName("should throw when root processor provider argument is null")
         void test2() {
             List<Resolver> resolvers = Arrays.asList(new DefaultResolver());
-            VariableExpander variableExpander = new SimpleVariableExpander();
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new RootResolver(
                     resolvers,
-                    null,
-                    variableExpander
-                )
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when variable expander provider argument is null")
-        void test3() {
-            List<Resolver> resolvers = Arrays.asList(new DefaultResolver());
-            RootProcessor rootProcessor = new RootProcessor();
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> new RootResolver(
-                    resolvers,
-                    rootProcessor,
                     null
                 )
             );
@@ -153,36 +132,8 @@ public class RootResolverTests {
         }
 
         @Test
-        @DisplayName("should expand variables in externalized property name")
-        void test4() {
-            Map<String, String> propertySource = new HashMap<>();
-            propertySource.put("property", "property-expanded");
-            propertySource.put("property-expanded", "variable-expanded");
-
-            List<Resolver> resolvers = Arrays.asList(
-                new MapResolver(propertySource)
-            );
-
-            RootResolver resolver = rootResolver(resolvers);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::propertyVariable,
-                externalizedProperties(resolvers)
-            );
-            
-            Optional<String> result = 
-                resolver.resolve(proxyMethod, "${property}");
-
-            assertNotNull(result);
-            assertTrue(result.isPresent());
-            assertEquals(
-                propertySource.get("property-expanded"), 
-                result.get()
-            );
-        }
-
-        @Test
         @DisplayName("should process resolved properties via registered processors")
-        void test5() {
+        void test4() {
             String originalPropertyValue = "property-value";
             String base64EncodedPropertyValue = EncryptionUtils.encryptAesBase64(
                 originalPropertyValue
@@ -224,11 +175,7 @@ public class RootResolverTests {
             Collection<Resolver> resolvers,
             RootProcessor rootProcessor
     ) {
-        return new RootResolver(
-            resolvers, 
-            rootProcessor, 
-            new SimpleVariableExpander()
-        );
+        return new RootResolver(resolvers, rootProcessor);
     }
     
     private static ExternalizedProperties externalizedProperties(
@@ -264,7 +211,7 @@ public class RootResolverTests {
         String propertyVariable();
 
         @ExternalizedProperty("test.decrypt")
-        @Decrypt(EncryptionUtils.AES_GCM_ALGORITHM)
+        @Decrypt(AES_GCM_ALGORITHM)
         String propertyDecrypt();
     }
 }

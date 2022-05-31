@@ -1,8 +1,10 @@
-# Property Conversion
+# Conversion
 
-Externalized Properties has powerful support for conversion of properties to various types. There are several built-in converters but it is very easy to create a custom converter by implementing the [Converter](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Converter.java) interface.
+Externalized Properties has powerful support for conversion of values to various types. There are several built-in converters but it is very easy to create a custom converter by implementing the [Converter](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Converter.java) interface.
 
-To convert properties, just set return types of the proxy interface methods to the target type, and the library will handle the conversion behind the scenes - using the registered converters.
+## 🌟 Automatic Property Conversion
+
+To setup automatic property conversion, just set return types of the proxy interface methods to the target type. The library will handle the conversion behind the scenes - using the registered [Converter](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Converter.java)s e.g.
 
 ```java
 public interface ApplicationProperties {
@@ -34,7 +36,7 @@ private static ExternalizedProperties buildExternalizedProperties() {
 
 ## 🌟 Conversion to Generic Types
 
-Externalized Properties has support for generic types. Given the proxy interface:
+Externalized Properties has support for generic types e.g.
 
 ```java
 public interface ApplicationProperties {
@@ -52,15 +54,13 @@ public interface ApplicationProperties {
     @ExternalizedProperty("list-of-numbers")
     List<Optional<Integer>> listOfOptionalNumbers();
 }
-````
+```
 
 Each item in the list will be converted to an `Optional<Integer>`.
 
-## 🌟 Converter Methods (via [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java))
+## 🌟 Conversion of Arbitrary Strings (via [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java))
 
-Externalized Properties has support for dynamic conversion of String values to any type. This is made possible by the [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java) annotation.
-
-To enable dynamic conversion, a proxy interface method may be annotated with the [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java) annotatation e.g.
+Externalized Properties has support for dynamic conversion of String values to any type. This is made possible by the [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java) annotation e.g.
 
 (Kindly see [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java) documentation to learn more about the rules of defining a converter method.)
 

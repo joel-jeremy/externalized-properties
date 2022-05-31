@@ -61,19 +61,24 @@ module foo.bar {
 
 ✨ Default/Fallback Values  
 ✨ Non-static/Dynamic Property Names  
-✨ Variable Expansion  
+✨ Variable Expansion in Property Names
 ✨ Caching  
 ✨ Eager Loading  
 ✨ Automatic Cache Reload  
 
-### 🔗 [Property Post-Processing](docs/property-post-processing.md)
+### 🔗 [Conversion](docs/conversion.md)
 
-✨ Symmetric/Asymmetric Decryption
-
-### 🔗 [Property Conversion](docs/property-conversion.md)
-
+✨ Automatic Property Conversion  
 ✨ Generic Type Conversion  
-✨ Converter Methods
+✨ Conversion of Arbitrary Strings (via [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java))
+
+### 🔗 [Variable Expansion](docs/variable-expansion.md)
+
+✨ Conversion of Arbitrary Strings (via [@ExpandVariables](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExpandVariables.java))
+
+### 🔗 [Processing](docs/processing.md)
+
+✨ Targeted Processing
 
 ### 🔗 [Profiles](docs/profiles.md)
 
@@ -81,7 +86,8 @@ module foo.bar {
 
 ### 🔗 [Ordinal Components](docs/ordinal-components.md)
 
-✨ Ordered Resolvers and Converters
+✨ Ordinal Resolvers  
+✨ Ordinal Converters
 
 ## 🏎️ Quick Start
 

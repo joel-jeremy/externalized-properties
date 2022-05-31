@@ -1,7 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.proxy;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
-import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.GenericArrayType;
@@ -24,25 +23,6 @@ public interface ProxyMethod {
      * this method.
      */
     ExternalizedProperties externalizedProperties();
-
-    /**
-     * The externalized property name. 
-     * 
-     * <ol>
-     *  <li>It will be derived from {@link ExternalizedProperty#value()}, if specified.</li> 
-     *  <li>
-     *  Otherwise, if {@link ExternalizedProperty#value()} is not specified, the property name 
-     *  will be derived from the proxy method's arguments. Specifically, the first argument of 
-     *  the proxy method (the method must only have one String argument e.g. 
-     *  {@code String resolve(String propertyName)}).
-     *  </li>
-     * </ol>
-     * 
-     * @return The externalized property name derived from {@link ExternalizedProperty#value()}, 
-     * or from proxy method arguments if {@link ExternalizedProperty#value()}
-     * is not specified. Otherwise, an empty {@link Optional}.
-     */
-    Optional<String> externalizedPropertyName();
 
     /**
      * The array of annotations the proxy method is annotated with.

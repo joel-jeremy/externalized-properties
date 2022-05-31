@@ -88,7 +88,7 @@ public interface ApplicationProperties {
 }
 ```
 
-## 🌟 Variable Expansion
+## 🌟 Variable Expansion in Property Names
 
 Variable expansion is supported in property names and is enabled by default e.g.
 

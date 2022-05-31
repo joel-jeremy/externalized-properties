@@ -107,9 +107,8 @@ public class RootProcessor implements Processor {
             }
 
             throw new ProcessingException(String.format(
-                "No processor registered for processor class: %s. " +
-                "Please make sure the processor is registered when " + 
-                "building %s.",
+                "No processor registered for required processor class: %s. " +
+                "Please make sure the processor is registered when building %s.",
                 processWith.value().getName(),
                 ExternalizedProperties.class.getSimpleName()
             ));

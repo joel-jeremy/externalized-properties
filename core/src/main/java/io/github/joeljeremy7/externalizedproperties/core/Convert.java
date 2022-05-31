@@ -9,7 +9,7 @@ import java.lang.reflect.Type;
 /**
  * This annotation is used to specify that the annotated method will serve as a
  * converter method. Converter methods are expected to be with a specific signature. 
- * The first parameter should be the value to convert (String) and the second 
+ * The first parameter should be the value to convert ({@code String}) and the second 
  * parameter should be the target type which may be represented by the following 
  * classes: {@link TypeReference}, {@link Class}, or {@link Type}. The return type
  * can be a generic type variable e.g. {@code <T>} or any type as long as the target
@@ -27,31 +27,52 @@ import java.lang.reflect.Type;
  *     {@code @}Convert
  *     {@code <T>} T convert(String value, Class{@code <T>} targetType);
  * 
- *     {@code // Warning: May throw if return value is assigned to a variable that is not assignable from the target type.}
- *     {@code // It may be better to use Object as return type when working Type to avoid possible ClassCastExceptions.}
+ *     {@code // Warning: This is valid but it may throw ClassCastExceptions if return value is assigned to a variable that is not assignable from the target type.}
+ *     {@code // The recommended approach is to use TypeReference<T> or Class<T> instead whenever possible.}
  *     {@code @}Convert
  *     {@code <T>} T convert(String value, Type targetType);
  * 
+ *     {@code // This is allowed but the recommended approach is to declare method with generic return type.}
  *     {@code @}Convert
  *     Object convertToObject(String value, TypeReference{@code <?>} targetType);
  * 
+ *     {@code // This is allowed but the recommended approach is to declare method with generic return type.}
  *     {@code @}Convert
  *     Object convertToObject(String value, Class{@code <?>} targetType);
  * 
+ *     {@code // This is allowed but the recommended approach is to declare method with generic return type.}
  *     {@code @}Convert
  *     Object convertToObject(String value, Type targetType);
  * 
- *     {@code // Will result in a ClassCastException if target type reference is not Integer.}
+ *     {@code // This is allowed but the recommended approach is to declare method with generic return type.}
+ *     {@code // Warning: Will result in a ClassCastException if target type reference is not int.}
  *     {@code @}Convert
- *     Integer convertToObject(String value, TypeReference{@code <?>} targetType);
+ *     int convertToInt(String value, TypeReference{@code <?>} targetType);
  * 
- *     {@code // Will result in a ClassCastException if target class is not Integer.}
+ *     {@code // This is allowed but the recommended approach is to declare method with generic return type.}
+ *     {@code // Warning: Will result in a ClassCastException if target class is not int.}
  *     {@code @}Convert
- *     Integer convertToObject(String value, Class{@code <?>} targetType);
+ *     int convertToInt(String value, Class{@code <?>} targetType);
  * 
- *     {@code // Will result in a ClassCastException if target type is not Integer.}
+ *     {@code // This is allowed but the recommended approach is to declare method with generic return type.}
+ *     {@code // Warning: Will result in a ClassCastException if target type is not int.}
  *     {@code @}Convert
- *     Integer convertToObject(String value, Type targetType);
+ *     int convertToInt(String value, Type targetType);
+ * 
+ *     {@code // Invalid method signature.}
+ *     {@code // Method must accept 2 arguments: the value to convert (String) and the target type.}
+ *     {@code @}Convert
+ *     {@code <T>} T convertInvalidSignature(String value, String invalidArgType);
+ * 
+ *     {@code // Invalid method signature.}
+ *     {@code // Method must accept 2 arguments: the value to convert (String) and the target type.}
+ *     {@code @}Convert
+ *     {@code <T>} T convertInvalidSignature(String value, Class{@code <?>} targetType, String anotherArg);
+ * 
+ *     {@code // Invalid method signature.}
+ *     {@code // Method must accept 2 arguments: the value to convert (String) and the target type.}
+ *     {@code @}Convert
+ *     {@code <T>} T convertInvalidSignature();
  * } 
  * </pre></blockquote>
  */

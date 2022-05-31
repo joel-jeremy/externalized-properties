@@ -3,6 +3,7 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 import io.github.joeljeremy7.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
+import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakHashMapCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandlerFactory;
@@ -46,13 +47,15 @@ public class EagerLoadingInvocationHandlerFactory
             Class<?> proxyInterface,
             Resolver rootResolver,
             Converter<?> rootConverter,
+            VariableExpander variableExpander,
             ProxyMethodFactory proxyMethodFactory
     ) {
         return EagerLoadingInvocationHandler.eagerLoad(
             decorated.create(
-                proxyInterface, 
+                proxyInterface,
                 rootResolver,
                 rootConverter,
+                variableExpander,
                 proxyMethodFactory    
             ),
             cacheStrategy,

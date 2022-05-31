@@ -4,6 +4,7 @@ import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
+import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakHashMapCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
@@ -26,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CachingInvocationHandlerFactoryTests {
     private static final Resolver RESOLVER = new StubResolver();
     private static final Converter<?> CONVERTER = new DefaultConverter();
+    private static final VariableExpander VARIABLE_EXPANDER = 
+        new SimpleVariableExpander();
     private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
         ExternalizedProperties.builder()
             .resolvers(RESOLVER)
@@ -34,8 +37,7 @@ public class CachingInvocationHandlerFactoryTests {
 
     private static final Resolver ROOT_RESOLVER = new RootResolver(
         Arrays.asList(RESOLVER), 
-        new RootProcessor(), 
-        new SimpleVariableExpander()
+        new RootProcessor()
     );
     private static final Converter<?> ROOT_CONVERTER = new RootConverter(
         CONVERTER
@@ -88,6 +90,7 @@ public class CachingInvocationHandlerFactoryTests {
                 ProxyInterface.class, 
                 ROOT_RESOLVER, 
                 ROOT_CONVERTER, 
+                VARIABLE_EXPANDER,
                 PROXY_METHOD_FACTORY
             ));
         }
@@ -107,6 +110,7 @@ public class CachingInvocationHandlerFactoryTests {
                 ProxyInterface.class, 
                 ROOT_RESOLVER, 
                 ROOT_CONVERTER, 
+                VARIABLE_EXPANDER,
                 PROXY_METHOD_FACTORY
             );
 

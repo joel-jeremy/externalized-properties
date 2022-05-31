@@ -1,8 +1,11 @@
 # Profiles
 
-Externalized Properties has the concept of profiles. Applications typically are deployed to multiple environments and more often than not, these environment needs different configurations. 
+Externalized Properties has the concept of profiles. Applications typically are deployed to multiple environments and more often than not, these environment needs different configurations.
+This is where profiles can help. It allows applications to define different configurations per environment.
 
-This is where profiles can help. It allows applications to define different configurations per environment e.g.
+## ✨ Profile-Specific Configurations
+
+Setting up configuration that are profile-specific can be done through the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
 
 ```java
 public static void main(String[] args) {

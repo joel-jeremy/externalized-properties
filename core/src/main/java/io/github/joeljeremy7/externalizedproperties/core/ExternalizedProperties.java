@@ -3,7 +3,7 @@ package io.github.joeljeremy7.externalizedproperties.core;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.CachingExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.internal.InternalExternalizedProperties;
-import io.github.joeljeremy7.externalizedproperties.core.internal.ExternalizedPropertiesProfile;
+import io.github.joeljeremy7.externalizedproperties.core.internal.ProfileLookup;
 import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.ExpiringCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
@@ -218,8 +218,9 @@ public interface ExternalizedProperties {
 
             // At this point newly added configurations will have been applied.
             ExternalizedProperties externalizedProperties = new InternalExternalizedProperties(
-                buildRootResolver(resolvers, processors, variableExpander), 
+                buildRootResolver(resolvers, processors), 
                 buildRootConverter(converters),
+                variableExpander,
                 buildInvocationHandlerFactory()
             );
 
@@ -262,15 +263,15 @@ public interface ExternalizedProperties {
                 new InternalExternalizedProperties(
                     buildRootResolver(
                         profileResolvers, 
-                        Collections.emptyList(),
-                        NoOpVariableExpander.INSTANCE
+                        Collections.emptyList()
                     ), 
                     buildRootConverter(Collections.emptyList()),
+                    NoOpVariableExpander.INSTANCE,
                     buildInvocationHandlerFactory()
                 );
 
-            ExternalizedPropertiesProfile activeProfileProxy = 
-                resolverOnlyExternalizedProperties.initialize(ExternalizedPropertiesProfile.class);
+            ProfileLookup activeProfileProxy = 
+                resolverOnlyExternalizedProperties.initialize(ProfileLookup.class);
             
             // Treat blank profile as no profile.
             return activeProfileProxy.activeProfile().filter(p -> !p.trim().isEmpty());
@@ -314,8 +315,7 @@ public interface ExternalizedProperties {
 
         private RootResolver buildRootResolver(
                 List<Resolver> resolvers,
-                List<Processor> processors,
-                VariableExpander variableExpander
+                List<Processor> processors
         ) {
             // Add default resolvers last.
             // Custom resolvers always take precedence.
@@ -325,8 +325,7 @@ public interface ExternalizedProperties {
 
             return new RootResolver(
                 Ordinals.sortResolvers(resolvers), 
-                buildRootProcessor(processors), 
-                variableExpander
+                buildRootProcessor(processors)
             );
         }
 

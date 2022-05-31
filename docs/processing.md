@@ -1,8 +1,12 @@
-# Property Post-Processing
+# Processing
 
-Externalized Properties provides a mechanism to selectively apply post-processing to resolved properties.
+Externalized Properties provides a mechanism to do targeted processing operations.
 
-This feature may be used to apply transformations to resolved properties such as automatic decryption, masking, validation, etc. This can be achieved via a combination of annotations and [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java)s e.g.
+This feature may be used to apply transformations to properties such as automatic decryption, masking, validation, etc. This can be achieved via a combination of the [ProcessWith](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/processing/ProcessWith.java) and [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java) classes.
+
+## ✨ Targeted Processing
+
+Setting up processors can be done through the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
 
 ```java
 public interface ApplicationProperties {
@@ -69,7 +73,7 @@ public class Base64EncodeProcessor implements Processor {
 }
 ```
 
-### 2. Create an annotation to annotate methods which should go through the processor
+### 2. Create an annotation to target methods that should go through the processor
 
 Requirements for custom processor annotations:  
 
@@ -86,11 +90,12 @@ e.g.
 public @interface Base64Encode {}
 ```
 
-### 3. Register the processor and use custom processor annotation
+### 3. Register the processor and annotated methods using the custom processor annotation
 
 ```java
 public interface ApplicationProperties {
     @ExternalizedProperty("my.property")
+    // This property will be processed by the Base64EncodeProcessor.
     @Base64Encode
     String myProperty();
 }

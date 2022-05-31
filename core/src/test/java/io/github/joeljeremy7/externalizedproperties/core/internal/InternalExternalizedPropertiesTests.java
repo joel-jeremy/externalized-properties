@@ -1,6 +1,7 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal;
 
 import io.github.joeljeremy7.externalizedproperties.core.Convert;
+import io.github.joeljeremy7.externalizedproperties.core.ExpandVariables;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
@@ -202,7 +203,7 @@ public class InternalExternalizedPropertiesTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidFirstArgConvertProxy.class
+                    InvalidFirstArgTypeConvertProxy.class
                 )
             );
         }
@@ -219,7 +220,7 @@ public class InternalExternalizedPropertiesTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidSecondArgConvertProxy.class
+                    InvalidSecondArgTypeConvertProxy.class
                 )
             );
         }
@@ -246,7 +247,6 @@ public class InternalExternalizedPropertiesTests {
                 proxy.property()
             );
         }
-
 
         @Test
         @DisplayName("should initialize a proxy that handles @Convert annotations")
@@ -398,6 +398,95 @@ public class InternalExternalizedPropertiesTests {
 
                     fail("Did not throw. Result value: " + mismatch);
                 }
+            );
+        }
+
+        @Test
+        @DisplayName("should initialize a proxy that handles @ExpandVariables annotations")
+        void test19() {
+            StubResolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ExpandVariablesProxy proxy = externalizedProperties.initialize(
+                ExpandVariablesProxy.class
+            );
+
+            assertNotNull(proxy);
+            assertTrue(proxy instanceof Proxy);
+
+            assertEquals(
+                resolver.valueResolver().apply("java.version"), 
+                proxy.expandVariables("${java.version}")
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @ExpandVariables proxy method does not have " +
+            "any method parameters"
+        )
+        void test20() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    NoArgsExpandVariablesProxy.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @ExpandVariables proxy method have more than" +
+            "1 method parameters"
+        )
+        void test21() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidNumberOfArgsExpandVariablesProxy.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @ExpandVariables proxy method have an invalid" +
+            "parameter type"
+        )
+        void test22() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidArgTypeExpandVariablesProxy.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @ExpandVariables proxy method have an invalid" +
+            "return type"
+        )
+        void test23() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidReturnTypeExpandVariablesProxy.class
+                )
             );
         }
     }
@@ -594,7 +683,7 @@ public class InternalExternalizedPropertiesTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidFirstArgConvertProxy.class,
+                    InvalidFirstArgTypeConvertProxy.class,
                     getClass().getClassLoader()
                 )
             );
@@ -612,7 +701,7 @@ public class InternalExternalizedPropertiesTests {
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidSecondArgConvertProxy.class,
+                    InvalidSecondArgTypeConvertProxy.class,
                     getClass().getClassLoader()
                 )
             );
@@ -800,6 +889,100 @@ public class InternalExternalizedPropertiesTests {
                 }
             );
         }
+        
+        @Test
+        @DisplayName("should initialize a proxy that handles @ExpandVariables annotations")
+        void test20() {
+            StubResolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ExpandVariablesProxy proxy = externalizedProperties.initialize(
+                ExpandVariablesProxy.class,
+                getClass().getClassLoader()
+            );
+
+            assertNotNull(proxy);
+            assertTrue(proxy instanceof Proxy);
+
+            assertEquals(
+                resolver.valueResolver().apply("property"), 
+                proxy.expandVariables("${property}")
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @ExpandVariables proxy method does not have " +
+            "any method parameters"
+        )
+        void test21() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    NoArgsExpandVariablesProxy.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @ExpandVariables proxy method have more than" +
+            "1 method parameters"
+        )
+        void test22() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidNumberOfArgsExpandVariablesProxy.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @ExpandVariables proxy method have an invalid" +
+            "parameter type"
+        )
+        void test23() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidArgTypeExpandVariablesProxy.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when @ExpandVariables proxy method have an invalid" +
+            "return type"
+        )
+        void test24() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    InvalidReturnTypeExpandVariablesProxy.class,
+                    getClass().getClassLoader()
+                )
+            );
+        }
     }
 
     private static InternalExternalizedProperties internalExternalizedProperties(
@@ -807,20 +990,22 @@ public class InternalExternalizedPropertiesTests {
     ) {
         RootResolver rootResolver = new RootResolver(
             Arrays.asList(resolverToUse),
-            new RootProcessor(),
-            new SimpleVariableExpander()
+            new RootProcessor()
         );
 
         RootConverter rootConverter = new RootConverter(
             new DefaultConverter()
         );
 
+        SimpleVariableExpander variableExpander = new SimpleVariableExpander();
+
         return new InternalExternalizedProperties(
             rootResolver,
             rootConverter,
-            (proxyInterface, rr, rc, pmf) -> 
+            variableExpander,
+            (proxyInterface, rr, rc, ve, pmf) -> 
                 new ExternalizedPropertiesInvocationHandler(
-                    rr, rc, pmf
+                    rr, rc, ve, pmf
                 )
         );
     }
@@ -891,13 +1076,13 @@ public class InternalExternalizedPropertiesTests {
         <T> T convert(String valueToConvert);
     }
 
-    private static interface InvalidFirstArgConvertProxy {
+    private static interface InvalidFirstArgTypeConvertProxy {
         // First parameter must be the value to convert (String)
         @Convert
         <T> T convert(Integer mustBeString, Class<T> targetType);
     }
 
-    private static interface InvalidSecondArgConvertProxy {
+    private static interface InvalidSecondArgTypeConvertProxy {
         // Second parameter must be the target type.
         // Second argument must be one of the ff: TypeReference, Class, Type
         @Convert
@@ -926,5 +1111,34 @@ public class InternalExternalizedPropertiesTests {
             String valueToConvert, 
             Type targetType
         );
+    }
+
+    private static interface ExpandVariablesProxy {
+        @ExpandVariables
+        String expandVariables(String value);
+    }
+
+    private static interface InvalidReturnTypeExpandVariablesProxy {
+        // Return type must be String.
+        @ExpandVariables
+        int expandVariables(String value);
+    }
+
+    private static interface InvalidArgTypeExpandVariablesProxy {
+        // Must have 1 String argument.
+        @ExpandVariables
+        String expandVariables(int value);
+    }
+
+    private static interface NoArgsExpandVariablesProxy {
+        // Must have 1 String argument.
+        @ExpandVariables
+        String expandVariables();
+    }
+
+    private static interface InvalidNumberOfArgsExpandVariablesProxy {
+        //Must only have 1 String argument,
+        @ExpandVariables
+        int expandVariables(String value, String mustOnlyBeOneArg);
     }
 }

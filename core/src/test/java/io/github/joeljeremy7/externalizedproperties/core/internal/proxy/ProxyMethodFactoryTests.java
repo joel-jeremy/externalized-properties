@@ -52,24 +52,6 @@ public class ProxyMethodFactoryTests {
                     () -> new ProxyMethodAdapter(EXTERNALIZED_PROPERTIES, null)
                 );
             }
-
-            @Test
-            @DisplayName("should throw when args argument is null")
-            void test3() {
-                Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
-                    ProxyInterface.class, 
-                    ProxyInterface::property
-                );
-
-                assertThrows(
-                    IllegalArgumentException.class, 
-                    () -> new ProxyMethodAdapter(
-                        EXTERNALIZED_PROPERTIES, 
-                        proxyInterfaceMethod, 
-                        (Object[])null
-                    )
-                );
-            }
         }
 
         @Nested
@@ -118,43 +100,6 @@ public class ProxyMethodFactoryTests {
                 ProxyMethod proxyMethod = proxyMethod(proxyInterfaceMethod);
                 
                 assertEquals(methodName, proxyMethod.name());
-            }
-        }
-
-        @Nested
-        class ExternalizedPropertyNameMethod {
-            @Test
-            @DisplayName("should return name of the property.")
-            void test1() {
-                Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
-                    ProxyInterface.class, 
-                    ProxyInterface::property
-                );
-                ProxyMethod proxyMethod = proxyMethod(proxyInterfaceMethod);
-                
-                Optional<String> propertyName = proxyMethod.externalizedPropertyName();
-                
-                assertTrue(propertyName.isPresent());
-
-                // See ProxyInterface.property @ExternalizedProperty annotation value.
-                assertEquals("property", propertyName.get());
-            }
-            
-            @Test
-            @DisplayName("should return name of the property from method args.")
-            void test2() {
-                Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
-                    ProxyInterface.class, 
-                    ProxyInterface::resolve
-                );
-                String propertyNameArg = "property";
-                ProxyMethod proxyMethod = proxyMethod(proxyInterfaceMethod, propertyNameArg);
-                
-                Optional<String> propertyName = proxyMethod.externalizedPropertyName();
-                
-                assertTrue(propertyName.isPresent());
-
-                assertEquals(propertyNameArg, propertyName.get());
             }
         }
 
@@ -593,8 +538,8 @@ public class ProxyMethodFactoryTests {
             }
         }
 
-        private ProxyMethod proxyMethod(Method method, Object... args) {
-            return new ProxyMethodAdapter(EXTERNALIZED_PROPERTIES, method, args);
+        private ProxyMethod proxyMethod(Method method) {
+            return new ProxyMethodAdapter(EXTERNALIZED_PROPERTIES, method);
         }
     }
 

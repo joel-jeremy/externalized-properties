@@ -1,9 +1,11 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal;
 
 import io.github.joeljeremy7.externalizedproperties.core.Convert;
+import io.github.joeljeremy7.externalizedproperties.core.ExpandVariables;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
+import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.ProxyMethodFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
@@ -22,6 +24,7 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
 public class InternalExternalizedProperties implements ExternalizedProperties {
     private final RootResolver rootResolver;
     private final RootConverter rootConverter;
+    private final VariableExpander variableExpander;
     private final InvocationHandlerFactory invocationHandlerFactory;
     private final ProxyMethodFactory proxyMethodFactory;
 
@@ -30,18 +33,22 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
      * 
      * @param rootResolver The root resolver.
      * @param rootConverter The root converter.
+     * @param variableExpander The variable expander.
      * @param invocationHandlerFactory The invocation handler factory.
      */
     public InternalExternalizedProperties(
             RootResolver rootResolver,
             RootConverter rootConverter,
+            VariableExpander variableExpander,
             InvocationHandlerFactory invocationHandlerFactory
     ) {
         requireNonNull(rootResolver, "rootResolver");
         requireNonNull(rootConverter, "rootConverter");
+        requireNonNull(variableExpander, "variableExpander");
         requireNonNull(invocationHandlerFactory, "invocationHandlerFactory");
         this.rootResolver = rootResolver;
         this.rootConverter = rootConverter;
+        this.variableExpander = variableExpander;
         this.invocationHandlerFactory = invocationHandlerFactory;
         this.proxyMethodFactory = new ProxyMethodFactory(this);
     }
@@ -71,6 +78,7 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
                 proxyInterface,
                 rootResolver,
                 rootConverter,
+                variableExpander,
                 proxyMethodFactory
             )
         );
@@ -81,6 +89,7 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
             throwIfVoidReturnType(proxyMethod);
             throwIfInvalidMethodSignature(proxyMethod);
             throwIfInvalidConvertMethodSignature(proxyMethod);
+            throwIfInvalidExpandVariablesMethodSignature(proxyMethod);
         }
     }
 
@@ -105,16 +114,18 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
 
         Class<?>[] parameterTypes = proxyMethod.getParameterTypes();
         if (parameterTypes.length != 1) {
-            throw new IllegalArgumentException(
-                "Proxy method must have a single parameter."
-            );
+            throw new IllegalArgumentException(String.format(
+                "Proxy methods annotated with @%s must have a single parameter.",
+                ExternalizedProperty.class
+            ));
         }
 
         Class<?> parameterType = parameterTypes[0];
         if (!String.class.equals(parameterType)) {
-            throw new IllegalArgumentException(
-                "Proxy method must have a single String parameter."
-            );
+            throw new IllegalArgumentException(String.format(
+                "Proxy methods annotated with @%s must have a single String parameter.",
+                ExternalizedProperty.class
+            ));
         }
     }
 
@@ -161,6 +172,35 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
                     )
                 )
             );
+        }
+    }
+
+    private void throwIfInvalidExpandVariablesMethodSignature(Method proxyMethod) {
+        if (!proxyMethod.isAnnotationPresent(ExpandVariables.class)) {
+            return;
+        }
+
+        Class<?>[] parameterTypes = proxyMethod.getParameterTypes();
+        if (parameterTypes.length != 1) {
+            throw new IllegalArgumentException(String.format(
+                "Proxy methods annotated with @%s must have a single parameter.",
+                ExpandVariables.class.getName()
+            ));
+        }
+
+        Class<?> parameterType = parameterTypes[0];
+        if (!String.class.equals(parameterType)) {
+            throw new IllegalArgumentException(String.format(
+                "Proxy methods annotated with @%s must have a single String parameter.",
+                ExpandVariables.class.getName()
+            ));
+        }
+
+        if (!String.class.equals(proxyMethod.getReturnType())) {
+            throw new IllegalArgumentException(String.format(
+                "Proxy methods annotated with @%s must have a String return type.",
+                ExpandVariables.class.getName()
+            ));
         }
     }
 }

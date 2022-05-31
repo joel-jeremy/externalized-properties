@@ -1,7 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
-import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
@@ -35,11 +34,10 @@ public class ProxyMethodFactory {
      * Create a {@link ProxyMethod} based from the method and the invocation arguments.
      * 
      * @param method The method to create a {@link ProxyMethod} from.
-     * @param args The method invocation arguments.
      * @return A {@link ProxyMethod} based from the method and the invocation arguments.
      */
-    public ProxyMethod proxyMethod(Method method, Object... args) {
-        return new ProxyMethodAdapter(externalizedProperties, method, args);
+    public ProxyMethod proxyMethod(Method method) {
+        return new ProxyMethodAdapter(externalizedProperties, method);
     }
 
     /**
@@ -49,51 +47,28 @@ public class ProxyMethodFactory {
 
         private final ExternalizedProperties externalizedProperties;
         private final Method method;
-        private final Object[] args;
 
         /**
          * Constructor.
          * 
          * @param externalizedProperties The {@link ExternalizedProperties} instance.
          * @param method The method.
-         * @param args The method arguments.
          */
         public ProxyMethodAdapter(
                 ExternalizedProperties externalizedProperties,
-                Method method, 
-                Object... args
+                Method method
         ) {
             this.externalizedProperties = requireNonNull(
                 externalizedProperties, 
                 "externalizedProperties"
             );
             this.method = requireNonNull(method, "method");
-            this.args = requireNonNull(args, "args");
         }
 
         /** {@inheritDoc} */
         @Override
         public ExternalizedProperties externalizedProperties() {
             return externalizedProperties;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Optional<String> externalizedPropertyName() {
-            ExternalizedProperty externalizedProperty = 
-                method.getAnnotation(ExternalizedProperty.class);
-            if (externalizedProperty == null) {
-                return Optional.empty();
-            }
-            
-            String value = externalizedProperty.value();
-            if (!"".equals(value)) {
-                return Optional.of(value);
-            }
-
-            // No need to check before casting. 
-            // Should have been validated on proxy creation.
-            return Optional.of((String)args[0]);
         }
 
         /** {@inheritDoc} */
