@@ -118,7 +118,6 @@ Registration of [Processor](../core/src/main/java/io/github/joeljeremy7/external
 ```java
 public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .defaults()
         // Register custom processor to process @Base64Encode
         .processors(new Base64EncodeProcessor())
         .build();

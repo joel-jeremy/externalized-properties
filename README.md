@@ -59,6 +59,7 @@ module foo.bar {
 
 ### 🔗 [Property Resolution via Java Dynamic Proxies](docs/property-resolution.md) ([Why Dynamic Proxies?](docs/why-dynamic-proxies.md))
 
+✨ Proxy Interface Property Mapping (via [@ExternalizedProperty](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java))  
 ✨ Default/Fallback Values  
 ✨ Non-Static/Dynamic Property Names (via [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
 ✨ Caching  
@@ -91,6 +92,10 @@ module foo.bar {
 
 ## 🏎️ Quick Start
 
+Properties are mapped to proxy interface methods by using the [@ExternalizedProperty](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java) annotation.
+
+(For more advanced scenarios, please see the feature documentations.)
+
 Given an interface:
 
 ```java
@@ -111,12 +116,13 @@ We can initialize and start resolving external configurations/properties by:
 
 ```java
 public static void main(String[] args) {
+    // 1. Configure and build the ExternalizedProperties instance.
     ExternalizedProperties externalizedProperties = buildExternalizedProperties();
 
-    // Proxied interface.
+    // 2. Initialize a proxy using the ExternalizedProperties.
     ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
 
-    // Use properties.
+    // 3. Resolve the properties.
     String javaHome = props.javaHome();
     String encryptedProperty = props.encryptedProperty();
     int javaVersion = props.javaVersion();

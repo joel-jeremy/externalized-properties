@@ -78,3 +78,45 @@ Invoking the methods annotated with [@ConverterFacade](../core/src/main/java/io/
 ## 🚀 Custom Converters
 
 There are several built-in converters but it is very easy to create a custom converter by implementing the [Converter](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Converter.java) interface and registering the converter via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder.
+
+```java
+public class MyCustomConverter implements Converter<MyCustomType> {
+    @Override
+    public boolean canConvertTo(Class<?> targetType) {
+        return MyCustomType.class.equals(targetType);
+    }
+
+    @Override
+    public ConversionResult<MyCustomType> convert(
+            ProxyMethod proxyMethod, 
+            String valueToConvert,
+            Type targetType // This is always MyCustomType.class
+    ) {
+        // There is also a ConversionResult.skip() result to skip this converter and move to the next available one.
+        return ConversionResult.of(
+            MyCustomType.valueOf(valueToConvert)
+        );
+    }
+}
+```
+
+```java
+public interface ApplicationProperties {
+    @ExternalizedProperty("my.property")
+    MyCustomType myProperty();
+}
+```
+
+```java
+private static void main(String[] args) {
+    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+        // Register custom resolvers here.
+        .converters(new MyCustomConverter())
+        .build();
+
+    ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
+
+    // Converted using MyCustomConverter.
+    MyCustomType myProperty = props.myProperty();
+}
+```
