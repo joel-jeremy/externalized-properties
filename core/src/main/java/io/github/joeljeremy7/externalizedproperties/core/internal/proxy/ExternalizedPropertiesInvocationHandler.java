@@ -1,14 +1,14 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 
-import io.github.joeljeremy7.externalizedproperties.core.Convert;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
-import io.github.joeljeremy7.externalizedproperties.core.ExpandVariables;
+import io.github.joeljeremy7.externalizedproperties.core.ConverterFacade;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
 import io.github.joeljeremy7.externalizedproperties.core.UnresolvedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
+import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderFacade;
 import io.github.joeljeremy7.externalizedproperties.core.internal.ExternalizedPropertyName;
 import io.github.joeljeremy7.externalizedproperties.core.internal.MethodHandleFactory;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
@@ -23,8 +23,8 @@ import java.util.Optional;
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 /**
- * Invocation handler for Externalized Properties.
- * This handles invocations of methods that are marked with {@link ExternalizedProperty} annotation.
+ * Invocation handler for Externalized Properties. It handles invocations of methods 
+ * that are marked with {@link ExternalizedProperty} annotation.
  */
 public class ExternalizedPropertiesInvocationHandler implements InvocationHandler {
     private final Resolver rootResolver;
@@ -80,28 +80,28 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
             return objectMethodResult;
         }
 
-        // @ExternalizedProperty handling.
         Optional<String> externalizedPropertyName = 
             ExternalizedPropertyName.fromProxyMethodInvocation(method, args);
+        // @ExternalizedProperty and @ResolverFacade handling.
         if (externalizedPropertyName.isPresent()) {
-            return handleExternalizedProperty(
+            return resolveProperty(
                 proxy,
                 method, 
                 args, 
                 externalizedPropertyName.get()
             );
         }
-        // @Convert handling
-        else if (method.isAnnotationPresent(Convert.class)) {
-            return handleConvert(method, args);
+        // @ConverterFacade handling
+        else if (method.isAnnotationPresent(ConverterFacade.class)) {
+            return handleConverterFacade(method, args);
         }
-        // @ExpandVariables handling.
-        else if (method.isAnnotationPresent(ExpandVariables.class)) {
-            return handleExpandVariables(method, args);
+        // @VariableExpanderFacade handling.
+        else if (method.isAnnotationPresent(VariableExpanderFacade.class)) {
+            return handleVariableExpanderFacade(method, args);
         }
 
         // Either there was no property name (means not annotated with @ExternalizedProperty)
-        // @Convert, or @ExpandVariables. That, or property cannot be resolved.
+        // @ConverterFacade, or @VariableExpanderFacade. That, or property cannot be resolved.
         return determineDefaultValueOrThrow(
             proxy, 
             method, 
@@ -109,7 +109,7 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
         );
     }
     
-    private Object handleExternalizedProperty(
+    private Object resolveProperty(
             Object proxy,
             Method method, 
             Object[] args, 
@@ -125,14 +125,14 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
             .orElseGet(() -> determineDefaultValueOrThrow(proxy, method, args));
     }
 
-    private String handleExpandVariables(Method method, Object[] args) {
+    private String handleVariableExpanderFacade(Method method, Object[] args) {
         ProxyMethod proxyMethod = proxyMethodFactory.proxyMethod(method);
         // No need to validate. Already validated when proxy was built.
         String valueToExpand = (String)args[0];
         return variableExpander.expandVariables(proxyMethod, valueToExpand);
     }
 
-    private Object handleConvert(Method method, Object[] args) {
+    private Object handleConverterFacade(Method method, Object[] args) {
         ProxyMethod proxyMethod = proxyMethodFactory.proxyMethod(method);
         // No need to validate. Already validated when proxy was built.
         String valueToConvert = (String)args[0];

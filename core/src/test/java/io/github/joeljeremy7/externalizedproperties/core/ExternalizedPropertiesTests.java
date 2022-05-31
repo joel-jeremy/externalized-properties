@@ -1015,10 +1015,10 @@ public class ExternalizedPropertiesTests {
     }
 
     public static interface OrdinalProxyInterface {
-        @ExternalizedProperty
+        @ResolverFacade
         String resolve(String propertyName);
 
-        @Convert
+        @ConverterFacade
         <T> T convert(String property, Class<T> targetType);
     }
 

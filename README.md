@@ -60,8 +60,7 @@ module foo.bar {
 ### 🔗 [Property Resolution via Java Dynamic Proxies](docs/property-resolution.md) ([Why Dynamic Proxies?](docs/why-dynamic-proxies.md))
 
 ✨ Default/Fallback Values  
-✨ Non-static/Dynamic Property Names  
-✨ Variable Expansion in Property Names
+✨ Non-Static/Dynamic Property Names (via [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
 ✨ Caching  
 ✨ Eager Loading  
 ✨ Automatic Cache Reload  
@@ -70,11 +69,12 @@ module foo.bar {
 
 ✨ Automatic Property Conversion  
 ✨ Generic Type Conversion  
-✨ Conversion of Arbitrary Strings (via [@Convert](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Convert.java))
+✨ Dynamic Value Conversion (via [@ConverterFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java))
 
 ### 🔗 [Variable Expansion](docs/variable-expansion.md)
 
-✨ Conversion of Arbitrary Strings (via [@ExpandVariables](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExpandVariables.java))
+✨ Automatic Variable Expansion in Property Names
+✨ Dynamic Variable Expansion (via [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
 
 ### 🔗 [Processing](docs/processing.md)
 

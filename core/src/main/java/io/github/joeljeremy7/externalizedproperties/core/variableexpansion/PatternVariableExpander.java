@@ -1,6 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
-import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
@@ -93,7 +93,7 @@ public class PatternVariableExpander implements VariableExpander {
     }
 
     private static interface ResolverProxy {
-        @ExternalizedProperty
+        @ResolverFacade
         String resolve(String propertyName);
     }
 }

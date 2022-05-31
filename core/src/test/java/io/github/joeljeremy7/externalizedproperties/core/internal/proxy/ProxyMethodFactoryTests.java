@@ -2,6 +2,7 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.ProxyMethodFactory.ProxyMethodAdapter;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
@@ -546,9 +547,6 @@ public class ProxyMethodFactoryTests {
     private static interface ProxyInterface {
         @ExternalizedProperty("property")
         String property();
-        
-        @ExternalizedProperty
-        String resolve(String propertyName);
 
         @ExternalizedProperty("generic.property")
         Optional<String> optionalProperty();
@@ -557,6 +555,9 @@ public class ProxyMethodFactoryTests {
         default String defaultPropertyWithParameter(String defaultValue) {
             return defaultValue;
         }
+        
+        @ResolverFacade
+        String resolve(String propertyName);
         
         default String defaultPropertyWithParameterNoAnnotation(String defaultValue) {
             return defaultValue;

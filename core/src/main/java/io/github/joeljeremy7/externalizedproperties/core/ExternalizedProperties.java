@@ -35,11 +35,13 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
 
 /**
  * The core API for Externalized Properties. This provides methods to initialize proxies that
- * will redirect method invocations to Externalized Properties. The annotation provided by
- * Externalized Properties will define how certain method invocations will be handled.
+ * will redirect method invocations to Externalized Properties' handlers. The annotation 
+ * provided by Externalized Properties will define how certain method invocations will be handled.
  * 
  * @see ExternalizedProperty
- * @see Convert
+ * @see ResolverFacade
+ * @see ConverterFacade
+ * @see VariableExpanderFacade
  */
 public interface ExternalizedProperties {
     /**

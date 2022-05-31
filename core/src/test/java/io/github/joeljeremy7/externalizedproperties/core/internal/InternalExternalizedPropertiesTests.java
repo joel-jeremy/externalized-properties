@@ -1,10 +1,11 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal;
 
-import io.github.joeljeremy7.externalizedproperties.core.Convert;
-import io.github.joeljeremy7.externalizedproperties.core.ExpandVariables;
+import io.github.joeljeremy7.externalizedproperties.core.ConverterFacade;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
+import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
+import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderFacade;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
@@ -32,7 +33,7 @@ public class InternalExternalizedPropertiesTests {
     class InitializeMethod {
         @Test
         @DisplayName("should throw when proxy interface argument is null")
-        void test1() {
+        void validationTest1() {
             // Do not resolve any property.
             Resolver resolver = new StubResolver(
                 StubResolver.NULL_VALUE_RESOLVER
@@ -49,7 +50,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should throw when proxy interface argument is not an interface")
-        void test2() {
+        void validationTest2() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -63,7 +64,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should throw when proxy interface contains void-returning methods")
-        void test3() {
+        void validationTest3() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -77,7 +78,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should throw when proxy interface contains Void-returning methods")
-        void test4() {
+        void validationTest4() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -94,7 +95,7 @@ public class InternalExternalizedPropertiesTests {
             "should throw when @ExternalizedProperty (no value) proxy method does not have " +
             "a single String argument"
         )
-        void test5() {
+        void validationTest5() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -111,7 +112,7 @@ public class InternalExternalizedPropertiesTests {
             "should throw when @ExternalizedProperty (no value) proxy method have " +
             "multiple arguments"
         )
-        void test6() {
+        void validationTest6() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -128,7 +129,7 @@ public class InternalExternalizedPropertiesTests {
             "should throw when @ExternalizedProperty (no value) proxy method have " +
             "a non-String argument"
         )
-        void test7() {
+        void validationTest7() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -142,85 +143,101 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when @Convert proxy method have invalid " +
+            "should throw when @ConverterFacade proxy method have invalid " +
             "method parameter types"
         )
-        void test8() {
+        void validationTest8() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidArgsConvertProxy.class
+                    InvalidArgsConverterFacadeProxyInterface.class
                 )
             );
         }
 
         @Test
         @DisplayName(
-            "should throw when @Convert proxy method have no " +
+            "should throw when @ConverterFacade proxy method has no" +
             "method parameters"
         )
-        void test9() {
+        void validationTest9() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    NoArgsConvertProxy.class
+                    NoArgsConverterFacadeProxyInterface.class
                 )
             );
         }
 
         @Test
         @DisplayName(
-            "should throw when @Convert proxy method does not have " +
+            "should throw when @ConverterFacade proxy method does not have " +
             "2 method parameters"
         )
-        void test10() {
+        void validationTest10() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    SingleArgConvertProxy.class
+                    SingleArgConverterFacadeProxyInterface.class
                 )
             );
         }
 
         @Test
         @DisplayName(
-            "should throw when @Convert proxy method first parameter " + 
+            "should throw when @ConverterFacade proxy method first parameter " + 
             "is not a String (value to convert)"
         )
-        void test11() {
+        void validationTest11() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidFirstArgTypeConvertProxy.class
+                    InvalidFirstArgTypeConverterFacadeProxyInterface.class
                 )
             );
         }
 
         @Test
         @DisplayName(
-            "should throw when @Convert proxy method second parameter " + 
+            "should throw when @ConverterFacade proxy method second parameter " + 
             "is not the target type"
         )
-        void test12() {
+        void validationTest12() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidSecondArgTypeConvertProxy.class
+                    InvalidSecondArgTypeConverterFacadeProxyInterface.class
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should throw when exclusive annotations are found in proxy method"
+        )
+        void validationTest13() {
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(new StubResolver());
+
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> externalizedProperties.initialize(
+                    ExclusiveProxyInterface.class
                 )
             );
         }
@@ -229,7 +246,7 @@ public class InternalExternalizedPropertiesTests {
         @DisplayName(
             "should initialize a proxy that handles @ExternalizedProperty annotations"
         )
-        void test13() {
+        void test1() {
             StubResolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
@@ -249,15 +266,38 @@ public class InternalExternalizedPropertiesTests {
         }
 
         @Test
-        @DisplayName("should initialize a proxy that handles @Convert annotations")
-        void test14() {
+        @DisplayName(
+            "should initialize a proxy that handles @ResolverFacade annotations"
+        )
+        void test2() {
+            StubResolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ResolverFacadeProxyInterface proxy = externalizedProperties.initialize(
+                ResolverFacadeProxyInterface.class
+            );
+
+            assertNotNull(proxy);
+            assertTrue(proxy instanceof Proxy);
+
+            assertEquals(
+                resolver.valueResolver().apply("property"),
+                proxy.resolve("property")
+            );
+        }
+
+        @Test
+        @DisplayName("should initialize a proxy that handles @ConverterFacade annotations")
+        void test3() {
             Resolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            ConvertProxy proxy = externalizedProperties.initialize(
-                ConvertProxy.class
+            ConverterFacadeProxyInterface proxy = externalizedProperties.initialize(
+                ConverterFacadeProxyInterface.class
             );
 
             assertNotNull(proxy);
@@ -296,14 +336,14 @@ public class InternalExternalizedPropertiesTests {
             "should throw ClassCastException when value converted to target type reference " +
             "is not assignable to the proxy method return type"
         )
-        void test15() {
+        void test4() {
             Resolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
-                ReturnTypeMismatchConvertProxy.class
+            ReturnTypeMismatchConverterFacadeProxyInterface proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConverterFacadeProxyInterface.class
             );
 
             // Target type is List<String> but proxy interface method
@@ -322,14 +362,14 @@ public class InternalExternalizedPropertiesTests {
             "should throw ClassCastException when value converted to target class " +
             "is not assignable to the proxy method return type"
         )
-        void test16() {
+        void test5() {
             Resolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
-                ReturnTypeMismatchConvertProxy.class
+            ReturnTypeMismatchConverterFacadeProxyInterface proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConverterFacadeProxyInterface.class
             );
 
             // Target type is List but proxy interface method
@@ -348,14 +388,14 @@ public class InternalExternalizedPropertiesTests {
             "should throw ClassCastException when value converted to target type " +
             "is not assignable to the proxy method return type"
         )
-        void test17() {
+        void test6() {
             Resolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
-                ReturnTypeMismatchConvertProxy.class
+            ReturnTypeMismatchConverterFacadeProxyInterface proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConverterFacadeProxyInterface.class
             );
 
             // Target type is List<String> but proxy interface method
@@ -374,14 +414,14 @@ public class InternalExternalizedPropertiesTests {
             "should throw ClassCastException when value converted to target type" + 
             "is not assignable to the proxy method return type variable"
         )
-        void test18() {
+        void test7() {
             Resolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
-                ReturnTypeMismatchConvertProxy.class
+            ReturnTypeMismatchConverterFacadeProxyInterface proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConverterFacadeProxyInterface.class
             );
 
             // Target type is List<String> but proxy interface method
@@ -402,15 +442,17 @@ public class InternalExternalizedPropertiesTests {
         }
 
         @Test
-        @DisplayName("should initialize a proxy that handles @ExpandVariables annotations")
-        void test19() {
+        @DisplayName(
+            "should initialize a proxy that handles @VariableExpanderFacade annotations"
+        )
+        void test8() {
             StubResolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            ExpandVariablesProxy proxy = externalizedProperties.initialize(
-                ExpandVariablesProxy.class
+            VariableExpanderFacadeProxyInterface proxy = externalizedProperties.initialize(
+                VariableExpanderFacadeProxyInterface.class
             );
 
             assertNotNull(proxy);
@@ -424,68 +466,68 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when @ExpandVariables proxy method does not have " +
+            "should throw when @VariableExpanderFacade proxy method does not have " +
             "any method parameters"
         )
-        void test20() {
+        void test9() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    NoArgsExpandVariablesProxy.class
+                    NoArgsVariableExpanderFacadeProxyInterface.class
                 )
             );
         }
 
         @Test
         @DisplayName(
-            "should throw when @ExpandVariables proxy method have more than" +
+            "should throw when @VariableExpanderFacade proxy method have more than" +
             "1 method parameters"
         )
-        void test21() {
+        void test10() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidNumberOfArgsExpandVariablesProxy.class
+                    InvalidNumberOfArgsVariableExpanderFacadeProxyInterface.class
                 )
             );
         }
 
         @Test
         @DisplayName(
-            "should throw when @ExpandVariables proxy method have an invalid" +
+            "should throw when @VariableExpanderFacade proxy method have an invalid" +
             "parameter type"
         )
-        void test22() {
+        void test11() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidArgTypeExpandVariablesProxy.class
+                    InvalidArgTypeVariableExpanderFacadeProxyInterface.class
                 )
             );
         }
 
         @Test
         @DisplayName(
-            "should throw when @ExpandVariables proxy method have an invalid" +
+            "should throw when @VariableExpanderFacade proxy method have an invalid" +
             "return type"
         )
-        void test23() {
+        void test12() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidReturnTypeExpandVariablesProxy.class
+                    InvalidReturnTypeVariableExpanderFacadeProxyInterface.class
                 )
             );
         }
@@ -495,7 +537,7 @@ public class InternalExternalizedPropertiesTests {
     class InitializeMethodWithClassLoaderOverload {
         @Test
         @DisplayName("should throw when proxy interface argument is null")
-        void test1() {
+        void validationTest1() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
             ClassLoader classLoader = getClass().getClassLoader();
@@ -508,7 +550,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should throw when class loader argument is null")
-        void test2() {
+        void validationTest2() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -520,7 +562,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should throw when proxy interface argument is not an interface")
-        void test3() {
+        void validationTest3() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -535,7 +577,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should throw when proxy interface contains void-returning methods")
-        void test4() {
+        void validationTest4() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -550,7 +592,7 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName("should throw when proxy interface contains Void-returning methods")
-        void test5() {
+        void validationTest5() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -568,7 +610,7 @@ public class InternalExternalizedPropertiesTests {
             "should throw when @ExternalizedProperty (no value) proxy method does not have " +
             "a single String argument"
         )
-        void test6() {
+        void validationTest6() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -586,7 +628,7 @@ public class InternalExternalizedPropertiesTests {
             "should throw when @ExternalizedProperty (no value) proxy method have " +
             "multiple arguments"
         )
-        void test7() {
+        void validationTest7() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -604,7 +646,7 @@ public class InternalExternalizedPropertiesTests {
             "should throw when @ExternalizedProperty (no value) proxy method have " +
             "a non-String argument"
         )
-        void test8() {
+        void validationTest8() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
@@ -619,17 +661,17 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when @Convert proxy method have invalid " +
+            "should throw when @ConverterFacade proxy method have invalid " +
             "method parameter types"
         )
-        void test9() {
+        void validationTest9() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidArgsConvertProxy.class,
+                    InvalidArgsConverterFacadeProxyInterface.class,
                     getClass().getClassLoader()
                 )
             );
@@ -637,17 +679,17 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when @Convert proxy method have no " +
+            "should throw when @ConverterFacade proxy method have no " +
             "method parameters"
         )
-        void test10() {
+        void validationTest10() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    NoArgsConvertProxy.class,
+                    NoArgsConverterFacadeProxyInterface.class,
                     getClass().getClassLoader()
                 )
             );
@@ -655,17 +697,17 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when @Convert proxy method does not have " +
+            "should throw when @ConverterFacade proxy method does not have " +
             "2 method parameters"
         )
-        void test11() {
+        void validationTest11() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    SingleArgConvertProxy.class,
+                    SingleArgConverterFacadeProxyInterface.class,
                     getClass().getClassLoader()
                 )
             );
@@ -673,17 +715,17 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when @Convert proxy method first parameter " + 
+            "should throw when @ConverterFacade proxy method first parameter " + 
             "is not a String (value to convert)"
         )
-        void test12() {
+        void validationTest12() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidFirstArgTypeConvertProxy.class,
+                    InvalidFirstArgTypeConverterFacadeProxyInterface.class,
                     getClass().getClassLoader()
                 )
             );
@@ -691,17 +733,17 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when @Convert proxy method second parameter " + 
+            "should throw when @ConverterFacade proxy method second parameter " + 
             "is not the target type"
         )
-        void test13() {
+        void validationTest13() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidSecondArgTypeConvertProxy.class,
+                    InvalidSecondArgTypeConverterFacadeProxyInterface.class,
                     getClass().getClassLoader()
                 )
             );
@@ -711,7 +753,7 @@ public class InternalExternalizedPropertiesTests {
         @DisplayName(
             "should initialize a proxy that handles @ExternalizedProperty annotations"
         )
-        void test14() {
+        void test1() {
             StubResolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
@@ -731,17 +773,41 @@ public class InternalExternalizedPropertiesTests {
             );
         }
 
+        @Test
+        @DisplayName(
+            "should initialize a proxy that handles @ResolverFacade annotations"
+        )
+        void test2() {
+            StubResolver resolver = new StubResolver();
+            
+            InternalExternalizedProperties externalizedProperties = 
+                internalExternalizedProperties(resolver);
+
+            ResolverFacadeProxyInterface proxy = externalizedProperties.initialize(
+                ResolverFacadeProxyInterface.class,
+                getClass().getClassLoader()
+            );
+
+            assertNotNull(proxy);
+            assertTrue(proxy instanceof Proxy);
+
+            assertEquals(
+                resolver.valueResolver().apply("property"),
+                proxy.resolve("property")
+            );
+        }
+
 
         @Test
-        @DisplayName("should initialize a proxy that handles @Convert annotations")
-        void test15() {
+        @DisplayName("should initialize a proxy that handles @ConverterFacade annotations")
+        void test3() {
             Resolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            ConvertProxy proxy = externalizedProperties.initialize(
-                ConvertProxy.class,
+            ConverterFacadeProxyInterface proxy = externalizedProperties.initialize(
+                ConverterFacadeProxyInterface.class,
                 getClass().getClassLoader()
             );
 
@@ -781,14 +847,14 @@ public class InternalExternalizedPropertiesTests {
             "should throw ClassCastException when value converted to target type reference " +
             "is not assignable to the proxy method return type"
         )
-        void test16() {
+        void test4() {
             Resolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
-                ReturnTypeMismatchConvertProxy.class,
+            ReturnTypeMismatchConverterFacadeProxyInterface proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConverterFacadeProxyInterface.class,
                 getClass().getClassLoader()
             );
 
@@ -808,14 +874,14 @@ public class InternalExternalizedPropertiesTests {
             "should throw ClassCastException when value converted to target class " +
             "is not assignable to the proxy method return type"
         )
-        void test17() {
+        void test5() {
             Resolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
-                ReturnTypeMismatchConvertProxy.class,
+            ReturnTypeMismatchConverterFacadeProxyInterface proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConverterFacadeProxyInterface.class,
                 getClass().getClassLoader()
             );
 
@@ -835,14 +901,14 @@ public class InternalExternalizedPropertiesTests {
             "should throw ClassCastException when value converted to target type " +
             "is not assignable to the proxy method return type"
         )
-        void test18() {
+        void test6() {
             Resolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
-                ReturnTypeMismatchConvertProxy.class,
+            ReturnTypeMismatchConverterFacadeProxyInterface proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConverterFacadeProxyInterface.class,
                 getClass().getClassLoader()
             );
 
@@ -862,14 +928,14 @@ public class InternalExternalizedPropertiesTests {
             "should throw ClassCastException when value converted to target type" + 
             "is not assignable to the proxy method return type variable"
         )
-        void test19() {
+        void test7() {
             Resolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            ReturnTypeMismatchConvertProxy proxy = externalizedProperties.initialize(
-                ReturnTypeMismatchConvertProxy.class,
+            ReturnTypeMismatchConverterFacadeProxyInterface proxy = externalizedProperties.initialize(
+                ReturnTypeMismatchConverterFacadeProxyInterface.class,
                 getClass().getClassLoader()
             );
 
@@ -891,15 +957,17 @@ public class InternalExternalizedPropertiesTests {
         }
         
         @Test
-        @DisplayName("should initialize a proxy that handles @ExpandVariables annotations")
-        void test20() {
+        @DisplayName(
+            "should initialize a proxy that handles @VariableExpanderFacade annotations"
+        )
+        void test8() {
             StubResolver resolver = new StubResolver();
             
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(resolver);
 
-            ExpandVariablesProxy proxy = externalizedProperties.initialize(
-                ExpandVariablesProxy.class,
+            VariableExpanderFacadeProxyInterface proxy = externalizedProperties.initialize(
+                VariableExpanderFacadeProxyInterface.class,
                 getClass().getClassLoader()
             );
 
@@ -914,17 +982,17 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when @ExpandVariables proxy method does not have " +
+            "should throw when @VariableExpanderFacade proxy method does not have " +
             "any method parameters"
         )
-        void test21() {
+        void test9() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    NoArgsExpandVariablesProxy.class,
+                    NoArgsVariableExpanderFacadeProxyInterface.class,
                     getClass().getClassLoader()
                 )
             );
@@ -932,17 +1000,17 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when @ExpandVariables proxy method have more than" +
+            "should throw when @VariableExpanderFacade proxy method have more than" +
             "1 method parameters"
         )
-        void test22() {
+        void test10() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidNumberOfArgsExpandVariablesProxy.class,
+                    InvalidNumberOfArgsVariableExpanderFacadeProxyInterface.class,
                     getClass().getClassLoader()
                 )
             );
@@ -950,17 +1018,17 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when @ExpandVariables proxy method have an invalid" +
+            "should throw when @VariableExpanderFacade proxy method have an invalid" +
             "parameter type"
         )
-        void test23() {
+        void test11() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidArgTypeExpandVariablesProxy.class,
+                    InvalidArgTypeVariableExpanderFacadeProxyInterface.class,
                     getClass().getClassLoader()
                 )
             );
@@ -968,17 +1036,17 @@ public class InternalExternalizedPropertiesTests {
 
         @Test
         @DisplayName(
-            "should throw when @ExpandVariables proxy method have an invalid" +
+            "should throw when @VariableExpanderFacade proxy method have an invalid" +
             "return type"
         )
-        void test24() {
+        void test12() {
             InternalExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
-                    InvalidReturnTypeExpandVariablesProxy.class,
+                    InvalidReturnTypeVariableExpanderFacadeProxyInterface.class,
                     getClass().getClassLoader()
                 )
             );
@@ -1012,19 +1080,19 @@ public class InternalExternalizedPropertiesTests {
     
     private static interface NoStringArgProxyInterface {
         // Invalid: Must have a single String argument
-        @ExternalizedProperty
+        @ResolverFacade
         String resolve();
     }
 
     private static interface MultipleArgsProxyInterface {
         // Invalid: Must be a single String argument
-        @ExternalizedProperty
+        @ResolverFacade
         String resolve(String arg1, String arg2, int arg3);
     }
 
     private static interface InvalidArgTypeProxyInterface {
         // Invalid: Must be a single String argument
-        @ExternalizedProperty
+        @ResolverFacade
         String resolve(int invalidMustBeString);
     }
 
@@ -1045,100 +1113,131 @@ public class InternalExternalizedPropertiesTests {
         Void invalidVoidClassMethod();
     }
 
-    private static interface ConvertProxy {
-        @Convert
+    private static interface ResolverFacadeProxyInterface {
+        @ResolverFacade
+        String resolve(String propertyName);
+    }
+
+    private static interface ConverterFacadeProxyInterface {
+        @ConverterFacade
         <T> T convertToTargetTypeReference(
             String valueToConvert, 
             TypeReference<T> targetType
         );
-        @Convert
+        @ConverterFacade
         <T> T convertToTargetClass(String valueToConvert, Class<T> targetType);
-        @Convert
+        @ConverterFacade
         <T> T convertToTargetType(String valueToConvert, Type targetType);
     }
 
-    private static interface InvalidArgsConvertProxy {
+    private static interface InvalidArgsConverterFacadeProxyInterface {
         // First argument must be a String.
         // Second argument must be one of the ff: TypeReference, Class, Type
-        @Convert
+        @ConverterFacade
         <T> T convert(Integer mustBeString, Double mustBeTargetType);
     }
 
-    private static interface NoArgsConvertProxy {
+    private static interface NoArgsConverterFacadeProxyInterface {
         // Must have 2 parameters: The value to convert and the target type.
-        @Convert
+        @ConverterFacade
         <T> T convert();
     }
 
-    private static interface SingleArgConvertProxy {
+    private static interface SingleArgConverterFacadeProxyInterface {
         // Must have 2 parameters: The value to convert and the target type.
-        @Convert
+        @ConverterFacade
         <T> T convert(String valueToConvert);
     }
 
-    private static interface InvalidFirstArgTypeConvertProxy {
+    private static interface InvalidFirstArgTypeConverterFacadeProxyInterface {
         // First parameter must be the value to convert (String)
-        @Convert
+        @ConverterFacade
         <T> T convert(Integer mustBeString, Class<T> targetType);
     }
 
-    private static interface InvalidSecondArgTypeConvertProxy {
+    private static interface InvalidSecondArgTypeConverterFacadeProxyInterface {
         // Second parameter must be the target type.
         // Second argument must be one of the ff: TypeReference, Class, Type
-        @Convert
+        @ConverterFacade
         <T> T convert(String valueToConvert, Integer mustBeTargetType);
     }
 
-    private static interface ReturnTypeMismatchConvertProxy {
+    private static interface ReturnTypeMismatchConverterFacadeProxyInterface {
         // Return type not assignable with target type.
-        @Convert
+        @ConverterFacade
         Integer convertToTargetTypeReference(
             String valueToConvert, 
             TypeReference<?> targetType
         );
 
         // Return type not assignable with target type.
-        @Convert
+        @ConverterFacade
         Integer convertToTargetClass(String valueToConvert, Class<?> targetType);
 
         // Return type not assignable with target type.
-        @Convert
+        @ConverterFacade
         Integer convertToTargetType(String valueToConvert, Type targetType);
 
         // Return type not assignable with target type.
-        @Convert
+        @ConverterFacade
         <T> T convertToTargetTypeWithTypeVariableReturnType(
             String valueToConvert, 
             Type targetType
         );
     }
 
-    private static interface ExpandVariablesProxy {
-        @ExpandVariables
+    private static interface VariableExpanderFacadeProxyInterface {
+        @VariableExpanderFacade
         String expandVariables(String value);
     }
 
-    private static interface InvalidReturnTypeExpandVariablesProxy {
+    private static interface InvalidReturnTypeVariableExpanderFacadeProxyInterface {
         // Return type must be String.
-        @ExpandVariables
+        @VariableExpanderFacade
         int expandVariables(String value);
     }
 
-    private static interface InvalidArgTypeExpandVariablesProxy {
+    private static interface InvalidArgTypeVariableExpanderFacadeProxyInterface {
         // Must have 1 String argument.
-        @ExpandVariables
+        @VariableExpanderFacade
         String expandVariables(int value);
     }
 
-    private static interface NoArgsExpandVariablesProxy {
+    private static interface NoArgsVariableExpanderFacadeProxyInterface {
         // Must have 1 String argument.
-        @ExpandVariables
+        @VariableExpanderFacade
         String expandVariables();
     }
 
-    private static interface InvalidNumberOfArgsExpandVariablesProxy {
-        //Must only have 1 String argument,
-        @ExpandVariables
+    private static interface InvalidNumberOfArgsVariableExpanderFacadeProxyInterface {
+        //Must only have 1 argument (String).
+        @VariableExpanderFacade
         int expandVariables(String value, String mustOnlyBeOneArg);
+    }
+
+    private static interface ExclusiveProxyInterface {
+        @ExternalizedProperty("property+resolverfacade")
+        @ResolverFacade
+        String exclusive1();
+
+        @ExternalizedProperty("property+converterfacade")
+        @ConverterFacade
+        String exclusive2();
+
+        @ExternalizedProperty("property+variableexpanderfacade")
+        @VariableExpanderFacade
+        String exclusive3();
+
+        @ResolverFacade
+        @ConverterFacade
+        String exclusive4(String propertyName);
+
+        @ResolverFacade
+        @VariableExpanderFacade
+        String exclusive5(String propertyName);
+
+        @ConverterFacade
+        @VariableExpanderFacade
+        String property5(String valueToConvert, Class<?> targetType);
     }
 }

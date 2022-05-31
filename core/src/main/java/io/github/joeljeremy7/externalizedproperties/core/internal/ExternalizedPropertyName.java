@@ -1,6 +1,7 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.Method;
@@ -16,54 +17,67 @@ public class ExternalizedPropertyName {
      * Determine the externalized property name from the proxy method invocation.
      * 
      * <ol>
-     *  <li>It will be derived from {@link ExternalizedProperty#value()}, if specified.</li> 
      *  <li>
-     *  Otherwise, if {@link ExternalizedProperty#value()} is not specified, the property name 
-     *  will be derived from the proxy method's arguments. Specifically, the first argument of 
-     *  the proxy method (the method must only have one String argument e.g. 
-     *  {@code String resolve(String propertyName)}).
+     *  If method is annotated with {@link ExternalizedProperty}, the externalized property 
+     *  name will be derived from {@link ExternalizedProperty#value()}.
+     * </li> 
+     *  <li>
+     *  If method is annotated with {@link ResolverFacade}, the externalized property name 
+     *  will be derived from the proxy method's invocation arguments.
      *  </li>
      * </ol>
      * 
+     * @see ExternalizedProperty
+     * @see ResolverFacade
+     * 
      * @param proxyMethod The proxy method.
-     * @param args The proxy method invocation arguments.
+     * @param invocationArgs The proxy method invocation arguments.
      * @return The externalized property name derived from {@link ExternalizedProperty#value()}, 
-     * or from proxy method arguments if {@link ExternalizedProperty#value()}
-     * is not specified. Otherwise, an empty {@link Optional}.
+     * or from proxy method arguments if method is annotated with {@link ResolverFacade}. 
+     * Otherwise, an empty {@link Optional}.
      */
     public static Optional<String> fromProxyMethodInvocation(
             ProxyMethod proxyMethod,
-            Object[] args
+            Object[] invocationArgs
     ) {
         ExternalizedProperty externalizedProperty = 
             proxyMethod.findAnnotation(ExternalizedProperty.class)
                 .orElse(null);
-        
-        if (externalizedProperty == null) {
-            return Optional.empty();
+        if (externalizedProperty != null) {
+            return Optional.of(externalizedProperty.value());
+        }
+
+        ResolverFacade resolverFacade = 
+            proxyMethod.findAnnotation(ResolverFacade.class).orElse(null);
+        if (resolverFacade != null) {
+            return Optional.of(determineNameFromInvocationArgs(invocationArgs));
         }
         
-        return determineExternalizedPropertyName(externalizedProperty, args);
+        return Optional.empty();
     }
 
     /**
      * Determine the externalized property name from the proxy method invocation.
      * 
      * <ol>
-     *  <li>It will be derived from {@link ExternalizedProperty#value()}, if specified.</li> 
      *  <li>
-     *  Otherwise, if {@link ExternalizedProperty#value()} is not specified, the property name 
-     *  will be derived from the proxy method's arguments. Specifically, the first argument of 
-     *  the proxy method (the method must only have one String argument e.g. 
-     *  {@code String resolve(String propertyName)}).
+     *  If method is annotated with {@link ExternalizedProperty}, the externalized property 
+     *  name will be derived from {@link ExternalizedProperty#value()}.
+     * </li> 
+     *  <li>
+     *  If method is annotated with {@link ResolverFacade}, the externalized property name 
+     *  will be derived from the proxy method's invocation arguments.
      *  </li>
      * </ol>
+     * 
+     * @see ExternalizedProperty
+     * @see ResolverFacade
      * 
      * @param proxyMethod The proxy method.
      * @param invocationArgs The proxy method invocation arguments.
      * @return The externalized property name derived from {@link ExternalizedProperty#value()}, 
-     * or from proxy method arguments if {@link ExternalizedProperty#value()}
-     * is not specified. Otherwise, an empty {@link Optional}.
+     * or from proxy method arguments if method is annotated with {@link ResolverFacade}. 
+     * Otherwise, an empty {@link Optional}.
      */
     public static Optional<String> fromProxyMethodInvocation(
             Method proxyMethod, 
@@ -71,23 +85,20 @@ public class ExternalizedPropertyName {
     ) {
         ExternalizedProperty externalizedProperty = 
             proxyMethod.getAnnotation(ExternalizedProperty.class);
-        
-        if (externalizedProperty == null) {
-            return Optional.empty();
+        if (externalizedProperty != null) {
+            return Optional.of(externalizedProperty.value());
         }
-        
-        return determineExternalizedPropertyName(externalizedProperty, invocationArgs);
+
+        ResolverFacade resolverFacade = 
+            proxyMethod.getAnnotation(ResolverFacade.class);
+        if (resolverFacade != null) {
+            return Optional.of(determineNameFromInvocationArgs(invocationArgs));
+        }
+
+        return Optional.empty();
     }
 
-    private static Optional<String> determineExternalizedPropertyName(
-            ExternalizedProperty externalizedProperty,
-            Object[] invocationArgs
-    ) {
-        String value = externalizedProperty.value();
-        if (!"".equals(value)) {
-            return Optional.of(value);
-        }
-
+    private static String determineNameFromInvocationArgs(Object[] invocationArgs) {
         // No value specified in the @ExternalizedProperty annotation.
         // Check method invocation arguments for the externalized property name.
         String nameFromArguments = null;
@@ -96,14 +107,12 @@ public class ExternalizedPropertyName {
         }
 
         if (nameFromArguments == null || nameFromArguments.isEmpty()) {
-            throw new IllegalArgumentException(String.format(
-                "No @%s value was specified. Please provide the " + 
-                "externalized property name via method arguments. " +
-                "Only String values are allowed. Null or empty values are not allowed.",
-                ExternalizedProperty.class.getName()
-            ));
+            throw new IllegalArgumentException(
+                "Please provide the externalized property name via method arguments. " +
+                "Only String values are allowed. Null or empty values are not allowed."
+            );
         }
 
-        return Optional.of(nameFromArguments);
+        return nameFromArguments;
     }
 }

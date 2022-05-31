@@ -2,6 +2,7 @@ package io.github.joeljeremy7.externalizedproperties.core.internal;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
@@ -50,7 +51,7 @@ public class ExternalizedPropertyNameTests {
         @Test
         @DisplayName(
             "should derive property name from proxy method invocation args value " + 
-            "when no @ExternalizedProperty value is specified"
+            "when proxy method is annotated with @ResolverFacade"
         )
         void proxyMethodOverloadTest2() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -73,7 +74,7 @@ public class ExternalizedPropertyNameTests {
 
         @Test
         @DisplayName(
-            "should throw when no @ExternalizedProperty value is specified and there " + 
+            "should throw when proxy method is annotated with @ResolverFacade and there " + 
             "is no property name provided via proxy method invocation args"
         )
         void proxyMethodOverloadTest3() {
@@ -93,7 +94,7 @@ public class ExternalizedPropertyNameTests {
 
         @Test
         @DisplayName(
-            "should throw when no @ExternalizedProperty value is specified and the " + 
+            "should throw when proxy method is annotated with @ResolverFacade and the " + 
             "property name provided via proxy method invocation args is null"
         )
         void proxyMethodOverloadTest4() {
@@ -121,8 +122,8 @@ public class ExternalizedPropertyNameTests {
 
         @Test
         @DisplayName(
-            "should return empty Optional when proxy method is not annotated with " +
-            "@ExternalizedProperty annotation"
+            "should return empty Optional when proxy method is neither annotated with " +
+            "@ExternalizedProperty nor @ResolverFacade"
         )
         void proxyMethodOverloadTest5() {
             ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
@@ -161,7 +162,7 @@ public class ExternalizedPropertyNameTests {
         @Test
         @DisplayName(
             "should derive property name from proxy method invocation args value " + 
-            "when no @ExternalizedProperty value is specified"
+            "when proxy method is annotated with @ResolverFacade"
         )
         void methodOverloadTest2() {
             Method proxyMethod = ProxyMethodUtils.getMethod(
@@ -184,7 +185,7 @@ public class ExternalizedPropertyNameTests {
 
         @Test
         @DisplayName(
-            "should throw when no @ExternalizedProperty value is specified and there " + 
+            "should throw when proxy method is annotated with @ResolverFacade and there " + 
             "is no property name provided via proxy method invocation args"
         )
         void methodOverloadTest3() {
@@ -204,7 +205,7 @@ public class ExternalizedPropertyNameTests {
 
         @Test
         @DisplayName(
-            "should throw when no @ExternalizedProperty value is specified and the " + 
+            "should throw when proxy method is annotated with @ResolverFacade and the " + 
             "property name provided via proxy method invocation args is null"
         )
         void methodOverloadTest4() {
@@ -232,8 +233,8 @@ public class ExternalizedPropertyNameTests {
 
         @Test
         @DisplayName(
-            "should return empty Optional when proxy method is not annotated with " +
-            "@ExternalizedProperty annotation"
+            "should return empty Optional when proxy method is neither annotated with " +
+            "@ExternalizedProperty nor @ResolverFacade"
         )
         void methodOverloadTest5() {
             Method proxyMethod = ProxyMethodUtils.getMethod(
@@ -254,7 +255,7 @@ public class ExternalizedPropertyNameTests {
         @ExternalizedProperty("property")
         String property();
 
-        @ExternalizedProperty
+        @ResolverFacade
         String resolve(String propertyName);
 
         String noAnnotation();

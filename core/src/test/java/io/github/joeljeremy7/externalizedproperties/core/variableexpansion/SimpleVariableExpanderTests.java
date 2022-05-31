@@ -2,6 +2,7 @@ package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
@@ -110,8 +111,8 @@ public class SimpleVariableExpanderTests {
                 "property-${java.version}"
             );
 
-            ResolverProxy resolverProxy = 
-                EXTERNALIZED_PROPERTIES.initialize(ResolverProxy.class);
+            ResolverFacadeProxyInterface resolverProxy = 
+                EXTERNALIZED_PROPERTIES.initialize(ResolverFacadeProxyInterface.class);
             
             String propertyValue = resolverProxy.resolve("java.version");
 
@@ -136,8 +137,8 @@ public class SimpleVariableExpanderTests {
                 "property-${java.version}-home-${java.home}"
             );
 
-            ResolverProxy resolverProxy = 
-                EXTERNALIZED_PROPERTIES.initialize(ResolverProxy.class);
+            ResolverFacadeProxyInterface resolverProxy = 
+                EXTERNALIZED_PROPERTIES.initialize(ResolverFacadeProxyInterface.class);
             
             String javaVersionProperty = resolverProxy.resolve("java.version");
             String javaHomeProperty = resolverProxy.resolve("java.home");
@@ -250,8 +251,8 @@ public class SimpleVariableExpanderTests {
                 "property-#[java.version]"
             );
 
-            ResolverProxy resolverProxy = 
-                EXTERNALIZED_PROPERTIES.initialize(ResolverProxy.class);
+            ResolverFacadeProxyInterface resolverProxy = 
+                EXTERNALIZED_PROPERTIES.initialize(ResolverFacadeProxyInterface.class);
             
             String propertyValue = resolverProxy.resolve("java.version");
 
@@ -296,8 +297,8 @@ public class SimpleVariableExpanderTests {
         String propertyNoVariableSuffix();
     }
 
-    private static interface ResolverProxy {
-        @ExternalizedProperty
+    private static interface ResolverFacadeProxyInterface {
+        @ResolverFacade
         String resolve(String propertyName);
     }
 }

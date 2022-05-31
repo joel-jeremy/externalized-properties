@@ -4,6 +4,8 @@ Externalized Properties makes the best use of Java's strong typing by using Java
 
 It works by creating dynamic/configurable proxy instances (created at runtime by Java) that implement user-defined interfaces as facade to resolve properties.
 
+Externalized property names are mapped to proxy methods by using the [@ExternalizedProperty](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java) annotation.
+
 ## 🙋 [Why Dynamic Proxies?](why-dynamic-proxies.md)
 
 ## 🏎️ Quick Start
@@ -70,63 +72,19 @@ public interface ApplicationProperties {
 }
 ```
 
-## 🌟 Non-static/Dynamic Property Names
+## 🌟 Non-static/Dynamic Property Names (via [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
 
 Externalized Properties supports resolution of properties whose names are not known at compile time e.g.
 
 ```java
-/**
- * No property name in annotation. 
- * Property name is provided on runtime.
- */
 public interface ApplicationProperties {
-    @ExternalizedProperty
+    @ResolverFacade
     String resolve(String propertyName);
 
-    @ExternalizedProperty
+    @ResolverFacade
     int resolveInt(String propertyName);
 }
 ```
-
-## 🌟 Variable Expansion in Property Names
-
-Variable expansion is supported in property names and is enabled by default e.g.
-
-```java
-public interface ApplicationProperties {
-    @ExternalizedProperty("environment")
-    default String environment() {
-        return "dev";
-    }
-
-    // ${environment} will be replaced with whatever the 
-    // value of the "environment" property is e.g. dev.my.property
-    @ExternalizedProperty("${environment}.my.property")
-    String myProperty();
-}
-```
-
-If custom variable expansion is required, the default variable expander can be overriden via `ExternalizedProperties.Builder` e.g.
-
-```java
-public static void main(String[] args) {
-    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .defaults() 
-        .variableExpander(
-            // Format: #(variable)
-            new SimpleVariableExpander("#(", ")")
-        )
-        .build();
-    
-    ApplicationProperties appProperties = externalizedProperties.initialize(ApplicationProperties.class);
-}
-```
-
-Built-in variable expander implementations:
-
-- [SimpleVariableExpander](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/variableexpansion/SimpleVariableExpander.java) - Uses a speficied prefix and suffix to match variables.
-- [PatternVariableExpander](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/variableexpansion/PatternVariableExpander.java) - Uses a regex to match variables.
-- [NoOpVariableExpander](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/variableexpansion/NoOpVariableExpander.java) - Disables variable expansion.
 
 ## 🌟 Caching
 
@@ -167,3 +125,9 @@ private static void main(String[] args) {
     ApplicationProperties appProperties = externalizedProperties.initialize(ApplicationProperties.class);
 }
 ```
+
+## 🚀 Custom Resolvers
+
+At the heart of Externalized Properties are the [Resolver](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Resolver.java)s. Instances of these interface are responsible for resolving requested properties.
+
+Creating a custom resolver is as easy as implementing the [Resolver](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Resolver.java) interface and registering the resolver via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder.

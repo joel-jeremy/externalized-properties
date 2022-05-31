@@ -1,8 +1,7 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 
-import io.github.joeljeremy7.externalizedproperties.core.Convert;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
-import io.github.joeljeremy7.externalizedproperties.core.ExpandVariables;
+import io.github.joeljeremy7.externalizedproperties.core.ConverterFacade;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
@@ -11,6 +10,7 @@ import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
 import io.github.joeljeremy7.externalizedproperties.core.UnresolvedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
+import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderFacade;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.PrimitiveConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
@@ -602,7 +602,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         }
 
         /**
-         * @Convert tests
+         * @ConverterFacade tests
          */
         
         @Test
@@ -614,12 +614,12 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 resolver,
                 converter
             );
-            Class<ConvertProxyInterface> proxyInterface = ConvertProxyInterface.class;
+            Class<ConverterFacadeProxyInterface> proxyInterface = ConverterFacadeProxyInterface.class;
 
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                (ProxyMethodReference.WithTwoArgs<ConvertProxyInterface, String, TypeReference<?>, ?>)
-                ConvertProxyInterface::convertToTypeReference
+                (ProxyMethodReference.WithTwoArgs<ConverterFacadeProxyInterface, String, TypeReference<?>, ?>)
+                ConverterFacadeProxyInterface::convertToTypeReference
             );
             
             ExternalizedPropertiesInvocationHandler handler = 
@@ -654,12 +654,12 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 resolver,
                 converter
             );
-            Class<ConvertProxyInterface> proxyInterface = ConvertProxyInterface.class;
+            Class<ConverterFacadeProxyInterface> proxyInterface = ConverterFacadeProxyInterface.class;
 
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                (ProxyMethodReference.WithTwoArgs<ConvertProxyInterface, String, TypeReference<?>, ?>)
-                ConvertProxyInterface::convertToTypeReferenceObject
+                (ProxyMethodReference.WithTwoArgs<ConverterFacadeProxyInterface, String, TypeReference<?>, ?>)
+                ConverterFacadeProxyInterface::convertToTypeReferenceObject
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -691,12 +691,12 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 resolver,
                 converter
             );
-            Class<ConvertProxyInterface> proxyInterface = ConvertProxyInterface.class;
+            Class<ConverterFacadeProxyInterface> proxyInterface = ConverterFacadeProxyInterface.class;
 
             Method method = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                (ProxyMethodReference.WithTwoArgs<ConvertProxyInterface, String, Class<?>, ?>)
-                ConvertProxyInterface::convertToClass
+                (ProxyMethodReference.WithTwoArgs<ConverterFacadeProxyInterface, String, Class<?>, ?>)
+                ConverterFacadeProxyInterface::convertToClass
             );
             
             ExternalizedPropertiesInvocationHandler handler = 
@@ -731,12 +731,12 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 resolver,
                 converter
             );
-            Class<ConvertProxyInterface> proxyInterface = ConvertProxyInterface.class;
+            Class<ConverterFacadeProxyInterface> proxyInterface = ConverterFacadeProxyInterface.class;
 
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                (ProxyMethodReference.WithTwoArgs<ConvertProxyInterface, String, Class<?>, ?>)
-                ConvertProxyInterface::convertToClassObject
+                (ProxyMethodReference.WithTwoArgs<ConverterFacadeProxyInterface, String, Class<?>, ?>)
+                ConverterFacadeProxyInterface::convertToClassObject
             );
             
             ExternalizedPropertiesInvocationHandler handler = 
@@ -768,12 +768,12 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 resolver,
                 converter
             );
-            Class<ConvertProxyInterface> proxyInterface = ConvertProxyInterface.class;
+            Class<ConverterFacadeProxyInterface> proxyInterface = ConverterFacadeProxyInterface.class;
 
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                (ProxyMethodReference.WithTwoArgs<ConvertProxyInterface, String, Type, ?>)
-                ConvertProxyInterface::convertToType
+                (ProxyMethodReference.WithTwoArgs<ConverterFacadeProxyInterface, String, Type, ?>)
+                ConverterFacadeProxyInterface::convertToType
             );
             
             ExternalizedPropertiesInvocationHandler handler = 
@@ -808,12 +808,12 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                 resolver,
                 converter
             );
-            Class<ConvertProxyInterface> proxyInterface = ConvertProxyInterface.class;
+            Class<ConverterFacadeProxyInterface> proxyInterface = ConverterFacadeProxyInterface.class;
 
             Method proxyMethod = ProxyMethodUtils.getMethod(
                 proxyInterface,
-                (ProxyMethodReference.WithTwoArgs<ConvertProxyInterface, String, Type, ?>)
-                ConvertProxyInterface::convertToTypeObject
+                (ProxyMethodReference.WithTwoArgs<ConverterFacadeProxyInterface, String, Type, ?>)
+                ConverterFacadeProxyInterface::convertToTypeObject
             );
             
             ExternalizedPropertiesInvocationHandler handler = 
@@ -836,7 +836,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             assertEquals(1, (Integer)convertedValue);
         }
         
-        /** @ExpandVariables tests */
+        /** @VariableExpanderFacade tests */
 
         @Test
         @DisplayName("should expand variables in value")
@@ -1068,15 +1068,15 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(resolver);
 
-            ProxyInterfaceWithEqualsMethodOverload proxy = 
+            EqualsMethodOverloadProxyInterface proxy = 
                 externalizedProperties.initialize(
-                    ProxyInterfaceWithEqualsMethodOverload.class
+                    EqualsMethodOverloadProxyInterface.class
                 );
 
             Method objectEqualsMethodOverload = ProxyMethodUtils.getMethod(
-                ProxyInterfaceWithEqualsMethodOverload.class,
-                (ProxyMethodReference<ProxyInterfaceWithEqualsMethodOverload, Boolean>)
-                ProxyInterfaceWithEqualsMethodOverload::equals
+                EqualsMethodOverloadProxyInterface.class,
+                (ProxyMethodReference<EqualsMethodOverloadProxyInterface, Boolean>)
+                EqualsMethodOverloadProxyInterface::equals
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -1280,33 +1280,33 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         String decryptedProperty();
     }
 
-    private static interface ConvertProxyInterface {
-        @Convert
+    private static interface ConverterFacadeProxyInterface {
+        @ConverterFacade
         <T> T convertToTypeReference(String valueToConvert, TypeReference<T> targetType);
-        @Convert
+        @ConverterFacade
         <T> T convertToClass(String valueToConvert, Class<T> targetType);
-        @Convert
+        @ConverterFacade
         <T> T convertToType(String valueToConvert, Type targetType);
         
-        @Convert
+        @ConverterFacade
         Object convertToTypeReferenceObject(
             String valueToConvert, 
             TypeReference<?> targetType
         );
-        @Convert
+        @ConverterFacade
         Object convertToClassObject(String valueToConvert, Class<?> targetType);
-        @Convert
+        @ConverterFacade
         Object convertToTypeObject(String valueToConvert, Type targetType);
     }
 
     private static interface ExpandVariablesProxyInterface {
-        @ExpandVariables
+        @VariableExpanderFacade
         String expandVariables(String value);
     }
 
     private static interface OtherProxyInterface {}
 
-    private static interface ProxyInterfaceWithEqualsMethodOverload {
+    private static interface EqualsMethodOverloadProxyInterface {
         boolean equals();
     }
 }

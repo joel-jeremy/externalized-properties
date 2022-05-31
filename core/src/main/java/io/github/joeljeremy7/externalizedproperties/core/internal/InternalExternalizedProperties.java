@@ -1,16 +1,18 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal;
 
-import io.github.joeljeremy7.externalizedproperties.core.Convert;
-import io.github.joeljeremy7.externalizedproperties.core.ExpandVariables;
+import io.github.joeljeremy7.externalizedproperties.core.ConverterFacade;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
+import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderFacade;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.ProxyMethodFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandlerFactory;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
@@ -87,9 +89,10 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
     private <T> void validate(Class<T> proxyInterface) {
         for (Method proxyMethod : proxyInterface.getMethods()) {
             throwIfVoidReturnType(proxyMethod);
-            throwIfInvalidMethodSignature(proxyMethod);
-            throwIfInvalidConvertMethodSignature(proxyMethod);
-            throwIfInvalidExpandVariablesMethodSignature(proxyMethod);
+            throwIfExclusiveAnnotationsAreFound(proxyMethod);
+            throwIfInvalidResolverFacadeMethodSignature(proxyMethod);
+            throwIfInvalidConverterFacadeSignature(proxyMethod);
+            throwIfInvalidVariableExpanderFacadeMethodSignature(proxyMethod);
         }
     }
 
@@ -103,56 +106,58 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         }
     }
 
-    private void throwIfInvalidMethodSignature(Method proxyMethod) {
-        ExternalizedProperty externalizedProperty = 
-            proxyMethod.getAnnotation(ExternalizedProperty.class);
-        // No need to validate method signature if method is not annotated with 
-        // @ExternalizedProperty or ExternalizedProperty.value() is specified.
-        if (externalizedProperty == null || !"".equals(externalizedProperty.value())) {
+    private void throwIfExclusiveAnnotationsAreFound(Method proxyMethod) {
+        Annotation[] d = proxyMethod.getAnnotations();
+        String[] annotationNames = Arrays.stream(d)
+            .map(Annotation::annotationType)
+            .filter(InternalExternalizedProperties::isExclusiveAnnotation)
+            .map(Class::getName)
+            .toArray(String[]::new);
+
+        if (annotationNames.length > 1) {
+            throw new IllegalArgumentException(
+                "Exclusive annotations detected: " + Arrays.toString(annotationNames) +
+                ". These annotations may only be use exclusive of each other."
+            );
+        }
+    }
+
+    private void throwIfInvalidResolverFacadeMethodSignature(Method proxyMethod) {
+        if (!proxyMethod.isAnnotationPresent(ResolverFacade.class)) {
             return;
         }
 
         Class<?>[] parameterTypes = proxyMethod.getParameterTypes();
         if (parameterTypes.length != 1) {
-            throw new IllegalArgumentException(String.format(
-                "Proxy methods annotated with @%s must have a single parameter.",
-                ExternalizedProperty.class
-            ));
+            throw new IllegalArgumentException(
+                "Resolver facades must have a single parameter."
+            );
         }
 
         Class<?> parameterType = parameterTypes[0];
         if (!String.class.equals(parameterType)) {
-            throw new IllegalArgumentException(String.format(
-                "Proxy methods annotated with @%s must have a single String parameter.",
-                ExternalizedProperty.class
-            ));
+            throw new IllegalArgumentException(
+                "Resolver facades must have a single String parameter."
+            );
         }
     }
 
-    private void throwIfInvalidConvertMethodSignature(Method proxyMethod) {
-        if (!proxyMethod.isAnnotationPresent(Convert.class)) {
+    private void throwIfInvalidConverterFacadeSignature(Method proxyMethod) {
+        if (!proxyMethod.isAnnotationPresent(ConverterFacade.class)) {
             return;
         }
 
         Class<?>[] parameterTypes = proxyMethod.getParameterTypes();
         if (parameterTypes.length != 2) {
             throw new IllegalArgumentException(
-                String.format(
-                    "Proxy methods annotated with @%s must have 2 parameters.", 
-                    Convert.class.getSimpleName()
-                )
+                "Converter facades must have 2 parameters."
             );
         }
 
         Class<?> firstParamType = parameterTypes[0];
         if (!String.class.equals(firstParamType)) {
             throw new IllegalArgumentException(
-                String.format(
-                    "Proxy methods annotated with @%s must have " + 
-                    "%s as first parameter.", 
-                    Convert.class.getSimpleName(),
-                    String.class.getName()
-                )
+                "Converter facades must have a String as first parameter."
             );
         }
 
@@ -162,9 +167,8 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
                 !Type.class.equals(secondParamType)) {
             throw new IllegalArgumentException(
                 String.format(
-                    "Proxy methods annotated with @%s must have one of the following " + 
-                    "as second parameter: %s", 
-                    Convert.class.getSimpleName(),
+                    "Converter facades must have any one of the following " + 
+                    "as second parameter: %s",
                     Arrays.asList(
                         TypeReference.class.getName(),
                         Class.class.getName(),
@@ -175,32 +179,41 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         }
     }
 
-    private void throwIfInvalidExpandVariablesMethodSignature(Method proxyMethod) {
-        if (!proxyMethod.isAnnotationPresent(ExpandVariables.class)) {
+    private void throwIfInvalidVariableExpanderFacadeMethodSignature(Method proxyMethod) {
+        if (!proxyMethod.isAnnotationPresent(VariableExpanderFacade.class)) {
             return;
         }
 
         Class<?>[] parameterTypes = proxyMethod.getParameterTypes();
         if (parameterTypes.length != 1) {
-            throw new IllegalArgumentException(String.format(
-                "Proxy methods annotated with @%s must have a single parameter.",
-                ExpandVariables.class.getName()
-            ));
+            throw new IllegalArgumentException(
+                "Variable expander facades must have a single parameter."
+            );
         }
 
         Class<?> parameterType = parameterTypes[0];
         if (!String.class.equals(parameterType)) {
-            throw new IllegalArgumentException(String.format(
-                "Proxy methods annotated with @%s must have a single String parameter.",
-                ExpandVariables.class.getName()
-            ));
+            throw new IllegalArgumentException(
+                "Variable expander facades must have a single String parameter."
+            );
         }
 
         if (!String.class.equals(proxyMethod.getReturnType())) {
-            throw new IllegalArgumentException(String.format(
-                "Proxy methods annotated with @%s must have a String return type.",
-                ExpandVariables.class.getName()
-            ));
+            throw new IllegalArgumentException(
+                "Variable expander facades must have a String return type."
+            );
         }
+    }
+
+    private static boolean isExclusiveAnnotation(Class<?> annotationType) {
+        // Add annotations here that must be exclusive of one another.
+        if (ExternalizedProperty.class.equals(annotationType) ||
+                ResolverFacade.class.equals(annotationType) ||
+                ConverterFacade.class.equals(annotationType) ||
+                VariableExpanderFacade.class.equals(annotationType)
+        ) {
+            return true;
+        }
+        return false;
     }
 }

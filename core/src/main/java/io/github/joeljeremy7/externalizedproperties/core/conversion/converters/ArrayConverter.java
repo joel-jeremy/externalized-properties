@@ -1,8 +1,8 @@
 package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
-import io.github.joeljeremy7.externalizedproperties.core.Convert;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
+import io.github.joeljeremy7.externalizedproperties.core.ConverterFacade;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
@@ -129,7 +129,7 @@ public class ArrayConverter implements Converter<Object[]> {
     }
 
     private static interface ConverterProxy {
-        @Convert
+        @ConverterFacade
         Object convert(String valueToConvert, Type targetType);
     }
 }

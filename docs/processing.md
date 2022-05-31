@@ -1,20 +1,26 @@
 # Processing
 
-Externalized Properties provides a mechanism to do targeted processing operations.
+Externalized Properties provides a mechanism to do targeted processing of resolved properties.
 
-This feature may be used to apply transformations to properties such as automatic decryption, masking, validation, etc. This can be achieved via a combination of the [ProcessWith](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/processing/ProcessWith.java) and [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java) classes.
+This feature may be used to selectively apply transformations to properties such as automatic decryption, masking, validation, etc. This can be achieved via a combination of the [ProcessWith](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/processing/ProcessWith.java) and [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java) classes.
 
 ## ✨ Targeted Processing
 
-Setting up processors can be done through the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
+Externalized Properties inspects the annotations on proxy methods to see if the property should undergo processing.
+
+To mark a proxy method (effectively the property assigned to it) as candidate for processing (via [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java)s), an annotation that is meta-annotated with [ProcessWith](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/processing/ProcessWith.java)) should be used e.g.
 
 ```java
 public interface ApplicationProperties {
     @ExternalizedProperty("encrypted.property.aes")
+    // @Decrypt is meta-annotated with @ProcessWith. 
+    // This can be verified in source code.
     @Decrypt("MyAESDecryptor")
     String aesEncryptedProperty();
 
     @ExternalizedProperty("encrypted.property.rsa")
+    // @Decrypt is meta-annotated with @ProcessWith. 
+    // This can be verified in source code.
     @Decrypt("MyRSADecryptor")
     String rsaEncryptedProperty();
 }
@@ -62,6 +68,10 @@ private static ProcessorProvider<DecryptProcessor> rsaDecryptProcessor() {
 
 ## 🚀 Custom Processors
 
+At the heart of Externalized Properties are the [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java)s. Instances of these interface are responsible for the targeted processing of resolved properties.
+
+To create custom processors, you need to:
+
 ### 1. Create a processor by implementing the [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java) interface
 
 ```java
@@ -90,7 +100,7 @@ e.g.
 public @interface Base64Encode {}
 ```
 
-### 3. Register the processor and annotated methods using the custom processor annotation
+### 3. Annotate proxy methods using the custom processor annotation
 
 ```java
 public interface ApplicationProperties {
@@ -99,7 +109,13 @@ public interface ApplicationProperties {
     @Base64Encode
     String myProperty();
 }
+```
 
+### 4. Register the processor and fire away
+
+Registration of [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java)s can be done through the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
+
+```java
 public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
         .defaults()
