@@ -55,4 +55,4 @@ The resulting converter order will be:
 
 ## 📖 Note on ordinal vs non-ordinal components
 
-Compoenents (resolvers/converters) that were assigned an ordinal will be placed earlier in the sequence than those that were not assigned one. In other words, ordinal components are given higher priority.
+Components (resolvers/converters) that were assigned an ordinal will be placed earlier in the sequence than those that were not assigned one. In other words, ordinal components are given higher priority.
