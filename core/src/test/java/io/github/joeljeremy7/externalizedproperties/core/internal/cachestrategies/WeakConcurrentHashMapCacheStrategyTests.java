@@ -12,6 +12,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
@@ -195,7 +196,44 @@ public class WeakConcurrentHashMapCacheStrategyTests {
     }
 
     @Nested
-    class WeakKeyClass {
+    class WeakKeyTests {
+        @Nested
+        class HashCodeMethod {
+            @Test
+            @DisplayName("should return hash code of the referent")
+            void test1() {
+                String referent = "referent";
+                WeakConcurrentHashMapCacheStrategy.WeakKey<String> key = 
+                    WeakConcurrentHashMapCacheStrategy.WeakKey.forLookup(referent);
+                assertEquals(referent.hashCode(), key.hashCode());
+            }
+
+            @Test
+            @DisplayName("should return the same of hash code everytime")
+            void test2() {
+                String referent = "referent";
+                WeakConcurrentHashMapCacheStrategy.WeakKey<String> key = 
+                    WeakConcurrentHashMapCacheStrategy.WeakKey.forLookup(referent);
+                int hashCode1 = key.hashCode();
+                int hashCode2 = key.hashCode();
+                assertEquals(hashCode1, hashCode2);
+            }
+
+            @Test
+            @DisplayName("should return different hash codes for different referents")
+            void test3() {
+                String referent1 = "referent1";
+                WeakConcurrentHashMapCacheStrategy.WeakKey<String> key = 
+                    WeakConcurrentHashMapCacheStrategy.WeakKey.forLookup(referent1);
+
+                String referent2 = "referent2";
+                WeakConcurrentHashMapCacheStrategy.WeakKey<String> otherKey = 
+                    WeakConcurrentHashMapCacheStrategy.WeakKey.forLookup(referent2);
+                
+                assertNotEquals(key.hashCode(), otherKey.hashCode());
+            }
+        }
+        
         @Nested
         class EqualsMethod {
             @Test
@@ -203,10 +241,10 @@ public class WeakConcurrentHashMapCacheStrategyTests {
             void test1() {
                 String referent = "referent";
                 WeakConcurrentHashMapCacheStrategy.WeakKey<String> key = 
-                    new WeakConcurrentHashMapCacheStrategy.WeakKey<>(referent);
+                    WeakConcurrentHashMapCacheStrategy.WeakKey.forLookup(referent);
 
                 WeakConcurrentHashMapCacheStrategy.WeakKey<String> sameReferentKey = 
-                    new WeakConcurrentHashMapCacheStrategy.WeakKey<>(referent);
+                    WeakConcurrentHashMapCacheStrategy.WeakKey.forLookup(referent);
 
                 assertTrue(key.equals(sameReferentKey));
             }
@@ -216,11 +254,11 @@ public class WeakConcurrentHashMapCacheStrategyTests {
             void test2() {
                 String referent1 = "referent1";
                 WeakConcurrentHashMapCacheStrategy.WeakKey<String> key = 
-                    new WeakConcurrentHashMapCacheStrategy.WeakKey<>(referent1);
+                    WeakConcurrentHashMapCacheStrategy.WeakKey.forLookup(referent1);
 
                 String referent2 = "referent2";
                 WeakConcurrentHashMapCacheStrategy.WeakKey<String> otherKey = 
-                    new WeakConcurrentHashMapCacheStrategy.WeakKey<>(referent2);
+                    WeakConcurrentHashMapCacheStrategy.WeakKey.forLookup(referent2);
 
                 assertFalse(key.equals(otherKey));
             }
@@ -230,7 +268,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
             void test3() {
                 String referent = "referent";
                 WeakConcurrentHashMapCacheStrategy.WeakKey<String> key = 
-                    new WeakConcurrentHashMapCacheStrategy.WeakKey<>(referent);
+                    WeakConcurrentHashMapCacheStrategy.WeakKey.forLookup(referent);
 
                 assertFalse(key.equals(new Object()));
             }
@@ -264,7 +302,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
 
         @Override
         public int hashCode() {
-            return Objects.hash(key);
+            return Objects.hashCode(key);
         }
     }
 }

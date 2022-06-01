@@ -40,7 +40,7 @@ public class WeakHashMapCacheStrategyTests {
     }
 
     @Nested
-    class WeakKeyReference {
+    class WeakKeyReferenceTests {
         @Test
         @DisplayName("should automatically remove cache key when weak references are cleared")
         void test1() throws InterruptedException {
@@ -218,7 +218,7 @@ public class WeakHashMapCacheStrategyTests {
 
         @Override
         public int hashCode() {
-            return Objects.hash(key);
+            return Objects.hashCode(key);
         }
     }
 }

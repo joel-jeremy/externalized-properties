@@ -39,7 +39,7 @@ public class WeakConcurrentHashMapCacheStrategy<K, V> implements CacheStrategy<K
     /** {@inheritDoc} */
     @Override
     public void cache(K cacheKey, V cacheValue) {
-        cache.putIfAbsent(new WeakKey<>(cacheKey, referenceQueue), cacheValue);
+        cache.putIfAbsent(WeakKey.forWrite(cacheKey, referenceQueue), cacheValue);
     }
 
     /** {@inheritDoc} */
@@ -47,7 +47,7 @@ public class WeakConcurrentHashMapCacheStrategy<K, V> implements CacheStrategy<K
     public Optional<V> get(K cacheKey) {
         purgeKeys();
         return Optional.ofNullable(
-            cache.get(new WeakKey<>(cacheKey))
+            cache.get(WeakKey.forLookup(cacheKey))
         );
     }
 
@@ -55,7 +55,7 @@ public class WeakConcurrentHashMapCacheStrategy<K, V> implements CacheStrategy<K
     @Override
     public void expire(K cacheKey) {
         purgeKeys();
-        cache.remove(new WeakKey<>(cacheKey));
+        cache.remove(WeakKey.forLookup(cacheKey));
     }
 
     /** {@inheritDoc} */
@@ -74,28 +74,47 @@ public class WeakConcurrentHashMapCacheStrategy<K, V> implements CacheStrategy<K
 
     /**
      * Package-private weak map key.
+     * 
+     * @param <K> The key type.
      */
     static class WeakKey<K> extends WeakReference<K> {
         private final int hashCode;
 
         /**
-         * Constructor.
-         * 
-         * @param referent The referent.
-         */
-        WeakKey(K referent) {
-            this(referent, null);
-        }
-
-        /**
-         * Constructor.
+         * Private constructor.
          * 
          * @param referent The referent.
          * @param referenceQueue The reference queue.
          */
-        WeakKey(K referent, @Nullable ReferenceQueue<? super K> referenceQueue) {
+        private WeakKey(K referent, @Nullable ReferenceQueue<? super K> referenceQueue) {
             super(referent, referenceQueue);
-            hashCode = referent.hashCode();
+            hashCode = Objects.hashCode(referent);
+        }
+
+        /**
+         * Create a {@link WeakKey} to be used when doing lookups in the weak map.
+         * 
+         * @param <K> The key type.
+         * @param referent The referent.
+         * @return A {@link WeakKey} to be used in map lookups.
+         */
+        static <K> WeakKey<K> forLookup(K referent) {
+            return new WeakKey<>(referent, null);
+        }
+
+        /**
+         * Create a {@link WeakKey} to be used when writing to the weak map.
+         * 
+         * @param <K> The key type.
+         * @param referent The referent.
+         * @param referenceQueue The reference queue.
+         * @return A {@link WeakKey} to be used in map writes.
+         */
+        static <K> WeakKey<K> forWrite(
+                K referent, 
+                @Nullable ReferenceQueue<? super K> referenceQueue
+        ) {
+            return new WeakKey<>(referent, referenceQueue);
         }
 
         /** {@inheritDoc} */
