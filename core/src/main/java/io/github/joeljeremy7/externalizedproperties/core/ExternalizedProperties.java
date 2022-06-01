@@ -345,14 +345,14 @@ public interface ExternalizedProperties {
             return new RootProcessor(processors);
         }
 
-        public Builder addProfileConfiguration(
+        private Builder addProfileConfiguration(
                 ProfileConfiguration profileConfiguration
         ) {
             profileConfigurations.add(profileConfiguration);
             return this;
         }
 
-        public Builder applyProfileConfigurations(String activeProfile) {
+        private Builder applyProfileConfigurations(String activeProfile) {
             profileConfigurations.forEach(c -> c.applyProfile(activeProfile));
             return this;
         }
