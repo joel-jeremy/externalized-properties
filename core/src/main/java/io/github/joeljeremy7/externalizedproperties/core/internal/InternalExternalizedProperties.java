@@ -17,6 +17,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
@@ -24,6 +27,7 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  * The default {@link ExternalizedProperties} implementation.
  */
 public class InternalExternalizedProperties implements ExternalizedProperties {
+    private static final Set<Class<?>> SUPPORTED_TARGET_TYPES = supportedTargetTypes();
     private final RootResolver rootResolver;
     private final RootConverter rootConverter;
     private final VariableExpander variableExpander;
@@ -86,7 +90,7 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         );
     }
 
-    private <T> void validate(Class<T> proxyInterface) {
+    private static <T> void validate(Class<T> proxyInterface) {
         for (Method proxyMethod : proxyInterface.getMethods()) {
             throwIfVoidReturnType(proxyMethod);
             throwIfExclusiveAnnotationsAreFound(proxyMethod);
@@ -96,17 +100,16 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         }
     }
 
-    private void throwIfVoidReturnType(Method proxyMethod) {
-        if (proxyMethod.getReturnType().equals(Void.TYPE) || 
-            proxyMethod.getReturnType().equals(Void.class)
-        ) {
+    private static void throwIfVoidReturnType(Method proxyMethod) {
+        Class<?> returnType = proxyMethod.getReturnType();
+        if (returnType.equals(Void.TYPE) ||  returnType.equals(Void.class)) {
             throw new IllegalArgumentException(
                 "Proxy methods must not have void return type."
             );
         }
     }
 
-    private void throwIfExclusiveAnnotationsAreFound(Method proxyMethod) {
+    private static void throwIfExclusiveAnnotationsAreFound(Method proxyMethod) {
         Annotation[] d = proxyMethod.getAnnotations();
         String[] annotationNames = Arrays.stream(d)
             .map(Annotation::annotationType)
@@ -122,64 +125,84 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         }
     }
 
-    private void throwIfInvalidResolverFacadeMethodSignature(Method proxyMethod) {
+    private static void throwIfInvalidResolverFacadeMethodSignature(Method proxyMethod) {
         if (!proxyMethod.isAnnotationPresent(ResolverFacade.class)) {
             return;
         }
 
         Class<?>[] parameterTypes = proxyMethod.getParameterTypes();
-        if (parameterTypes.length != 1) {
-            throw new IllegalArgumentException(
-                "Resolver facades must have a single parameter."
-            );
+        if (parameterTypes.length == 0 || parameterTypes.length > 2) {
+            throw new IllegalArgumentException(String.format(
+                "Resolver facades must either accept a single 'property name' parameter (%s) " +
+                "or two parameters - the 'property name' (%s) and the 'target type' (%s).",
+                String.class.getName(),
+                String.class.getName(),
+                SUPPORTED_TARGET_TYPES
+            ));
         }
 
         Class<?> parameterType = parameterTypes[0];
         if (!String.class.equals(parameterType)) {
-            throw new IllegalArgumentException(
-                "Resolver facades must have a single String parameter."
-            );
+            throw new IllegalArgumentException(String.format(
+                "Resolver facades must accept 'property name' (%s) as first parameter.",
+                String.class.getName()
+            ));
+        }
+
+        if (parameterTypes.length == 2) {
+            Class<?> secondParameterType = parameterTypes[1];
+            if (!SUPPORTED_TARGET_TYPES.contains(secondParameterType)) {
+                throw new IllegalArgumentException(
+                    String.format(
+                        "Resolver facades must accept 'target type' (%s)" + 
+                        "as second parameter.",
+                        SUPPORTED_TARGET_TYPES
+                    )
+                );
+            }
         }
     }
 
-    private void throwIfInvalidConverterFacadeSignature(Method proxyMethod) {
+    private static void throwIfInvalidConverterFacadeSignature(Method proxyMethod) {
         if (!proxyMethod.isAnnotationPresent(ConverterFacade.class)) {
             return;
         }
 
         Class<?>[] parameterTypes = proxyMethod.getParameterTypes();
-        if (parameterTypes.length != 2) {
-            throw new IllegalArgumentException(
-                "Converter facades must have 2 parameters."
-            );
+        if (parameterTypes.length == 0 || parameterTypes.length > 2) {
+            throw new IllegalArgumentException(String.format(
+                "Converter facades must either accept a single 'value to convert' parameter (%s) " +
+                "or two parameters - the 'value to convert' (%s) and the 'target type' (%s).",
+                String.class.getName(),
+                String.class.getName(),
+                SUPPORTED_TARGET_TYPES
+            ));
         }
+
 
         Class<?> firstParamType = parameterTypes[0];
         if (!String.class.equals(firstParamType)) {
-            throw new IllegalArgumentException(
-                "Converter facades must have a String as first parameter."
-            );
+            throw new IllegalArgumentException(String.format(
+                "Converter facades must accept 'value to convert' (%s) as first parameter.",
+                String.class.getName()
+            ));
         }
 
-        Class<?> secondParamType = parameterTypes[1];
-        if (!TypeReference.class.equals(secondParamType) &&
-                !Class.class.equals(secondParamType) &&
-                !Type.class.equals(secondParamType)) {
-            throw new IllegalArgumentException(
-                String.format(
-                    "Converter facades must have any one of the following " + 
-                    "as second parameter: %s",
-                    Arrays.asList(
-                        TypeReference.class.getName(),
-                        Class.class.getName(),
-                        Type.class.getName()
+        if (parameterTypes.length == 2) {
+            Class<?> secondParamType = parameterTypes[1];
+            if (!SUPPORTED_TARGET_TYPES.contains(secondParamType)) {
+                throw new IllegalArgumentException(
+                    String.format(
+                        "Converter facades must accept 'target type' (%s)" + 
+                        "as second parameter.",
+                        SUPPORTED_TARGET_TYPES
                     )
-                )
-            );
+                );
+            }
         }
     }
 
-    private void throwIfInvalidVariableExpanderFacadeMethodSignature(Method proxyMethod) {
+    private static void throwIfInvalidVariableExpanderFacadeMethodSignature(Method proxyMethod) {
         if (!proxyMethod.isAnnotationPresent(VariableExpanderFacade.class)) {
             return;
         }
@@ -215,5 +238,15 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
             return true;
         }
         return false;
+    }
+
+    private static Set<Class<?>> supportedTargetTypes() {
+        Set<Class<?>> weakSet = Collections.newSetFromMap(new WeakHashMap<>());
+        weakSet.addAll(Arrays.asList(
+        TypeReference.class,
+            Class.class,
+            Type.class
+        ));
+        return Collections.unmodifiableSet(weakSet);
     }
 }

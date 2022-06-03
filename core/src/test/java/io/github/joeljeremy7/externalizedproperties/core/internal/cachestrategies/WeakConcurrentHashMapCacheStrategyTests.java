@@ -44,7 +44,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
     class WeakKeyReferenceTests {
         @Test
         @DisplayName("should automatically remove cache key when weak references are cleared")
-        void test1() throws InterruptedException {
+        void test1() {
             CacheKey cacheKey1 = new CacheKey("cache.key.1");
             CacheKey cacheKey2 = new CacheKey("cache.key.2");
     
@@ -66,7 +66,7 @@ public class WeakConcurrentHashMapCacheStrategyTests {
             CacheKey cacheKey1Lookup = new CacheKey("cache.key.1");
             CacheKey cacheKey2Lookup = new CacheKey("cache.key.2");
 
-            assertTimeoutPreemptively(Duration.ofSeconds(86400), () -> {
+            assertTimeoutPreemptively(Duration.ofMinutes(10), () -> {
                 // Wait for GC to clear references.
                 while (cacheStrategy.get(cacheKey1Lookup).isPresent() ||
                         cacheStrategy.get(cacheKey2Lookup).isPresent()) {

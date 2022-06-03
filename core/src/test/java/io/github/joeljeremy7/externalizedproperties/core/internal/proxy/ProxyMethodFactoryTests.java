@@ -266,6 +266,42 @@ public class ProxyMethodFactoryTests {
                 assertArrayEquals(proxyInterfaceMethod.getParameterTypes(), parameterTypes);
             }
         }
+        
+        @Nested
+        class RawParameterTypeAtMethod {
+            @Test
+            @DisplayName("should return method parameter's raw type at specified index.")
+            void test1() {
+                Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
+                    ProxyInterface.class, 
+                    ProxyInterface::defaultPropertyWithParameter
+                );
+
+                ProxyMethod proxyMethod = proxyMethod(proxyInterfaceMethod);
+
+                Optional<Class<?>> parameterType = proxyMethod.rawParameterTypeAt(0);
+
+                assertTrue(parameterType.isPresent());
+                assertEquals(String.class, parameterType.get());
+            }
+
+            @Test
+            @DisplayName(
+                "should return empty Optional if there are no parameter at the specified index."
+            )
+            void test2() {
+                Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
+                    ProxyInterface.class, 
+                    ProxyInterface::defaultPropertyWithParameter
+                );
+
+                ProxyMethod proxyMethod = proxyMethod(proxyInterfaceMethod);
+
+                Optional<Class<?>> parameterType = proxyMethod.rawParameterTypeAt(1);
+
+                assertFalse(parameterType.isPresent());
+            }
+        }
 
         @Nested
         class ParameterTypesMethod {
@@ -282,6 +318,42 @@ public class ProxyMethodFactoryTests {
                 Type[] parameterTypes = proxyMethod.parameterTypes();
 
                 assertArrayEquals(proxyInterfaceMethod.getGenericParameterTypes(), parameterTypes);
+            }
+        }
+        
+        @Nested
+        class ParameterTypeAtMethod {
+            @Test
+            @DisplayName("should return method parameter's type at specified index.")
+            void test1() {
+                Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
+                    ProxyInterface.class, 
+                    ProxyInterface::defaultPropertyWithParameter
+                );
+
+                ProxyMethod proxyMethod = proxyMethod(proxyInterfaceMethod);
+
+                Optional<Type> parameterType = proxyMethod.parameterTypeAt(0);
+
+                assertTrue(parameterType.isPresent());
+                assertEquals((Type)String.class, parameterType.get());
+            }
+
+            @Test
+            @DisplayName(
+                "should return empty Optional if there are no parameter at the specified index."
+            )
+            void test2() {
+                Method proxyInterfaceMethod = ProxyMethodUtils.getMethod(
+                    ProxyInterface.class, 
+                    ProxyInterface::defaultPropertyWithParameter
+                );
+
+                ProxyMethod proxyMethod = proxyMethod(proxyInterfaceMethod);
+
+                Optional<Type> parameterType = proxyMethod.parameterTypeAt(1);
+
+                assertFalse(parameterType.isPresent());
             }
         }
 

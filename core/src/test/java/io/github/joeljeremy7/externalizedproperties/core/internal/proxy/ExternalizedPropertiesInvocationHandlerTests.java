@@ -7,6 +7,7 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesE
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
+import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
 import io.github.joeljeremy7.externalizedproperties.core.UnresolvedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
@@ -87,7 +88,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName(
-            "should resolve property from map and not from default interface method value"
+            "should resolve property from resolver and not from default interface method value"
         )
         void test2() throws Throwable {
             Resolver resolver = new MapResolver(
@@ -470,7 +471,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         }
 
         /**
-         * Post-processing tests.
+         * Processing tests.
          */
 
         @Test
@@ -602,12 +603,328 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         }
 
         /**
+         * @ResolverFacade tests
+         */
+        
+        @Test
+        @DisplayName("should resolve property")
+        void resolverFacadeTest1() throws Throwable {
+            StubResolver resolver = new StubResolver();
+            Converter<?> converter = new DefaultConverter();
+            ExternalizedProperties externalizedProperties = externalizedProperties(
+                resolver,
+                converter
+            );
+            Class<ResolverFacadeProxyInterface> proxyInterface = ResolverFacadeProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
+                (ProxyMethodReference.WithOneArg<ResolverFacadeProxyInterface, String, ?>)
+                ResolverFacadeProxyInterface::resolveString
+            );
+            
+            ExternalizedPropertiesInvocationHandler handler = 
+                new ExternalizedPropertiesInvocationHandler(
+                    rootResolver(resolver),
+                    rootConverter(converter),
+                    variableExpander(),
+                    new ProxyMethodFactory(externalizedProperties)
+                );
+
+            Object resolved = handler.invoke(
+                externalizedProperties.initialize(proxyInterface), 
+                proxyMethod, 
+                new Object[] {
+                    "property"
+                }
+            );
+
+            assertEquals(
+                resolver.valueResolver().apply("property"), 
+                resolved
+            );
+        }
+        
+        @Test
+        @DisplayName("should resolve property and convert to target type reference")
+        void resolverFacadeTest2() throws Throwable {
+            // Always returns "1".
+            Resolver resolver = new StubResolver(pn -> "1");
+            Converter<?> converter = new DefaultConverter();
+            ExternalizedProperties externalizedProperties = externalizedProperties(
+                resolver,
+                converter
+            );
+            Class<ResolverFacadeProxyInterface> proxyInterface = ResolverFacadeProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
+                (ProxyMethodReference.WithTwoArgs<ResolverFacadeProxyInterface, String, TypeReference<?>, ?>)
+                ResolverFacadeProxyInterface::resolveWithTargetTypeReference
+            );
+            
+            ExternalizedPropertiesInvocationHandler handler = 
+                new ExternalizedPropertiesInvocationHandler(
+                    rootResolver(resolver),
+                    rootConverter(converter),
+                    variableExpander(),
+                    new ProxyMethodFactory(externalizedProperties)
+                );
+
+            Object resolved = handler.invoke(
+                externalizedProperties.initialize(proxyInterface), 
+                proxyMethod, 
+                new Object[] {
+                    "property",
+                    new TypeReference<Integer>(){}
+                }
+            );
+
+            assertEquals(1, (Integer)resolved);
+        }
+
+        @Test
+        @DisplayName(
+            "should resolve property and convert to target type reference " +
+            "(Proxy method return type is Object)"
+        )
+        void resolverFacadeTest3() throws Throwable {
+            // Always returns "1".
+            Resolver resolver = new StubResolver(pn -> "1");
+            Converter<?> converter = new DefaultConverter();
+            ExternalizedProperties externalizedProperties = externalizedProperties(
+                resolver,
+                converter
+            );
+            Class<ResolverFacadeProxyInterface> proxyInterface = ResolverFacadeProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
+                (ProxyMethodReference.WithTwoArgs<ResolverFacadeProxyInterface, String, TypeReference<?>, ?>)
+                ResolverFacadeProxyInterface::resolveWithTargetTypeReference
+            );
+
+            ExternalizedPropertiesInvocationHandler handler = 
+                new ExternalizedPropertiesInvocationHandler(
+                    rootResolver(resolver),
+                    rootConverter(converter),
+                    variableExpander(),
+                    new ProxyMethodFactory(externalizedProperties)
+                );
+
+            Object resolved = handler.invoke(
+                externalizedProperties.initialize(proxyInterface),
+                proxyMethod,
+                new Object[] {
+                    "property",
+                    new TypeReference<Integer>(){}
+                }
+            );
+
+            assertEquals(1, (Integer)resolved);
+        }
+
+        @Test
+        @DisplayName("should resolve property and convert to target class")
+        void resolverFacadeTest4() throws Throwable {
+            // Always returns "1".
+            Resolver resolver = new StubResolver(pn -> "1");
+            Converter<?> converter = new DefaultConverter();
+            ExternalizedProperties externalizedProperties = externalizedProperties(
+                resolver,
+                converter
+            );
+            Class<ResolverFacadeProxyInterface> proxyInterface = ResolverFacadeProxyInterface.class;
+
+            Method method = ProxyMethodUtils.getMethod(
+                proxyInterface,
+                (ProxyMethodReference.WithTwoArgs<ResolverFacadeProxyInterface, String, Class<?>, ?>)
+                ResolverFacadeProxyInterface::resolveWithTargetClass
+            );
+            
+            ExternalizedPropertiesInvocationHandler handler = 
+                new ExternalizedPropertiesInvocationHandler(
+                    rootResolver(resolver),
+                    rootConverter(converter),
+                    variableExpander(),
+                    new ProxyMethodFactory(externalizedProperties)
+                );
+
+            Object resolved = handler.invoke(
+                externalizedProperties.initialize(proxyInterface),
+                method,
+                new Object[] {
+                    "property",
+                    Integer.class
+                }
+            );
+
+            assertEquals(1, (Integer)resolved);
+        }
+
+        @Test
+        @DisplayName(
+            "should resolve property and convert to target class " +
+            "(Proxy method return type is Object)"
+        )
+        void resolverFacadeTest5() throws Throwable {
+            // Always returns "1".
+            Resolver resolver = new StubResolver(pn -> "1");
+            Converter<?> converter = new DefaultConverter();
+            ExternalizedProperties externalizedProperties = externalizedProperties(
+                resolver,
+                converter
+            );
+            Class<ResolverFacadeProxyInterface> proxyInterface = ResolverFacadeProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
+                (ProxyMethodReference.WithTwoArgs<ResolverFacadeProxyInterface, String, Class<?>, ?>)
+                ResolverFacadeProxyInterface::resolveWithTargetClass
+            );
+            
+            ExternalizedPropertiesInvocationHandler handler = 
+                new ExternalizedPropertiesInvocationHandler(
+                    rootResolver(resolver),
+                    rootConverter(converter),
+                    variableExpander(),
+                    new ProxyMethodFactory(externalizedProperties)
+                );
+
+            Object resolved = handler.invoke(
+                externalizedProperties.initialize(proxyInterface),
+                proxyMethod,
+                new Object[] {
+                    "property",
+                    Integer.class
+                }
+            );
+
+            assertEquals(1, (Integer)resolved);
+        }
+
+        @Test
+        @DisplayName("should resolve property and convert to target type")
+        void resolverFacadeTest6() throws Throwable {
+            // Always returns "1".
+            Resolver resolver = new StubResolver(pn -> "1");
+            Converter<?> converter = new DefaultConverter();
+            ExternalizedProperties externalizedProperties = externalizedProperties(
+                resolver,
+                converter
+            );
+            Class<ResolverFacadeProxyInterface> proxyInterface = ResolverFacadeProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
+                (ProxyMethodReference.WithTwoArgs<ResolverFacadeProxyInterface, String, Type, ?>)
+                ResolverFacadeProxyInterface::resolveWithTargetType
+            );
+            
+            ExternalizedPropertiesInvocationHandler handler = 
+                new ExternalizedPropertiesInvocationHandler(
+                    rootResolver(resolver),
+                    rootConverter(converter),
+                    variableExpander(),
+                    new ProxyMethodFactory(externalizedProperties)
+                );
+
+            Object resolved = handler.invoke(
+                externalizedProperties.initialize(proxyInterface),
+                proxyMethod,
+                new Object[] {
+                    "property",
+                    (Type)Integer.class
+                }
+            );
+
+            assertEquals(1, (Integer)resolved);
+        }
+
+        @Test
+        @DisplayName(
+            "should resolve property and convert to target type " +
+            "(Proxy method return type is Object)"
+        )
+        void resolverFacadeTest7() throws Throwable {
+            // Always returns "1".
+            Resolver resolver = new StubResolver(pn -> "1");
+            Converter<?> converter = new DefaultConverter();
+            ExternalizedProperties externalizedProperties = externalizedProperties(
+                resolver,
+                converter
+            );
+            Class<ResolverFacadeProxyInterface> proxyInterface = ResolverFacadeProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
+                (ProxyMethodReference.WithTwoArgs<ResolverFacadeProxyInterface, String, Type, ?>)
+                ResolverFacadeProxyInterface::resolveWithTargetType
+            );
+            
+            ExternalizedPropertiesInvocationHandler handler = 
+                new ExternalizedPropertiesInvocationHandler(
+                    rootResolver(resolver),
+                    rootConverter(converter),
+                    variableExpander(),
+                    new ProxyMethodFactory(externalizedProperties)
+                );
+
+            Object resolved = handler.invoke(
+                externalizedProperties.initialize(proxyInterface),
+                proxyMethod,
+                new Object[] {
+                    "property",
+                    new TypeReference<Integer>(){}.type()
+                }
+            );
+
+            assertEquals(1, (Integer)resolved);
+        }
+
+        @Test
+        @DisplayName("should resolve property and convert to proxy method return type")
+        void resolverFacadeTest8() throws Throwable {
+            // Always returns "1".
+            Resolver resolver = new StubResolver(pn -> "1");
+            Converter<?> converter = new DefaultConverter();
+            ExternalizedProperties externalizedProperties = externalizedProperties(
+                resolver,
+                converter
+            );
+            Class<ResolverFacadeProxyInterface> proxyInterface = ResolverFacadeProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
+                ResolverFacadeProxyInterface::resolveInt
+            );
+            
+            ExternalizedPropertiesInvocationHandler handler = 
+                new ExternalizedPropertiesInvocationHandler(
+                    rootResolver(resolver),
+                    rootConverter(converter),
+                    variableExpander(),
+                    new ProxyMethodFactory(externalizedProperties)
+                );
+
+            Object resolved = handler.invoke(
+                externalizedProperties.initialize(proxyInterface),
+                proxyMethod,
+                new Object[] {
+                    "property"
+                }
+            );
+
+            assertEquals(1, (Integer)resolved);
+        }
+
+        /**
          * @ConverterFacade tests
          */
         
         @Test
         @DisplayName("should convert value to target type reference")
-        void convertTest1() throws Throwable {
+        void converterFacadeTest1() throws Throwable {
             Resolver resolver = new StubResolver();
             Converter<?> converter = new DefaultConverter();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -647,7 +964,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             "should convert value to target type reference " +
             "(Proxy method return type is Object)"
         )
-        void convertTest2() throws Throwable {
+        void converterFacadeTest2() throws Throwable {
             Resolver resolver = new StubResolver();
             Converter<?> converter = new DefaultConverter();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -684,7 +1001,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should convert value to target class")
-        void convertTest3() throws Throwable {
+        void converterFacadeTest3() throws Throwable {
             Resolver resolver = new StubResolver();
             Converter<?> converter = new DefaultConverter();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -724,7 +1041,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             "should convert value to target class " +
             "(Proxy method return type is Object)"
         )
-        void convertTest4() throws Throwable {
+        void converterFacadeTest4() throws Throwable {
             Resolver resolver = new StubResolver();
             Converter<?> converter = new DefaultConverter();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -761,7 +1078,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName("should convert value to target type")
-        void convertTest5() throws Throwable {
+        void converterFacadeTest5() throws Throwable {
             Resolver resolver = new StubResolver();
             Converter<?> converter = new DefaultConverter();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -801,7 +1118,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
             "should convert value to target type " +
             "(Proxy method return type is Object)"
         )
-        void convertTest6() throws Throwable {
+        void converterFacadeTest6() throws Throwable {
             Resolver resolver = new StubResolver();
             Converter<?> converter = new DefaultConverter();
             ExternalizedProperties externalizedProperties = externalizedProperties(
@@ -835,8 +1152,45 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
             assertEquals(1, (Integer)convertedValue);
         }
+
+        @Test
+        @DisplayName("should convert value to proxy method return type")
+        void converterFacadeTest7() throws Throwable {
+            Resolver resolver = new StubResolver();
+            Converter<?> converter = new DefaultConverter();
+            ExternalizedProperties externalizedProperties = externalizedProperties(
+                resolver,
+                converter
+            );
+            Class<ConverterFacadeProxyInterface> proxyInterface = ConverterFacadeProxyInterface.class;
+
+            Method proxyMethod = ProxyMethodUtils.getMethod(
+                proxyInterface,
+                ConverterFacadeProxyInterface::convertToInt
+            );
+            
+            ExternalizedPropertiesInvocationHandler handler = 
+                new ExternalizedPropertiesInvocationHandler(
+                    rootResolver(resolver),
+                    rootConverter(converter),
+                    variableExpander(),
+                    new ProxyMethodFactory(externalizedProperties)
+                );
+
+            Object convertedValue = handler.invoke(
+                externalizedProperties.initialize(proxyInterface),
+                proxyMethod,
+                new Object[] {
+                    "1"
+                }
+            );
+
+            assertEquals(1, (Integer)convertedValue);
+        }
         
-        /** @VariableExpanderFacade tests */
+        /**
+         *  @VariableExpanderFacade tests 
+         */
 
         @Test
         @DisplayName("should expand variables in value")
@@ -1280,6 +1634,19 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         String decryptedProperty();
     }
 
+    private static interface ResolverFacadeProxyInterface {
+        @ResolverFacade
+        String resolveString(String propertyName);
+        @ResolverFacade
+        int resolveInt(String propertyName);
+        @ResolverFacade
+        <T> T resolveWithTargetTypeReference(String propertyName, TypeReference<T> targetType);
+        @ResolverFacade
+        <T> T resolveWithTargetClass(String propertyName, Class<T> targetType);
+        @ResolverFacade
+        Object resolveWithTargetType(String propertyName, Type targetType);
+    }
+
     private static interface ConverterFacadeProxyInterface {
         @ConverterFacade
         <T> T convertToTypeReference(String valueToConvert, TypeReference<T> targetType);
@@ -1297,6 +1664,8 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         Object convertToClassObject(String valueToConvert, Class<?> targetType);
         @ConverterFacade
         Object convertToTypeObject(String valueToConvert, Type targetType);
+        @ConverterFacade
+        int convertToInt(String valueToConvert);
     }
 
     private static interface ExpandVariablesProxyInterface {

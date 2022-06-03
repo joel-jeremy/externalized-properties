@@ -8,13 +8,19 @@ import java.lang.reflect.Type;
 
 /**
  * This annotation is used to indicate that the annotated method will serve as a facade to the 
- * underlying registered Externalized Properties converters. Converter facades are expected to be 
- * with a specific signature. The first parameter must be the value to convert ({@code String}) 
- * and the second parameter must be the target type which may be represented by the following 
- * classes: {@link TypeReference}, {@link Class}, or {@link Type}. The return type can be a 
- * generic type variable e.g. {@code <T>} or any type as long as the target type is assignable 
- * to it. If a value is converted to a target type and converted value is not assignable to 
- * the method's return type, a {@link ClassCastException} will be thrown.
+ * underlying registered Externalized Properties converters. 
+ * 
+ * Converter facades are expected to be with a specific signature. The first parameter must be 
+ * the value to convert ({@code String}) and the second parameter must be the target type which 
+ * may be represented by the following classes: {@link TypeReference}, {@link Class}, or {@link Type}. 
+ * The method's return type can be a generic type variable e.g. {@code <T>} or any type as long as 
+ * the target type is assignable to it. 
+ * 
+ * Optionally, the second parameter (target type) can be omitted. In doing so, The target type will 
+ * be derived from the method's return type.
+ * 
+ * If a value is converted to a target type and converted value is not assignable to the method's 
+ * return type, a {@link ClassCastException} will be thrown.
  * 
  * <p>Examples:</p>
  * 
@@ -26,10 +32,14 @@ import java.lang.reflect.Type;
  *     {@code @}ConverterFacade
  *     {@code <T>} T convert(String value, Class{@code <T>} targetType);
  * 
- *     {@code // Warning: This is valid but it may throw ClassCastExceptions if return value is assigned to a variable that is not assignable from the target type.}
- *     {@code // The recommended approach is to use TypeReference<T> or Class<T> instead whenever possible.}
  *     {@code @}ConverterFacade
- *     {@code <T>} T convert(String value, Type targetType);
+ *     Object convert(String value, Type targetType);
+ * 
+ *     {@code @}ConverterFacade
+ *     int convertToInt(String value);
+ * 
+ *     {@code @}ConverterFacade
+ *     List{@code <String>} convertToList(String value);
  * 
  *     {@code // This is allowed but the recommended approach is to declare method with generic return type.}
  *     {@code @}ConverterFacade
@@ -38,10 +48,6 @@ import java.lang.reflect.Type;
  *     {@code // This is allowed but the recommended approach is to declare method with generic return type.}
  *     {@code @}ConverterFacade
  *     Object convertToObject(String value, Class{@code <?>} targetType);
- * 
- *     {@code // This is allowed but the recommended approach is to declare method with generic return type.}
- *     {@code @}ConverterFacade
- *     Object convertToObject(String value, Type targetType);
  * 
  *     {@code // This is allowed but the recommended approach is to declare method with generic return type.}
  *     {@code // Warning: Will result in a ClassCastException if target type reference is not int.}
@@ -59,17 +65,17 @@ import java.lang.reflect.Type;
  *     int convertToInt(String value, Type targetType);
  * 
  *     {@code // Invalid method signature.}
- *     {@code // Method must accept 2 arguments: the value to convert (String) and the target type.}
+ *     {@code // Method must either accept 1 or 2 arguments: the value to convert (String) and the target type, respectively.}
  *     {@code @}ConverterFacade
  *     {@code <T>} T convertInvalidSignature(String value, String invalidArgType);
  * 
  *     {@code // Invalid method signature.}
- *     {@code // Method must accept 2 arguments: the value to convert (String) and the target type.}
+ *     {@code // Method must either accept 1 or 2 arguments: the value to convert (String) and the target type, respectively.}
  *     {@code @}ConverterFacade
  *     {@code <T>} T convertInvalidSignature(String value, Class{@code <?>} targetType, String anotherArg);
  * 
  *     {@code // Invalid method signature.}
- *     {@code // Method must accept 2 arguments: the value to convert (String) and the target type.}
+ *     {@code // Method must either accept 1 or 2 arguments: the value to convert (String) and the target type, respectively.}
  *     {@code @}ConverterFacade
  *     {@code <T>} T convertInvalidSignature();
  * } 

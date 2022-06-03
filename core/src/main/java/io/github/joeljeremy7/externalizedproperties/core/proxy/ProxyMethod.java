@@ -81,12 +81,22 @@ public interface ProxyMethod {
     Type returnType();
 
     /**
-     * The proxy method's parameter types. These do not contain
+     * The proxy method's raw parameter types. These do not contain
      * generic type information.
      * 
      * @return The proxy method's parameter types.
      */
     Class<?>[] rawParameterTypes();
+
+    /**
+     * The raw type of the proxy method's parameter at the specified index.
+     * 
+     * @param parameterIndex The index of the proxy method parameter.
+     * @return The raw type of the proxy method parameter found at the specified 
+     * index. Otherwise, an empty {@link Optional} if the number of proxy method
+     * parameters is less than the specified index.
+     */
+    Optional<Class<?>> rawParameterTypeAt(int parameterIndex);
 
     /**
      * The proxy method's generic parameter types. These do contain
@@ -95,6 +105,16 @@ public interface ProxyMethod {
      * @return The proxy method's generic parameter types.
      */
     Type[] parameterTypes();
+
+    /**
+     * The type of the proxy method's parameter at the specified index.
+     * 
+     * @param parameterIndex The index of the proxy method parameter.
+     * @return The type of the proxy method parameter found at the specified 
+     * index. Otherwise, an empty {@link Optional} if the number of proxy method
+     * parameters is less than the specified index.
+     */
+    Optional<Type> parameterTypeAt(int parameterIndex);
 
     /**
      * Check if the proxy method's return type matches the given type. 
@@ -142,14 +162,14 @@ public interface ProxyMethod {
 
     /**
      * <p>The proxy method return type's generic type parameter on the given index, 
-     * if the return type is a generic type e.g. {@code Optional<String>}. 
+     * if the return type is a generic type e.g. {@code List<String>}. 
      * 
-     * <p>For example, we have a property method: {@code Optional<String> awesomeMethod();},
+     * <p>For example, we have a property method: {@code List<String> awesomeMethod();},
      * {@code returnTypeGenericTypeParameter(0)} shall return a {@code String} type/class.
      * 
      * @param typeParameterIndex The index of the type parameter to get.
      * @return The generic return type parameter, if the return type is a generic type 
-     * e.g. {@code Optional<String>}.
+     * e.g. {@code List<String>}. Otherwise, an empty {@link Optional}.
      */
     Optional<Type> typeParameterOfReturnTypeAt(int typeParameterIndex);
     

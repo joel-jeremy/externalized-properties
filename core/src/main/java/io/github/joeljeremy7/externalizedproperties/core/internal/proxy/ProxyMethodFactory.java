@@ -121,8 +121,30 @@ public class ProxyMethodFactory {
 
         /** {@inheritDoc} */
         @Override
+        public Optional<Class<?>> rawParameterTypeAt(int parameterIndex) {
+            Class<?>[] rawParameterTypes = rawParameterTypes();
+            if (parameterIndex >= rawParameterTypes.length) {
+                return Optional.empty();
+            }
+
+            return Optional.ofNullable(rawParameterTypes[parameterIndex]);
+        }
+
+        /** {@inheritDoc} */
+        @Override
         public Type[] parameterTypes() {
             return method.getGenericParameterTypes();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Optional<Type> parameterTypeAt(int parameterIndex) {
+            Type[] parameterTypes = parameterTypes();
+            if (parameterIndex >= parameterTypes.length) {
+                return Optional.empty();
+            }
+
+            return Optional.ofNullable(parameterTypes[parameterIndex]);
         }
 
         /** {@inheritDoc} */
@@ -147,8 +169,7 @@ public class ProxyMethodFactory {
         @Override
         public Optional<Type> typeParameterOfReturnTypeAt(int typeParameterIndex) {
             Type[] genericTypeParameters = typeParametersOfReturnType();
-            if (genericTypeParameters.length == 0 || 
-                    typeParameterIndex >= genericTypeParameters.length) {
+            if (typeParameterIndex >= genericTypeParameters.length) {
                 return Optional.empty();
             }
 

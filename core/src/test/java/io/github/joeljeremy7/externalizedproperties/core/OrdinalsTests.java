@@ -463,14 +463,12 @@ public class OrdinalsTests {
                 
                 ConversionResult<?> converterResult = ordinalConverter.convert(
                     proxyMethod, 
-                    "1",
-                    int.class
+                    "1"
                 );
 
                 ConversionResult<?> ordinalConverterResult = ordinalConverter.convert(
                     proxyMethod, 
-                    "1",
-                    int.class
+                    "1"
                 );
 
                 assertEquals(converterResult, ordinalConverterResult);

@@ -121,7 +121,14 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
             externalizedPropertyName
         );
         return rootResolver.resolve(proxyMethod, expandedName)
-            .<Object>map(resolved -> rootConverter.convert(proxyMethod, resolved).value())
+            .<Object>map(resolved -> {
+                Type targetType = proxyMethod.returnType();
+                if (proxyMethod.parameterTypes().length == 2) {
+                    // Means this is a resolver facade with target type as second parameter.
+                    targetType = determineConvertTargetType(args[1]);
+                }
+                return rootConverter.convert(proxyMethod, resolved, targetType).value();
+            })
             .orElseGet(() -> determineDefaultValueOrThrow(proxy, method, args));
     }
 
@@ -136,7 +143,11 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
         ProxyMethod proxyMethod = proxyMethodFactory.proxyMethod(method);
         // No need to validate. Already validated when proxy was built.
         String valueToConvert = (String)args[0];
-        Type targetType = determineConvertTargetType(args[1]);
+        Type targetType = proxyMethod.returnType();
+        if (proxyMethod.parameterTypes().length == 2) {
+            // Target type was provided as second parameter.
+            targetType = determineConvertTargetType(args[1]);
+        }
         return rootConverter.convert(proxyMethod, valueToConvert, targetType).value();
     }
 
@@ -232,14 +243,15 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
         };
     }
 
+    // If new target types are supported, add it there or else a ClassCastException 
+    // will get thrown.
     private static Type determineConvertTargetType(Object arg) {
         if (arg instanceof TypeReference<?>) {
             return ((TypeReference<?>)arg).type();
         }
 
         // Class is also a Type.
-        // Safe as only allowed types are:
-        // TypeReference, Class, and Type
+        // Safe as only allowed types are: TypeReference, Class, and Type.
         return (Type)arg;
     }
     
