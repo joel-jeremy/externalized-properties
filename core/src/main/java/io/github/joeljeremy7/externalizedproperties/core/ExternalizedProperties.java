@@ -213,12 +213,9 @@ public interface ExternalizedProperties {
          * @return The built {@link InternalExternalizedProperties} instance.
          */
         public ExternalizedProperties build() {
-            Optional<String> activeProfile = resolveActiveProfile();
-            if (activeProfile.isPresent()) {
-                applyProfileConfigurations(activeProfile.get());
-            }
+            applyProfileConfigurations();
 
-            // At this point newly added configurations will have been applied.
+            // At this point, profile configurations will have been applied. Let's build!
             ExternalizedProperties externalizedProperties = new InternalExternalizedProperties(
                 buildRootResolver(resolvers, processors), 
                 buildRootConverter(converters),
@@ -237,6 +234,19 @@ public interface ExternalizedProperties {
             }
 
             return externalizedProperties;
+        }
+
+        /**
+         * Resolve the active profile using non-profile-specific resolvers
+         * and apply the applicable profile configurations based on that.
+         * 
+         * @return This builder.
+         */
+        private Builder applyProfileConfigurations() {
+            resolveActiveProfile().ifPresent(activeProfile ->
+                profileConfigurations.forEach(c -> c.applyProfile(activeProfile))
+            );
+            return this;
         }
 
         /**
@@ -259,8 +269,9 @@ public interface ExternalizedProperties {
                     .map(ExceptionIgnoringResolver::new)
                     .collect(Collectors.toList());
             
-            // We don't need processors/converters/variable expanders here
-            // as we only need to use this to resolve the active profile which is a String.
+            // We don't need fancy processors/converters/variable expanders and invocation 
+            // handler factory here as we only need to use this to resolve the active profile 
+            // which is a String.
             ExternalizedProperties resolverOnlyExternalizedProperties = 
                 new InternalExternalizedProperties(
                     buildRootResolver(
@@ -269,14 +280,14 @@ public interface ExternalizedProperties {
                     ), 
                     buildRootConverter(Collections.emptyList()),
                     NoOpVariableExpander.INSTANCE,
-                    buildInvocationHandlerFactory()
+                    new ExternalizedPropertiesInvocationHandlerFactory()
                 );
 
-            ProfileLookup activeProfileProxy = 
+            ProfileLookup profileLookup = 
                 resolverOnlyExternalizedProperties.initialize(ProfileLookup.class);
             
             // Treat blank profile as no profile.
-            return activeProfileProxy.activeProfile().filter(p -> !p.trim().isEmpty());
+            return profileLookup.activeProfile().filter(p -> !p.trim().isEmpty());
         }
 
         private InvocationHandlerFactory buildInvocationHandlerFactory() {
@@ -349,11 +360,6 @@ public interface ExternalizedProperties {
                 ProfileConfiguration profileConfiguration
         ) {
             profileConfigurations.add(profileConfiguration);
-            return this;
-        }
-
-        private Builder applyProfileConfigurations(String activeProfile) {
-            profileConfigurations.forEach(c -> c.applyProfile(activeProfile));
             return this;
         }
 
@@ -468,8 +474,8 @@ public interface ExternalizedProperties {
          * Register {@link Resolver}s on which {@link ExternalizedProperties} will resolve 
          * properties from.
          * 
-         * @apiNote If ordering is desired, resolvers can be given an ordinal
-         * by using the {@link Ordinals#ordinalResolver(int, Resolver)} decorator method.
+         * @apiNote If ordering is necessary, resolvers can be assigned an ordinal
+         * via the {@link Ordinals#ordinalResolver(int, Resolver)} decorator method.
          * The lower the ordinal, the earlier the resolver will be placed in the resolver sequence.
          * 
          * @param resolvers The {@link Resolver}s to resolve properties from.
@@ -480,8 +486,8 @@ public interface ExternalizedProperties {
         /**
          * Register {@link Converter}s to be used by {@link ExternalizedProperties} for conversions.
          * 
-         * @apiNote If ordering is desired, converters can be given an ordinal
-         * by using the {@link Ordinals#ordinalConverter(int, Converter)} decorator method.
+         * @apiNote If ordering is necessary, converters can be assigned an ordinal
+         * via the {@link Ordinals#ordinalConverter(int, Converter)} decorator method.
          * The lower the ordinal, the earlier the converter will be placed in the converter sequence.
          * 
          * @param converters The {@link Converter}s to register.
