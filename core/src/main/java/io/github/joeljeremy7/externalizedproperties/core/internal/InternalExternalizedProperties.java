@@ -95,7 +95,7 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
             throwIfVoidReturnType(proxyMethod);
             throwIfExclusiveAnnotationsAreFound(proxyMethod);
             throwIfInvalidResolverFacadeMethodSignature(proxyMethod);
-            throwIfInvalidConverterFacadeSignature(proxyMethod);
+            throwIfInvalidConverterFacadeMethodSignature(proxyMethod);
             throwIfInvalidVariableExpanderFacadeMethodSignature(proxyMethod);
         }
     }
@@ -163,7 +163,7 @@ public class InternalExternalizedProperties implements ExternalizedProperties {
         }
     }
 
-    private static void throwIfInvalidConverterFacadeSignature(Method proxyMethod) {
+    private static void throwIfInvalidConverterFacadeMethodSignature(Method proxyMethod) {
         if (!proxyMethod.isAnnotationPresent(ConverterFacade.class)) {
             return;
         }
