@@ -251,7 +251,7 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
         }
 
         // Class is also a Type.
-        // Safe as only allowed types are: TypeReference, Class, and Type.
+        // Safe to cast as only allowed types are: TypeReference, Class, and Type.
         return (Type)arg;
     }
     
@@ -264,7 +264,7 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
         if ("toString".equals(method.getName())) {
             return proxyToString(proxy);
         }
-        else if ("equals".equals(method.getName()) && method.getParameterTypes().length == 1) {
+        else if ("equals".equals(method.getName()) && method.getParameterCount() == 1) {
             return proxyEquals(proxy, args);
         }
         else if ("hashCode".equals(method.getName())) {

@@ -399,6 +399,6 @@ public class ProxyMethodUtils {
             return 0.0D;
         } 
 
-        throw new IllegalArgumentException("Unsupprted type: " + returnType.getName());
+        throw new IllegalArgumentException("Unsupported type: " + returnType.getName());
     }
 }
