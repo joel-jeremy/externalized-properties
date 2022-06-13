@@ -25,11 +25,9 @@ If custom variable expansion is required, the default variable expander can be o
 ```java
 public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .defaults() 
-        .variableExpander(
-            // Format: #(variable)
-            new SimpleVariableExpander("#(", ")")
-        )
+        .defaults()
+        // Format: #(variable)
+        .variableExpander(new SimpleVariableExpander("#(", ")"))
         .build();
     
     ApplicationProperties appProperties = externalizedProperties.initialize(ApplicationProperties.class);

@@ -2,14 +2,12 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 
 import io.github.joeljeremy7.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
-import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
-import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakHashMapCacheStrategy;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationCacheKey;
+import io.github.joeljeremy7.externalizedproperties.core.internal.caching.WeakConcurrentHashMapCacheStrategy;
+import io.github.joeljeremy7.externalizedproperties.core.internal.caching.WeakHashMapCacheStrategy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
@@ -55,12 +53,17 @@ public class CachingInvocationHandler implements InvocationHandler {
         if (cached.isPresent()) {
             return cached.get();
         }
-        return getAndCache(proxy, cacheKey);
+        return getAndCache(cacheKey, proxy, method, args);
     }
 
-    private Object getAndCache(Object proxy, InvocationCacheKey cacheKey) {
+    private Object getAndCache(
+            InvocationCacheKey cacheKey,
+            Object proxy, 
+            Method method,
+            Object[] args
+    ) {
         try {
-            Object result = decorated.invoke(proxy, cacheKey.method, cacheKey.args);
+            Object result = decorated.invoke(proxy, method, args);
             if (result != null) {
                 cacheStrategy.cache(cacheKey, result);
             }
@@ -70,66 +73,6 @@ public class CachingInvocationHandler implements InvocationHandler {
                 "Error occurred while invoking decorated invocation handler.",
                 e
             );
-        }
-    }
-
-    /**
-     * The method invocation cache key.
-     */
-    public final static class InvocationCacheKey {
-        private final Method method;
-        private final @Nullable Object[] args;
-        private final int hashCode;
-
-        /**
-         * Constructor.
-         * 
-         * @param method The invoked method.
-         */
-        public InvocationCacheKey(Method method) {
-            // null because proxies give null instead of 
-            // empty array when there are no invocation args.
-            this(method, null);
-        }
-
-        /**
-         * Constructor.
-         * 
-         * @param method The invoked method.
-         * @param args The method invocation args.
-         */
-        public InvocationCacheKey(Method method, @Nullable Object[] args) {
-            this.method = method;
-            this.args = args;
-            this.hashCode = recursiveHashCode(method, args);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public int hashCode() {
-            return hashCode;
-        }
-
-        /**
-         * Two {@link InvocationCacheKey}s with the same combinations of {@code Method}
-         * and {@code Object[]} arguments are considered equal.
-         * 
-         * @param obj The other object to compare with.
-         * @return {@code true} if both {@link InvocationCacheKey}s have the same combination 
-         * of {@code Method} and {@code Object[]} arguments. Otherwise, {@code false}.
-         */
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof InvocationCacheKey) {
-                InvocationCacheKey other = (InvocationCacheKey)obj;
-                return Objects.equals(method, other.method) &&
-                    Arrays.deepEquals(args, other.args);
-            }
-            return false;
-        }
-
-        private static int recursiveHashCode(@Nullable Object... items) {
-            return Arrays.deepHashCode(items);
         }
     }
 }

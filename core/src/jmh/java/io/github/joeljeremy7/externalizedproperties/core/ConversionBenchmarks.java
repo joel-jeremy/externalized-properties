@@ -1,6 +1,5 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -185,7 +184,7 @@ public abstract class ConversionBenchmarks {
 
         @Override
         public ConversionResult<Integer> convert(
-                ProxyMethod proxyMethod, 
+                InvocationContext context, 
                 String valueToConvert, 
                 Type targetType
         ) {

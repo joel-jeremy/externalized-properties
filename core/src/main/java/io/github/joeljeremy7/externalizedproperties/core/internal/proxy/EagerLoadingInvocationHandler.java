@@ -3,8 +3,9 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 import io.github.joeljeremy7.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
-import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakHashMapCacheStrategy;
+import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationCacheKey;
+import io.github.joeljeremy7.externalizedproperties.core.internal.caching.WeakConcurrentHashMapCacheStrategy;
+import io.github.joeljeremy7.externalizedproperties.core.internal.caching.WeakHashMapCacheStrategy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

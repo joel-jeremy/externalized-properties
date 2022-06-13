@@ -1,6 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 
 import java.util.Optional;
 
@@ -30,10 +30,10 @@ public class EnvironmentVariableResolver extends MapResolver {
      * to {@code JAVA_HOME} and attempt to resolve with that formatted name.
      * */
     @Override
-    public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
+    public Optional<String> resolve(InvocationContext context, String propertyName) {
         // Format to env var format 
         // i.e. my.awesome.property-name -> MY_AWESOME_PROPERTY_NAME
-        return super.resolve(proxyMethod, format(propertyName));
+        return super.resolve(context, format(propertyName));
     }
 
     /**

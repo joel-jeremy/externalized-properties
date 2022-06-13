@@ -1,7 +1,5 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-
 import java.lang.reflect.Type;
 
 /**
@@ -29,7 +27,7 @@ public interface Converter<T> {
      * is thrown, the conversion will fail and will not attempt to convert using the other 
      * registered converters.
      * 
-     * @param proxyMethod The proxy method.
+     * @param context The proxy method invocation context.
      * @param valueToConvert The value to convert.
      * @return The result of conversion with the return type of the proxy method as the 
      * target type to convert to, or {@link ConversionResult#skip()} if the converter cannot 
@@ -37,10 +35,10 @@ public interface Converter<T> {
      * to the next registered converter in the conversion pipeline.
      */
     default ConversionResult<T> convert(
-        ProxyMethod proxyMethod, 
+        InvocationContext context, 
         String valueToConvert
     ) {
-        return convert(proxyMethod, valueToConvert, proxyMethod.returnType());
+        return convert(context, valueToConvert, context.method().returnType());
     }
 
     /**
@@ -53,7 +51,7 @@ public interface Converter<T> {
      * is thrown, the conversion will fail and will not attempt to convert using the other 
      * registered converters.
      * 
-     * @param proxyMethod The proxy method.
+     * @param context The invocation context.
      * @param valueToConvert The value to convert.
      * @param targetType The target type of the conversion.
      * @return The result of conversion to the target type or {@link ConversionResult#skip()}
@@ -61,7 +59,7 @@ public interface Converter<T> {
      * process should skip/move to the next registered converter in the conversion pipeline.
      */
     ConversionResult<T> convert(
-        ProxyMethod proxyMethod, 
+        InvocationContext context, 
         String valueToConvert,
         Type targetType
     );

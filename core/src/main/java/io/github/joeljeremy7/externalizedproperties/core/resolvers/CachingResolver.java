@@ -1,8 +1,8 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.CacheStrategy;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.Optional;
 
@@ -31,23 +31,15 @@ public class CachingResolver implements Resolver {
         this.cacheStrategy = requireNonNull(cacheStrategy, "cacheStrategy");
     }
 
-    /**
-     * Resolve property from the decorated {@link Resolver} 
-     * and caches the resolved property. If requested property is already in the cache,
-     * the cached property will be returned.
-     * 
-     * @param proxyMethod The proxy method.
-     * @param propertyName The property name.
-     * @return The resolved property value. Otherwise, an empty {@link Optional}.
-     */
+    /** {@inheritDoc} */
     @Override
-    public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
+    public Optional<String> resolve(InvocationContext context, String propertyName) {
         Optional<String> cached = cacheStrategy.get(propertyName);
         if (cached.isPresent()) {
             return cached;
         }
 
-        Optional<String> resolved = decorated.resolve(proxyMethod, propertyName);
+        Optional<String> resolved = decorated.resolve(context, propertyName);
         if (resolved.isPresent()) {
             // Cache.
             cacheStrategy.cache(propertyName, resolved.get());

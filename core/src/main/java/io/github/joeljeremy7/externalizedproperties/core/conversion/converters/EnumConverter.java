@@ -2,11 +2,12 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 
 /**
  * Supports conversion of values to enums.
@@ -15,18 +16,17 @@ public class EnumConverter implements Converter<Enum<?>> {
     /** {@inheritDoc} */
     @Override
     public boolean canConvertTo(Class<?> targetType) {
-        return targetType != null && targetType.isEnum();
+        return targetType.isEnum();
     }
 
     /** {@inheritDoc} */
     @Override
     public ConversionResult<Enum<?>> convert(
-            ProxyMethod proxyMethod,
+            InvocationContext context,
             String valueToConvert,
             Type targetType
     ) { 
         Class<?> enumClass = TypeUtilities.getRawType(targetType);
-        
         Object[] enumConstants = enumClass.getEnumConstants();
         if (enumConstants == null) {
             // Not an enum.
@@ -41,9 +41,10 @@ public class EnumConverter implements Converter<Enum<?>> {
         }
         
         throw new ConversionException(String.format(
-            "Invalid (%s) enum value: %s",
+            "Invalid (%s) enum value: %s. Valid values are: %s.",
             enumClass.getName(),
-            valueToConvert
+            valueToConvert,
+            Arrays.toString(enumConstants)
         ));
     }
 }

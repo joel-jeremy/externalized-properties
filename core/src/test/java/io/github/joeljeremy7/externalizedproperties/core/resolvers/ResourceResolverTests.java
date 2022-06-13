@@ -2,14 +2,15 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.ResourceResolver.PropertiesReader;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.ResourceResolver.ResourceReader;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.resourcereaders.JsonReader;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.resourcereaders.XmlReader;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.resourcereaders.YamlReader;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,8 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ResourceResolverTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
     private static final ResourceReader PROPERTIES_READER = new PropertiesReader();
     private static final ResourceReader JSON_READER = new JsonReader();
     private static final ResourceReader YAML_READER = new YamlReader();
@@ -275,12 +276,12 @@ public class ResourceResolverTests {
                 classpathResource("/test.properties")
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "property");
+                resolver.resolve(context, "property");
 
             assertTrue(result.isPresent());
             // Matches value in test.properties.
@@ -296,12 +297,12 @@ public class ResourceResolverTests {
                 classpathResource("/test.properties")
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "non.existent.property");
+                resolver.resolve(context, "non.existent.property");
 
             assertFalse(result.isPresent());
         }
@@ -315,12 +316,12 @@ public class ResourceResolverTests {
                 resourceReader
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "property");
+                resolver.resolve(context, "property");
 
             assertTrue(result.isPresent());
             // Matches value in test resource file.
@@ -333,12 +334,12 @@ public class ResourceResolverTests {
             URL resourceUrl = classpathResource("/test.properties");
             ResourceResolver resolver = resolverToTest(resourceUrl);
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result = 
-                resolver.resolve(proxyMethod, resourceUrl.toString());
+                resolver.resolve(context, resourceUrl.toString());
 
             assertTrue(result.isPresent());
             // Result is same as the test.properties file contents.
@@ -354,12 +355,12 @@ public class ResourceResolverTests {
                 resourceReader
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "property.nested.awesome");
+                resolver.resolve(context, "property.nested.awesome");
 
             assertTrue(result.isPresent());
             // Matches value in test-nested resource file.
@@ -374,16 +375,16 @@ public class ResourceResolverTests {
                 JSON_READER
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result1 = 
-                resolver.resolve(proxyMethod, "property.nested.array[0]");
+                resolver.resolve(context, "property.nested.array[0]");
             Optional<String> result2 = 
-                resolver.resolve(proxyMethod, "property.nested.array[1]");
+                resolver.resolve(context, "property.nested.array[1]");
             Optional<String> result3 = 
-                resolver.resolve(proxyMethod, "property.nested.array[2]");
+                resolver.resolve(context, "property.nested.array[2]");
 
             assertTrue(result1.isPresent());
             assertTrue(result2.isPresent());
@@ -402,16 +403,16 @@ public class ResourceResolverTests {
                 YAML_READER
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result1 = 
-                resolver.resolve(proxyMethod, "property.nested.array[0]");
+                resolver.resolve(context, "property.nested.array[0]");
             Optional<String> result2 = 
-                resolver.resolve(proxyMethod, "property.nested.array[1]");
+                resolver.resolve(context, "property.nested.array[1]");
             Optional<String> result3 = 
-                resolver.resolve(proxyMethod, "property.nested.array[2]");
+                resolver.resolve(context, "property.nested.array[2]");
 
             assertTrue(result1.isPresent());
             assertTrue(result2.isPresent());
@@ -430,16 +431,16 @@ public class ResourceResolverTests {
                 XML_READER
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result1 = 
-                resolver.resolve(proxyMethod, "property.nested.array.value[0]");
+                resolver.resolve(context, "property.nested.array.value[0]");
             Optional<String> result2 = 
-                resolver.resolve(proxyMethod, "property.nested.array.value[1]");
+                resolver.resolve(context, "property.nested.array.value[1]");
             Optional<String> result3 = 
-                resolver.resolve(proxyMethod, "property.nested.array.value[2]");
+                resolver.resolve(context, "property.nested.array.value[2]");
 
             assertTrue(result1.isPresent());
             assertTrue(result2.isPresent());
@@ -458,12 +459,12 @@ public class ResourceResolverTests {
                 JSON_READER
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "property.nested.empty-array");
+                resolver.resolve(context, "property.nested.empty-array");
 
             assertTrue(result.isPresent());
             // Matches value in test-nested.json.
@@ -479,12 +480,12 @@ public class ResourceResolverTests {
                 YAML_READER
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "property.nested.empty-array");
+                resolver.resolve(context, "property.nested.empty-array");
 
             assertTrue(result.isPresent());
             // Matches value in test-nested.yaml.
@@ -500,12 +501,12 @@ public class ResourceResolverTests {
                 XML_READER
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "property.nested.empty-array");
+                resolver.resolve(context, "property.nested.empty-array");
 
             assertTrue(result.isPresent());
             // Matches value in test-nested.xml.
@@ -521,12 +522,12 @@ public class ResourceResolverTests {
                 JSON_READER
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "property.null");
+                resolver.resolve(context, "property.null");
 
             assertTrue(result.isPresent());
             // Matches value in test-nested.json.
@@ -542,12 +543,12 @@ public class ResourceResolverTests {
                 YAML_READER
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "property.null");
+                resolver.resolve(context, "property.null");
 
             assertTrue(result.isPresent());
             // Matches value in test-nested.json.
@@ -563,12 +564,12 @@ public class ResourceResolverTests {
                 XML_READER
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "property.null");
+                resolver.resolve(context, "property.null");
 
             assertTrue(result.isPresent());
             // Matches value in test-nested.json.

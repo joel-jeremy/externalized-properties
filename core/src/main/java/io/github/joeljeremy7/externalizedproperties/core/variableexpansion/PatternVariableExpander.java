@@ -1,8 +1,8 @@
 package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,13 +40,13 @@ public class PatternVariableExpander implements VariableExpander {
 
     /** {@inheritDoc} */
     @Override
-    public String expandVariables(ProxyMethod proxyMethod, String value) {
+    public String expandVariables(InvocationContext context, String value) {
         if (value == null || value.isEmpty()) {
             return value;
         }
 
         try {
-            return replaceVariables(proxyMethod, value);
+            return replaceVariables(context, value);
         } catch (RuntimeException ex) {
             throw new VariableExpansionException(
                 "Exception occurred while trying to expand value: " + value,
@@ -55,7 +55,7 @@ public class PatternVariableExpander implements VariableExpander {
         }
     }
 
-    private String replaceVariables(ProxyMethod proxyMethod, String value) {
+    private String replaceVariables(InvocationContext context, String value) {
         StringBuffer output = new StringBuffer();
         Matcher matcher = variablePattern.matcher(value);
         
@@ -63,7 +63,7 @@ public class PatternVariableExpander implements VariableExpander {
             // Resolve property from variable.
             String propertyNameVariable = matcher.group(1);
             String propertyValue = resolvePropertyValueOrThrow(
-                proxyMethod,
+                context,
                 propertyNameVariable
             );
             matcher.appendReplacement(output, propertyValue);
@@ -74,10 +74,10 @@ public class PatternVariableExpander implements VariableExpander {
     }
 
     private String resolvePropertyValueOrThrow(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String variableName
     ) {
-        ResolverProxy resolverProxy = proxyMethod.externalizedProperties()
+        ResolverProxy resolverProxy = context.externalizedProperties()
             .initialize(ResolverProxy.class);
         
         try {

@@ -2,19 +2,18 @@ package io.github.joeljeremy7.externalizedproperties.core;
 
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.CachingExternalizedProperties;
-import io.github.joeljeremy7.externalizedproperties.core.internal.InternalExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationCacheKey;
+import io.github.joeljeremy7.externalizedproperties.core.internal.SystemExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.internal.caching.ExpiringCacheStrategy;
+import io.github.joeljeremy7.externalizedproperties.core.internal.caching.WeakConcurrentHashMapCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.ProfileLookup;
-import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.ExpiringCacheStrategy;
-import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakConcurrentHashMapCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
-import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.CachingInvocationHandler.InvocationCacheKey;
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.CachingInvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.EagerLoadingInvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.ExternalizedPropertiesInvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandlerFactory;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.DefaultResolver;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.NoOpVariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
@@ -208,15 +207,15 @@ public interface ExternalizedProperties {
         }
 
         /**
-         * Build the {@link InternalExternalizedProperties} instance.
+         * Build the {@link SystemExternalizedProperties} instance.
          * 
-         * @return The built {@link InternalExternalizedProperties} instance.
+         * @return The built {@link SystemExternalizedProperties} instance.
          */
         public ExternalizedProperties build() {
             applyProfileConfigurations();
 
             // At this point, profile configurations will have been applied. Let's build!
-            ExternalizedProperties externalizedProperties = new InternalExternalizedProperties(
+            ExternalizedProperties externalizedProperties = new SystemExternalizedProperties(
                 buildRootResolver(resolvers, processors), 
                 buildRootConverter(converters),
                 variableExpander,
@@ -273,7 +272,7 @@ public interface ExternalizedProperties {
             // handler factory here as we only need to use this to resolve the active profile 
             // which is a String.
             ExternalizedProperties resolverOnlyExternalizedProperties = 
-                new InternalExternalizedProperties(
+                new SystemExternalizedProperties(
                     buildRootResolver(
                         profileResolvers, 
                         Collections.emptyList()
@@ -388,9 +387,9 @@ public interface ExternalizedProperties {
             }
         
             @Override
-            public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
+            public Optional<String> resolve(InvocationContext context, String propertyName) {
                 try {
-                    return decorated.resolve(proxyMethod, propertyName);
+                    return decorated.resolve(context, propertyName);
                 } catch (Throwable ex) {
                     // Ignore exception, but leave a log so user is made aware.
                     LOGGER.log(

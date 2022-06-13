@@ -105,7 +105,7 @@ Creating a custom resolver is as easy as implementing the [Resolver](../core/src
 ```java
 public class MyCustomResolver implements Resolver {
     @Override
-    public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
+    public Optional<String> resolve(InvocationContext context, String propertyName) {
         return Optional.ofNullable(...);
     }
 }

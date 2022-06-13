@@ -1,9 +1,9 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal.resolvers;
 
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.CompositeResolver;
 
 import java.util.Collection;
@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
-import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmpty;
 
 /**
  * The root {@link Resolver}. All requests to resolve properties are routed through this resolver
@@ -33,10 +32,7 @@ public class RootResolver implements Resolver {
      * @param resolvers The collection of {@link Resolver}s to resolve properties from.
      * @param rootProcessor The root processor.
      */
-    public RootResolver(
-            Collection<Resolver> resolvers,
-            RootProcessor rootProcessor
-    ) {
+    public RootResolver(Collection<Resolver> resolvers, RootProcessor rootProcessor) {
         requireNonNull(resolvers, "resolvers");
         requireNonNull(rootProcessor, "rootProcessor");
         
@@ -46,11 +42,8 @@ public class RootResolver implements Resolver {
 
     /** {@inheritDoc} */
     @Override
-    public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
-        requireNonNull(proxyMethod, "proxyMethod");
-        requireNonNullOrEmpty(propertyName, "propertyName");
-
-        return resolver.resolve(proxyMethod, propertyName)
-            .map(resolved -> rootProcessor.process(proxyMethod, resolved));
+    public Optional<String> resolve(InvocationContext context, String propertyName) {
+        return resolver.resolve(context, propertyName)
+            .map(resolved -> rootProcessor.process(context, resolved));
     }
 }

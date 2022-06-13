@@ -1,7 +1,5 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-
 /**
  * The mechanism that allows expansion of variables in strings.
  */
@@ -9,10 +7,10 @@ public interface VariableExpander {
     /**
      * Expand any variables that is in the given string.
      * 
-     * @param proxyMethod The proxy method.
+     * @param context The proxy method invocation context.
      * @param value The string value. This may contain variables e.g. 
      * "${some.app.property}_property_name" which will be expanded by this method.
      * @return The string of which variables have been expanded.
      */
-    String expandVariables(ProxyMethod proxyMethod, String value);
+    String expandVariables(InvocationContext context, String value);
 }

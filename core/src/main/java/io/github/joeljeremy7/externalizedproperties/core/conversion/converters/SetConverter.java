@@ -2,10 +2,10 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -59,7 +59,7 @@ public class SetConverter implements Converter<Set<?>> {
     /** {@inheritDoc} */
     @Override
     public ConversionResult<Set<?>> convert(
-            ProxyMethod proxyMethod,
+            InvocationContext context,
             String valueToConvert,
             Type targetType
     ) { 
@@ -70,7 +70,7 @@ public class SetConverter implements Converter<Set<?>> {
         Type targetArrayType = toTargetArrayType(targetType);
 
         Object[] array = arrayConverter.convert(
-            proxyMethod, 
+            context, 
             valueToConvert,
             targetArrayType
         ).value();

@@ -2,10 +2,11 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver.UnresolvedPropertyHandler;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,8 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MapResolverTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
     
     @Nested
     class Constructor {
@@ -73,33 +74,6 @@ public class MapResolverTests {
 
     @Nested
     class ResolveMethod {
-        // @Test
-        // @DisplayName("should throw when proxy method argument is null or empty.")
-        // void validationTest1() {
-        //     MapResolver resolver = resolverToTest();
-        //     assertThrows(
-        //         IllegalArgumentException.class, 
-        //         () -> resolver.resolve(null, "property")
-        //     );
-        // }
-
-        // @Test
-        // @DisplayName("should throw when property name argument is null or empty.")
-        // void validationTest2() {
-        //     MapResolver resolver = resolverToTest();
-        //     ProxyMethod proxyMethod = proxyMethod(resolver);
-
-        //     assertThrows(
-        //         IllegalArgumentException.class, 
-        //         () -> resolver.resolve(proxyMethod, (String)null)
-        //     );
-            
-        //     assertThrows(
-        //         IllegalArgumentException.class, 
-        //         () -> resolver.resolve(proxyMethod, "")
-        //     );
-        // }
-
         @Test
         @DisplayName("should resolve values from the given map.")
         void test1() {
@@ -107,13 +81,13 @@ public class MapResolverTests {
             map.put("property", "property.value");
             
             MapResolver resolver = resolverToTest(map);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
-                proxyMethod, 
+                context, 
                 "property"
             );
 
@@ -132,13 +106,13 @@ public class MapResolverTests {
         )
         void test2() {
             MapResolver resolver = resolverToTest(Collections.emptyMap());
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
-                proxyMethod, 
+                context, 
                 "property"
             );
             
@@ -164,13 +138,13 @@ public class MapResolverTests {
                 Collections.emptyMap(),
                 unresolvedPropertyHandler
             );
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
 
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "property");
+                resolver.resolve(context, "property");
             
             assertNotNull(result);
             assertTrue(result.isPresent());

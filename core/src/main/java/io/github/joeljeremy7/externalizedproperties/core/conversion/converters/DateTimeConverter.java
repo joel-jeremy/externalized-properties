@@ -2,8 +2,8 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.DateTimeFormat;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.reflect.Type;
@@ -63,38 +63,38 @@ public class DateTimeConverter implements Converter<TemporalAccessor> {
     /** {@inheritDoc} */
     @Override
     public ConversionResult<TemporalAccessor> convert(
-            ProxyMethod proxyMethod,
+            InvocationContext context,
             String valueToConvert,
             Type targetType
     ) {
         if (LocalDateTime.class.equals(targetType)) {
             return ConversionResult.of(
-                parseLocalDateTime(proxyMethod, valueToConvert)
+                parseLocalDateTime(context, valueToConvert)
             );
         }
         else if (OffsetDateTime.class.equals(targetType)) {
             return ConversionResult.of(
-                parseOffsetDateTime(proxyMethod, valueToConvert)
+                parseOffsetDateTime(context, valueToConvert)
             );
         }
         else if (ZonedDateTime.class.equals(targetType)) {
             return ConversionResult.of(
-                parseZonedDateTime(proxyMethod, valueToConvert)
+                parseZonedDateTime(context, valueToConvert)
             );
         } 
         else if (LocalDate.class.equals(targetType)) {
             return ConversionResult.of(
-                parseLocalDate(proxyMethod, valueToConvert)
+                parseLocalDate(context, valueToConvert)
             );
         }
         else if (LocalTime.class.equals(targetType)) {
             return ConversionResult.of(
-                parseLocalTime(proxyMethod, valueToConvert)
+                parseLocalTime(context, valueToConvert)
             );
         }
         else if (OffsetTime.class.equals(targetType)) {
             return ConversionResult.of(
-                parseOffsetTime(proxyMethod, valueToConvert)
+                parseOffsetTime(context, valueToConvert)
             );
         }
         else if (Instant.class.equals(targetType)) {
@@ -114,17 +114,17 @@ public class DateTimeConverter implements Converter<TemporalAccessor> {
         }
         else if (MonthDay.class.equals(targetType)) {
             return ConversionResult.of(
-                parseMonthDay(proxyMethod, valueToConvert)
+                parseMonthDay(context, valueToConvert)
             );
         }
         else if (Year.class.equals(targetType)) {
             return ConversionResult.of(
-                parseYear(proxyMethod, valueToConvert)
+                parseYear(context, valueToConvert)
             );
         }
         else if (YearMonth.class.equals(targetType)) {
             return ConversionResult.of(
-                parseYearMonth(proxyMethod, valueToConvert)
+                parseYearMonth(context, valueToConvert)
             );
         }
         
@@ -132,108 +132,108 @@ public class DateTimeConverter implements Converter<TemporalAccessor> {
     }
 
     private static YearMonth parseYearMonth(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String valueToConvert
     ) {
         DateTimeFormatter dateTimeFormatter = 
-            determineDateTimeFormatterOrNull(proxyMethod);
+            determineDateTimeFormatterOrNull(context);
         return dateTimeFormatter != null ?
             YearMonth.parse(valueToConvert, dateTimeFormatter) :
             YearMonth.parse(valueToConvert);
     }
 
     private static Year parseYear(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String valueToConvert
     ) {
         DateTimeFormatter dateTimeFormatter = 
-            determineDateTimeFormatterOrNull(proxyMethod);
+            determineDateTimeFormatterOrNull(context);
         return dateTimeFormatter != null ?
             Year.parse(valueToConvert, dateTimeFormatter) :
             Year.parse(valueToConvert);
     }
 
     private static MonthDay parseMonthDay(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String valueToConvert
     ) {
         DateTimeFormatter dateTimeFormatter = 
-            determineDateTimeFormatterOrNull(proxyMethod);
+            determineDateTimeFormatterOrNull(context);
         return dateTimeFormatter != null ?
             MonthDay.parse(valueToConvert, dateTimeFormatter) :
             MonthDay.parse(valueToConvert);
     }
 
     private static ZonedDateTime parseZonedDateTime(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String valueToConvert
     ) {
         DateTimeFormatter dateTimeFormatter = 
-            determineDateTimeFormatterOrNull(proxyMethod);
+            determineDateTimeFormatterOrNull(context);
         return dateTimeFormatter != null ?
             ZonedDateTime.parse(valueToConvert, dateTimeFormatter) :
             ZonedDateTime.parse(valueToConvert);
     }
 
     private static OffsetTime parseOffsetTime(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String valueToConvert
     ) {
         DateTimeFormatter dateTimeFormatter = 
-            determineDateTimeFormatterOrNull(proxyMethod);
+            determineDateTimeFormatterOrNull(context);
         return dateTimeFormatter != null ?
             OffsetTime.parse(valueToConvert, dateTimeFormatter) :
             OffsetTime.parse(valueToConvert);
     }
 
     private static OffsetDateTime parseOffsetDateTime(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String valueToConvert
     ) {
         DateTimeFormatter dateTimeFormatter = 
-            determineDateTimeFormatterOrNull(proxyMethod);
+            determineDateTimeFormatterOrNull(context);
         return dateTimeFormatter != null ?
             OffsetDateTime.parse(valueToConvert, dateTimeFormatter) :
             OffsetDateTime.parse(valueToConvert);
     }
 
     private static LocalTime parseLocalTime(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String valueToConvert
     ) {
         DateTimeFormatter dateTimeFormatter = 
-            determineDateTimeFormatterOrNull(proxyMethod);
+            determineDateTimeFormatterOrNull(context);
         return dateTimeFormatter != null ?
             LocalTime.parse(valueToConvert, dateTimeFormatter) :
             LocalTime.parse(valueToConvert);
     }
 
     private static LocalDate parseLocalDate(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String valueToConvert
     ) {
         DateTimeFormatter dateTimeFormatter = 
-            determineDateTimeFormatterOrNull(proxyMethod);
+            determineDateTimeFormatterOrNull(context);
         return dateTimeFormatter != null ?
             LocalDate.parse(valueToConvert, dateTimeFormatter) :
             LocalDate.parse(valueToConvert);
     }
 
     private static LocalDateTime parseLocalDateTime(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String valueToConvert
     ) {
         DateTimeFormatter dateTimeFormatter = 
-            determineDateTimeFormatterOrNull(proxyMethod);
+            determineDateTimeFormatterOrNull(context);
         return dateTimeFormatter != null ?
             LocalDateTime.parse(valueToConvert, dateTimeFormatter) :
             LocalDateTime.parse(valueToConvert);
     }
 
     private static @Nullable DateTimeFormatter determineDateTimeFormatterOrNull(
-            ProxyMethod proxyMethod
+            InvocationContext context
     ) {
-        DateTimeFormat dateTimeFormat = getDateTimeFormatOrNull(proxyMethod);
+        DateTimeFormat dateTimeFormat = getDateTimeFormatOrNull(context);
         if (dateTimeFormat == null) {
             return null;
         }
@@ -241,9 +241,9 @@ public class DateTimeConverter implements Converter<TemporalAccessor> {
     }
     
     private static @Nullable DateTimeFormat getDateTimeFormatOrNull(
-            ProxyMethod proxyMethod
+            InvocationContext context
     ) {
-        return proxyMethod
+        return context.method()
             .findAnnotation(DateTimeFormat.class)
             .orElse(null);
     }

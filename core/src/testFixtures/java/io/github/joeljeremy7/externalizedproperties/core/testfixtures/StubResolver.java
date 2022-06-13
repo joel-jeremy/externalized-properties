@@ -1,7 +1,7 @@
 package io.github.joeljeremy7.externalizedproperties.core.testfixtures;
 
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,7 +40,7 @@ public class StubResolver implements Resolver {
     }
 
     @Override
-    public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
+    public Optional<String> resolve(InvocationContext context, String propertyName) {
         String value = valueResolver.apply(propertyName);
         if (value != null) {
             // Add for tracking.

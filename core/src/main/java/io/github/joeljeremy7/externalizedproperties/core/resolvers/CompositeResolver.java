@@ -1,7 +1,7 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,17 +123,11 @@ public class CompositeResolver implements Resolver, Iterable<Resolver> {
         return from(flattened);
     }
 
-    /**
-     * Resolve property from a collection of {@link Resolver}s.
-     * 
-     * @param proxyMethod The proxy method.
-     * @param propertyName The property name.
-     * @return The resolved property value. Otherwise, an empty {@link Optional}.
-     */
+    /** {@inheritDoc} */
     @Override
-    public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
+    public Optional<String> resolve(InvocationContext context, String propertyName) {
         for (Resolver resolver : resolvers) {
-            Optional<String> resolved = resolver.resolve(proxyMethod, propertyName);
+            Optional<String> resolved = resolver.resolve(context, propertyName);
             if (resolved.isPresent()) {
                 return resolved;
             }

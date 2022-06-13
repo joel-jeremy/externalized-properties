@@ -2,10 +2,11 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver.UnresolvedPropertyHandler;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PropertiesResolverTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
     private static final Properties EMPTY_PROPERTIES = new Properties();
 
     @Nested
@@ -54,19 +55,19 @@ public class PropertiesResolverTests {
             props.put("property", "property.value");
 
             PropertiesResolver resolver = resolverToTest(props);
-            ProxyMethod intPropertyProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext intPropertyContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyNonString,
                 externalizedProperties(resolver)
             );
-            ProxyMethod propertyProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext propertyContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
 
             Optional<String> nonStringResult = 
-                resolver.resolve(intPropertyProxyMethod, "property.nonstring");
+                resolver.resolve(intPropertyContext, "property.nonstring");
             Optional<String> result = 
-                resolver.resolve(propertyProxyMethod, "property");
+                resolver.resolve(propertyContext, "property");
             
             assertFalse(nonStringResult.isPresent());
             assertTrue(result.isPresent());
@@ -87,13 +88,13 @@ public class PropertiesResolverTests {
             props.setProperty("property", "property.value");
             
             PropertiesResolver resolver = resolverToTest(props);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
-                proxyMethod, 
+                context, 
                 "property"
             );
 
@@ -112,13 +113,13 @@ public class PropertiesResolverTests {
         )
         void test2() {
             PropertiesResolver resolver = resolverToTest(EMPTY_PROPERTIES);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
-                proxyMethod, 
+                context, 
                 "property" // Not in Properties.
             );
             
@@ -144,13 +145,13 @@ public class PropertiesResolverTests {
                 EMPTY_PROPERTIES,
                 unresolvedPropertyHandler
             );
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
 
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "property");
+                resolver.resolve(context, "property");
             
             assertNotNull(result);
             assertTrue(result.isPresent());

@@ -2,10 +2,11 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubResolver;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,8 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CompositeResolverTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
 
     @Nested
     class FromMethodWithVarargsOverload {
@@ -221,50 +222,18 @@ public class CompositeResolverTests {
 
     @Nested
     class ResolveMethod {
-        // @Test
-        // @DisplayName("should throw when proxy method argument null.")
-        // void validationTest1() {
-        //     CompositeResolver compositeResolver = resolverToTest(
-        //         new StubResolver()
-        //     );
-
-        //     assertThrows(
-        //         IllegalArgumentException.class, 
-        //         () -> compositeResolver.resolve(null, "property")
-        //     );
-        // }
-
-        // @Test
-        // @DisplayName("should throw when property name argument is null or empty.")
-        // void validationTest2() {
-        //     CompositeResolver compositeResolver = resolverToTest(
-        //         new StubResolver()
-        //     );
-        //     ProxyMethod proxyMethod = proxyMethod(compositeResolver);
-
-        //     assertThrows(
-        //         IllegalArgumentException.class, 
-        //         () -> compositeResolver.resolve(proxyMethod, (String)null)
-        //     );
-            
-        //     assertThrows(
-        //         IllegalArgumentException.class, 
-        //         () -> compositeResolver.resolve(proxyMethod, "")
-        //     );
-        // }
-
         @Test
         @DisplayName("should resolve property value from the child resolver.")
         void test1() {
             StubResolver resolver = new StubResolver();
             
             CompositeResolver compositeResolver = resolverToTest(resolver);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
 
-            Optional<String> result = compositeResolver.resolve(proxyMethod, "property");
+            Optional<String> result = compositeResolver.resolve(context, "property");
 
             assertTrue(resolver.resolvedPropertyNames().contains("property"));
             assertNotNull(result);
@@ -293,13 +262,13 @@ public class CompositeResolverTests {
                 resolver1,
                 resolver2
             );
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(compositeResolver)
             );
 
             Optional<String> result = compositeResolver.resolve(
-                proxyMethod,
+                context,
                 "property"
             );
 
@@ -336,13 +305,13 @@ public class CompositeResolverTests {
                 resolver2,
                 resolver3
             );
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property2,
                 externalizedProperties(compositeResolver)
             );
 
             // Should resolve from resolver2.
-            Optional<String> result = compositeResolver.resolve(proxyMethod, "property.2");
+            Optional<String> result = compositeResolver.resolve(context, "property.2");
 
             // property.2 resolved from resolver2
             assertFalse(resolver2.resolvedPropertyNames().contains("property.1"));
@@ -386,12 +355,12 @@ public class CompositeResolverTests {
                 resolver2,
                 resolver3
             );
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property1,
                 externalizedProperties(compositeResolver)
             );
 
-            Optional<String> result = compositeResolver.resolve(proxyMethod, "property.1");
+            Optional<String> result = compositeResolver.resolve(context, "property.1");
 
             // property.1 and resolved from resolver1 and not from subsequent resolvers.
             assertTrue(resolver1.resolvedPropertyNames().contains("property.1"));

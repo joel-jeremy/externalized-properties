@@ -1,7 +1,5 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
@@ -170,8 +168,8 @@ public class Ordinals {
     
         /** {@inheritDoc}} */
         @Override
-        public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
-            return decorated.resolve(proxyMethod, propertyName);
+        public Optional<String> resolve(InvocationContext context, String propertyName) {
+            return decorated.resolve(context, propertyName);
         }
     
         /**
@@ -223,11 +221,11 @@ public class Ordinals {
         /** {@inheritDoc}} */
         @Override
         public ConversionResult<T> convert(
-                ProxyMethod proxyMethod, 
+                InvocationContext context, 
                 String valueToConvert, 
                 Type targetType
         ) {
-            return decorated.convert(proxyMethod, valueToConvert, targetType);
+            return decorated.convert(context, valueToConvert, targetType);
         }
 
         /**

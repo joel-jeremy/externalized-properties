@@ -3,12 +3,12 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterFacade;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.Tokenizer;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -30,13 +30,13 @@ public class ArrayConverter implements Converter<Object[]> {
     /** {@inheritDoc} */
     @Override
     public boolean canConvertTo(Class<?> targetType) {
-        return targetType != null && targetType.isArray();
+        return targetType.isArray();
     }
 
     /** {@inheritDoc} */
     @Override
     public ConversionResult<Object[]> convert(
-            ProxyMethod proxyMethod,
+            InvocationContext context,
             String valueToConvert,
             Type targetType
     ) {
@@ -54,7 +54,7 @@ public class ArrayConverter implements Converter<Object[]> {
             return ConversionResult.of(newArray(rawTargetType, 0));
         }
 
-        final String[] values = tokenizer.tokenizeValue(proxyMethod, valueToConvert);
+        final String[] values = tokenizer.tokenizeValue(context, valueToConvert);
         
         // If array is String[] or Object[], return the string values.
         if (String.class.equals(rawArrayComponentType) || 
@@ -72,7 +72,7 @@ public class ArrayConverter implements Converter<Object[]> {
         
             return ConversionResult.of(
                 convertValuesToArrayComponentType(
-                    proxyMethod,
+                    context,
                     values,
                     genericArrayComponentType
                 )
@@ -81,16 +81,12 @@ public class ArrayConverter implements Converter<Object[]> {
 
         // Just convert to raw type.
         return ConversionResult.of(
-            convertValuesToArrayComponentType(
-                proxyMethod,
-                values,
-                rawArrayComponentType
-            )
+            convertValuesToArrayComponentType(context, values, rawArrayComponentType)
         );
     }
 
     private Object[] convertValuesToArrayComponentType(
-            ProxyMethod proxyMethod,
+            InvocationContext context,
             String[] values,
             Type arrayComponentType
     ) {
@@ -99,7 +95,7 @@ public class ArrayConverter implements Converter<Object[]> {
             values.length
         );
 
-        ConverterProxy rootConverter = proxyMethod.externalizedProperties()
+        ConverterProxy rootConverter = context.externalizedProperties()
             .initialize(ConverterProxy.class);
         
         for (int i = 0; i < values.length; i++) {

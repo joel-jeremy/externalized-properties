@@ -1,9 +1,10 @@
 package io.github.joeljeremy7.externalizedproperties.core.proxy;
 
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
-import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.ProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationContextFactory;
 
 import java.lang.reflect.InvocationHandler;
 
@@ -18,7 +19,7 @@ public interface InvocationHandlerFactory {
      * @param rootResolver The root resolver.
      * @param rootConverter The root converter.
      * @param variableExpander The variable expander.
-     * @param proxyMethodFactory The {@link ProxyMethod} factory.
+     * @param invocationContextFactory The {@link InvocationContext} factory.
      * @return The {@link InvocationHandler} instance for the specified proxy interface.
      */
     InvocationHandler create(
@@ -26,6 +27,6 @@ public interface InvocationHandlerFactory {
         Resolver rootResolver,
         Converter<?> rootConverter,
         VariableExpander variableExpander,
-        ProxyMethodFactory proxyMethodFactory
+        InvocationContextFactory invocationContextFactory
     );
 }

@@ -1,8 +1,8 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal.conversion;
 
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -31,19 +31,19 @@ public class Tokenizer {
     /**
      * Split the string value to an array based on the determined delimiter.
      * 
-     * @param proxyMethod The proxy method.
+     * @param context The invocation context.
      * @param value The value to tokenize/split.
      * @return The resulting array.
      */
-    public String[] tokenizeValue(ProxyMethod proxyMethod, String value) {
-        String delimiterToUse = determineDelimiter(proxyMethod);
+    public String[] tokenizeValue(InvocationContext context, String value) {
+        String delimiterToUse = determineDelimiter(context);
         String[] tokens = value.split(delimiterToUse);
-        return stripEmptyValuesIfNecessary(proxyMethod, tokens);
+        return stripEmptyValuesIfNecessary(context, tokens);
     }
 
-    private String determineDelimiter(ProxyMethod proxyMethod) {
+    private String determineDelimiter(InvocationContext context) {
         Delimiter delimiterOverride = 
-            proxyMethod.findAnnotation(Delimiter.class).orElse(null);
+            context.method().findAnnotation(Delimiter.class).orElse(null);
 
         return delimiterOverride != null ? 
             Pattern.quote(delimiterOverride.value()) : 
@@ -51,10 +51,10 @@ public class Tokenizer {
     }
 
     private String[] stripEmptyValuesIfNecessary(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String[] tokens
     ) {
-        if (proxyMethod.hasAnnotation(StripEmptyValues.class)) {
+        if (context.method().hasAnnotation(StripEmptyValues.class)) {
             // Filter empty values.
             return Arrays.stream(tokens)
                 .filter(v -> !v.isEmpty())

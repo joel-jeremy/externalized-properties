@@ -2,8 +2,8 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 
 import io.github.joeljeremy7.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
-import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.CachingInvocationHandler.InvocationCacheKey;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationCacheKey;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.MethodUtils;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubInvocationHandler;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +15,6 @@ import java.lang.reflect.Proxy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -192,168 +191,6 @@ public class CachingInvocationHandlerTests {
         }
     }
 
-    @Nested
-    class InvocationCacheKeyTests {
-        @Nested
-        class HashCodeMethod {
-            @Test
-            @DisplayName("should return the same of hash code everytime")
-            void test1() {
-                Method method = stubMethod();
-                Object[] args = new Object[] { "1", Class.class };
-                InvocationCacheKey cacheKey = new InvocationCacheKey(method, args);
-                int hashCode1 = cacheKey.hashCode();
-                int hashCode2 = cacheKey.hashCode();
-
-                assertEquals(hashCode1, hashCode2);
-            }
-
-            @Test
-            @DisplayName(
-                "should return the same of hash code for matching methods " + 
-                "and args combinations"
-            )
-            void test2() {
-                Method method1 = stubMethod();
-                Method method2 = stubMethod();
-                Object[] args1 = new Object[] { "1", Class.class };
-                Object[] args2 = new Object[] { "1", Class.class };
-                InvocationCacheKey cacheKey1 = new InvocationCacheKey(method1, args1);
-                InvocationCacheKey cacheKey2 = new InvocationCacheKey(method2, args2);
-                assertEquals(cacheKey1.hashCode(), cacheKey2.hashCode());
-            }
-
-            @Test
-            @DisplayName(
-                "should return the same of hash code for matching methods " + 
-                "(no args)"
-            )
-            void test3() {
-                Method method1 = stubMethod();
-                Method method2 = stubMethod();
-                InvocationCacheKey cacheKey1 = new InvocationCacheKey(method1);
-                InvocationCacheKey cacheKey2 = new InvocationCacheKey(method2);
-                assertEquals(cacheKey1.hashCode(), cacheKey2.hashCode());
-            }
-
-            @Test
-            @DisplayName(
-                "should return a different hash code for different args combinations"
-            )
-            void test4() {
-                Method method = stubMethod();
-                Object[] args1 = new Object[] { "1", Class.class };
-                Object[] args2 = new Object[] { "2", Class.class };
-                InvocationCacheKey cacheKey1 = new InvocationCacheKey(method, args1);
-                InvocationCacheKey cacheKey2 = new InvocationCacheKey(method, args2);
-                int hashCode1 = cacheKey1.hashCode();
-                int hashCode2 = cacheKey2.hashCode();
-
-                assertNotEquals(hashCode1, hashCode2);
-            }
-        }
-
-        @Nested
-        class EqualsMethod {
-            @Test
-            @DisplayName("should return true when method and args are all equal")
-            void test1() {
-                Method method1 = stubMethod();
-                Method method2 = stubMethod();
-                Object[] args1 = new Object[] { "1", Class.class };
-                Object[] args2 = new Object[] { "1", Class.class };
-                InvocationCacheKey cacheKey1 = new InvocationCacheKey(method1, args1);
-                InvocationCacheKey cacheKey2 = new InvocationCacheKey(method2, args2);
-
-                assertTrue(cacheKey1.equals(cacheKey2));
-            }
-
-            @Test
-            @DisplayName(
-                "should return true when method and args are all equal " + 
-                "(args has an array)"
-            )
-            void test2() {
-                Method method1 = stubMethod();
-                Method method2 = stubMethod();
-                Object[] args1 = new Object[] { 
-                    "1", 
-                    new Object[] { Class.class, Integer.class, InvocationCacheKey.class }
-                };
-                Object[] args2 = new Object[] { 
-                    "1", 
-                    new Object[] { Class.class, Integer.class, InvocationCacheKey.class }
-                };
-                InvocationCacheKey cacheKey1 = new InvocationCacheKey(method1, args1);
-                InvocationCacheKey cacheKey2 = new InvocationCacheKey(method2, args2);
-
-                assertTrue(cacheKey1.equals(cacheKey2));
-            }
-
-            @Test
-            @DisplayName("should return false when methods are not equal (no args)")
-            void test3() {
-                Method method = ProxyMethodUtils.getMethod(
-                    StubProxyInterface.class, 
-                    StubProxyInterface::methodName
-                );
-                Method otherMethod = ProxyMethodUtils.getMethod(
-                    OtherProxyInterface.class, 
-                    OtherProxyInterface::methodName
-                );
-                InvocationCacheKey cacheKey1 = new InvocationCacheKey(method);
-                InvocationCacheKey cacheKey2 = new InvocationCacheKey(otherMethod);
-
-                assertFalse(cacheKey1.equals(cacheKey2));
-            }
-
-            @Test
-            @DisplayName("should return false args are not all equal")
-            void test4() {
-                Method method1 = stubMethod();
-                Method method2 = stubMethod();
-                Object[] args1 = new Object[] { 
-                    "1", 
-                    new Object[] { Class.class, Integer.class, String.class }
-                };
-                Object[] args2 = new Object[] { 
-                    "1", 
-                    new Object[] { Class.class, Integer.class, InvocationCacheKey.class }
-                };
-                InvocationCacheKey cacheKey1 = new InvocationCacheKey(method1, args1);
-                InvocationCacheKey cacheKey2 = new InvocationCacheKey(method2, args2);
-
-                assertFalse(cacheKey1.equals(cacheKey2));
-            }
-
-            @Test
-            @DisplayName(
-                "should return false when other object is not an invocation cache key"
-            )
-            void test5() {
-                Method method = ProxyMethodUtils.getMethod(
-                    StubProxyInterface.class, 
-                    StubProxyInterface::methodName
-                );
-                InvocationCacheKey cacheKey1 = new InvocationCacheKey(method);
-
-                assertFalse(cacheKey1.equals(new Object()));
-            }
-
-            @Test
-            @DisplayName("should return false when other object is null")
-            void test6() {
-                Method method = ProxyMethodUtils.getMethod(
-                    StubProxyInterface.class, 
-                    StubProxyInterface::methodName
-                );
-                InvocationCacheKey cacheKey1 = new InvocationCacheKey(method);
-
-                assertFalse(cacheKey1.equals(null));
-            }
-        }
-    }
-
     private StubProxyInterface stubProxy(StubInvocationHandler decorated) {
         return (StubProxyInterface)Proxy.newProxyInstance(
             StubProxyInterface.class.getClassLoader(), 
@@ -363,17 +200,13 @@ public class CachingInvocationHandlerTests {
     }
 
     private Method stubMethod() {
-        return ProxyMethodUtils.getMethod(
+        return MethodUtils.getMethod(
             StubProxyInterface.class, 
             StubProxyInterface::methodName
         );
     }
 
-    static interface StubProxyInterface {
-        String methodName();
-    }
-
-    static interface OtherProxyInterface {
+    private static interface StubProxyInterface {
         String methodName();
     }
 }

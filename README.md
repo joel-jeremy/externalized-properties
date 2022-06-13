@@ -139,4 +139,5 @@ private static ExternalizedProperties buildExternalizedProperties() {
 ```
 
 ## 🧪 Samples
-More sample can be found here: https://github.com/joeljeremy7/externalized-properties-samples
+
+More sample can be found here: <https://github.com/joeljeremy7/externalized-properties-samples>

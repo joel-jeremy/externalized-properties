@@ -3,9 +3,9 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.EnumConverterTests.TestEnum;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,8 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultConverterTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
     
     @Nested
     class CanConvertToMethod {
@@ -243,23 +243,23 @@ public class DefaultConverterTests {
             boolean canConvert = converter.canConvertTo(YearMonth.class);
             assertTrue(canConvert);
         }
-        
-        @Test
-        @DisplayName("should return false when target type is null.")
-        void unsupportedTest1() {
-            DefaultConverter converter = converterToTest();
-            boolean canConvert = converter.canConvertTo(null);
-            assertFalse(canConvert);
-        }
 
         @Test
         @DisplayName("should return false when target type is not supported.")
-        void unsupportedTest2() {
+        void unsupportedTest1() {
             DefaultConverter converter = converterToTest();
             // Unsupported.
             boolean canConvert = converter.canConvertTo(Properties.class);
             assertFalse(canConvert);
         }
+        
+        // @Test
+        // @DisplayName("should return false when target type is null.")
+        // void unsupportedTest2() {
+        //     DefaultConverter converter = converterToTest();
+        //     boolean canConvert = converter.canConvertTo(null);
+        //     assertFalse(canConvert);
+        // }
     }
 
     @Nested
@@ -270,13 +270,13 @@ public class DefaultConverterTests {
             DefaultConverter converter = converterToTest();
 
             // Not primitive, List/Collection, array or Optional.
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::customType, // This method returns a CustomType.
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 ""
             );
             assertEquals(ConversionResult.skip(), result);
@@ -287,23 +287,23 @@ public class DefaultConverterTests {
         void primitiveTest1() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext wrapperContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::intWrapperProperty, // This method returns a Integer wrapper class
                 externalizedProperties(converter)
             );
 
-            ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext primitiveContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::intPrimitiveProperty, // This method returns an int primitive
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
-                wrapperProxyMethod,
+                wrapperContext,
                 "1"
             );
 
             ConversionResult<?> primitiveResult = converter.convert(
-                primitiveProxyMethod,
+                primitiveContext,
                 "2"
             );
 
@@ -327,23 +327,23 @@ public class DefaultConverterTests {
         void primitiveTest2() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext wrapperContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::longWrapperProperty, // This method returns a Long wrapper class
                 externalizedProperties(converter)
             );
 
-            ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext primitiveContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::longPrimitiveProperty, // This method returns an long primitive
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
-                wrapperProxyMethod,
+                wrapperContext,
                 "1"
             );
 
             ConversionResult<?> primitiveResult = converter.convert(
-                primitiveProxyMethod,
+                primitiveContext,
                 "2"
             );
             
@@ -367,23 +367,23 @@ public class DefaultConverterTests {
         void primitiveTest3() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext wrapperContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::floatWrapperProperty, // This method returns a Float wrapper class
                 externalizedProperties(converter)
             );
 
-            ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext primitiveContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::floatPrimitiveProperty, // This method returns an float primitive
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
-                wrapperProxyMethod,
+                wrapperContext,
                 "1.0"
             );
 
             ConversionResult<?> primitiveResult = converter.convert(
-                primitiveProxyMethod,
+                primitiveContext,
                 "2.0"
             );
             
@@ -407,23 +407,23 @@ public class DefaultConverterTests {
         void primitiveTest4() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext wrapperContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::doubleWrapperProperty, // This method returns a Double wrapper class
                 externalizedProperties(converter)
             );
 
-            ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext primitiveContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::doublePrimitiveProperty, // This method returns an double primitive
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
-                wrapperProxyMethod,
+                wrapperContext,
                 "1.0"
             );
 
             ConversionResult<?> primitiveResult = converter.convert(
-                primitiveProxyMethod,
+                primitiveContext,
                 "2.0"
             );
             
@@ -447,23 +447,23 @@ public class DefaultConverterTests {
         void primitiveTest5() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext wrapperContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::shortWrapperProperty, // This method returns a Short wrapper class
                 externalizedProperties(converter)
             );
 
-            ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext primitiveContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::shortPrimitiveProperty, // This method returns a short primitive
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
-                wrapperProxyMethod,
+                wrapperContext,
                 "1"
             );
 
             ConversionResult<?> primitiveResult = converter.convert(
-                primitiveProxyMethod,
+                primitiveContext,
                 "2"
             );
             
@@ -487,23 +487,23 @@ public class DefaultConverterTests {
         void primitiveTest6() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext wrapperContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::booleanWrapperProperty, // This method returns a Boolean wrapper class
                 externalizedProperties(converter)
             );
 
-            ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext primitiveContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::booleanPrimitiveProperty, // This method returns a boolean primitive
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
-                wrapperProxyMethod,
+                wrapperContext,
                 "true"
             );
 
             ConversionResult<?> primitiveResult = converter.convert(
-                primitiveProxyMethod,
+                primitiveContext,
                 "false"
             );
             
@@ -527,23 +527,23 @@ public class DefaultConverterTests {
         void primitiveTest7() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod wrapperProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext wrapperContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::byteWrapperProperty, // This method returns a Byte wrapper class
                 externalizedProperties(converter)
             );
 
-            ProxyMethod primitiveProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext primitiveContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::bytePrimitiveProperty, // This method returns a byte primitive
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> wrapperResult = converter.convert(
-                wrapperProxyMethod,
+                wrapperContext,
                 "1"
             );
 
             ConversionResult<?> primitiveResult = converter.convert(
-                primitiveProxyMethod,
+                primitiveContext,
                 "2"
             );
             
@@ -567,23 +567,23 @@ public class DefaultConverterTests {
         void listTest1() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod listProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext listContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::listProperty, // This method returns a List.
                 externalizedProperties(converter)
             );
 
-            ProxyMethod collectionProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext collectionContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::collectionProperty, // This method returns a Collection.
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> listResult = converter.convert(
-                listProxyMethod,
+                listContext,
                 "a,b,c"
             );
 
             ConversionResult<?> collectionResult = converter.convert(
-                collectionProxyMethod,
+                collectionContext,
                 "c,b,a"
             );
             
@@ -613,13 +613,13 @@ public class DefaultConverterTests {
         void setTest1() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod setProxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setProperty, // This method returns a Set.
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> setResult = converter.convert(
-                setProxyMethod,
+                context,
                 "a,b,c"
             );
             
@@ -637,13 +637,13 @@ public class DefaultConverterTests {
         void arrayTest1() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::arrayProperty, // This method returns a String[].
                 externalizedProperties(converter)
             );
             
             ConversionResult<?> arrayResult = converter.convert(
-                proxyMethod,
+                context,
                 "a,b,c"
             );
 
@@ -663,13 +663,13 @@ public class DefaultConverterTests {
         void enumTest1() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::enumProperty,
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 TestEnum.ONE.name()
             );
             assertNotNull(result);
@@ -683,7 +683,7 @@ public class DefaultConverterTests {
         void dateTimeTest1() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::localDateTime,
                 externalizedProperties(converter)
             );
@@ -692,7 +692,7 @@ public class DefaultConverterTests {
             String localDateTimeString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 localDateTimeString
             );
             assertNotNull(result);
@@ -707,7 +707,7 @@ public class DefaultConverterTests {
         void dateTimeTest2() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::localDate,
                 externalizedProperties(converter)
             );
@@ -715,7 +715,7 @@ public class DefaultConverterTests {
             String localDateString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 localDateString
             );
             
@@ -731,7 +731,7 @@ public class DefaultConverterTests {
         void dateTimeTest3() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::localTime,
                 externalizedProperties(converter)
             );
@@ -740,7 +740,7 @@ public class DefaultConverterTests {
             String localTimeString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 localTimeString
             );
             assertNotNull(result);
@@ -755,7 +755,7 @@ public class DefaultConverterTests {
         void dateTimeTest4() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::offsetDateTime,
                 externalizedProperties(converter)
             );
@@ -768,7 +768,7 @@ public class DefaultConverterTests {
             String offsetDateTimeString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 offsetDateTimeString
             );
             assertNotNull(result);
@@ -783,7 +783,7 @@ public class DefaultConverterTests {
         void dateTimeTest5() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::offsetTime,
                 externalizedProperties(converter)
             );
@@ -795,7 +795,7 @@ public class DefaultConverterTests {
             String offsetTimeString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 offsetTimeString
             );
             assertNotNull(result);
@@ -810,7 +810,7 @@ public class DefaultConverterTests {
         void dateTimeTest7() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::zonedDateTime,
                 externalizedProperties(converter)
             );
@@ -823,7 +823,7 @@ public class DefaultConverterTests {
             String zonedDateTimeString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 zonedDateTimeString
             );
             assertNotNull(result);
@@ -838,7 +838,7 @@ public class DefaultConverterTests {
         void dateTimeTest8() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::instant,
                 externalizedProperties(converter)
             );
@@ -847,7 +847,7 @@ public class DefaultConverterTests {
             String instantString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 instantString
             );
             assertNotNull(result);
@@ -862,7 +862,7 @@ public class DefaultConverterTests {
         void dateTimeTest9() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::dayOfWeek,
                 externalizedProperties(converter)
             );
@@ -871,7 +871,7 @@ public class DefaultConverterTests {
             String dayOfWeekString = input.name();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 dayOfWeekString
             );
             assertNotNull(result);
@@ -886,7 +886,7 @@ public class DefaultConverterTests {
         void dateTimeTest10() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::month,
                 externalizedProperties(converter)
             );
@@ -895,7 +895,7 @@ public class DefaultConverterTests {
             String monthString = input.name();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 monthString
             );
             assertNotNull(result);
@@ -910,7 +910,7 @@ public class DefaultConverterTests {
         void dateTimeTest11() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::monthDay,
                 externalizedProperties(converter)
             );
@@ -919,7 +919,7 @@ public class DefaultConverterTests {
             String monthDayString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 monthDayString
             );
             assertNotNull(result);
@@ -934,7 +934,7 @@ public class DefaultConverterTests {
         void dateTimeTest12() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::year,
                 externalizedProperties(converter)
             );
@@ -943,7 +943,7 @@ public class DefaultConverterTests {
             String yearString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 yearString
             );
             assertNotNull(result);
@@ -958,7 +958,7 @@ public class DefaultConverterTests {
         void dateTimeTest13() {
             DefaultConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::yearMonth,
                 externalizedProperties(converter)
             );
@@ -967,7 +967,7 @@ public class DefaultConverterTests {
             String yearMonthString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 yearMonthString
             );
             assertNotNull(result);
@@ -990,17 +990,110 @@ public class DefaultConverterTests {
             .build();
     }
 
-    private static interface ProxyInterface extends PrimitiveConverterTests.ProxyInterface, 
-            ArrayConverterTests.ProxyInterface,
-            ListConverterTests.ProxyInterface, 
-            SetConverterTests.ProxyInterface,
-            OptionalConverterTests.ProxyInterface,
-            EnumConverterTests.ProxyInterface, 
-            DateTimeConverterTests.ProxyInterface {
+    private static interface ProxyInterface {
+        @ExternalizedProperty("property.int.primitive")
+        int intPrimitiveProperty();
+    
+        @ExternalizedProperty("property.int.wrapper")
+        Integer intWrapperProperty();
+    
+        @ExternalizedProperty("property.long.primitive")
+        long longPrimitiveProperty();
+    
+        @ExternalizedProperty("property.long.wrapper")
+        Long longWrapperProperty();
+    
+        @ExternalizedProperty("property.float.primitive")
+        float floatPrimitiveProperty();
+    
+        @ExternalizedProperty("property.float.wrapper")
+        Float floatWrapperProperty();
+    
+        @ExternalizedProperty("property.double.primitive")
+        double doublePrimitiveProperty();
+    
+        @ExternalizedProperty("property.double.wrapper")
+        Double doubleWrapperProperty();
+    
+        @ExternalizedProperty("property.boolean.primitive")
+        boolean booleanPrimitiveProperty();
+    
+        @ExternalizedProperty("property.boolean.wrapper")
+        Boolean booleanWrapperProperty();
+    
+        @ExternalizedProperty("property.short.primitive")
+        short shortPrimitiveProperty();
+    
+        @ExternalizedProperty("property.short.wrapper")
+        Short shortWrapperProperty();
+    
+        @ExternalizedProperty("property.byte.primitive")
+        byte bytePrimitiveProperty();
+    
+        @ExternalizedProperty("property.byte.wrapper")
+        Byte byteWrapperProperty();
         
+        @ExternalizedProperty("property.array")
+        String[] arrayProperty();
+
+        @ExternalizedProperty("property.list")
+        Collection<String> listProperty();
+
+        @ExternalizedProperty("property.collection")
+        Collection<String> collectionProperty();
+
+        @ExternalizedProperty("property.set")
+        Set<String> setProperty();
+
+        @ExternalizedProperty("property.enum")
+        TestEnum enumProperty();
+
+        @ExternalizedProperty("property.localdatetime")
+        LocalDateTime localDateTime();
+
+        @ExternalizedProperty("localdate.property")
+        LocalDate localDate();
+
+        @ExternalizedProperty("property.localtime")
+        LocalTime localTime();
+
+        @ExternalizedProperty("property.offsetdatetime")
+        OffsetDateTime offsetDateTime();
+
+        @ExternalizedProperty("property.offsettime")
+        OffsetTime offsetTime();
+
+        @ExternalizedProperty("property.zoneddatetime")
+        ZonedDateTime zonedDateTime();
+
+        @ExternalizedProperty("property.instant")
+        Instant instant();
+
+        @ExternalizedProperty("property.dayofweek")
+        DayOfWeek dayOfWeek();
+
+        @ExternalizedProperty("property.month")
+        Month month();
+
+        @ExternalizedProperty("property.monthday")
+        MonthDay monthDay();
+
+        @ExternalizedProperty("property.year")
+        Year year();
+
+        @ExternalizedProperty("property.yearmonth.customformat")
+        YearMonth yearMonth();
+
         @ExternalizedProperty("property.custom.type")
         CustomType customType();
     }
 
     private static class CustomType {}
+
+    private static enum TestEnum {
+        NONE,
+        ONE,
+        TWO,
+        THREE
+    }
 }

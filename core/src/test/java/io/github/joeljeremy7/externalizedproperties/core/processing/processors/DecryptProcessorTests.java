@@ -2,14 +2,15 @@ package io.github.joeljeremy7.externalizedproperties.core.processing.processors;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.Decrypt;
 import io.github.joeljeremy7.externalizedproperties.core.processing.ProcessingException;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.Decryptor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.JceDecryptor;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.testentities.EncryptionUtils;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -40,8 +41,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DecryptProcessorTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY = 
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY = 
+        InvocationContextUtils.testFactory(ProxyInterface.class);
 
     // AES constants.
     private static final String AES_ALGORITHM = EncryptionUtils.AES_ALGORITHM;
@@ -115,7 +116,7 @@ public class DecryptProcessorTests {
         void test1() {
             // AES decryptor is not registered.
             DecryptProcessor processor = processorToTest(RSA_DECRYPTOR);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::decryptAesGcm,
                 externalizedProperties(processor)
             );
@@ -127,7 +128,7 @@ public class DecryptProcessorTests {
             
             assertThrows(
                 ProcessingException.class, 
-                () -> processor.process(proxyMethod, aesEncryptedBase64)
+                () -> processor.process(context, aesEncryptedBase64)
             );
         }
 
@@ -135,7 +136,7 @@ public class DecryptProcessorTests {
         @DisplayName("should throw when proxy method is not annotated with @Decrypt")
         void test2() {
             DecryptProcessor processor = processorToTest(AES_GCM_DECRYPTOR);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::notAnnotatedWithDecrypt,
                 externalizedProperties(processor)
             );
@@ -147,7 +148,7 @@ public class DecryptProcessorTests {
             
             assertThrows(
                 ProcessingException.class, 
-                () -> processor.process(proxyMethod, aesEncryptedBase64)
+                () -> processor.process(context, aesEncryptedBase64)
             );
         }
         
@@ -155,7 +156,7 @@ public class DecryptProcessorTests {
         @DisplayName("should wrap exceptions when decrypting values")
         void test3() {
             DecryptProcessor processor = processorToTest(RSA_DECRYPTOR);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::decryptRsa,
                 externalizedProperties(processor)
             );
@@ -169,7 +170,7 @@ public class DecryptProcessorTests {
             
             assertThrows(
                 ProcessingException.class, 
-                () -> processor.process(proxyMethod, aesEncryptedBase64)
+                () -> processor.process(context, aesEncryptedBase64)
             );
         }
         
@@ -177,7 +178,7 @@ public class DecryptProcessorTests {
         @DisplayName("should throw when property is not in Base64 format")
         void test4() {
             DecryptProcessor processor = processorToTest(RSA_DECRYPTOR);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::decryptRsa,
                 externalizedProperties(processor)
             );
@@ -190,7 +191,7 @@ public class DecryptProcessorTests {
 
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> processor.process(proxyMethod, notInBase64Format)
+                () -> processor.process(context, notInBase64Format)
             );
         }
         
@@ -210,7 +211,7 @@ public class DecryptProcessorTests {
                 AES_GCM_DECRYPTOR,
                 RSA_DECRYPTOR
             );
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::decryptAesGcm,
                 externalizedProperties(processor)
             );
@@ -222,7 +223,7 @@ public class DecryptProcessorTests {
                 AES_SECRET_KEY,
                 GCM_PARAMETER_SPEC
             );
-            String decrypted = processor.process(proxyMethod, aesEncryptedBase64);
+            String decrypted = processor.process(context, aesEncryptedBase64);
 
             assertEquals(plainText, decrypted);
         }
@@ -234,14 +235,14 @@ public class DecryptProcessorTests {
                 AES_GCM_DECRYPTOR,
                 RSA_DECRYPTOR
             );
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::decryptRsa,
                 externalizedProperties(processor)
             );
 
             String plainText = "plain-text";
             String rsaEncryptedBase64 = EncryptionUtils.encryptRsaBase64(plainText);
-            String decrypted = processor.process(proxyMethod, rsaEncryptedBase64);
+            String decrypted = processor.process(context, rsaEncryptedBase64);
 
             assertEquals(plainText, decrypted);
         }

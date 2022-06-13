@@ -6,7 +6,8 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
-import io.github.joeljeremy7.externalizedproperties.core.internal.cachestrategies.WeakHashMapCacheStrategy;
+import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationContextFactory;
+import io.github.joeljeremy7.externalizedproperties.core.internal.caching.WeakHashMapCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
@@ -43,8 +44,8 @@ public class CachingInvocationHandlerFactoryTests {
         CONVERTER
     );
 
-    private static final ProxyMethodFactory PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory(EXTERNALIZED_PROPERTIES);
+    private static final InvocationContextFactory INVOCATION_CONTEXT_FACTORY =
+        new InvocationContextFactory(EXTERNALIZED_PROPERTIES);
     
     private static final InvocationHandlerFactory BASE_INVOCATION_HANDLER_FACTORY = 
         new ExternalizedPropertiesInvocationHandlerFactory();
@@ -91,7 +92,7 @@ public class CachingInvocationHandlerFactoryTests {
                 ROOT_RESOLVER, 
                 ROOT_CONVERTER, 
                 VARIABLE_EXPANDER,
-                PROXY_METHOD_FACTORY
+                INVOCATION_CONTEXT_FACTORY
             ));
         }
 
@@ -111,7 +112,7 @@ public class CachingInvocationHandlerFactoryTests {
                 ROOT_RESOLVER, 
                 ROOT_CONVERTER, 
                 VARIABLE_EXPANDER,
-                PROXY_METHOD_FACTORY
+                INVOCATION_CONTEXT_FACTORY
             );
 
             assertTrue(result instanceof CachingInvocationHandler);

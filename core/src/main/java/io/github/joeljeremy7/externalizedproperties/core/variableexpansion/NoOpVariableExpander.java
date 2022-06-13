@@ -1,7 +1,7 @@
 package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 /**
  * A no-op {@link VariableExpander} implementation.
@@ -19,7 +19,7 @@ public class NoOpVariableExpander implements VariableExpander {
 
     /** {@inheritDoc} */
     @Override
-    public String expandVariables(ProxyMethod proxyMethod, String value) {
+    public String expandVariables(InvocationContext context, String value) {
         return value;
     }
     

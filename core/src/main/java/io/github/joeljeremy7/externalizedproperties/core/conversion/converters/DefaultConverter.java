@@ -2,8 +2,8 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.reflect.Type;
@@ -14,7 +14,14 @@ import java.util.Collection;
  * Default property converter which delegates to the following converters 
  * (in order):
  * <ol>
- *  <li>{@link PrimitiveConverter}</li>
+ *  <li>{@link IntegerConverter}</li>
+ *  <li>{@link BooleanConverter}</li>
+ *  <li>{@link LongConverter}</li>
+ *  <li>{@link ShortConverter}</li>
+ *  <li>{@link FloatConverter}</li>
+ *  <li>{@link DoubleConverter}</li>
+ *  <li>{@link CharacterConverter}</li>
+ *  <li>{@link ByteConverter}</li>
  *  <li>{@link ListConverter}</li>
  *  <li>{@link ArrayConverter}</li>
  *  <li>{@link SetConverter}</li>
@@ -30,7 +37,14 @@ public class DefaultConverter implements Converter<Object> {
      * Constructs a {@link DefaultConverter} instance 
      * which delegates to the following converters (in order):
      * <ol>
-     *  <li>{@link PrimitiveConverter}</li>
+     *  <li>{@link IntegerConverter}</li>
+     *  <li>{@link BooleanConverter}</li>
+     *  <li>{@link LongConverter}</li>
+     *  <li>{@link ShortConverter}</li>
+     *  <li>{@link FloatConverter}</li>
+     *  <li>{@link DoubleConverter}</li>
+     *  <li>{@link CharacterConverter}</li>
+     *  <li>{@link ByteConverter}</li>
      *  <li>{@link ListConverter}</li>
      *  <li>{@link ArrayConverter}</li>
      *  <li>{@link SetConverter}</li>
@@ -42,7 +56,14 @@ public class DefaultConverter implements Converter<Object> {
         convertersByTargetType = new ConvertersByTargetType(
             // In order.
             Arrays.asList(
-                new PrimitiveConverter(),
+                new IntegerConverter(),
+                new BooleanConverter(),
+                new LongConverter(),
+                new ShortConverter(),
+                new FloatConverter(),
+                new DoubleConverter(),
+                new CharacterConverter(),
+                new ByteConverter(),
                 new ListConverter(),
                 new ArrayConverter(),
                 new SetConverter(),
@@ -55,16 +76,13 @@ public class DefaultConverter implements Converter<Object> {
     /** {@inheritDoc} */
     @Override
     public boolean canConvertTo(Class<?> targetType) {
-        if (targetType == null) {
-            return false;
-        }
         return convertersByTargetType.get(targetType) != null;
     }
     
     /** {@inheritDoc} */
     @Override
     public ConversionResult<Object> convert(
-            ProxyMethod proxyMethod,
+            InvocationContext context,
             String valueToConvert,
             Type targetType
     ) {
@@ -74,11 +92,7 @@ public class DefaultConverter implements Converter<Object> {
             return ConversionResult.skip();
         }
 
-        return converter.convert(
-            proxyMethod,
-            valueToConvert,
-            targetType
-        );
+        return converter.convert(context, valueToConvert, targetType);
     }
 
     /**

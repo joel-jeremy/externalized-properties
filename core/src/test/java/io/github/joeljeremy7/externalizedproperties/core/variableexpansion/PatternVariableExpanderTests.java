@@ -2,9 +2,10 @@ package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class PatternVariableExpanderTests {
     private static final ExternalizedProperties EXTERNALIZED_PROPERTIES = 
         ExternalizedProperties.builder().defaults().build();
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
     // Variable pattern: #[variable]
     private static final Pattern CUSTOM_VARIABLE_PATTERN = Pattern.compile("#\\[(.+?)\\]");
 
@@ -44,17 +45,17 @@ public class PatternVariableExpanderTests {
         void test1() {
             PatternVariableExpander variableExpander = variableExpander();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyJavaVersion,
                 EXTERNALIZED_PROPERTIES
             );
 
             String nullResult = variableExpander.expandVariables(
-                proxyMethod, 
+                context, 
                 null
             );
             String emptyResult = variableExpander.expandVariables(
-                proxyMethod, 
+                context, 
                 ""
             );
 
@@ -67,13 +68,13 @@ public class PatternVariableExpanderTests {
         void test2() {
             PatternVariableExpander variableExpander = variableExpander();
             
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyJavaVersion,
                 EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
-                proxyMethod,
+                context,
                 "property-${java.version}"
             );
 
@@ -93,13 +94,13 @@ public class PatternVariableExpanderTests {
         void test3() {
             PatternVariableExpander variableExpander =  variableExpander();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyNoVariables,
                 EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
-                proxyMethod,
+                context,
                 "property-no-variables"
             );
 
@@ -114,7 +115,7 @@ public class PatternVariableExpanderTests {
         void test4() {
             PatternVariableExpander variableExpander = variableExpander();
             
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyNonExistent,
                 EXTERNALIZED_PROPERTIES
             );
@@ -122,7 +123,7 @@ public class PatternVariableExpanderTests {
             assertThrows(
                 VariableExpansionException.class, 
                 () -> variableExpander.expandVariables(
-                    proxyMethod, 
+                    context, 
                     "property-${non.existent}"
                 )
             );
@@ -137,13 +138,13 @@ public class PatternVariableExpanderTests {
                 CUSTOM_VARIABLE_PATTERN
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::customPrefixSuffix,
                 EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
-                proxyMethod,
+                context,
                 "property-#[java.version]"
             );
 

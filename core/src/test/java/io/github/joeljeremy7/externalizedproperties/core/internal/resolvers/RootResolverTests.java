@@ -2,6 +2,7 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
@@ -9,11 +10,11 @@ import io.github.joeljeremy7.externalizedproperties.core.processing.Decrypt;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.Decryptor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.JceDecryptor;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.DefaultResolver;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver;
 import io.github.joeljeremy7.externalizedproperties.core.testentities.EncryptionUtils;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -37,8 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RootResolverTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
     
     @Nested
     class Constructor {
@@ -73,40 +74,40 @@ public class RootResolverTests {
 
     @Nested
     class ResolveMethod {
-        @Test
-        @DisplayName("should throw when proxy method argument is null")
-        void test1() {
-            RootResolver resolver = rootResolver(Arrays.asList(new DefaultResolver()));
+        // @Test
+        // @DisplayName("should throw when proxy method argument is null")
+        // void test1() {
+        //     RootResolver resolver = rootResolver(Arrays.asList(new DefaultResolver()));
             
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> resolver.resolve(null, "property")
-            );
-        }
+        //     assertThrows(
+        //         IllegalArgumentException.class, 
+        //         () -> resolver.resolve(null, "property")
+        //     );
+        // }
 
-        @Test
-        @DisplayName("should throw when property name is null")
-        void test2() {
-            List<Resolver> resolvers = Arrays.asList(
-                new DefaultResolver()
-            );
+        // @Test
+        // @DisplayName("should throw when property name is null")
+        // void test2() {
+        //     List<Resolver> resolvers = Arrays.asList(
+        //         new DefaultResolver()
+        //     );
 
-            RootResolver resolver = rootResolver(resolvers);
+        //     RootResolver resolver = rootResolver(resolvers);
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::property,
-                externalizedProperties(resolvers)
-            );
+        //     InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
+        //         ProxyInterface::property,
+        //         externalizedProperties(resolvers)
+        //     );
             
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> resolver.resolve(proxyMethod, null)
-            );
-        }
+        //     assertThrows(
+        //         IllegalArgumentException.class, 
+        //         () -> resolver.resolve(context, null)
+        //     );
+        // }
 
         @Test
         @DisplayName("should resolve properties from registered resolvers")
-        void test3() {
+        void test1() {
             Map<String, String> propertySource = new HashMap<>();
             propertySource.put("property", "property-value");
             
@@ -115,13 +116,13 @@ public class RootResolverTests {
             );
 
             RootResolver resolver = rootResolver(resolvers);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolvers)
             );
             
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "property");
+                resolver.resolve(context, "property");
 
             assertNotNull(result);
             assertTrue(result.isPresent());
@@ -133,7 +134,7 @@ public class RootResolverTests {
 
         @Test
         @DisplayName("should process resolved properties via registered processors")
-        void test4() {
+        void test2() {
             String originalPropertyValue = "property-value";
             String base64EncodedPropertyValue = EncryptionUtils.encryptAesBase64(
                 originalPropertyValue
@@ -147,13 +148,13 @@ public class RootResolverTests {
             Processor processor = new DecryptProcessor(getAesDecryptor());
             
             RootResolver resolver = rootResolver(resolvers, processor);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyDecrypt,
                 externalizedProperties(resolvers, processor)
             );
             
             Optional<String> result = 
-                resolver.resolve(proxyMethod, "test.decrypt");
+                resolver.resolve(context, "test.decrypt");
 
             assertNotNull(result);
             assertTrue(result.isPresent());

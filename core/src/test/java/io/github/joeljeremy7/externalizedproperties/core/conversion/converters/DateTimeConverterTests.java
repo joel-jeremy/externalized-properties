@@ -3,9 +3,10 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.DateTimeFormat;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,28 +28,19 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DateTimeConverterTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
 
     @Nested
     class CanConvertMethod {
         @Test
-        @DisplayName("should return true when target type is null.")
-        void test1() {
-            DateTimeConverter converter = converterToTest();
-            boolean canConvert = converter.canConvertTo(null);
-            assertFalse(canConvert);
-        }
-
-        @Test
         @DisplayName("should return true when target type is LocalDateTime.")
-        void test2() {
+        void test1() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(LocalDateTime.class);
             assertTrue(canConvert);
@@ -56,7 +48,7 @@ public class DateTimeConverterTests {
 
         @Test
         @DisplayName("should return true when target type is LocalDate.")
-        void test3() {
+        void dateTimeTest2() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(LocalDate.class);
             assertTrue(canConvert);
@@ -64,7 +56,7 @@ public class DateTimeConverterTests {
 
         @Test
         @DisplayName("should return true when target type is LocalTime.")
-        void test4() {
+        void test3() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(LocalTime.class);
             assertTrue(canConvert);
@@ -72,7 +64,7 @@ public class DateTimeConverterTests {
 
         @Test
         @DisplayName("should return true when target type is OffsetDateTime.")
-        void test5() {
+        void test4() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(OffsetDateTime.class);
             assertTrue(canConvert);
@@ -80,7 +72,7 @@ public class DateTimeConverterTests {
 
         @Test
         @DisplayName("should return true when target type is OffsetTime.")
-        void test6() {
+        void test5() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(OffsetTime.class);
             assertTrue(canConvert);
@@ -88,7 +80,7 @@ public class DateTimeConverterTests {
 
         @Test
         @DisplayName("should return true when target type is ZonedDateTime.")
-        void test7() {
+        void test6() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(ZonedDateTime.class);
             assertTrue(canConvert);
@@ -96,7 +88,7 @@ public class DateTimeConverterTests {
 
         @Test
         @DisplayName("should return true when target type is Instant.")
-        void test8() {
+        void test7() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Instant.class);
             assertTrue(canConvert);
@@ -104,7 +96,7 @@ public class DateTimeConverterTests {
 
         @Test
         @DisplayName("should return true when target type is DayOfWeek.")
-        void test9() {
+        void test8() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(DayOfWeek.class);
             assertTrue(canConvert);
@@ -112,7 +104,7 @@ public class DateTimeConverterTests {
 
         @Test
         @DisplayName("should return true when target type is Month.")
-        void test10() {
+        void test9() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Month.class);
             assertTrue(canConvert);
@@ -120,7 +112,7 @@ public class DateTimeConverterTests {
 
         @Test
         @DisplayName("should return true when target type is MonthDay.")
-        void test11() {
+        void test10() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(MonthDay.class);
             assertTrue(canConvert);
@@ -128,7 +120,7 @@ public class DateTimeConverterTests {
 
         @Test
         @DisplayName("should return true when target type is Year.")
-        void test12() {
+        void test11() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Year.class);
             assertTrue(canConvert);
@@ -136,7 +128,7 @@ public class DateTimeConverterTests {
 
         @Test
         @DisplayName("should return true when target type is YearMonth.")
-        void test13() {
+        void test12() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(YearMonth.class);
             assertTrue(canConvert);
@@ -150,7 +142,7 @@ public class DateTimeConverterTests {
         void test1() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::localDateTime,
                 externalizedProperties(converter)
             );
@@ -159,7 +151,7 @@ public class DateTimeConverterTests {
             String localDateTimeString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 localDateTimeString
             );
             assertNotNull(result);
@@ -174,7 +166,7 @@ public class DateTimeConverterTests {
         void test2() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::localDate,
                 externalizedProperties(converter)
             );
@@ -182,7 +174,7 @@ public class DateTimeConverterTests {
             String localDateString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 localDateString
             );
             
@@ -198,7 +190,7 @@ public class DateTimeConverterTests {
         void test3() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::localTime,
                 externalizedProperties(converter)
             );
@@ -207,7 +199,7 @@ public class DateTimeConverterTests {
             String localTimeString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 localTimeString
             );
             assertNotNull(result);
@@ -222,7 +214,7 @@ public class DateTimeConverterTests {
         void test4() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::offsetDateTime,
                 externalizedProperties(converter)
             );
@@ -235,7 +227,7 @@ public class DateTimeConverterTests {
             String offsetDateTimeString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 offsetDateTimeString
             );
             assertNotNull(result);
@@ -250,7 +242,7 @@ public class DateTimeConverterTests {
         void test5() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::offsetTime,
                 externalizedProperties(converter)
             );
@@ -262,7 +254,7 @@ public class DateTimeConverterTests {
             String offsetTimeString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 offsetTimeString
             );
             assertNotNull(result);
@@ -277,7 +269,7 @@ public class DateTimeConverterTests {
         void test7() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::zonedDateTime,
                 externalizedProperties(converter)
             );
@@ -290,7 +282,7 @@ public class DateTimeConverterTests {
             String zonedDateTimeString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 zonedDateTimeString
             );
             assertNotNull(result);
@@ -305,7 +297,7 @@ public class DateTimeConverterTests {
         void test8() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::instant,
                 externalizedProperties(converter)
             );
@@ -314,7 +306,7 @@ public class DateTimeConverterTests {
             String instantString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 instantString
             );
             assertNotNull(result);
@@ -329,7 +321,7 @@ public class DateTimeConverterTests {
         void test9() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::dayOfWeek,
                 externalizedProperties(converter)
             );
@@ -338,7 +330,7 @@ public class DateTimeConverterTests {
             String dayOfWeekString = input.name();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 dayOfWeekString
             );
             assertNotNull(result);
@@ -353,7 +345,7 @@ public class DateTimeConverterTests {
         void test10() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::month,
                 externalizedProperties(converter)
             );
@@ -362,7 +354,7 @@ public class DateTimeConverterTests {
             String monthString = input.name();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 monthString
             );
             assertNotNull(result);
@@ -377,7 +369,7 @@ public class DateTimeConverterTests {
         void test11() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::monthDay,
                 externalizedProperties(converter)
             );
@@ -386,7 +378,7 @@ public class DateTimeConverterTests {
             String monthDayString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 monthDayString
             );
             assertNotNull(result);
@@ -401,7 +393,7 @@ public class DateTimeConverterTests {
         void test12() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::year,
                 externalizedProperties(converter)
             );
@@ -410,7 +402,7 @@ public class DateTimeConverterTests {
             String yearString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 yearString
             );
             assertNotNull(result);
@@ -425,7 +417,7 @@ public class DateTimeConverterTests {
         void test13() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::yearMonth,
                 externalizedProperties(converter)
             );
@@ -434,7 +426,7 @@ public class DateTimeConverterTests {
             String yearMonthString = input.toString();
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 yearMonthString
             );
             assertNotNull(result);
@@ -449,13 +441,13 @@ public class DateTimeConverterTests {
         void test14() {
             DateTimeConverter converter = converterToTest();
             
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::notSupportedNotADateTimeClass,
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 "1"
             );
             assertNotNull(result);
@@ -471,7 +463,7 @@ public class DateTimeConverterTests {
         void customFormatTest1() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::localDateTimeCustomFormat,
                 externalizedProperties(converter)
             );
@@ -481,7 +473,7 @@ public class DateTimeConverterTests {
                 DateTimeFormatter.ofPattern("MMM.dd.yyyy h:mm:ss a").format(input);
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 localDateTimeString
             );
             assertNotNull(result);
@@ -496,7 +488,7 @@ public class DateTimeConverterTests {
         void customFormatTest2() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::localDateCustomFormat,
                 externalizedProperties(converter)
             );
@@ -506,7 +498,7 @@ public class DateTimeConverterTests {
                 DateTimeFormatter.ofPattern("MMM.dd.yyyy").format(input);
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 localDateString
             );
             assertNotNull(result);
@@ -521,7 +513,7 @@ public class DateTimeConverterTests {
         void customFormatTest3() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::localTimeCustomFormat,
                 externalizedProperties(converter)
             );
@@ -531,7 +523,7 @@ public class DateTimeConverterTests {
                 DateTimeFormatter.ofPattern("h:mm:ss a").format(input);
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 localTimeString
             );
             assertNotNull(result);
@@ -546,7 +538,7 @@ public class DateTimeConverterTests {
         void customFormatTest4() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::offsetDateTimeCustomFormat,
                 externalizedProperties(converter)
             );
@@ -560,7 +552,7 @@ public class DateTimeConverterTests {
                 DateTimeFormatter.ofPattern("MMM.dd.yyyy h:mm:ss a (ZZZZ)").format(input);
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 offsetDateTimeString
             );
             assertNotNull(result);
@@ -575,7 +567,7 @@ public class DateTimeConverterTests {
         void customFormatTest5() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::offsetTimeCustomFormat,
                 externalizedProperties(converter)
             );
@@ -588,7 +580,7 @@ public class DateTimeConverterTests {
                 DateTimeFormatter.ofPattern("h:mm:ss a (ZZZZ)").format(input);
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 offsetTimeString
             );
             assertNotNull(result);
@@ -603,7 +595,7 @@ public class DateTimeConverterTests {
         void customFormatTest6() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::zonedDateTimeCustomFormat,
                 externalizedProperties(converter)
             );
@@ -618,7 +610,7 @@ public class DateTimeConverterTests {
                     .format(input);
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 zonedDateTimeString
             );
             assertNotNull(result);
@@ -633,7 +625,7 @@ public class DateTimeConverterTests {
         void customFormatTest7() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::monthDayCustomFormat,
                 externalizedProperties(converter)
             );
@@ -643,7 +635,7 @@ public class DateTimeConverterTests {
                 DateTimeFormatter.ofPattern("MMMM.dd").format(input);
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 monthDayString
             );
             assertNotNull(result);
@@ -658,7 +650,7 @@ public class DateTimeConverterTests {
         void customFormatTest8() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::yearCustomFormat,
                 externalizedProperties(converter)
             );
@@ -667,7 +659,7 @@ public class DateTimeConverterTests {
             String yearString = DateTimeFormatter.ofPattern("yy").format(input);
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 yearString
             );
             assertNotNull(result);
@@ -682,7 +674,7 @@ public class DateTimeConverterTests {
         void customFormatTest9() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::yearMonthCustomFormat,
                 externalizedProperties(converter)
             );
@@ -692,7 +684,7 @@ public class DateTimeConverterTests {
                 DateTimeFormatter.ofPattern("yyyy MMMM").format(input);
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 yearMonthString
             );
             assertNotNull(result);
@@ -707,13 +699,13 @@ public class DateTimeConverterTests {
         void customFormatTest10() {
             DateTimeConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::notSupportedNotADateTimeClass,
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 "1"
             );
             assertNotNull(result);
@@ -733,7 +725,7 @@ public class DateTimeConverterTests {
             .build();
     }
 
-    static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("property.localdatetime")
         LocalDateTime localDateTime();
 

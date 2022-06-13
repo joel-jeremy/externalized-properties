@@ -1,7 +1,7 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Collections;
@@ -64,15 +64,9 @@ public class MapResolver implements Resolver {
         this.unresolvedPropertyHandler = propertyName -> null;
     }
     
-    /**
-     * Resolve property from a given properties map.
-     * 
-     * @param proxyMethod The proxy method.
-     * @param propertyName The property name.
-     * @return The resolved property value. Otherwise, an empty {@link Optional}.
-     */
+    /** {@inheritDoc} */
     @Override
-    public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
+    public Optional<String> resolve(InvocationContext context, String propertyName) {
         return Optional.ofNullable(getPropertyOrNull(propertyName));
     }
 

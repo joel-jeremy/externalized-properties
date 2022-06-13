@@ -4,10 +4,13 @@ import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
-import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.PrimitiveConverter;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.BooleanConverter;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.IntegerConverter;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.ShortConverter;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,8 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RootConverterTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
 
     @Nested
     class Constructor {
@@ -63,16 +66,18 @@ public class RootConverterTests {
             "support conversion to the target type"
         )
         void test1() {
-            Converter<?> converter = new PrimitiveConverter();
-            RootConverter rootConverter = rootConverter(converter);
+            Converter<?> intConverter = new IntegerConverter();
+            Converter<?> booleanConverter = new BooleanConverter();
+            Converter<?> shortConverter = new ShortConverter();
+            RootConverter rootConverter = rootConverter(
+                intConverter,
+                booleanConverter,
+                shortConverter
+            );
 
-            assertTrue(rootConverter.canConvertTo(Boolean.class));
-            assertTrue(rootConverter.canConvertTo(Integer.class));
-            assertTrue(rootConverter.canConvertTo(Long.class));
-            assertTrue(rootConverter.canConvertTo(Short.class));
-            assertTrue(rootConverter.canConvertTo(Float.class));
-            assertTrue(rootConverter.canConvertTo(Double.class));
-            assertTrue(rootConverter.canConvertTo(Byte.class));
+            assertTrue(rootConverter.canConvertTo(int.class));
+            assertTrue(rootConverter.canConvertTo(boolean.class));
+            assertTrue(rootConverter.canConvertTo(short.class));
             // Sanity check.
             assertFalse(rootConverter.canConvertTo(List.class));
         }
@@ -83,7 +88,7 @@ public class RootConverterTests {
             "does not support conversion to the target type"
         )
         void test2() {
-            Converter<?> converter = new PrimitiveConverter();
+            Converter<?> converter = new BooleanConverter();
             RootConverter rootConverter = rootConverter(converter);
 
             assertFalse(rootConverter.canConvertTo(List.class));
@@ -96,65 +101,65 @@ public class RootConverterTests {
 
     @Nested
     class ConvertMethod {
-        @Test
-        @DisplayName("should throw when proxy method argument is null.")
-        void test1() {
-            Converter<?> converter = new PrimitiveConverter();
-            RootConverter rootConverter = rootConverter(converter);
+        // @Test
+        // @DisplayName("should throw when proxy method argument is null.")
+        // void test1() {
+        //     Converter<?> converter = new PrimitiveConverter();
+        //     RootConverter rootConverter = rootConverter(converter);
 
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> rootConverter.convert(null, "valueToConvert", Integer.class)
-            );
-        }
+        //     assertThrows(
+        //         IllegalArgumentException.class, 
+        //         () -> rootConverter.convert(null, "valueToConvert", Integer.class)
+        //     );
+        // }
 
-        @Test
-        @DisplayName("should throw when value to convert argument is null.")
-        void test2() {
-            Converter<?> converter = new PrimitiveConverter();
-            RootConverter rootConverter = rootConverter(converter);
+        // @Test
+        // @DisplayName("should throw when value to convert argument is null.")
+        // void test2() {
+        //     Converter<?> converter = new PrimitiveConverter();
+        //     RootConverter rootConverter = rootConverter(converter);
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::intProperty,
-                externalizedProperties(converter)
-            );
+        //     InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
+        //         ProxyInterface::intProperty,
+        //         externalizedProperties(converter)
+        //     );
 
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> rootConverter.convert(proxyMethod, null, Integer.class)
-            );
-        }
+        //     assertThrows(
+        //         IllegalArgumentException.class, 
+        //         () -> rootConverter.convert(context, null, Integer.class)
+        //     );
+        // }
 
-        @Test
-        @DisplayName("should throw when value target type argument is null.")
-        void test3() {
-            Converter<?> converter = new PrimitiveConverter();
-            RootConverter rootConverter = rootConverter(converter);
+        // @Test
+        // @DisplayName("should throw when value target type argument is null.")
+        // void test3() {
+        //     Converter<?> converter = new PrimitiveConverter();
+        //     RootConverter rootConverter = rootConverter(converter);
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::intProperty,
-                externalizedProperties(converter)
-            );
+        //     InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
+        //         ProxyInterface::intProperty,
+        //         externalizedProperties(converter)
+        //     );
 
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> rootConverter.convert(proxyMethod, "valueToConvert", null)
-            );
-        }
+        //     assertThrows(
+        //         IllegalArgumentException.class, 
+        //         () -> rootConverter.convert(context, "valueToConvert", null)
+        //     );
+        // }
 
         @Test
         @DisplayName("should correctly convert to target type.")
-        void test4() {
-            Converter<?> converter = new PrimitiveConverter();
+        void test1() {
+            Converter<?> converter = new IntegerConverter();
             RootConverter rootConverter = rootConverter(converter);
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::intProperty,
                 externalizedProperties(converter)
             );
 
             ConversionResult<?> result = rootConverter.convert(
-                proxyMethod,
+                context,
                 "1"
             );
 
@@ -166,18 +171,18 @@ public class RootConverterTests {
 
         @Test
         @DisplayName("should have out-of-the-box support for Optional.")
-        void test5() {
+        void test2() {
             // No converters registered.
             RootConverter rootConverter = rootConverter();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::optionalProperty,
                 externalizedProperties()
             );
 
             String valueToConvert = "value";
             ConversionResult<?> result = rootConverter.convert(
-                proxyMethod,
+                context,
                 valueToConvert
             );
 
@@ -191,11 +196,11 @@ public class RootConverterTests {
         @DisplayName(
             "should throw when there is no converter can convert to target type."
         )
-        void tes6() {
-            Converter<?> converter = new PrimitiveConverter();
+        void tes3() {
+            Converter<?> converter = new IntegerConverter();
             RootConverter rootConverter = rootConverter(converter);
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::noRegisteredConverter,
                 externalizedProperties(converter)
             );
@@ -203,13 +208,13 @@ public class RootConverterTests {
             // No converter registered to convert to List.
             assertThrows(
                 ConversionException.class, 
-                () -> rootConverter.convert(proxyMethod, "1,2,3")
+                () -> rootConverter.convert(context, "1,2,3")
             );
         }
 
         @Test
         @DisplayName("should wrap and re-throw when converter has thrown an exception.")
-        void test7() {
+        void test4() {
             // Handler that can convert anything but always throws.
             Converter<?> throwingConverter = new Converter<Object>() {
                 @Override
@@ -219,7 +224,7 @@ public class RootConverterTests {
 
                 @Override
                 public ConversionResult<Object> convert(
-                        ProxyMethod proxyMethod,
+                        InvocationContext context,
                         String valueToConvert,
                         Type targetType
                 ) {
@@ -229,22 +234,22 @@ public class RootConverterTests {
             
             RootConverter converter = rootConverter(throwingConverter);
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::intProperty,
                 externalizedProperties(throwingConverter)
             );
 
-            Type targetType = proxyMethod.returnType();
+            Type targetType = context.method().returnType();
 
             assertThrows(
                 ConversionException.class, 
-                () -> converter.convert(proxyMethod, "1", targetType)
+                () -> converter.convert(context, "1", targetType)
             );
         }
 
         @Test
         @DisplayName("should skip to next converter when skip result is returned.")
-        void test8() throws InterruptedException {
+        void test5() throws InterruptedException {
             Converter<?> converter1 = new Converter<Object>() {
                 @Override
                 public boolean canConvertTo(Class<?> targetType) {
@@ -253,7 +258,7 @@ public class RootConverterTests {
 
                 @Override
                 public ConversionResult<Object> convert(
-                        ProxyMethod proxyMethod,
+                        InvocationContext context,
                         String valueToConvert,
                         Type targetType
                 ) {
@@ -272,7 +277,7 @@ public class RootConverterTests {
 
                 @Override
                 public ConversionResult<Object> convert(
-                        ProxyMethod proxyMethod,
+                        InvocationContext context,
                         String valueToConvert,
                         Type targetType
                 ) {
@@ -286,15 +291,15 @@ public class RootConverterTests {
                 converter2
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::intProperty,
                 externalizedProperties(converter1, converter2)
             );
 
             ConversionResult<?> result = rootConverter.convert(
-                proxyMethod,
+                context,
                 "1",
-                proxyMethod.returnType()
+                context.method().returnType()
             );
 
             Object convertedValue = result.value();

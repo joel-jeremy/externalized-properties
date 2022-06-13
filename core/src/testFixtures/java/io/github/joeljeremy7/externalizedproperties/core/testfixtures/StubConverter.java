@@ -2,7 +2,7 @@ package io.github.joeljeremy7.externalizedproperties.core.testfixtures;
 
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -44,12 +44,12 @@ public class StubConverter<T> implements Converter<T> {
 
     @Override
     public ConversionResult<T> convert(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String valueToConvert, 
             Type targetType
     ) {
         ConversionResult<T> result = 
-            convert.convert(proxyMethod, valueToConvert, targetType);
+            convert.convert(context, valueToConvert, targetType);
 
         if (result != ConversionResult.skip()) {
             trackedConversionResults.putIfAbsent(
@@ -66,7 +66,7 @@ public class StubConverter<T> implements Converter<T> {
     
     public static interface ConvertDelegate<T> {
         ConversionResult<T> convert(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String valueToConvert, 
             Type targetType
         );
