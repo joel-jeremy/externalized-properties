@@ -2,8 +2,9 @@ package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 public class NoOpVariableExpanderTests {
     private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
         ExternalizedProperties.builder().defaults().build();
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
     
     @Nested
     class ExpandVariablesMethod {
@@ -23,12 +24,12 @@ public class NoOpVariableExpanderTests {
         void test1() {
             String value = "${test}";
             
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::variableProperty,
                 EXTERNALIZED_PROPERTIES
             );
             
-            String result = NoOpVariableExpander.INSTANCE.expandVariables(proxyMethod, value);
+            String result = NoOpVariableExpander.INSTANCE.expandVariables(context, value);
 
             assertSame(value, result);
         }

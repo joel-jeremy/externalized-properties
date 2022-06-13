@@ -6,6 +6,7 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
+import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationContextFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
@@ -41,8 +42,8 @@ public class ExternalizedPropertiesInvocationHandlerFactoryTests {
         CONVERTER
     );
 
-    private static final ProxyMethodFactory PROXY_METHOD_FACTORY =
-        new ProxyMethodFactory(EXTERNALIZED_PROPERTIES);
+    private static final InvocationContextFactory INVOCATION_CONTEXT_FACTORY =
+        new InvocationContextFactory(EXTERNALIZED_PROPERTIES);
 
     @Nested
     class CreateMethod {
@@ -57,7 +58,7 @@ public class ExternalizedPropertiesInvocationHandlerFactoryTests {
                 ROOT_RESOLVER, 
                 ROOT_CONVERTER, 
                 VARIABLE_EXPANDER,
-                PROXY_METHOD_FACTORY
+                INVOCATION_CONTEXT_FACTORY
             ));
         }
 
@@ -74,7 +75,7 @@ public class ExternalizedPropertiesInvocationHandlerFactoryTests {
                 ROOT_RESOLVER, 
                 ROOT_CONVERTER, 
                 VARIABLE_EXPANDER,
-                PROXY_METHOD_FACTORY
+                INVOCATION_CONTEXT_FACTORY
             );
 
             assertTrue(result instanceof ExternalizedPropertiesInvocationHandler);

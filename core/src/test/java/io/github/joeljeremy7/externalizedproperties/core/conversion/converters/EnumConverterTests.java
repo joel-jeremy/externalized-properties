@@ -3,9 +3,10 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,24 +18,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EnumConverterTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
 
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return false when target type is null.")
-        void test1() {
-            EnumConverter converter = converterToTest();
-            boolean canConvert = converter.canConvertTo(null);
-            assertFalse(canConvert);
-        }
-
-        @Test
         @DisplayName(
             "should return true when target type is an enum."
         )
-        void test2() {
+        void test1() {
             EnumConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(TestEnum.class);
             assertTrue(canConvert);
@@ -44,7 +37,7 @@ public class EnumConverterTests {
         @DisplayName(
             "should return false when target type is not an enum."
         )
-        void test3() {
+        void test2() {
             EnumConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(String.class);
             assertFalse(canConvert);
@@ -58,13 +51,13 @@ public class EnumConverterTests {
         void test1() {
             EnumConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::enumProperty,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Enum<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 TestEnum.ONE.name()
             );
             assertNotNull(result);
@@ -78,14 +71,14 @@ public class EnumConverterTests {
         void test2() {
             EnumConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::enumProperty,
                 externalizedProperties(converter)
             );
 
             assertThrows(ConversionException.class, () -> {
                 converter.convert(
-                    proxyMethod,
+                    context,
                     "INVALID_ENUM_VALUE"
                 );
             });
@@ -96,13 +89,13 @@ public class EnumConverterTests {
         void test3() {
             EnumConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::notSupportedNotAnEnum,
                 externalizedProperties(converter)
             );
             
             ConversionResult<?> result = converter.convert(
-                proxyMethod,
+                context,
                 "1"
             );
             assertEquals(ConversionResult.skip(), result);
@@ -121,7 +114,7 @@ public class EnumConverterTests {
             .build();
     }
 
-    static interface ProxyInterface {
+    private static interface ProxyInterface {
         @ExternalizedProperty("property.enum")
         TestEnum enumProperty();
 
@@ -129,7 +122,7 @@ public class EnumConverterTests {
         int notSupportedNotAnEnum();
     }
 
-    static enum TestEnum {
+    private static enum TestEnum {
         NONE,
         ONE,
         TWO,

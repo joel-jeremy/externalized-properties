@@ -1,6 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.MethodUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ public class TypeReferenceTests {
 
             // Method returns a List<String>.
             // Used for comparison of generic type.
-            Method method = ProxyMethodUtils.getMethod(
+            Method method = MethodUtils.getMethod(
                 GenericTypes.class, 
                 GenericTypes::listProperty
             );
@@ -66,7 +66,7 @@ public class TypeReferenceTests {
 
             // Method returns a Optional<Optional<String>>[].
             // Used for comparison of generic type.
-            Method method = ProxyMethodUtils.getMethod(
+            Method method = MethodUtils.getMethod(
                 GenericTypes.class, 
                 GenericTypes::arrayPropertyNestedGeneric
             );

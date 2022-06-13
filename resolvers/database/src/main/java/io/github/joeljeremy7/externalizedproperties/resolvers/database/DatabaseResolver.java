@@ -1,8 +1,8 @@
 package io.github.joeljeremy7.externalizedproperties.resolvers.database;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
 
 import java.sql.Connection;
@@ -52,12 +52,12 @@ public class DatabaseResolver implements Resolver {
     /**
      * Resolve property from database.
      * 
-     * @param proxyMethod The proxy method.
+     * @param context The invocation context.
      * @param propertyName The property name.
      * @return The resolved property value. Otherwise, an empty {@link Optional}.
      */
     @Override
-    public Optional<String> resolve(ProxyMethod proxyMethod, String propertyName) {
+    public Optional<String> resolve(InvocationContext context, String propertyName) {
         try {
             return getFromDatabase(propertyName);
         } catch (SQLException e) {

@@ -1,10 +1,11 @@
 package io.github.joeljeremy7.externalizedproperties.core.processing.processors;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
+import io.github.joeljeremy7.externalizedproperties.core.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.processing.Decrypt;
 import io.github.joeljeremy7.externalizedproperties.core.processing.ProcessingException;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.crypto.BadPaddingException;
@@ -68,19 +69,19 @@ public class DecryptProcessor implements Processor {
     /**
      * {@inheritDoc}
      * 
-     * @param proxyMethod The proxy method.
+     * @param context The proxy method invocation context.
      * @param base64EncodedValue The value to decrypt. This is expected to be the 
      * encrypted data in Base64 format.
      * @return The decrypted String.
      */
     @Override
-    public String process(ProxyMethod proxyMethod, String base64EncodedValue) {
+    public String process(InvocationContext context, String base64EncodedValue) {
         // Encrypted string is expected to be in Base64.
         byte[] encryptedValue = base64Decode(base64EncodedValue);
         
         try {
-            Decryptor decryptor = determineDecryptor(proxyMethod);
-            byte[] decrypted = decryptor.decrypt(proxyMethod, encryptedValue);
+            Decryptor decryptor = determineDecryptor(context);
+            byte[] decrypted = decryptor.decrypt(context, encryptedValue);
             return new String(decrypted, StandardCharsets.UTF_8);
         } catch (RuntimeException e) {
             throw new ProcessingException(
@@ -102,7 +103,8 @@ public class DecryptProcessor implements Processor {
         }
     }
 
-    private Decryptor determineDecryptor(ProxyMethod proxyMethod) {
+    private Decryptor determineDecryptor(InvocationContext context) {
+        ProxyMethod proxyMethod = context.method();
         Decrypt decrypt = proxyMethod.findAnnotation(Decrypt.class)
             // Should not happen because Decrypt is annotated with 
             // @ProcessWith(DecryptProcessor.class)
@@ -155,11 +157,11 @@ public class DecryptProcessor implements Processor {
         /**
          * Decrypt value.
          * 
-         * @param proxyMethod The proxy method.
+         * @param context The proxy method invocation context.
          * @param valueToDecrypt The value to decrypt.
          * @return The decrypted value.
          */
-        byte[] decrypt(ProxyMethod proxyMethod, byte[] valueToDecrypt);
+        byte[] decrypt(InvocationContext context, byte[] valueToDecrypt);
     }
 
     /**
@@ -243,12 +245,12 @@ public class DecryptProcessor implements Processor {
         /**
          * Decrypt the value using the configured {@link Cipher}.
          * 
-         * @param proxyMethod The proxy method.
+         * @param context The proxy method invocation context.
          * @param valueToDecrypt The value to decrypt.
          * @return The decrypted value.
          */
         @Override
-        public byte[] decrypt(ProxyMethod proxyMethod, byte[] valueToDecrypt) {
+        public byte[] decrypt(InvocationContext context, byte[] valueToDecrypt) {
             try {
                 return initializedCipher.doFinal(valueToDecrypt);
             } catch (IllegalBlockSizeException | BadPaddingException e) {

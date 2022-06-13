@@ -3,11 +3,12 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 import io.github.joeljeremy7.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubResolver;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CachingResolverTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
 
     @Nested
     class Constructor {
@@ -51,41 +52,6 @@ public class CachingResolverTests {
 
     @Nested
     class ResolveMethod {
-        // @Test
-        // @DisplayName("should throw when proxy method argument is null.")
-        // void validationTest1() {
-        //     CachingResolver resolver = resolverToTest(
-        //         new StubResolver()
-        //     );
-
-        //     assertThrows(
-        //         IllegalArgumentException.class, 
-        //         () -> resolver.resolve(
-        //             null,
-        //             "property"
-        //         )
-        //     );
-        // }
-
-        // @Test
-        // @DisplayName("should throw when property name argument is null or empty.")
-        // void validationTest2() {
-        //     CachingResolver resolver = resolverToTest(
-        //         new StubResolver()
-        //     );
-        //     ProxyMethod proxyMethod = proxyMethod(resolver);
-
-        //     assertThrows(
-        //         IllegalArgumentException.class, 
-        //         () -> resolver.resolve(proxyMethod, (String)null)
-        //     );
-
-        //     assertThrows(
-        //         IllegalArgumentException.class, 
-        //         () -> resolver.resolve(proxyMethod, "")
-        //     );
-        // }
-
         @Test
         @DisplayName("should resolve property value from the decorated resolver.")
         void test1() {
@@ -94,11 +60,11 @@ public class CachingResolverTests {
 
             CachingResolver resolver = resolverToTest(decorated);
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
-            Optional<String> result = resolver.resolve(proxyMethod, propertyName);
+            Optional<String> result = resolver.resolve(context, propertyName);
             
             assertNotNull(result);
             assertTrue(result.isPresent());
@@ -117,12 +83,12 @@ public class CachingResolverTests {
             CachingResolver resolver = resolverToTest(
                 new SystemPropertyResolver()
             );
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             // Not in system properties.
-            Optional<String> result = resolver.resolve(proxyMethod, "non.existent");
+            Optional<String> result = resolver.resolve(context, "non.existent");
             
             assertNotNull(result);
             assertFalse(result.isPresent());
@@ -140,11 +106,11 @@ public class CachingResolverTests {
                 cacheStrategy
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
-            Optional<String> result = resolver.resolve(proxyMethod, propertyName);
+            Optional<String> result = resolver.resolve(context, propertyName);
             
             assertNotNull(result);
             assertTrue(result.isPresent());
@@ -166,13 +132,13 @@ public class CachingResolverTests {
                 cacheStrategy
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             // Property is not in system properties.
             Optional<String> result = resolver.resolve(
-                proxyMethod,
+                context,
                 "not.found"
             );
 
@@ -198,12 +164,12 @@ public class CachingResolverTests {
                 cacheStrategy
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property,
                 externalizedProperties(resolver)
             );
             // property.cache is not in system properties but is in the strategy cache.
-            Optional<String> result = resolver.resolve(proxyMethod, propertyName);
+            Optional<String> result = resolver.resolve(context, propertyName);
             
             assertNotNull(result);
             assertTrue(result.isPresent());

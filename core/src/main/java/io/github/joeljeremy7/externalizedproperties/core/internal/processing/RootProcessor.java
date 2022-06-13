@@ -1,10 +1,10 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal.processing;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.ProcessWith;
 import io.github.joeljeremy7.externalizedproperties.core.processing.ProcessingException;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.annotation.Annotation;
@@ -44,19 +44,16 @@ public class RootProcessor implements Processor {
 
     /** {@inheritDoc} */
     @Override
-    public String process(ProxyMethod proxyMethod, String valueToProcess) {
-        requireNonNull(proxyMethod, "proxyMethod");
-        requireNonNull(valueToProcess, "valueToProcess");
-
+    public String process(InvocationContext context, String valueToProcess) {
         String value = valueToProcess;
-        for (Annotation annotation : proxyMethod.annotations()) {
+        for (Annotation annotation : context.method().annotations()) {
             Processor processor = processorByAnnotationType.get(annotation.annotationType());
             if (processor == null) {
                 // Annotation is not a processor annotation i.e. 
                 // not annotated with @ProcessWith.
                 continue;
             }
-            value = processor.process(proxyMethod, value);
+            value = processor.process(context, value);
         }
         return value;
     }
@@ -73,9 +70,7 @@ public class RootProcessor implements Processor {
          * 
          * @param registeredProcessors The registered {@link ProcessorProvider} instances.
          */
-        ProcessorByAnnotationType(
-                Collection<Processor> registeredProcessors
-        ) {
+        ProcessorByAnnotationType(Collection<Processor> registeredProcessors) {
             this.registeredProcessors = registeredProcessors;
         }
 

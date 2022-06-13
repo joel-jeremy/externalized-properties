@@ -2,9 +2,10 @@ package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EnvironmentVariableResolverTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
     
     @Nested
     class ResolveMethod {
@@ -26,13 +27,13 @@ public class EnvironmentVariableResolverTests {
         @DisplayName("should resolve property value from environment variables.")
         void test1() {
             EnvironmentVariableResolver resolver = resolverToTest();
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::path,
                 externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
-                proxyMethod,
+                context,
                 "PATH"
             );
 
@@ -50,13 +51,13 @@ public class EnvironmentVariableResolverTests {
         )
         void test2() {
             EnvironmentVariableResolver resolver = resolverToTest();
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::notFound,
                 externalizedProperties(resolver)
             );
 
             Optional<String> result = resolver.resolve(
-                proxyMethod,
+                context,
                 "not.found"
             );
 
@@ -71,19 +72,19 @@ public class EnvironmentVariableResolverTests {
         )
         void test3() {
             EnvironmentVariableResolver resolver = resolverToTest();
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::javaHome,
                 externalizedProperties(resolver)
             );
 
             Optional<String> result1 = resolver.resolve(
-                proxyMethod,
+                context,
                 // java.home should be converted to JAVA_HOME
                 "java.home"
             );
 
             Optional<String> result2 = resolver.resolve(
-                proxyMethod,
+                context,
                 // java-home should be converted to JAVA_HOME
                 "java-home"  
             );

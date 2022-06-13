@@ -3,8 +3,8 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 import io.github.joeljeremy7.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.CachingInvocationHandler.InvocationCacheKey;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
+import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationCacheKey;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.MethodUtils;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubInvocationHandler;
 import org.junit.jupiter.api.DisplayName;
@@ -120,7 +120,7 @@ public class EagerLoadingInvocationHandlerTests {
                 proxyInterface
             );
 
-            Method proxyMethod = ProxyMethodUtils.getMethod(
+            Method proxyMethod = MethodUtils.getMethod(
                 proxyInterface, 
                 EagerLoadingProxyInterface::propertyWithNoAnnotationButWithDefaultValue
             );
@@ -147,7 +147,7 @@ public class EagerLoadingInvocationHandlerTests {
                 proxyInterface
             );
 
-            Method proxyMethod = ProxyMethodUtils.getMethod(
+            Method proxyMethod = MethodUtils.getMethod(
                 proxyInterface, 
                 NoEagerLoadingProxyInterface::noAnnotation
             );
@@ -174,7 +174,7 @@ public class EagerLoadingInvocationHandlerTests {
                 proxyInterface
             );
 
-            Method proxyMethod = ProxyMethodUtils.getMethod(
+            Method proxyMethod = MethodUtils.getMethod(
                 proxyInterface, 
                 NoEagerLoadingProxyInterface::withParameters
             );
@@ -218,7 +218,7 @@ public class EagerLoadingInvocationHandlerTests {
             Class<EagerLoadingProxyInterface> proxyInterface = 
                 EagerLoadingProxyInterface.class;
 
-            Method proxyMethod = ProxyMethodUtils.getMethod(
+            Method proxyMethod = MethodUtils.getMethod(
                 proxyInterface,
                 EagerLoadingProxyInterface::javaVersion
             );
@@ -265,7 +265,7 @@ public class EagerLoadingInvocationHandlerTests {
             Class<NoEagerLoadingProxyInterface> proxyInterface = 
                 NoEagerLoadingProxyInterface.class;
 
-            Method proxyMethod = ProxyMethodUtils.getMethod(
+            Method proxyMethod = MethodUtils.getMethod(
                 proxyInterface,
                 // This property method will not be eagerly loaded
                 // because it has a parameter.
@@ -310,7 +310,7 @@ public class EagerLoadingInvocationHandlerTests {
             Class<EagerLoadingProxyInterface> proxyInterface = 
                 EagerLoadingProxyInterface.class;
             
-            Method proxyMethod = ProxyMethodUtils.getMethod(
+            Method proxyMethod = MethodUtils.getMethod(
                 proxyInterface,
                 // This property method will not be eagerly loaded
                 // because it has a parameter.
@@ -355,7 +355,7 @@ public class EagerLoadingInvocationHandlerTests {
         }
     }
 
-    static interface EagerLoadingProxyInterface {
+    private static interface EagerLoadingProxyInterface {
         @ExternalizedProperty("java.version")
         String javaVersion();
 
@@ -365,7 +365,7 @@ public class EagerLoadingInvocationHandlerTests {
         }
     }
 
-    static interface NoEagerLoadingProxyInterface {
+    private static interface NoEagerLoadingProxyInterface {
         String noAnnotation();
     
         @ExternalizedProperty("with.parameters")

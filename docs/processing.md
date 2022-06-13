@@ -77,8 +77,8 @@ To create custom processors, you need to:
 ```java
 public class Base64EncodeProcessor implements Processor {
     @Override
-    public String process(ProxyMethod proxyMethod, String valueToProcess) {
-        return base64Encode(proxyMethod, valueToProcess);
+    public String process(InvocationContext context, String valueToProcess) {
+        return base64Encode(context, valueToProcess);
     }
 }
 ```

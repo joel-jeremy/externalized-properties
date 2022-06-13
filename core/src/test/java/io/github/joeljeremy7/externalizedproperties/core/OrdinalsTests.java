@@ -1,11 +1,11 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
 import io.github.joeljeremy7.externalizedproperties.core.Ordinals.Ordinal;
-import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.PrimitiveConverter;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
+import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.IntegerConverter;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubConverter;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubResolver;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OrdinalsTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
 
     @Nested
     class OrdinalResolverMethod {
@@ -392,7 +392,7 @@ public class OrdinalsTests {
                 Resolver ordinalResolver = 
                     Ordinals.ordinalResolver(1, resolver);
 
-                ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                     ProxyInterface::property,
                     externalizedProperties(ordinalResolver)
                 );
@@ -400,7 +400,7 @@ public class OrdinalsTests {
                 String propertyName = "property";
                 
                 Optional<String> result = 
-                    ordinalResolver.resolve(proxyMethod, propertyName);
+                    ordinalResolver.resolve(context, propertyName);
 
                 assertTrue(result.isPresent());
                 assertEquals(
@@ -436,7 +436,7 @@ public class OrdinalsTests {
             @Test
             @DisplayName("should invoke decorated converter")
             void test1() {
-                PrimitiveConverter converter = new PrimitiveConverter();
+                IntegerConverter converter = new IntegerConverter();
                 Converter<?> ordinalConverter = 
                     Ordinals.ordinalConverter(1, converter);
                 
@@ -452,25 +452,23 @@ public class OrdinalsTests {
             @Test
             @DisplayName("should invoke decorated converter")
             void test1() {
-                PrimitiveConverter converter = new PrimitiveConverter();
+                IntegerConverter converter = new IntegerConverter();
                 Converter<?> ordinalConverter = 
                     Ordinals.ordinalConverter(1, converter);
 
-                ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+                InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                     ProxyInterface::intProperty,
                     externalizedProperties(ordinalConverter)
                 );
                 
                 ConversionResult<?> converterResult = ordinalConverter.convert(
-                    proxyMethod, 
-                    "1",
-                    int.class
+                    context, 
+                    "1"
                 );
 
                 ConversionResult<?> ordinalConverterResult = ordinalConverter.convert(
-                    proxyMethod, 
-                    "1",
-                    int.class
+                    context, 
+                    "1"
                 );
 
                 assertEquals(converterResult, ordinalConverterResult);

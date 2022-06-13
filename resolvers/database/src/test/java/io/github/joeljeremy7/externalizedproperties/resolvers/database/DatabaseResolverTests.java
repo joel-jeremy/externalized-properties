@@ -3,9 +3,10 @@ package io.github.joeljeremy7.externalizedproperties.resolvers.database;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import io.github.joeljeremy7.externalizedproperties.resolvers.database.queryexecutors.AbstractNameValueQueryExecutor;
 import io.github.joeljeremy7.externalizedproperties.resolvers.database.queryexecutors.SimpleNameValueQueryExecutor;
 import io.github.joeljeremy7.externalizedproperties.resolvers.database.testentities.H2Utils;
@@ -24,8 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DatabaseResolverTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
 
     private static final int NUMBER_OF_TEST_ENTRIES = 2;
     private static final String H2_CONNECTION_STRING = 
@@ -61,58 +62,19 @@ public class DatabaseResolverTests {
 
     @Nested
     class ResolveMethod {
-        // @Test
-        // @DisplayName("should throw when proxy method argument is null")
-        // void validationTest1() {
-        //     DatabaseResolver databaseResolver = 
-        //         new DatabaseResolver(CONNECTION_PROVIDER);
-
-        //     assertThrows(IllegalArgumentException.class, () -> {
-        //         databaseResolver.resolve(null, "test.property.1");
-        //     });
-        // }
-
-        // @Test
-        // @DisplayName("should throw when propertyName argument is null")
-        // void validationTest2() {
-        //     DatabaseResolver databaseResolver = 
-        //         new DatabaseResolver(CONNECTION_PROVIDER);
-        //     ProxyMethod proxyMethod = proxyMethod(databaseResolver);
-
-        //     assertThrows(IllegalArgumentException.class, () -> {
-        //         databaseResolver.resolve(proxyMethod, (String)null);
-        //     });
-        // }
-
-        // @Test
-        // @DisplayName("should throw when property name argument is blank")
-        // void validationTest3() {
-        //     DatabaseResolver databaseResolver = 
-        //         new DatabaseResolver(CONNECTION_PROVIDER);
-        //     ProxyMethod proxyMethod = proxyMethod(databaseResolver);
-                
-        //     assertThrows(IllegalArgumentException.class, () -> {
-        //         databaseResolver.resolve(proxyMethod, "");
-        //     });
-
-        //     assertThrows(IllegalArgumentException.class, () -> {
-        //         databaseResolver.resolve(proxyMethod, " ");
-        //     });
-        // }
-
         @Test
         @DisplayName("should resolve all properties from database")
         void test1() {
             DatabaseResolver databaseResolver = 
                 new DatabaseResolver(CONNECTION_PROVIDER);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property1,
                 externalizedProperties(databaseResolver)
             );
             
             String propertyName = "test.property.1";
 
-            Optional<String> result = databaseResolver.resolve(proxyMethod, propertyName);
+            Optional<String> result = databaseResolver.resolve(context, propertyName);
             
             assertTrue(result.isPresent());
             assertNotNull(result.get());
@@ -123,14 +85,14 @@ public class DatabaseResolverTests {
         void test2() {
             DatabaseResolver databaseResolver = 
                 new DatabaseResolver(CONNECTION_PROVIDER);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::nonExistentProperty,
                 externalizedProperties(databaseResolver)
             );
 
             String propertyName = "non.existent.property";
 
-            Optional<String> result = databaseResolver.resolve(proxyMethod, propertyName);
+            Optional<String> result = databaseResolver.resolve(context, propertyName);
 
             assertFalse(result.isPresent());
         }
@@ -158,14 +120,14 @@ public class DatabaseResolverTests {
                         }
                     }
                 );
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property1,
                 externalizedProperties(databaseResolver)
             );
 
             String propertyName = "test.property.1";
 
-            Optional<String> result = databaseResolver.resolve(proxyMethod, propertyName);
+            Optional<String> result = databaseResolver.resolve(context, propertyName);
 
             assertTrue(result.isPresent());
             assertNotNull(result.get());
@@ -184,7 +146,7 @@ public class DatabaseResolverTests {
             
             DatabaseResolver databaseResolver = 
                 new DatabaseResolver(invalidConnectionProvider);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property1,
                 externalizedProperties(databaseResolver)
             );
@@ -193,7 +155,7 @@ public class DatabaseResolverTests {
 
             ExternalizedPropertiesException exception = assertThrows(
                 ExternalizedPropertiesException.class, 
-                () -> databaseResolver.resolve(proxyMethod, propertyName)
+                () -> databaseResolver.resolve(context, propertyName)
             );
 
             assertTrue(exception.getCause() instanceof SQLException);

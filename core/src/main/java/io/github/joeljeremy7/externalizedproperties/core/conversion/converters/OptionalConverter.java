@@ -3,9 +3,9 @@ package io.github.joeljeremy7.externalizedproperties.core.conversion.converters;
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterFacade;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
@@ -26,7 +26,7 @@ public class OptionalConverter implements Converter<Optional<?>> {
     /** {@inheritDoc} */
     @Override
     public ConversionResult<Optional<?>> convert(
-            ProxyMethod proxyMethod,
+            InvocationContext context,
             String valueToConvert,
             Type targetType
     ) { 
@@ -52,20 +52,16 @@ public class OptionalConverter implements Converter<Optional<?>> {
         }
 
         return ConversionResult.of(
-            convertToOptionalType(
-                proxyMethod,
-                valueToConvert,
-                targetOptionalType
-            )
+            convertToOptionalType(context, valueToConvert, targetOptionalType)
         );
     }
 
     private Optional<?> convertToOptionalType(
-            ProxyMethod proxyMethod,
+            InvocationContext context,
             String valueToConvert,
             Type optionalGenericTypeParameter
     ) {
-        ConverterProxy rootConverter = proxyMethod.externalizedProperties()
+        ConverterProxy rootConverter = context.externalizedProperties()
             .initialize(ConverterProxy.class);
         
         Object converted = rootConverter.convert(

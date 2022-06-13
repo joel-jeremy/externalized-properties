@@ -3,10 +3,10 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.conversion;
 import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.OptionalConverter;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -30,9 +30,7 @@ public class RootConverter implements Converter<Object> {
      * @param converters The collection of {@link Converter}s to handle the actual conversion.
      */
     public RootConverter(Converter<?>... converters) {
-        this(
-            Arrays.asList(requireNonNull(converters, "converters"))
-        );
+        this(Arrays.asList(requireNonNull(converters, "converters")));
     }
 
     /**
@@ -55,14 +53,10 @@ public class RootConverter implements Converter<Object> {
     /** {@inheritDoc} */
     @Override
     public ConversionResult<Object> convert(
-            ProxyMethod proxyMethod,
+            InvocationContext context,
             String valueToConvert,
             Type targetType
     ) {
-        requireNonNull(proxyMethod, "proxyMethod");
-        requireNonNull(valueToConvert, "valueToConvert");
-        requireNonNull(targetType, "targetType");
-
         // No conversion needed since target type is string.
         Class<?> rawTargetType = TypeUtilities.getRawType(targetType);
         if (String.class.equals(rawTargetType)) {
@@ -74,7 +68,7 @@ public class RootConverter implements Converter<Object> {
         try {
             for (Converter<Object> converter : converters) {
                 ConversionResult<Object> result = converter.convert(
-                    proxyMethod,
+                    context,
                     valueToConvert,
                     targetType
                 );
@@ -128,9 +122,7 @@ public class RootConverter implements Converter<Object> {
          * 
          * @param registeredConverters The registered {@link ConverterProvider} instances.
          */
-        ConvertersByTargetType(
-                Collection<Converter<?>> registeredConverters
-        ) {
+        ConvertersByTargetType(Collection<Converter<?>> registeredConverters) {
             this.registeredConverters = setupOutOfTheBoxConverters(registeredConverters);
         }
 
@@ -170,9 +162,9 @@ public class RootConverter implements Converter<Object> {
                 List<Converter<?>> converters
         ) {
             // Add if no OptionalConverter was explicitly added.
-            if (converters.stream()
-                    .noneMatch(c -> c.canConvertTo(Optional.class))
-            ) {
+            if (converters.stream().noneMatch(c -> 
+                    c.canConvertTo(Optional.class)
+            )) {
                 // Optional conversion is natively supported out of the box.
                 converters.add(new OptionalConverter());
             }

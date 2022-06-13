@@ -39,11 +39,11 @@ tasks.withType(JavaCompile).configureEach { task ->
             'ComparisonContractViolated', 'DepAnn', 'EmptyIf', 'EqualsBrokenForNull',
             'FieldCanBeFinal', 'FieldCanBeLocal', 'FieldCanBeStatic', 'ForEachIterable',
             'FuzzyEqualsShouldNotBeUsedInEqualsMethod', 'FunctionalInterfaceClash',
-            'IterablePathParameter', 'LockMethodChecker', 'LongLiteralLowerCaseSuffix', 'MissingBraces',
-            'MissingDefault', 'MixedArrayDimensions', 'MissingDefault', 'NoAllocation', 'PackageLocation',
-            'PreferredInterfaceType', 'RedundantThrows', 'RemoveUnusedImports', 'ReturnsNullCollection',
-            'StronglyTypeByteString', 'StronglyTypeTime', 'SwitchDefault', 'TimeUnitMismatch',
-            'TransientMisuse', 'UnlockMethod', 'UnnecessarilyVisible', 'UnnecessaryAnonymousClass',
+            'IterablePathParameter', 'LongLiteralLowerCaseSuffix', 'MissingBraces',
+            'MissingDefault', 'MixedArrayDimensions', 'MissingDefault', 'NoAllocation', 
+            'PackageLocation', 'PreferredInterfaceType', 'RedundantThrows', 'RemoveUnusedImports', 
+            'ReturnsNullCollection', 'StronglyTypeByteString', 'StronglyTypeTime', 'SwitchDefault', 
+            'TimeUnitMismatch', 'TransientMisuse', 'UnnecessarilyVisible', 'UnnecessaryAnonymousClass',
             'UnnecessaryOptionalGet', 'UsingJsr305CheckReturnValue'
         ]
         enabledChecks.each { enable(it) }

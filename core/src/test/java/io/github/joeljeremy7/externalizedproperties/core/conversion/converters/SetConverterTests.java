@@ -5,12 +5,13 @@ import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.Delimiter;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.StripEmptyValues;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.SetConverter.SetFactory;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,8 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SetConverterTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
     
     @Nested
     class Constructor {
@@ -51,16 +52,8 @@ public class SetConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return false when target type is null.")
-        void test1() {
-            SetConverter converter = converterToTest();
-            boolean canConvert = converter.canConvertTo(null);
-            assertFalse(canConvert);
-        }
-
-        @Test
         @DisplayName("should return true when target type is a Set class.")
-        void test2() {
+        void test1() {
             SetConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Set.class);
             assertTrue(canConvert);
@@ -68,7 +61,7 @@ public class SetConverterTests {
 
         @Test
         @DisplayName("should return false when target type is not a Set class.")
-        void test4() {
+        void test2() {
             SetConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(String.class);
             assertFalse(canConvert);
@@ -82,13 +75,13 @@ public class SetConverterTests {
         void test1() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setProperty,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value1,value2,value3"
             );
             
@@ -112,13 +105,13 @@ public class SetConverterTests {
         void test2() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setInteger,
                 externalizedProperties(converter)
             );
                 
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "1,2,3",
                 // Override proxy method return type with a raw Set
                 // No generic type parameter
@@ -143,13 +136,13 @@ public class SetConverterTests {
         void test3() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setCustomDelimiter,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value1#value2#value3"
             );
 
@@ -171,16 +164,16 @@ public class SetConverterTests {
         void test4() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setInteger,
                 externalizedProperties(
                     converter,
-                    new PrimitiveConverter()
+                    new IntegerConverter()
                 )
             );
             
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "1,2,3"
             );
             
@@ -204,13 +197,13 @@ public class SetConverterTests {
         void test5() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setPropertyWildcard,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value1,value2,value3"
             );
             
@@ -232,13 +225,13 @@ public class SetConverterTests {
         void test6() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setPropertyObject,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value1,value2,value3"
             );
         
@@ -260,13 +253,13 @@ public class SetConverterTests {
         void test7() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setProperty,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "" // Empty value.
             );
             
@@ -282,13 +275,13 @@ public class SetConverterTests {
         void test8() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setProperty,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value1,value2,value3,,value5" // Has empty values.
             );
         
@@ -312,13 +305,13 @@ public class SetConverterTests {
         void test9() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setPropertyStripEmpty,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value1,,value3,,value5" // Has empty values.
             );
             
@@ -342,7 +335,7 @@ public class SetConverterTests {
         void test10() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setInteger,
                 externalizedProperties(converter)
             );
@@ -350,7 +343,7 @@ public class SetConverterTests {
             // No registered rootConverter for Integer.
             assertThrows(
                 ExternalizedPropertiesException.class,
-                () -> converter.convert(proxyMethod, "1,2,3,4,5")
+                () -> converter.convert(context, "1,2,3,4,5")
             );
         }
 
@@ -362,13 +355,13 @@ public class SetConverterTests {
         void test11() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setPropertyNestedGenerics, // Returns a Set<Optional<String>>.
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value1,value2,value3"
             );
             
@@ -396,7 +389,7 @@ public class SetConverterTests {
         void test12() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setPropertyNestedGenericsArray, // Returns a Set<Optional<String>[]>.
                 externalizedProperties(
                     converter,
@@ -405,7 +398,7 @@ public class SetConverterTests {
             );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value1,value2,value3"
             );
             
@@ -444,14 +437,14 @@ public class SetConverterTests {
         void test13() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setPropertyT,
                 externalizedProperties(converter)
             );
                 
             assertThrows(
                 ConversionException.class, 
-                () -> converter.convert(proxyMethod, "value")
+                () -> converter.convert(context, "value")
             );
         }
 
@@ -462,13 +455,13 @@ public class SetConverterTests {
         void test14() {
             SetConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setProperty,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value1,value1,value1,value1,value5" // There are 4 value1
             );
         
@@ -499,13 +492,13 @@ public class SetConverterTests {
                 capacity -> new CopyOnWriteArraySet<>()
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setProperty,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Set<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value1,value2,value3,value4,value5"
             );
             
@@ -534,7 +527,7 @@ public class SetConverterTests {
                 capacity -> null
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setProperty,
                 externalizedProperties(converter)
             );
@@ -542,7 +535,7 @@ public class SetConverterTests {
             // Throws IllegalStateException if set factory returned null.
             assertThrows(
                 IllegalStateException.class, 
-                () -> converter.convert(proxyMethod, "value1,value2,value3")
+                () -> converter.convert(context, "value1,value2,value3")
             );
         }
         
@@ -558,7 +551,7 @@ public class SetConverterTests {
                 ))
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::setProperty,
                 externalizedProperties(converter)
             );
@@ -566,7 +559,7 @@ public class SetConverterTests {
             // Throws IllegalStateException if set factory returned a populated set.
             assertThrows(
                 IllegalStateException.class, 
-                () -> converter.convert(proxyMethod, "value1,value2,value3")
+                () -> converter.convert(context, "value1,value2,value3")
             );
         }
     }

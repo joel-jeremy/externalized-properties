@@ -2,9 +2,10 @@ package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,8 @@ public class SimpleVariableExpanderTests {
     private static final ExternalizedProperties EXTERNALIZED_PROPERTIES = 
         ExternalizedProperties.builder().defaults().build();
 
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
 
     @Nested
     class Constructor {
@@ -78,17 +79,17 @@ public class SimpleVariableExpanderTests {
         void test1() {
             SimpleVariableExpander variableExpander = variableExpander();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyJavaVersion,
                 EXTERNALIZED_PROPERTIES
             );
 
             String nullResult = variableExpander.expandVariables(
-                proxyMethod, 
+                context, 
                 null
             );
             String emptyResult = variableExpander.expandVariables(
-                proxyMethod, 
+                context, 
                 ""
             );
 
@@ -101,13 +102,13 @@ public class SimpleVariableExpanderTests {
         void test2() {
             SimpleVariableExpander variableExpander = variableExpander();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyJavaVersion,
                 EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
-                proxyMethod, 
+                context,
                 "property-${java.version}"
             );
 
@@ -127,13 +128,13 @@ public class SimpleVariableExpanderTests {
         void test3() {
             SimpleVariableExpander variableExpander = variableExpander();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyMultipleVariables,
                 EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
-                proxyMethod,
+                context,
                 "property-${java.version}-home-${java.home}"
             );
 
@@ -154,13 +155,13 @@ public class SimpleVariableExpanderTests {
         void test4() {
             SimpleVariableExpander variableExpander = variableExpander();
             
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyNoVariables,
                 EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
-                proxyMethod,
+                context,
                 "property-no-variables"
             );
 
@@ -175,7 +176,7 @@ public class SimpleVariableExpanderTests {
         void test5() {
             SimpleVariableExpander variableExpander = variableExpander();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyNonExistent,
                 EXTERNALIZED_PROPERTIES
             );
@@ -183,7 +184,7 @@ public class SimpleVariableExpanderTests {
             assertThrows(
                 VariableExpansionException.class, 
                 () -> variableExpander.expandVariables(
-                    proxyMethod,
+                    context,
                     "property-${non.existent}"
                 )
             );
@@ -197,13 +198,13 @@ public class SimpleVariableExpanderTests {
         void test6() {
             SimpleVariableExpander variableExpander = variableExpander();
             
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyNoVariableName,
                 EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
-                proxyMethod, 
+                context,
                 "test-${}"
             );
 
@@ -218,13 +219,13 @@ public class SimpleVariableExpanderTests {
         void test7() {
             SimpleVariableExpander variableExpander = variableExpander();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::propertyNoVariableSuffix,
                 EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
-                proxyMethod, 
+                context,
                 "test-${variable"
             );
 
@@ -241,13 +242,13 @@ public class SimpleVariableExpanderTests {
                 "]"
             );
             
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::customPrefixSuffix,
                 EXTERNALIZED_PROPERTIES
             );
 
             String result = variableExpander.expandVariables(
-                proxyMethod,
+                context,
                 "property-#[java.version]"
             );
 

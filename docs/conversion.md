@@ -2,6 +2,17 @@
 
 Externalized Properties has powerful support for conversion of values to various types.
 
+## 🌟 Out-of-the-box Conversion Support
+
+By enabling the default converters, you get out-of-the-box conversion support for:
+
+- Primitives
+- Lists / Collections
+- Arrays
+- Sets
+- Enums
+- Date/Time types
+
 ## 🌟 Automatic Property Conversion
 
 Externalized Properties automatically attempts to convert resolved properties to the declared proxy method (non-String) return type. The library will handle the conversion behind the scenes - using the registered [Converter](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Converter.java)s e.g.
@@ -88,14 +99,12 @@ public class MyCustomConverter implements Converter<MyCustomType> {
 
     @Override
     public ConversionResult<MyCustomType> convert(
-            ProxyMethod proxyMethod, 
+            InvocationContext context, 
             String valueToConvert,
-            Type targetType // This is always MyCustomType.class
+            Type targetType
     ) {
         // There is also a ConversionResult.skip() result to skip this converter and move to the next available one.
-        return ConversionResult.of(
-            MyCustomType.valueOf(valueToConvert)
-        );
+        return ConversionResult.of(MyCustomType.valueOf(valueToConvert));
     }
 }
 ```

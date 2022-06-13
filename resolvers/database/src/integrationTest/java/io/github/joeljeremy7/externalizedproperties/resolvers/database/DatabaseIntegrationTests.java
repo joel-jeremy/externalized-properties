@@ -3,9 +3,10 @@ package io.github.joeljeremy7.externalizedproperties.resolvers.database;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import io.github.joeljeremy7.externalizedproperties.resolvers.database.testentities.JdbcUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,8 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class DatabaseIntegrationTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
 
     /**
      * Override if different connection provider is desired.
@@ -63,14 +64,14 @@ public abstract class DatabaseIntegrationTests {
         void test1() {
             DatabaseResolver databaseResolver = 
                 new DatabaseResolver(connectionProvider);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property1,
                 externalizedProperties(databaseResolver)
             );
             
             String propertyName = "test.property.1";
 
-            Optional<String> result = databaseResolver.resolve(proxyMethod, propertyName);
+            Optional<String> result = databaseResolver.resolve(context, propertyName);
             
             assertTrue(result.isPresent());
             assertNotNull(result.get());
@@ -81,14 +82,14 @@ public abstract class DatabaseIntegrationTests {
         void test2() {
             DatabaseResolver databaseResolver = 
                 new DatabaseResolver(connectionProvider);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::nonExistentProperty,
                 externalizedProperties(databaseResolver)
             );
 
             String propertyName = "non.existent.property";
 
-            Optional<String> result = databaseResolver.resolve(proxyMethod, propertyName);
+            Optional<String> result = databaseResolver.resolve(context, propertyName);
 
             assertFalse(result.isPresent());
         }
@@ -106,7 +107,7 @@ public abstract class DatabaseIntegrationTests {
             
             DatabaseResolver databaseResolver = 
                 new DatabaseResolver(invalidConnectionProvider);
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property1,
                 externalizedProperties(databaseResolver)
             );
@@ -115,7 +116,7 @@ public abstract class DatabaseIntegrationTests {
 
             ExternalizedPropertiesException exception = assertThrows(
                 ExternalizedPropertiesException.class, 
-                () -> databaseResolver.resolve(proxyMethod, propertyName)
+                () -> databaseResolver.resolve(context, propertyName)
             );
 
             assertTrue(exception.getCause() instanceof SQLException);

@@ -1,8 +1,8 @@
 package io.github.joeljeremy7.externalizedproperties.core.variableexpansion;
 
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmpty;
 
@@ -34,10 +34,7 @@ public class SimpleVariableExpander implements VariableExpander {
      * @param variablePrefix The variable prefix to look for when expanding variables.
      * @param variableSuffix The variable suffix to look for when expanding variables.
      */
-    public SimpleVariableExpander(
-            String variablePrefix,
-            String variableSuffix
-    ) {
+    public SimpleVariableExpander(String variablePrefix, String variableSuffix) {
         this.variablePrefix = requireNonNullOrEmpty(
             variablePrefix, 
             "variablePrefix"
@@ -50,13 +47,13 @@ public class SimpleVariableExpander implements VariableExpander {
 
     /** {@inheritDoc} */
     @Override
-    public String expandVariables(ProxyMethod proxyMethod, String value) {
-        if (value == null || value.isEmpty()) {
+    public String expandVariables(InvocationContext context, String value) {
+        if (value == null || value.isEmpty() || value.indexOf(variablePrefix) == -1) {
             return value;
         }
 
         try {
-            return expandVariables(proxyMethod, new StringBuilder(value)).toString();
+            return expandVariables(context, new StringBuilder(value)).toString();
         } catch (RuntimeException ex) {
             throw new VariableExpansionException(
                 "Exception occurred while trying to expand value: " + value,
@@ -65,7 +62,7 @@ public class SimpleVariableExpander implements VariableExpander {
         }
     }
 
-    private StringBuilder expandVariables(ProxyMethod proxyMethod, StringBuilder builder) {
+    private StringBuilder expandVariables(InvocationContext context, StringBuilder builder) {
         int startIndex = builder.indexOf(variablePrefix);
         if (startIndex == -1) {
             return builder;
@@ -81,15 +78,15 @@ public class SimpleVariableExpander implements VariableExpander {
 
         String variableName = builder.substring(variableNameStartIndex, variableNameEndIndex);
 
-        String variableValue = resolvePropertyValueOrThrow(proxyMethod, variableName);
+        String variableValue = resolvePropertyValueOrThrow(context, variableName);
 
         builder.replace(startIndex, variableNameEndIndex + 1, variableValue);
 
-        return expandVariables(proxyMethod, builder);
+        return expandVariables(context, builder);
     }
 
-    private String resolvePropertyValueOrThrow(ProxyMethod proxyMethod, String variableName) {
-        ResolverProxy resolverProxy = proxyMethod.externalizedProperties()
+    private String resolvePropertyValueOrThrow(InvocationContext context, String variableName) {
+        ResolverProxy resolverProxy = context.externalizedProperties()
             .initialize(ResolverProxy.class);
         
         try {

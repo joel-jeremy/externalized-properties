@@ -2,49 +2,42 @@ package io.github.joeljeremy7.externalizedproperties.core.internal;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.ProxyMethodUtils;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ExternalizedPropertyNameTests {
     private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
         ExternalizedProperties.builder().build();
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
     
     @Nested
-    class FromProxyMethodInvocationMethods {
+    class FromInvocationContextMethod {
         @Test
         @DisplayName("should return the proxy method @ExternalizedProperty value")
-        void proxyMethodOverloadTest1() {
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+        void test1() {
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::property, 
                 EXTERNALIZED_PROPERTIES
             );
             
-            Optional<String> name = ExternalizedPropertyName.fromProxyMethodInvocation(
-                proxyMethod, 
-                new Object[0]
-            );
+            String name = ExternalizedPropertyName.fromInvocationContext(context);
 
-            assertTrue(name.isPresent());
+            assertNotNull(name);
             assertEquals(
-                proxyMethod.findAnnotation(ExternalizedProperty.class)
+                context.method().findAnnotation(ExternalizedProperty.class)
                     .map(ExternalizedProperty::value)
                     .orElse(null),
-                name.get()
+                name
             );
         }
 
@@ -53,23 +46,18 @@ public class ExternalizedPropertyNameTests {
             "should derive property name from proxy method invocation args value " + 
             "when proxy method is annotated with @ResolverFacade"
         )
-        void proxyMethodOverloadTest2() {
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+        void test2() {
+            String propertyNameArg = "property";
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::resolve, 
+                propertyNameArg,
                 EXTERNALIZED_PROPERTIES
             );
             
-            String propertyNameArg = "property";
-            Optional<String> name = ExternalizedPropertyName.fromProxyMethodInvocation(
-                proxyMethod, 
-                new Object[] { propertyNameArg }
-            );
+            String name = ExternalizedPropertyName.fromInvocationContext(context);
 
-            assertTrue(name.isPresent());
-            assertEquals(
-                propertyNameArg,
-                name.get()
-            );
+            assertNotNull(name);
+            assertEquals(propertyNameArg, name);
         }
 
         @Test
@@ -77,18 +65,16 @@ public class ExternalizedPropertyNameTests {
             "should throw when proxy method is annotated with @ResolverFacade and there " + 
             "is no property name provided via proxy method invocation args"
         )
-        void proxyMethodOverloadTest3() {
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+        void test3() {
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::resolve, 
+                null, // No property name invocation arguments
                 EXTERNALIZED_PROPERTIES
             );
             
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> ExternalizedPropertyName.fromProxyMethodInvocation(
-                    proxyMethod, 
-                    new Object[0] // No property name invocation arguments
-                )
+                () -> ExternalizedPropertyName.fromInvocationContext(context)
             );
         }
 
@@ -97,157 +83,44 @@ public class ExternalizedPropertyNameTests {
             "should throw when proxy method is annotated with @ResolverFacade and the " + 
             "property name provided via proxy method invocation args is null"
         )
-        void proxyMethodOverloadTest4() {
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+        void test4() {
+            InvocationContext nullPropertyNameContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::resolve, 
+                null, // Null property name in invocation arguments
                 EXTERNALIZED_PROPERTIES
             );
             
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> ExternalizedPropertyName.fromProxyMethodInvocation(
-                    proxyMethod, 
-                    new Object[] { null } // Null property name in invocation arguments
-                )
+                () -> ExternalizedPropertyName.fromInvocationContext(nullPropertyNameContext)
+            );
+
+            InvocationContext emptyPropertyNameContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
+                ProxyInterface::resolve, 
+                "", // Empty property name in invocation arguments
+                EXTERNALIZED_PROPERTIES
             );
             
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> ExternalizedPropertyName.fromProxyMethodInvocation(
-                    proxyMethod, 
-                    new Object[] { "" } // Empty property name in invocation arguments
-                )
+                () -> ExternalizedPropertyName.fromInvocationContext(emptyPropertyNameContext)
             );
         }
 
         @Test
         @DisplayName(
-            "should return empty Optional when proxy method is neither annotated with " +
+            "should return method name when proxy method is neither annotated with " +
             "@ExternalizedProperty nor @ResolverFacade"
         )
-        void proxyMethodOverloadTest5() {
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+        void test5() {
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::noAnnotation, 
                 EXTERNALIZED_PROPERTIES
             );
             
-            Optional<String> name = ExternalizedPropertyName.fromProxyMethodInvocation(
-                proxyMethod, 
-                new Object[0]
-            );
+            String name = ExternalizedPropertyName.fromInvocationContext(context);
             
-            assertFalse(name.isPresent());
-        }
-
-        @Test
-        @DisplayName("should return the proxy method @ExternalizedProperty value")
-        void methodOverloadTest1() {
-            Method proxyMethod = ProxyMethodUtils.getMethod(
-                ProxyInterface.class,
-                ProxyInterface::property
-            );
-            
-            Optional<String> name = ExternalizedPropertyName.fromProxyMethodInvocation(
-                proxyMethod, 
-                new Object[0]
-            );
-
-            assertTrue(name.isPresent());
-            assertEquals(
-                proxyMethod.getAnnotation(ExternalizedProperty.class).value(),
-                name.get()
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should derive property name from proxy method invocation args value " + 
-            "when proxy method is annotated with @ResolverFacade"
-        )
-        void methodOverloadTest2() {
-            Method proxyMethod = ProxyMethodUtils.getMethod(
-                ProxyInterface.class,
-                ProxyInterface::resolve
-            );
-            
-            String propertyNameArg = "property";
-            Optional<String> name = ExternalizedPropertyName.fromProxyMethodInvocation(
-                proxyMethod, 
-                new Object[] { propertyNameArg }
-            );
-
-            assertTrue(name.isPresent());
-            assertEquals(
-                propertyNameArg,
-                name.get()
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should throw when proxy method is annotated with @ResolverFacade and there " + 
-            "is no property name provided via proxy method invocation args"
-        )
-        void methodOverloadTest3() {
-            Method proxyMethod = ProxyMethodUtils.getMethod(
-                ProxyInterface.class,
-                ProxyInterface::resolve
-            );
-            
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> ExternalizedPropertyName.fromProxyMethodInvocation(
-                    proxyMethod, 
-                    new Object[0] // No property name invocation arguments
-                )
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should throw when proxy method is annotated with @ResolverFacade and the " + 
-            "property name provided via proxy method invocation args is null"
-        )
-        void methodOverloadTest4() {
-            Method proxyMethod = ProxyMethodUtils.getMethod(
-                ProxyInterface.class,
-                ProxyInterface::resolve
-            );
-            
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> ExternalizedPropertyName.fromProxyMethodInvocation(
-                    proxyMethod, 
-                    new Object[] { null } // Null property name in invocation arguments
-                )
-            );
-            
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> ExternalizedPropertyName.fromProxyMethodInvocation(
-                    proxyMethod, 
-                    new Object[] { "" } // Empty property name in invocation arguments
-                )
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should return empty Optional when proxy method is neither annotated with " +
-            "@ExternalizedProperty nor @ResolverFacade"
-        )
-        void methodOverloadTest5() {
-            Method proxyMethod = ProxyMethodUtils.getMethod(
-                ProxyInterface.class,
-                ProxyInterface::noAnnotation
-            );
-            
-            Optional<String> name = ExternalizedPropertyName.fromProxyMethodInvocation(
-                proxyMethod, 
-                new Object[0]
-            );
-
-            assertFalse(name.isPresent());
+            assertEquals(context.method().name(), name);
         }
     }
 

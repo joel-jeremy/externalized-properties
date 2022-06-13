@@ -4,9 +4,10 @@ import io.github.joeljeremy7.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.ConversionException;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,22 +25,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OptionalConverterTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
 
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return false when target type is null.")
-        void test1() {
-            OptionalConverter converter = converterToTest();
-            boolean canConvert = converter.canConvertTo(null);
-            assertFalse(canConvert);
-        }
-
-        @Test
         @DisplayName("should return true when target type is an Optional class.")
-        void test2() {
+        void test1() {
             OptionalConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Optional.class);
             assertTrue(canConvert);
@@ -47,7 +40,7 @@ public class OptionalConverterTests {
 
         @Test
         @DisplayName("should return false when target type is not an Optional class.")
-        void test3() {
+        void test2() {
             OptionalConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(String.class);
             assertFalse(canConvert);
@@ -61,13 +54,13 @@ public class OptionalConverterTests {
         void test1() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::optionalProperty,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value"
             );
 
@@ -87,13 +80,13 @@ public class OptionalConverterTests {
         void test2() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::nonStringOptionalProperty,
-                externalizedProperties(converter, new PrimitiveConverter())
+                externalizedProperties(converter, new IntegerConverter())
             );
             
             ConversionResult<? extends Optional<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "1"
             );
 
@@ -114,13 +107,13 @@ public class OptionalConverterTests {
         void test3() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::nonStringOptionalProperty,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "1",
                 // Override proxy method return type with a raw Optional
                 // No generic type parameter
@@ -142,13 +135,13 @@ public class OptionalConverterTests {
         void test4() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::optionalPropertyObject,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value"
             );
             
@@ -168,13 +161,13 @@ public class OptionalConverterTests {
         void test5() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::optionalPropertyWildcard,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value"
             );
             
@@ -192,14 +185,14 @@ public class OptionalConverterTests {
         void test6() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::optionalPropertyT,
                 externalizedProperties(converter)
             );
                 
             assertThrows(
                 ConversionException.class, 
-                () -> converter.convert(proxyMethod, "value")
+                () -> converter.convert(context, "value")
             );
         }
 
@@ -211,13 +204,13 @@ public class OptionalConverterTests {
         void test7() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::optionalPropertyNestedGenerics,
                 externalizedProperties(converter, new ListConverter())
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value1,value2,value3"
             );
             
@@ -241,13 +234,13 @@ public class OptionalConverterTests {
         void test8() {
             OptionalConverter converter = converterToTest();
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::optionalPropertyNestedGenericsArray,
                 externalizedProperties(converter, new ArrayConverter())
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "value1,value2,value3"
             );
             
@@ -275,13 +268,13 @@ public class OptionalConverterTests {
         void test9() {
             OptionalConverter converter = converterToTest();
             
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::optionalProperty,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
-                proxyMethod,
+                context,
                 "" // Empty.
             );
             

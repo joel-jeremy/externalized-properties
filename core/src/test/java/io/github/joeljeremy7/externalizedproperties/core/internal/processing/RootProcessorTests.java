@@ -2,15 +2,16 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.processing;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Processor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.Decrypt;
 import io.github.joeljeremy7.externalizedproperties.core.processing.ProcessingException;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.Decryptor;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.JceDecryptor;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.testentities.EncryptionUtils;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.TestProxyMethodFactory;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
+import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,8 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RootProcessorTests {
-    private static final TestProxyMethodFactory<ProxyInterface> PROXY_METHOD_FACTORY =
-        new TestProxyMethodFactory<>(ProxyInterface.class);
+    private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+        InvocationContextUtils.testFactory(ProxyInterface.class);
     
     @Nested
     class Constructor {
@@ -57,44 +58,43 @@ public class RootProcessorTests {
 
     @Nested
     class ProcessMethod {
+        // @Test
+        // @DisplayName("should throw when proxy method argument is null")
+        // void test1() {
+        //     RootProcessor processor = rootProcessor();
+
+        //     assertThrows(
+        //         IllegalArgumentException.class, 
+        //         () -> processor.process(null, "valueToProcess")
+        //     );
+        // }
+
+        // @Test
+        // @DisplayName("should throw when context argument is null")
+        // void test2() {
+        //     RootProcessor processor = rootProcessor(
+        //         new DecryptProcessor(createAesDecryptor())
+        //     );
+
+        //     InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
+        //         ProxyInterface::decrypt,
+        //         externalizedProperties(processor)
+        //     );
+
+        //     assertThrows(
+        //         IllegalArgumentException.class, 
+        //         () -> processor.process(context, null)
+        //     );
+        // }
+
         @Test
-        @DisplayName("should throw when proxy method argument is null")
+        @DisplayName("should process property using configured processor")
         void test1() {
-            RootProcessor processor = rootProcessor();
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> processor.process(null, "valueToProcess")
-            );
-        }
-        @Test
-        @DisplayName("should throw when context argument is null")
-        void test2() {
             RootProcessor processor = rootProcessor(
                 new DecryptProcessor(createAesDecryptor())
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
-                ProxyInterface::decrypt,
-                externalizedProperties(processor)
-            );
-
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> processor.process(proxyMethod, null)
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should process property using configured processor classes"
-        )
-        void test3() {
-            RootProcessor processor = rootProcessor(
-                new DecryptProcessor(createAesDecryptor())
-            );
-
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::decrypt,
                 externalizedProperties(processor)
             );
@@ -103,7 +103,7 @@ public class RootProcessorTests {
             String encryptedBase64Encoded = EncryptionUtils.encryptAesBase64(plainText);
 
             String result = processor.process(
-                proxyMethod, 
+                context, 
                 encryptedBase64Encoded
             );
 
@@ -111,23 +111,21 @@ public class RootProcessorTests {
         }
 
         @Test
-        @DisplayName(
-            "should when required processor class is not configured"
-        )
-        void test4() {
+        @DisplayName("should throw when required processor is not registered")
+        void test2() {
             Processor stubProcessor = new Processor() {
                 @Override
-                public String process(ProxyMethod proxyMethod, String valueToProcess) {
+                public String process(InvocationContext context, String valueToProcess) {
                     return valueToProcess;
                 }
             };
 
             RootProcessor processor = rootProcessor(
                 stubProcessor
-                // Base64Decode processor not configured.
+                // Base64Decode processor not registered.
             );
 
-            ProxyMethod proxyMethod = PROXY_METHOD_FACTORY.fromMethodReference(
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::decrypt,
                 externalizedProperties(processor)
             );
@@ -137,7 +135,7 @@ public class RootProcessorTests {
 
             assertThrows(
                 ProcessingException.class, 
-                () -> processor.process(proxyMethod, encryptedBase64Encoded))
+                () -> processor.process(context, encryptedBase64Encoded))
             ;
         }
     }
