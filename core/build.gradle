@@ -13,7 +13,7 @@ jar {
 dependencies {
     // For testing different resource formats in ResourceResolver.
     testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
-    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.2'
+    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.3'
     testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.2'
     // For testing custom JCE providers with DecryptProcessor.JceDecryptor.
     testImplementation 'org.bouncycastle:bcprov-jdk18on:1.71'
