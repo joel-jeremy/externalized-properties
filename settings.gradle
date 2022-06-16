@@ -7,6 +7,7 @@ pluginManagement {
         id 'me.champeau.jmh' version "${jmhPluginVersion}"
         id 'net.ltgt.errorprone' version "${errorPronePluginVersion}"
         id 'net.ltgt.nullaway' version "${nullawayPluginVersion}"
+        id 'com.github.ben-manes.versions' version "${versionsPluginVersion}"
     }
 }
 

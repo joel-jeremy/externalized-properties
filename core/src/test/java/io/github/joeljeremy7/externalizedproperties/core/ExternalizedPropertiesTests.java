@@ -1,5 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties.ProfileConfigurator;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubConverter;
@@ -675,7 +676,7 @@ public class ExternalizedPropertiesTests {
     }
 
     @Nested
-    class ProfileConfigurationTests {
+    class ProfilesConfigurationTests {
         @Nested
         class ApplyMethod {
             @Test
@@ -684,7 +685,24 @@ public class ExternalizedPropertiesTests {
                 assertThrows(
                     IllegalArgumentException.class, 
                     () -> ExternalizedProperties.builder()
-                        .onProfiles().apply(null)
+                        .onProfiles().apply(
+                            (ProfileConfigurator[])null
+                        )
+                );
+            }
+
+            @Test
+            @DisplayName(
+                "should throw when profile configurator argument contains null elements"
+            )
+            void test2() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> ExternalizedProperties.builder()
+                        .onProfiles().apply(
+                            (activeProfile, builder) -> {},
+                            null // Not allowed
+                        )
                 );
             }
         }

@@ -15,6 +15,10 @@ dependencies {
     compileOnly "org.checkerframework:checker-qual:${versions.checkerframework}"
 }
 
+jacoco {
+    toolVersion = "${versions.jacoco}"
+}
+
 jacocoTestCoverageVerification { 
     violationRules { 
         rule { 
