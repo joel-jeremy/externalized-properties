@@ -644,12 +644,10 @@ public class ExternalizedPropertiesTests {
             @Test
             @DisplayName("should cache initialized proxies")
             void test1() {
-                Map<String, String> testProps = testProperties();
-
                 ExternalizedProperties externalizedProperties = 
                     ExternalizedProperties.builder()
                         .enableInitializeCaching()
-                        .resolvers(new MapResolver(testProps))
+                        .enableDefaultResolvers()
                         .build();
 
                 ProxyInterface proxy1 = 
@@ -659,6 +657,28 @@ public class ExternalizedPropertiesTests {
 
                 // Same instance.
                 assertSame(proxy1, proxy2);
+            }
+        }
+
+        @Nested
+        class EnableResolvedPropertyExpansionMethod {
+            @Test
+            @DisplayName("should expand variables in resolved properties")
+            void test1() {
+                Map<String, String> testProps = testProperties();
+
+                ExternalizedProperties externalizedProperties = 
+                    ExternalizedProperties.builder()
+                        .enableResolvedPropertyExpansion()
+                        .resolvers(new MapResolver(testProps))
+                        .build();
+
+                ProxyInterface proxy = 
+                    externalizedProperties.initialize(ProxyInterface.class);
+
+                String resolved = proxy.propertyWithVariableValue();
+
+                assertEquals(proxy.propertyVariable(), resolved);
             }
         }
 
@@ -914,6 +934,8 @@ public class ExternalizedPropertiesTests {
         props.put("property.monthday", MonthDay.now().toString());
         props.put("property.year", Year.now().toString());
         props.put("property.yearmonth", YearMonth.now().toString());
+        props.put("property.with.variable.value", "${property.variable}");
+        props.put("property.variable", "property-variable-value");
         return props;
     }
 
@@ -1046,6 +1068,12 @@ public class ExternalizedPropertiesTests {
     
         @ExternalizedProperty("property.yearmonth")
         YearMonth yearMonth();
+
+        @ExternalizedProperty("property.with.variable.value")
+        String propertyWithVariableValue();
+
+        @ExternalizedProperty("property.variable")
+        String propertyVariable();
     }
 
     public static interface EagerLoadingProxyInterface {

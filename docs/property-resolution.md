@@ -65,36 +65,36 @@ public class App {
     public static void main(String[] args) throws IOException {
         ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
             .resolvers(
-                propertiesConfigFile(),
-                yamlConfigFile(),
-                jsonConfigFile(),
-                xmlConfigFile()
+                propertiesFileResolver(),
+                yamlFileResolver(),
+                jsonFileResolver(),
+                xmlFileResolver()
             )
             .build();
     }
 
-    private static ResourceResolver propertiesConfigFile() throws IOException {
+    private static ResourceResolver propertiesFileResolver() throws IOException {
         // By default, ResourceResolver expects the resource to be in properties format.
         return ResourceResolver.fromUrl(
             App.class.getResource("/properties-sample/application.properties")
         );
     }
 
-    private static ResourceResolver yamlConfigFile() throws IOException {
+    private static ResourceResolver yamlFileResolver() throws IOException {
         return ResourceResolver.fromUrl(
             App.class.getResource("/yaml-sample/application.yaml"),
             new YamlReader()
         );
     }
 
-    private static ResourceResolver jsonConfigFile() throws IOException {
+    private static ResourceResolver jsonFileResolver() throws IOException {
         return ResourceResolver.fromUrl(
             App.class.getResource("/json-sample/application.json"),
             new JsonReader()
         );
     }
 
-    private static ResourceResolver xmlConfigFile() throws IOException {
+    private static ResourceResolver xmlFileResolver() throws IOException {
         return ResourceResolver.fromUrl(
             App.class.getResource("/xml-sample/application.xml"),
             new XmlReader()

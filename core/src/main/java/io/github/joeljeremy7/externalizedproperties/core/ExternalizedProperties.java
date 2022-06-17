@@ -15,6 +15,7 @@ import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.External
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.DefaultResolver;
+import io.github.joeljeremy7.externalizedproperties.core.resolvers.VariableExpandingResolver;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.NoOpVariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 
@@ -107,6 +108,7 @@ public interface ExternalizedProperties {
         // Default settings.
         private boolean enableDefaultResolvers = false;
         private boolean enableDefaultConverters = false;
+        private boolean enableResolvedPropertyExpansion = false;
 
         /**
          * Private constructor.
@@ -154,6 +156,13 @@ public interface ExternalizedProperties {
         @Override
         public Builder enableEagerLoading() {
             this.enableEagerLoading = true;
+            return this;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Builder enableResolvedPropertyExpansion() {
+            this.enableResolvedPropertyExpansion = true;
             return this;
         }
 
@@ -329,7 +338,7 @@ public interface ExternalizedProperties {
             return factory;
         }
 
-        private RootResolver buildRootResolver(
+        private Resolver buildRootResolver(
                 List<Resolver> resolvers,
                 List<Processor> processors
         ) {
@@ -339,10 +348,16 @@ public interface ExternalizedProperties {
                 resolvers(new DefaultResolver());
             }
 
-            return new RootResolver(
+            Resolver rootResolver = new RootResolver(
                 Ordinals.sortResolvers(resolvers), 
                 buildRootProcessor(processors)
             );
+
+            if (enableResolvedPropertyExpansion) {
+                rootResolver = new VariableExpandingResolver(rootResolver);
+            }
+            
+            return rootResolver;
         }
 
         private RootConverter buildRootConverter(List<Converter<?>> converters) {
@@ -450,6 +465,13 @@ public interface ExternalizedProperties {
          * @return This builder.
          */
         BuilderConfiguration enableEagerLoading();
+
+        /**
+         * Expand variables in resolved properties.
+         * 
+         * @return This builder.
+         */
+        BuilderConfiguration enableResolvedPropertyExpansion();
 
         /**
          * Sets the global cache duration.
