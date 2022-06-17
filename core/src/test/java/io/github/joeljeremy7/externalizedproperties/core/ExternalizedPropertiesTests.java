@@ -672,15 +672,30 @@ public class ExternalizedPropertiesTests {
                     () -> ExternalizedProperties.builder().onProfiles((String[])null)
                 );
             }
+
+            @Test
+            @DisplayName(
+                "should throw when profiles varargs argument contains null elements"
+            )
+            void test2() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> ExternalizedProperties.builder().onProfiles(
+                        "test",
+                        "staging",
+                        null
+                    )
+                );
+            }
         }
     }
 
     @Nested
-    class ProfilesConfigurationTests {
+    class ProfilesBuilderTests {
         @Nested
         class ApplyMethod {
             @Test
-            @DisplayName("should throw when profile configurator argument is null")
+            @DisplayName("should throw when profile configurators argument is null")
             void test1() {
                 assertThrows(
                     IllegalArgumentException.class, 
@@ -693,7 +708,7 @@ public class ExternalizedPropertiesTests {
 
             @Test
             @DisplayName(
-                "should throw when profile configurator argument contains null elements"
+                "should throw when profile configurators argument contains null elements"
             )
             void test2() {
                 assertThrows(
@@ -703,6 +718,18 @@ public class ExternalizedPropertiesTests {
                             (activeProfile, builder) -> {},
                             null // Not allowed
                         )
+                );
+            }
+
+            @Test
+            @DisplayName(
+                "should throw when profile configurators argument is empty"
+            )
+            void test3() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> ExternalizedProperties.builder()
+                        .onProfiles().apply()
                 );
             }
         }
