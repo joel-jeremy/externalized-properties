@@ -62,6 +62,7 @@ module foo.bar {
 ✨ Proxy Interface Property Mapping (via [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java))  
 ✨ Default/Fallback Values  
 ✨ Non-Static/Dynamic Property Names (via [@ResolverFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
+✨ Support for Various Configuration File/Resource Formats
 ✨ Caching  
 ✨ Eager Loading  
 ✨ Automatic Cache Reload  
