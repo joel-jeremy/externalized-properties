@@ -3,7 +3,7 @@ description = 'Externalized Properties Database Resolver'
 dependencies {
     implementation project(':core')
     testImplementation(testFixtures(project(":core")))
-    testImplementation 'com.h2database:h2:2.1.210'
+    testImplementation 'com.h2database:h2:2.1.214'
 }
 
 jar {
