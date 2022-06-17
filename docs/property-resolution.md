@@ -144,7 +144,7 @@ private class XmlReader implements ResourceReader {
 
 ## 🌟 Caching
 
-Caching is enabled by default, but when not using defaults, it can be enabled via the [@ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder. All proxies created by the resulting [@ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) instance will cache resolved properties.
+Caching is enabled by default, but when not using defaults, it can be enabled via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder. All proxies created by the resulting [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) instance will cache resolved properties.
 
 ```java
 public static void main(String[] args) {
@@ -165,7 +165,7 @@ public static void main(String[] args) {
 
 ## 🌟 Eager Loading
 
-Eager loading is opt-in and can be enabled via the [@ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder. All proxies created by the resulting [@ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) instance will eagerly load properties on initialization.
+Eager loading is opt-in and can be enabled via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder. All proxies created by the resulting [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) instance will eagerly load properties on initialization.
 
 ```java
 private static void main(String[] args) {
