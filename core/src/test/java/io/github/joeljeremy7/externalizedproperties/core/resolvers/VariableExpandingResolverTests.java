@@ -84,7 +84,7 @@ public class VariableExpandingResolverTests {
     
     private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
         return ExternalizedProperties.builder()
-            .enableResolvedPropertyExpansion()
+            .enableVariableExpansionInProperties()
             .resolvers(resolvers).build();
     }
 

@@ -161,7 +161,7 @@ public interface ExternalizedProperties {
 
         /** {@inheritDoc} */
         @Override
-        public Builder enableResolvedPropertyExpansion() {
+        public Builder enableVariableExpansionInProperties() {
             this.enableResolvedPropertyExpansion = true;
             return this;
         }
@@ -223,9 +223,9 @@ public interface ExternalizedProperties {
         }
 
         /**
-         * Build the {@link SystemExternalizedProperties} instance.
+         * Build the {@link ExternalizedProperties} instance.
          * 
-         * @return The built {@link SystemExternalizedProperties} instance.
+         * @return The built {@link ExternalizedProperties} instance.
          */
         public ExternalizedProperties build() {
             applyActiveProfileConfigurations();
@@ -471,7 +471,7 @@ public interface ExternalizedProperties {
          * 
          * @return This builder.
          */
-        BuilderConfiguration enableResolvedPropertyExpansion();
+        BuilderConfiguration enableVariableExpansionInProperties();
 
         /**
          * Sets the global cache duration.

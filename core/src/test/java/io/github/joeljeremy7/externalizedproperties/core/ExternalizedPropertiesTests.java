@@ -661,7 +661,7 @@ public class ExternalizedPropertiesTests {
         }
 
         @Nested
-        class EnableResolvedPropertyExpansionMethod {
+        class EnableVariableExpansionInPropertiesMethod {
             @Test
             @DisplayName("should expand variables in resolved properties")
             void test1() {
@@ -669,7 +669,7 @@ public class ExternalizedPropertiesTests {
 
                 ExternalizedProperties externalizedProperties = 
                     ExternalizedProperties.builder()
-                        .enableResolvedPropertyExpansion()
+                        .enableVariableExpansionInProperties()
                         .resolvers(new MapResolver(testProps))
                         .build();
 
