@@ -108,7 +108,7 @@ public interface ExternalizedProperties {
         // Default settings.
         private boolean enableDefaultResolvers = false;
         private boolean enableDefaultConverters = false;
-        private boolean enableResolvedPropertyExpansion = false;
+        private boolean enableVariableExpansionInProperties = false;
 
         /**
          * Private constructor.
@@ -162,7 +162,7 @@ public interface ExternalizedProperties {
         /** {@inheritDoc} */
         @Override
         public Builder enableVariableExpansionInProperties() {
-            this.enableResolvedPropertyExpansion = true;
+            this.enableVariableExpansionInProperties = true;
             return this;
         }
 
@@ -353,7 +353,7 @@ public interface ExternalizedProperties {
                 buildRootProcessor(processors)
             );
 
-            if (enableResolvedPropertyExpansion) {
+            if (enableVariableExpansionInProperties) {
                 rootResolver = new VariableExpandingResolver(rootResolver);
             }
             
