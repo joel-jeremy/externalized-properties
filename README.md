@@ -71,13 +71,13 @@ module foo.bar {
 
 ✨ Automatic Property Conversion  
 ✨ Generic Type Conversion  
-✨ Dynamic Value Conversion (via [@ConverterFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java))
+✨ Conversion of Arbitrary Values (via [@ConverterFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java))
 
 ### 🔗 [Variable Expansion](docs/variable-expansion.md)
 
 ✨ Automatic Variable Expansion in Property Names  
 ✨ Automatic Variable Expansion in Properties  
-✨ Dynamic Variable Expansion (via [@VariableExpanderFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
+✨ Variable Expansion in Arbitrary Values (via [@VariableExpanderFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
 
 ### 🔗 [Processing](docs/processing.md)
 

@@ -44,7 +44,9 @@ public interface ApplicationProperties {
 
 ## 🌟 Non-static/Dynamic Property Names (via [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
 
-Externalized Properties supports resolution of properties whose names are not known at compile time e.g.
+Externalized Properties supports resolution of properties whose names are not known at compile time. This is made possible by the [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java) annotation e.g.
+
+(Kindly see [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java) documentation to learn more about the rules of defining a resolver facade.)
 
 ```java
 public interface ApplicationProperties {
