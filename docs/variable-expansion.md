@@ -40,9 +40,9 @@ Built-in variable expander implementations:
 - [PatternVariableExpander](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/variableexpansion/PatternVariableExpander.java) - Uses a regex to match variables.
 - [NoOpVariableExpander](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/variableexpansion/NoOpVariableExpander.java) - Disables variable expansion.
 
-## ✨ Automatic Variable Expansion in Resolved Properties
+## ✨ Automatic Variable Expansion in Properties
 
-Variable expansion is supported in resolved properties. This can be enabled via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
+Variable expansion is supported in properties. This can be enabled via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
 
 ```java
 public interface ApplicationProperties {
@@ -60,7 +60,7 @@ my.property=${variable}
 ```java
 public static void main(String[] args) {
     ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .enableResolvedPropertyExpansion()
+        .enableVariableExpansionInProperties()
         .resolvers(applicationPropertiesResolver())
         .build();
     
