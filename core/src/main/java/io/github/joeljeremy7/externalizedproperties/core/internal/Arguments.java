@@ -80,7 +80,7 @@ public class Arguments {
     }
 
     /**
-     * Require array argument have no {@code null} elements.
+     * Require array argument to have no {@code null} elements.
      * 
      * @param <T> The type of the array argument.
      * @param arg The array argument.

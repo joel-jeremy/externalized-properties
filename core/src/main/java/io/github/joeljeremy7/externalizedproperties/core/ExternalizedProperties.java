@@ -15,6 +15,7 @@ import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.External
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.DefaultResolver;
+import io.github.joeljeremy7.externalizedproperties.core.resolvers.VariableExpandingResolver;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.NoOpVariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 
@@ -91,9 +92,8 @@ public interface ExternalizedProperties {
     /**
      * Builder for {@link ExternalizedProperties}.
      */
-    public static class Builder implements BuilderConfiguration {
-        private final List<ProfileConfiguration> profileConfigurations =
-            new ArrayList<>();
+    static class Builder implements BuilderConfiguration {
+        private final List<ProfilesBuilder> profilesBuilders = new ArrayList<>();
         private final List<Resolver> resolvers = new ArrayList<>();
         private final List<Processor> processors = new ArrayList<>();
         private final List<Converter<?>> converters = new ArrayList<>();
@@ -108,6 +108,7 @@ public interface ExternalizedProperties {
         // Default settings.
         private boolean enableDefaultResolvers = false;
         private boolean enableDefaultConverters = false;
+        private boolean enableVariableExpansionInProperties = false;
 
         /**
          * Private constructor.
@@ -160,16 +161,16 @@ public interface ExternalizedProperties {
 
         /** {@inheritDoc} */
         @Override
-        public Builder cacheDuration(Duration cacheDuration) {
-            this.cacheDuration = requireNonNull(cacheDuration, "cacheDuration");
+        public Builder enableVariableExpansionInProperties() {
+            this.enableVariableExpansionInProperties = true;
             return this;
         }
 
         /** {@inheritDoc} */
         @Override
-        public ProfileConfiguration onProfiles(String... targetProfiles) {
-            requireNonNull(targetProfiles, "targetProfiles");
-            return new ProfileConfiguration(this, targetProfiles);
+        public Builder cacheDuration(Duration cacheDuration) {
+            this.cacheDuration = requireNonNull(cacheDuration, "cacheDuration");
+            return this;
         }
 
         /** {@inheritDoc} */
@@ -207,12 +208,27 @@ public interface ExternalizedProperties {
         }
 
         /**
-         * Build the {@link SystemExternalizedProperties} instance.
+         * Profile-specific configurations that gets applied depending on the active profile. 
+         * If no target profiles are specified, the configuration will be treated as a wildcard 
+         * configuration such that it will be applied regardless of what the active profile is.
          * 
-         * @return The built {@link SystemExternalizedProperties} instance.
+         * @param targetProfiles The profiles in which the configurations should be applied to.
+         * If no target profiles are specified, the configuration will be treated as a wildcard
+         * configuration such that it will be applied regardless of what the active profile is.
+         * @return The profile builder for the target profiles.
+         */
+        public ProfilesBuilder onProfiles(String... targetProfiles) {
+            requireNoNullElements(targetProfiles, "targetProfiles");
+            return new ProfilesBuilder(this, targetProfiles);
+        }
+
+        /**
+         * Build the {@link ExternalizedProperties} instance.
+         * 
+         * @return The built {@link ExternalizedProperties} instance.
          */
         public ExternalizedProperties build() {
-            applyProfileConfigurations();
+            applyActiveProfileConfigurations();
 
             // At this point, profile configurations will have been applied. Let's build!
             ExternalizedProperties externalizedProperties = new SystemExternalizedProperties(
@@ -238,14 +254,11 @@ public interface ExternalizedProperties {
         /**
          * Resolve the active profile using non-profile-specific resolvers
          * and apply the applicable profile configurations based on that.
-         * 
-         * @return This builder.
          */
-        private Builder applyProfileConfigurations() {
+        private void applyActiveProfileConfigurations() {
             resolveActiveProfile().ifPresent(activeProfile ->
-                profileConfigurations.forEach(c -> c.applyProfile(activeProfile))
+                profilesBuilders.forEach(pc -> pc.runConfiguratorsFor(activeProfile))
             );
-            return this;
         }
 
         /**
@@ -325,7 +338,7 @@ public interface ExternalizedProperties {
             return factory;
         }
 
-        private RootResolver buildRootResolver(
+        private Resolver buildRootResolver(
                 List<Resolver> resolvers,
                 List<Processor> processors
         ) {
@@ -335,10 +348,16 @@ public interface ExternalizedProperties {
                 resolvers(new DefaultResolver());
             }
 
-            return new RootResolver(
+            Resolver rootResolver = new RootResolver(
                 Ordinals.sortResolvers(resolvers), 
                 buildRootProcessor(processors)
             );
+
+            if (enableVariableExpansionInProperties) {
+                rootResolver = new VariableExpandingResolver(rootResolver);
+            }
+            
+            return rootResolver;
         }
 
         private RootConverter buildRootConverter(List<Converter<?>> converters) {
@@ -355,10 +374,8 @@ public interface ExternalizedProperties {
             return new RootProcessor(processors);
         }
 
-        private Builder addProfileConfiguration(
-                ProfileConfiguration profileConfiguration
-        ) {
-            profileConfigurations.add(profileConfiguration);
+        private Builder registerProfilesBuilder(ProfilesBuilder profilesBuilder) {
+            profilesBuilders.add(profilesBuilder);
             return this;
         }
 
@@ -412,42 +429,49 @@ public interface ExternalizedProperties {
          * 
          * @return This builder.
          */
-        Builder defaults();
+        BuilderConfiguration defaults();
 
         /**
          * Enable the default resolvers.
          * 
          * @return This builder.
          */
-        Builder enableDefaultResolvers();
+        BuilderConfiguration enableDefaultResolvers();
 
         /**
          * Enable the default converters.
          * 
          * @return This builder.
          */
-        Builder enableDefaultConverters();
+        BuilderConfiguration enableDefaultConverters();
 
         /**
          * Enable caching of initialized instances (per proxy interface).
          * 
          * @return This builder.
          */
-        Builder enableInitializeCaching();
+        BuilderConfiguration enableInitializeCaching();
 
         /**
          * Enable caching of proxy invocation results.
          * 
          * @return This builder.
          */
-        Builder enableInvocationCaching();
+        BuilderConfiguration enableInvocationCaching();
 
         /**
          * Eagerly resolve property values for candidate proxy methods.
          * 
          * @return This builder.
          */
-        Builder enableEagerLoading();
+        BuilderConfiguration enableEagerLoading();
+
+        /**
+         * Expand variables in properties.
+         * 
+         * @return This builder.
+         */
+        BuilderConfiguration enableVariableExpansionInProperties();
 
         /**
          * Sets the global cache duration.
@@ -455,19 +479,7 @@ public interface ExternalizedProperties {
          * @param cacheDuration The duration of caches before being reloaded.
          * @return This builder.
          */
-        Builder cacheDuration(Duration cacheDuration);
-
-        /**
-         * Profile-specific configurations that gets applied depending on the active profile. 
-         * If no target profiles are specified, the configuration will be treated as a wildcard 
-         * configuration such that it will be applied regardless of what the active profile is.
-         * 
-         * @param targetProfiles The profiles in which the configurations should be applied to.
-         * If no target profiles are specified, the configuration will be treated as a wildcard
-         * configuration such that it will be applied regardless of what the active profile is.
-         * @return The profile configuration.
-         */
-        ProfileConfiguration onProfiles(String... targetProfiles);
+        BuilderConfiguration cacheDuration(Duration cacheDuration);
 
         /**
          * Register {@link Resolver}s on which {@link ExternalizedProperties} will resolve 
@@ -480,7 +492,7 @@ public interface ExternalizedProperties {
          * @param resolvers The {@link Resolver}s to resolve properties from.
          * @return This builder.
          */
-        Builder resolvers(Resolver... resolvers);
+        BuilderConfiguration resolvers(Resolver... resolvers);
 
         /**
          * Register {@link Converter}s to be used by {@link ExternalizedProperties} for conversions.
@@ -492,7 +504,7 @@ public interface ExternalizedProperties {
          * @param converters The {@link Converter}s to register.
          * @return This builder.
          */
-        Builder converters(Converter<?>... converters);
+        BuilderConfiguration converters(Converter<?>... converters);
 
         /**
          * Register {@link Processor}s to be used by {@link ExternalizedProperties} for 
@@ -501,7 +513,7 @@ public interface ExternalizedProperties {
          * @param processors The {@link Processor}s to register.
          * @return This builder.
          */
-        Builder processors(Processor... processors);
+        BuilderConfiguration processors(Processor... processors);
 
         /**
          * Register the {@link VariableExpander} to be used by {@link ExternalizedProperties} for
@@ -510,59 +522,7 @@ public interface ExternalizedProperties {
          * @param variableExpander The {@link VariableExpander} to register.
          * @return This builder.
          */
-        Builder variableExpander(VariableExpander variableExpander);
-    }
-
-    /**
-     * Profile-specific configurations.
-     */
-    public static class ProfileConfiguration {
-        private final Builder builder;
-        private final String[] targetProfiles;
-        private final List<ProfileConfigurator> profileConfigurators = 
-            new ArrayList<>();
-
-        /**
-         * Private constructor.
-         * 
-         * @param builder The {@link ExternalizedProperties} builder.
-         * @param targetProfiles The profiles in which this configuration should be applied to.
-         * If no target profiles are specified, the configuration will be treated as a wildcard
-         * configuration such that it will be applied regardless of what the active profile is.
-         */
-        private ProfileConfiguration(Builder builder, String... targetProfiles) {
-            // Self-register to builder.
-            this.builder = builder.addProfileConfiguration(this);   
-            this.targetProfiles = targetProfiles;
-        }
-
-        /**
-         * Apply the configurator if the set Externalized Properties profile is active.
-         * 
-         * @param profileConfigurator The profile configurator to apply if the
-         * set Externalized Properties profile is active.
-         * @return The builder.
-         */
-        public Builder apply(ProfileConfigurator profileConfigurator) {
-            requireNonNull(profileConfigurator, "profileConfigurator");
-            this.profileConfigurators.add(profileConfigurator);
-            return builder;
-        }
-
-        private Builder applyProfile(String activeProfile) {
-            // Wildcard profile. Apply regardless of the active profile.
-            if (targetProfiles.length == 0) {
-                profileConfigurators.forEach(c -> c.configure(activeProfile, builder));
-            } 
-            else {
-                for (String profile : targetProfiles) {
-                    if (Objects.equals(profile, activeProfile)) {
-                        profileConfigurators.forEach(c -> c.configure(activeProfile, builder));
-                    }
-                }
-            }
-            return builder;
-        }
+        BuilderConfiguration variableExpander(VariableExpander variableExpander);
     }
 
     /**
@@ -576,5 +536,61 @@ public interface ExternalizedProperties {
          * @param builder The Externalized Properties builder configuration.
          */
         void configure(String activeProfile, BuilderConfiguration builder);
+    }
+
+    /**
+     * Build configurations that are specific to the target profiles.
+     */
+    public static class ProfilesBuilder {
+        private final Builder builder;
+        private final String[] targetProfiles;
+        private final List<ProfileConfigurator> profileConfigurators = 
+            new ArrayList<>();
+
+        /**
+         * Private constructor.
+         * 
+         * @param builder The {@link ExternalizedProperties} builder.
+         * @param targetProfiles The profiles in which this configuration should be applied to.
+         * If no target profiles are specified, the configuration will be treated as a wildcard
+         * configuration such that it will be applied regardless of what the active profile is.
+         */
+        private ProfilesBuilder(Builder builder, String... targetProfiles) {
+            // Self-register to builder.
+            this.builder = builder.registerProfilesBuilder(this);   
+            this.targetProfiles = targetProfiles;
+        }
+
+        /**
+         * Apply the configurator if the set Externalized Properties profile is active.
+         * 
+         * @param profileConfigurators The profile configurators to apply if the target profile 
+         * is active.
+         * @return The builder.
+         */
+        public Builder apply(ProfileConfigurator... profileConfigurators) {
+            requireNoNullElements(profileConfigurators, "profileConfigurators");
+            if (profileConfigurators.length == 0) {
+                throw new IllegalArgumentException(
+                    "Please provide atleast 1 profile configurator."
+                );
+            }
+            Collections.addAll(this.profileConfigurators, profileConfigurators);
+            return builder;
+        }
+
+        private void runConfiguratorsFor(String activeProfile) {
+            // Wildcard profile. Apply regardless of the active profile.
+            if (targetProfiles.length == 0) {
+                profileConfigurators.forEach(c -> c.configure(activeProfile, builder));
+            } 
+            else {
+                for (String profile : targetProfiles) {
+                    if (Objects.equals(profile, activeProfile)) {
+                        profileConfigurators.forEach(pc -> pc.configure(activeProfile, builder));
+                    }
+                }
+            }
+        }
     }
 }

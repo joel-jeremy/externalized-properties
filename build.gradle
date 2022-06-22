@@ -1,11 +1,12 @@
 plugins {
-    id 'io.github.gradle-nexus.publish-plugin'
-    id 'com.github.kt3k.coveralls'
-    id 'io.snyk.gradle.plugin.snykplugin'
-    id 'org.sonarqube'
-    id 'me.champeau.jmh' apply false
-    id 'net.ltgt.errorprone' apply false
-    id 'net.ltgt.nullaway' apply false
+    id "io.github.gradle-nexus.publish-plugin"
+    id "com.github.kt3k.coveralls"
+    id "io.snyk.gradle.plugin.snykplugin"
+    id "org.sonarqube"
+    id "com.github.ben-manes.versions"
+    id "me.champeau.jmh" apply false
+    id "net.ltgt.errorprone" apply false
+    id "net.ltgt.nullaway" apply false
 }
 
 apply from: "${rootDir}/gradle/reporting.gradle"
@@ -16,10 +17,10 @@ apply from: "${rootDir}/gradle/sonarqube.gradle"
 allprojects {
     apply from: "${rootDir}/gradle/dependencies.gradle"
 
-    group = 'io.github.joeljeremy7.externalizedproperties'
+    group = "io.github.joeljeremy7.externalizedproperties"
 
-    def snapshotSuffix = rootProject.hasProperty('release') ? '' : '-SNAPSHOT'
-    version = '1.0.0-alpha.4' + snapshotSuffix
+    def snapshotSuffix = rootProject.hasProperty("release") ? "" : "-SNAPSHOT"
+    version = "1.0.0-alpha.4" + snapshotSuffix
 
     repositories {
         mavenLocal()
@@ -30,11 +31,15 @@ allprojects {
 def javaProjects = subprojects.findAll { new File(it.projectDir, "src").exists() }
 
 configure(javaProjects) {
-    apply plugin: 'java-library'
-    apply plugin: 'java-test-fixtures'
+    apply plugin: "java-library"
+    apply plugin: "java-test-fixtures"
 
     apply from: "${rootDir}/gradle/publications.gradle"
     apply from: "${rootDir}/gradle/code-quality.gradle"
+
+    dependencies {
+        testImplementation "org.junit.jupiter:junit-jupiter:${versions.junitJupiter}"
+    }
 
     testing {
         suites { 
@@ -55,7 +60,7 @@ configure(javaProjects) {
     }
 
     java {
-        archivesBaseName = rootProject.relativeProjectPath(project.path).replace(':', '-')
+        archivesBaseName = rootProject.relativeProjectPath(project.path).replace(":", "-")
         
         toolchain {
             languageVersion = JavaLanguageVersion.of(11)
@@ -69,23 +74,37 @@ configure(javaProjects) {
     javadoc {
         configure(options) {
             tags(
-                'apiNote:a:API Note:',
-                'implSpec:a:Implementation Requirements:',
-                'implNote:a:Implementation Note:'
+                "apiNote:a:API Note:",
+                "implSpec:a:Implementation Requirements:",
+                "implNote:a:Implementation Note:"
             )
         }
     }
 }
 
-if (project.hasProperty('ossrh')) {
+if (project.hasProperty("ossrh")) {
     nexusPublishing {
         repositories {
             sonatype {
                 nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
                 snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-                username = System.getenv('OSSRH_USERNAME') ?: property('ossrhUsername')
-                password = System.getenv('OSSRH_PASSWORD') ?: property('ossrhPassword')
+                username = System.getenv("OSSRH_USERNAME") ?: property("ossrhUsername")
+                password = System.getenv("OSSRH_PASSWORD") ?: property("ossrhPassword")
             }
         }
     }
+}
+
+def isNonStable = { String version ->
+    def nonStableKeyword = ["PREVIEW","ALPHA","BETA", "SNAPSHOT"].any { 
+        it -> version.toUpperCase().contains(it) 
+    }
+    return nonStableKeyword
+}
+tasks.named("dependencyUpdates").configure {
+    rejectVersionIf {
+        isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
+    }
+    checkForGradleUpdate = true
+    outputFormatter = "html"
 }

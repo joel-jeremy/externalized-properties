@@ -62,6 +62,7 @@ module foo.bar {
 ✨ Proxy Interface Property Mapping (via [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java))  
 ✨ Default/Fallback Values  
 ✨ Non-Static/Dynamic Property Names (via [@ResolverFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
+✨ Support for Various Configuration File/Resource Formats  
 ✨ Caching  
 ✨ Eager Loading  
 ✨ Automatic Cache Reload  
@@ -70,12 +71,13 @@ module foo.bar {
 
 ✨ Automatic Property Conversion  
 ✨ Generic Type Conversion  
-✨ Dynamic Value Conversion (via [@ConverterFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java))
+✨ Conversion of Arbitrary Values (via [@ConverterFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java))
 
 ### 🔗 [Variable Expansion](docs/variable-expansion.md)
 
 ✨ Automatic Variable Expansion in Property Names  
-✨ Dynamic Variable Expansion (via [@VariableExpanderFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
+✨ Automatic Variable Expansion in Properties  
+✨ Variable Expansion in Arbitrary Values (via [@VariableExpanderFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
 
 ### 🔗 [Processing](docs/processing.md)
 

@@ -1,5 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties.ProfileConfigurator;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubConverter;
@@ -643,12 +644,10 @@ public class ExternalizedPropertiesTests {
             @Test
             @DisplayName("should cache initialized proxies")
             void test1() {
-                Map<String, String> testProps = testProperties();
-
                 ExternalizedProperties externalizedProperties = 
                     ExternalizedProperties.builder()
                         .enableInitializeCaching()
-                        .resolvers(new MapResolver(testProps))
+                        .enableDefaultResolvers()
                         .build();
 
                 ProxyInterface proxy1 = 
@@ -662,6 +661,28 @@ public class ExternalizedPropertiesTests {
         }
 
         @Nested
+        class EnableVariableExpansionInPropertiesMethod {
+            @Test
+            @DisplayName("should expand variables in resolved properties")
+            void test1() {
+                Map<String, String> testProps = testProperties();
+
+                ExternalizedProperties externalizedProperties = 
+                    ExternalizedProperties.builder()
+                        .enableVariableExpansionInProperties()
+                        .resolvers(new MapResolver(testProps))
+                        .build();
+
+                ProxyInterface proxy = 
+                    externalizedProperties.initialize(ProxyInterface.class);
+
+                String resolved = proxy.propertyWithVariableValue();
+
+                assertEquals(proxy.propertyVariable(), resolved);
+            }
+        }
+
+        @Nested
         class OnProfilesMethod {
             @Test
             @DisplayName("should throw when profiles varargs argument is null")
@@ -671,20 +692,64 @@ public class ExternalizedPropertiesTests {
                     () -> ExternalizedProperties.builder().onProfiles((String[])null)
                 );
             }
+
+            @Test
+            @DisplayName(
+                "should throw when profiles varargs argument contains null elements"
+            )
+            void test2() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> ExternalizedProperties.builder().onProfiles(
+                        "test",
+                        "staging",
+                        null
+                    )
+                );
+            }
         }
     }
 
     @Nested
-    class ProfileConfigurationTests {
+    class ProfilesBuilderTests {
         @Nested
         class ApplyMethod {
             @Test
-            @DisplayName("should throw when profile configurator argument is null")
+            @DisplayName("should throw when profile configurators argument is null")
             void test1() {
                 assertThrows(
                     IllegalArgumentException.class, 
                     () -> ExternalizedProperties.builder()
-                        .onProfiles().apply(null)
+                        .onProfiles().apply(
+                            (ProfileConfigurator[])null
+                        )
+                );
+            }
+
+            @Test
+            @DisplayName(
+                "should throw when profile configurators argument contains null elements"
+            )
+            void test2() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> ExternalizedProperties.builder()
+                        .onProfiles().apply(
+                            (activeProfile, builder) -> {},
+                            null // Not allowed
+                        )
+                );
+            }
+
+            @Test
+            @DisplayName(
+                "should throw when profile configurators argument is empty"
+            )
+            void test3() {
+                assertThrows(
+                    IllegalArgumentException.class, 
+                    () -> ExternalizedProperties.builder()
+                        .onProfiles().apply()
                 );
             }
         }
@@ -869,6 +934,8 @@ public class ExternalizedPropertiesTests {
         props.put("property.monthday", MonthDay.now().toString());
         props.put("property.year", Year.now().toString());
         props.put("property.yearmonth", YearMonth.now().toString());
+        props.put("property.with.variable.value", "${property.variable}");
+        props.put("property.variable", "property-variable-value");
         return props;
     }
 
@@ -1001,6 +1068,12 @@ public class ExternalizedPropertiesTests {
     
         @ExternalizedProperty("property.yearmonth")
         YearMonth yearMonth();
+
+        @ExternalizedProperty("property.with.variable.value")
+        String propertyWithVariableValue();
+
+        @ExternalizedProperty("property.variable")
+        String propertyVariable();
     }
 
     public static interface EagerLoadingProxyInterface {

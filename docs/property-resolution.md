@@ -44,7 +44,9 @@ public interface ApplicationProperties {
 
 ## 🌟 Non-static/Dynamic Property Names (via [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
 
-Externalized Properties supports resolution of properties whose names are not known at compile time e.g.
+Externalized Properties supports resolution of properties whose names are not known at compile time. This is made possible by the [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java) annotation e.g.
+
+(Kindly see [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java) documentation to learn more about the rules of defining a resolver facade.)
 
 ```java
 public interface ApplicationProperties {
@@ -56,9 +58,95 @@ public interface ApplicationProperties {
 }
 ```
 
+## 🌟 Support for Various Configuration File/Resource Formats
+
+Externalized Properties can support any configuration file/resource format via the [ResourceResolver](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/resolvers/ResourceResolver.java) and [ResourceReader](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/resolvers/ResourceResolver.java) classes.
+
+```java
+public class App {
+    public static void main(String[] args) throws IOException {
+        ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+            .resolvers(
+                propertiesFileResolver(),
+                yamlFileResolver(),
+                jsonFileResolver(),
+                xmlFileResolver()
+            )
+            .build();
+    }
+
+    private static ResourceResolver propertiesFileResolver() throws IOException {
+        // By default, ResourceResolver expects the resource to be in properties format.
+        return ResourceResolver.fromUrl(
+            App.class.getResource("/properties-sample/application.properties")
+        );
+    }
+
+    private static ResourceResolver yamlFileResolver() throws IOException {
+        return ResourceResolver.fromUrl(
+            App.class.getResource("/yaml-sample/application.yaml"),
+            new YamlReader()
+        );
+    }
+
+    private static ResourceResolver jsonFileResolver() throws IOException {
+        return ResourceResolver.fromUrl(
+            App.class.getResource("/json-sample/application.json"),
+            new JsonReader()
+        );
+    }
+
+    private static ResourceResolver xmlFileResolver() throws IOException {
+        return ResourceResolver.fromUrl(
+            App.class.getResource("/xml-sample/application.xml"),
+            new XmlReader()
+        );
+    }
+}
+
+// Example uses Jackson ObjectMapper, but any other libraries will do.
+private class YamlReader implements ResourceReader {
+    private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+
+    @Override
+    public Map<String, Object> read(String resourceContents) throws IOException {
+        return yamlMapper.readValue(
+            resourceContents, 
+            new TypeReference<Map<String, Object>>() {}
+        );
+    }
+}
+
+// Example uses Jackson ObjectMapper, but any other libraries will do.
+private class JsonReader implements ResourceReader {
+    private final ObjectMapper yamlMapper = new ObjectMapper();
+
+    @Override
+    public Map<String, Object> read(String resourceContents) throws IOException {
+        return yamlMapper.readValue(
+            resourceContents, 
+            new TypeReference<Map<String, Object>>() {}
+        );
+    }
+}
+
+// Example uses Jackson ObjectMapper, but any other libraries will do.
+private class XmlReader implements ResourceReader {
+    private final ObjectMapper yamlMapper = new ObjectMapper(new XmlFactory());
+
+    @Override
+    public Map<String, Object> read(String resourceContents) throws IOException {
+        return yamlMapper.readValue(
+            resourceContents, 
+            new TypeReference<Map<String, Object>>() {}
+        );
+    }
+}
+```
+
 ## 🌟 Caching
 
-Caching is enabled by default, but when not using defaults, it can be enabled via the [@ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder. All proxies created by the resulting [@ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) instance will cache resolved properties.
+Caching is enabled by default, but when not using defaults, it can be enabled via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder. All proxies created by the resulting [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) instance will cache resolved properties.
 
 ```java
 public static void main(String[] args) {
@@ -79,7 +167,7 @@ public static void main(String[] args) {
 
 ## 🌟 Eager Loading
 
-Eager loading is opt-in and can be enabled via the [@ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder. All proxies created by the resulting [@ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) instance will eagerly load properties on initialization.
+Eager loading is opt-in and can be enabled via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder. All proxies created by the resulting [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) instance will eagerly load properties on initialization.
 
 ```java
 private static void main(String[] args) {

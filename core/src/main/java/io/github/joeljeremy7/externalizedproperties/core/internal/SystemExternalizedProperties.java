@@ -1,14 +1,14 @@
 package io.github.joeljeremy7.externalizedproperties.core.internal;
 
+import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterFacade;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderFacade;
-import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
-import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
 import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandlerFactory;
 
 import java.lang.annotation.Annotation;
@@ -27,8 +27,8 @@ import static io.github.joeljeremy7.externalizedproperties.core.internal.Argumen
  */
 public class SystemExternalizedProperties implements ExternalizedProperties {
     private static final Set<Class<?>> SUPPORTED_TARGET_TYPES = supportedTargetTypes();
-    private final RootResolver rootResolver;
-    private final RootConverter rootConverter;
+    private final Resolver rootResolver;
+    private final Converter<?> rootConverter;
     private final VariableExpander variableExpander;
     private final InvocationHandlerFactory invocationHandlerFactory;
     private final InvocationContextFactory invocationContextFactory;
@@ -42,8 +42,8 @@ public class SystemExternalizedProperties implements ExternalizedProperties {
      * @param invocationHandlerFactory The invocation handler factory.
      */
     public SystemExternalizedProperties(
-            RootResolver rootResolver,
-            RootConverter rootConverter,
+            Resolver rootResolver,
+            Converter<?> rootConverter,
             VariableExpander variableExpander,
             InvocationHandlerFactory invocationHandlerFactory
     ) {

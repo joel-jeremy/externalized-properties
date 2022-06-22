@@ -40,11 +40,43 @@ Built-in variable expander implementations:
 - [PatternVariableExpander](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/variableexpansion/PatternVariableExpander.java) - Uses a regex to match variables.
 - [NoOpVariableExpander](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/variableexpansion/NoOpVariableExpander.java) - Disables variable expansion.
 
-## 🌟 Dynamic Variable Expansion (via [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
+## ✨ Automatic Variable Expansion in Properties
+
+Variable expansion is supported in properties. This can be enabled via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
+
+```java
+public interface ApplicationProperties {
+    @ExternalizedProperty("my.property")
+    String myProperty();
+}
+```
+
+```properties
+# application.properties
+variable=variable-value
+my.property=${variable}
+```
+
+```java
+public static void main(String[] args) {
+    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+        .enableVariableExpansionInProperties()
+        .resolvers(applicationPropertiesResolver())
+        .build();
+    
+    ApplicationProperties appProperties = externalizedProperties.initialize(ApplicationProperties.class);
+
+    // Resolved property is "variable-value"
+    String resolved = appProperties.myProperty();
+}
+
+```
+
+## 🌟 Variable Expansion in Arbitrary Values (via [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
 
 Externalized Properties can create proxies that expand variables in any String values. This is made possible by the [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java) annotation e.g.
 
-(Kindly see [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java) documentation to learn more about the rules of defining a variable expander method.)
+(Kindly see [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java) documentation to learn more about the rules of defining a variable expander facade.)
 
 ```java
 public interface ProxyInterface {
