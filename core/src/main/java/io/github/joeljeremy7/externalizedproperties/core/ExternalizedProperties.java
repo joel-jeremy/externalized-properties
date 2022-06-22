@@ -467,7 +467,7 @@ public interface ExternalizedProperties {
         BuilderConfiguration enableEagerLoading();
 
         /**
-         * Expand variables in resolved properties.
+         * Expand variables in properties.
          * 
          * @return This builder.
          */
