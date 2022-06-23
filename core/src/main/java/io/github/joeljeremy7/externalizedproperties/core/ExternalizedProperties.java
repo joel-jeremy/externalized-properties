@@ -90,7 +90,7 @@ public interface ExternalizedProperties {
     }
 
     /**
-     * Builder for {@link ExternalizedProperties}.
+     * The builder for {@link ExternalizedProperties}.
      */
     static class Builder implements BuilderConfiguration {
         private final List<ProfilesBuilder> profilesBuilders = new ArrayList<>();
