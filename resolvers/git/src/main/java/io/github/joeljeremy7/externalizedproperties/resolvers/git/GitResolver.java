@@ -39,7 +39,7 @@ public class GitResolver implements Resolver {
     private GitResolver(ResourceResolver resourceResolver) {
         this.resourceResolver = requireNonNull(
             resourceResolver, 
-            "resourceResolvers"
+            "resourceResolver"
         );
     }
 
