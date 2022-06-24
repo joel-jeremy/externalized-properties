@@ -1,6 +1,7 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
@@ -23,6 +24,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -117,7 +119,7 @@ public class ResourceResolverTests {
         @DisplayName("should throw when URI resource does not exist")
         void uriTest2() {
             assertThrows(
-                IOException.class, 
+                ExternalizedPropertiesException.class, 
                 () -> ResourceResolver.fromUri(
                     URI.create("file://non.existent.properties")
                 )
@@ -125,8 +127,19 @@ public class ResourceResolverTests {
         }
 
         @Test
+        @DisplayName("should throw when URI is malformed")
+        void uriTest3() {
+            assertThrows(
+                UncheckedIOException.class, 
+                () -> ResourceResolver.fromUri(
+                    URI.create("notsupported://malformed")
+                )
+            );
+        }
+
+        @Test
         @DisplayName("should not return null")
-        void uriTest3() throws IOException, URISyntaxException {
+        void uriTest4() throws IOException, URISyntaxException {
             ResourceResolver resolver = ResourceResolver.fromUri(
                 classpathResourceAsUri("/test.properties")
             );
@@ -161,7 +174,7 @@ public class ResourceResolverTests {
         @DisplayName("should throw when URI resource does not exist")
         void uriAndReaderOverloadTest3() {
             assertThrows(
-                IOException.class, 
+                ExternalizedPropertiesException.class, 
                 () -> ResourceResolver.fromUri(
                     URI.create("file://non.existent.properties"), 
                     PROPERTIES_READER
@@ -170,8 +183,20 @@ public class ResourceResolverTests {
         }
 
         @Test
+        @DisplayName("should throw when URI is malformed")
+        void uriAndReaderOverloadTest4() {
+            assertThrows(
+                UncheckedIOException.class, 
+                () -> ResourceResolver.fromUri(
+                    URI.create("notsupported://malformed"),
+                    PROPERTIES_READER
+                )
+            );
+        }
+
+        @Test
         @DisplayName("should not return null")
-        void uriAndReaderOverloadTest4() throws IOException, URISyntaxException {
+        void uriAndReaderOverloadTest5() throws IOException, URISyntaxException {
             ResourceResolver resolver = ResourceResolver.fromUri(
                 classpathResourceAsUri("/test.properties"), 
                 PROPERTIES_READER
@@ -196,7 +221,7 @@ public class ResourceResolverTests {
         @DisplayName("should throw when path resource does not exist")
         void pathTest2() {
             assertThrows(
-                IOException.class, 
+                ExternalizedPropertiesException.class, 
                 () -> ResourceResolver.fromPath(
                     Paths.get("path", "to", "non.existent.properties")
                 )
@@ -244,7 +269,7 @@ public class ResourceResolverTests {
         @DisplayName("should throw when path resource does not exist")
         void pathAndReaderOverloadTest3() {
             assertThrows(
-                IOException.class, 
+                ExternalizedPropertiesException.class, 
                 () -> ResourceResolver.fromPath(
                     Paths.get("path", "to", "non.existent.properties"), 
                     PROPERTIES_READER

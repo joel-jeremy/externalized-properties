@@ -42,6 +42,21 @@ public class Arguments {
     }
 
     /**
+     * Require argument to not be {@code null} or an empty {@link String}.
+     * 
+     * @param arg The {@link String} argument.
+     * @param argName The name of the {@link String} argument to be used in building the 
+     * {@link IllegalArgumentException} message if the argument failed validation.
+     * @return The {@link String} argument.
+     */
+    public static String requireNonNullOrBlank(@Nullable String arg, String argName) {
+        if (arg == null || arg.chars().allMatch(Character::isWhitespace)) {
+            throw new IllegalArgumentException(argName + " must not be null or empty.");
+        }
+        return arg;
+    }
+
+    /**
      * Require argument to not be {@code null} or an empty {@link Collection}.
      * 
      * @param <T> The type of the collection argument.

@@ -1454,22 +1454,22 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName(
-            "should treat equals method with different signature as a proxy method"
+            "should treat equals method with no argument as a proxy method"
         )
         void proxyEqualsTest3() throws Throwable {
             Resolver resolver = new MapResolver(Collections.emptyMap());
             ExternalizedProperties externalizedProperties = 
                 externalizedProperties(resolver);
 
-            EqualsMethodOverloadProxyInterface proxy = 
+            EqualsMethodNoArgProxyInterface proxy = 
                 externalizedProperties.initialize(
-                    EqualsMethodOverloadProxyInterface.class
+                    EqualsMethodNoArgProxyInterface.class
                 );
 
             Method objectEqualsMethodOverload = MethodUtils.getMethod(
-                EqualsMethodOverloadProxyInterface.class,
-                (MethodReference<EqualsMethodOverloadProxyInterface, Boolean>)
-                EqualsMethodOverloadProxyInterface::equals
+                EqualsMethodNoArgProxyInterface.class,
+                (MethodReference<EqualsMethodNoArgProxyInterface, Boolean>)
+                EqualsMethodNoArgProxyInterface::equals
             );
 
             ExternalizedPropertiesInvocationHandler handler = 
@@ -1488,6 +1488,46 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                     proxy, 
                     objectEqualsMethodOverload, 
                     new Object[] { proxy }
+                )
+            );
+        }
+
+        @Test
+        @DisplayName(
+            "should treat equals method with non-Object argument as a proxy method"
+        )
+        void proxyEqualsTest4() throws Throwable {
+            Resolver resolver = new MapResolver(Collections.emptyMap());
+            ExternalizedProperties externalizedProperties = 
+                externalizedProperties(resolver);
+
+            EqualsMethodNonObjectArgProxyInterface proxy = 
+                externalizedProperties.initialize(
+                    EqualsMethodNonObjectArgProxyInterface.class
+                );
+
+            Method objectEqualsMethodOverload = MethodUtils.getMethod(
+                EqualsMethodNonObjectArgProxyInterface.class,
+                (MethodReference.WithOneArg<EqualsMethodNonObjectArgProxyInterface, String, Boolean>)
+                EqualsMethodNonObjectArgProxyInterface::equals
+            );
+
+            ExternalizedPropertiesInvocationHandler handler = 
+                new ExternalizedPropertiesInvocationHandler(
+                    rootResolver(resolver),
+                    rootConverter(),
+                    variableExpander(),
+                    new InvocationContextFactory(externalizedProperties)
+                );
+
+            // equals method treated as proxy method
+            // instead of an Object method due to different signature.
+            assertThrows(
+                UnresolvedPropertyException.class,
+                () -> handler.invoke(
+                    proxy, 
+                    objectEqualsMethodOverload, 
+                    new Object[] { "test" }
                 )
             );
         }
@@ -1714,7 +1754,11 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
     private static interface OtherProxyInterface {}
 
-    private static interface EqualsMethodOverloadProxyInterface {
+    private static interface EqualsMethodNoArgProxyInterface {
         boolean equals();
+    }
+
+    private static interface EqualsMethodNonObjectArgProxyInterface {
+        boolean equals(String other);
     }
 }

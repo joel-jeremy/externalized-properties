@@ -264,7 +264,10 @@ public class ResourceResolver extends MapResolver {
             result.putAll(flattenMap(properties));
         } catch (IOException e) {
             throw new ExternalizedPropertiesException(
-                "An I/O exception occurred.", 
+                String.format(
+                    "An exception occurred while trying to read resource: %s",
+                    url.toString()
+                ),
                 e
             );
         }

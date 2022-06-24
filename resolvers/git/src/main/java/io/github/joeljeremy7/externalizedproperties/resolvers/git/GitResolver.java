@@ -1,8 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.resolvers.git;
 
-import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
-import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.ResourceResolver;
@@ -18,14 +16,17 @@ import org.eclipse.jgit.transport.SshTransport;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
-import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrEmpty;
+import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNullOrBlank;
 
+/**
+ * A {@link Resolver} implementation which reads properties from a resource file that is
+ * stored in a Git repository.
+ */
 public class GitResolver implements Resolver {
 
     private final ResourceResolver resourceResolver;
@@ -66,8 +67,8 @@ public class GitResolver implements Resolver {
         private String gitBranch;
         private Path gitCloneDirectory;
         private String resourceFilePath;
-        private CredentialsProvider credentialsProvider;
-        private SshSessionFactory sshSessionFactory;
+        private CredentialsProvider gitCredentialsProvider;
+        private SshSessionFactory gitSshSessionFactory;
         private ResourceReader resourceReader = new PropertiesReader();
 
         @SuppressWarnings("NullAway.Init")
@@ -80,7 +81,7 @@ public class GitResolver implements Resolver {
          * @return This builder.
          */
         public Builder gitRepositoryUri(String gitRepositoryUri) {
-            this.gitRepositoryUri = requireNonNullOrEmpty(
+            this.gitRepositoryUri = requireNonNullOrBlank(
                 gitRepositoryUri, 
                 "gitRepositoryUri"
             );
@@ -99,7 +100,7 @@ public class GitResolver implements Resolver {
          * @return This builder.
          */
         public Builder gitBranch(String gitBranch) {
-            this.gitBranch = requireNonNullOrEmpty(
+            this.gitBranch = requireNonNullOrBlank(
                 gitBranch, 
                 "gitBranch"
             );
@@ -107,7 +108,11 @@ public class GitResolver implements Resolver {
         }
 
         /**
-         * The directory to clone the Git repository to.
+         * The directory to clone the Git repository to. 
+         * 
+         * @implNote If the directory does not exist, it will automatically be created. 
+         * Otherwise, the contents of the existing directory will be cleaned/deleted
+         * before attempting to clone the Git repository.
          * 
          * @param gitCloneDirectory The directory to clone the Git repository to.
          * @return This builder.
@@ -130,7 +135,7 @@ public class GitResolver implements Resolver {
          * @return This builder.
          */
         public Builder resourceFilePath(String resourceFilePath) {
-            this.resourceFilePath = requireNonNullOrEmpty(
+            this.resourceFilePath = requireNonNullOrBlank(
                 resourceFilePath, 
                 "resourceFilePath"
             );
@@ -138,29 +143,33 @@ public class GitResolver implements Resolver {
         }
 
         /**
-         * The Git credentials provider.
+         * The Git credentials provider. This will only be used when cloning a Git repository
+         * via HTTP(s).
          * 
-         * @param credentialsProvider The Git credentials provider.
+         * @param gitCredentialsProvider The Git credentials provider. This will only be used 
+         * when cloning a Git repository via HTTP(s).
          * @return This builder.
          */
-        public Builder credentialsProvider(CredentialsProvider credentialsProvider) {
-            this.credentialsProvider = requireNonNull(
-                credentialsProvider, 
-                "credentialsProvider"
+        public Builder gitCredentialsProvider(CredentialsProvider gitCredentialsProvider) {
+            this.gitCredentialsProvider = requireNonNull(
+                gitCredentialsProvider, 
+                "gitCredentialsProvider"
             );
             return this;
         }
 
         /**
-         * The Git SSH session factory.
+         * The Git SSH session factory. This will only be used when cloning a Git repository
+         * via SSH.
          * 
-         * @param sshSessionFactory The Git SSH session factory.
+         * @param gitSshSessionFactory The Git SSH session factory. This will only be used when 
+         * cloning a Git repository via SSH.
          * @return This builder.
          */
-        public Builder sshSessionFactory(SshSessionFactory sshSessionFactory) {
-            this.sshSessionFactory = requireNonNull(
-                sshSessionFactory, 
-                "sshSessionFactory"
+        public Builder gitSshSessionFactory(SshSessionFactory gitSshSessionFactory) {
+            this.gitSshSessionFactory = requireNonNull(
+                gitSshSessionFactory, 
+                "gitSshSessionFactory"
             );
             return this;
         }
@@ -186,21 +195,24 @@ public class GitResolver implements Resolver {
          * the target configuration resource.
          * 
          * @return The built {@link GitResolver}.
-         * @throws IOException if an I/O exception occurs.
-         * @throws GitAPIException if a Git-related exception occurs.
          */
         public GitResolver build() {
             validate();
-            try (Git gitRepo = initializeGitRepo()) {
-                Path configResourcePath = gitCheckoutConfigurationResource(gitRepo);
+
+            try (Git git = cloneOrOpenGitRepo()) {
+                Path checkedOutResourceFile = gitCheckoutResourceFile(
+                    git,
+                    gitBranch,
+                    resourceFilePath
+                );
                 return new GitResolver(ResourceResolver.fromPath(
-                    configResourcePath,
+                    checkedOutResourceFile,
                     resourceReader
                 ));
             }
-            catch (GitAPIException | IOException e) {
+            catch (Exception e) {
                 throw new ExternalizedPropertiesException(
-                    "An exception error occurred while building Git resolver.", 
+                    "An exception occurred while building GitResolver.", 
                     e
                 );
             }
@@ -208,7 +220,7 @@ public class GitResolver implements Resolver {
 
         private void validate() {
             if (gitRepositoryUri == null) {
-                throw new IllegalStateException("Git Repository URI is required.");
+                throw new IllegalStateException("Git repository URI is required.");
             }
 
             if (gitBranch == null) {
@@ -220,11 +232,11 @@ public class GitResolver implements Resolver {
             }
 
             if (resourceFilePath == null) {
-                throw new IllegalStateException("Configuration resource path is required.");
+                throw new IllegalStateException("Resource file path is required.");
             }
         }
 
-        private Git initializeGitRepo() throws IOException, GitAPIException {
+        private Git cloneOrOpenGitRepo() throws IOException, GitAPIException {
             if (Files.exists(gitCloneDirectory.resolve(".git"))) {
                 // Open existing git repo.
                 return Git.open(gitCloneDirectory.toFile());
@@ -233,76 +245,58 @@ public class GitResolver implements Resolver {
                 cleanDirectory(gitCloneDirectory);
 
                 // Clone repo but don't checkout anything yet.
-                CloneCommand builder = Git.cloneRepository()
+                CloneCommand clone = Git.cloneRepository()
                     .setURI(gitRepositoryUri)
                     .setDirectory(gitCloneDirectory.toFile())
                     .setNoCheckout(true)
                     .setCloneAllBranches(false);
 
-                if (credentialsProvider != null) {
-                    builder.setCredentialsProvider(credentialsProvider);
+                if (gitCredentialsProvider != null) {
+                    clone.setCredentialsProvider(gitCredentialsProvider);
                 } 
-                else if (sshSessionFactory != null) {
-                    builder.setTransportConfigCallback(transport -> {
+                
+                if (gitSshSessionFactory != null) {
+                    clone.setTransportConfigCallback(transport -> {
                         if (transport instanceof SshTransport) {
-                            ((SshTransport) transport).setSshSessionFactory(sshSessionFactory);
+                            ((SshTransport)transport).setSshSessionFactory(gitSshSessionFactory);
                         }
                     });
                 }
 
-                return builder.call();
+                return clone.call();
             }
         }
 
-        private Path gitCheckoutConfigurationResource(Git gitRepo) throws GitAPIException {
-            if (sshSessionFactory != null) {
-                SshSessionFactory.setInstance(sshSessionFactory);
-            }
-
-            boolean hasRemote = gitBranch.indexOf('/') != -1;
+        private static Path gitCheckoutResourceFile(
+                Git git, 
+                String branchToCheckout,
+                String resourceFilePath
+        ) throws GitAPIException {
+            boolean branchHasRemote = branchToCheckout.indexOf('/') != -1;
             
             // Checkout specific files.
-            gitRepo.checkout()
+            git.checkout()
                 // Default remote name is origin.
-                .setStartPoint(hasRemote ? gitBranch : "origin/" + gitBranch)
+                .setStartPoint(branchHasRemote ? 
+                    branchToCheckout : "origin/" + branchToCheckout)
                 .addPath(resourceFilePath)
                 .call();
             
-            return gitCloneDirectory.resolve(resourceFilePath);
+            return git.getRepository().getWorkTree().toPath().resolve(resourceFilePath);
         }
 
-        private void cleanDirectory(Path dir) throws IOException {
+        private static void cleanDirectory(Path dir) throws IOException {
             if (Files.exists(dir)) {
-                // Delete from bottom up.
-                try (Stream<Path> paths = Files.walk(dir).sorted(Comparator.reverseOrder())) {
-                    for (Path path : paths.toArray(Path[]::new)) {
+                try (Stream<Path> paths = Files.walk(dir)) {
+                    // Delete from bottom up.
+                    for (Path path : paths.sorted(Comparator.reverseOrder())
+                            .toArray(Path[]::new)) {
                         Files.delete(path);
                     }
                 }
             }
 
-            Files.createDirectory(dir);
+            Files.createDirectories(dir);
         }
-    }
-
-    public static void main(String[] args) {
-        GitResolver resolver = GitResolver.builder()
-            .gitRepositoryUri("https://github.com/spring-cloud-samples/config-repo.git")
-            .gitBranch("main")
-            .gitCloneDirectory(Paths.get("").resolve("cloneDir"))
-            .resourceFilePath("bar.properties")
-            .build();
-
-        ExternalizedProperties ep = ExternalizedProperties.builder()
-            .resolvers(resolver)
-            .build();
-
-        ProxyInterface p = ep.initialize(ProxyInterface.class);
-        System.out.println(p.foo());
-    }
-
-    private static interface ProxyInterface {
-        @ExternalizedProperty("foo")
-        String foo();
     }
 }
