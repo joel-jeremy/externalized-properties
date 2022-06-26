@@ -31,7 +31,9 @@ jacocoTestCoverageVerification {
         } 
     } 
 }
-check.dependsOn jacocoTestCoverageVerification
+tasks.named("check").configure {
+    finalizedBy jacocoTestCoverageVerification
+}
 
 tasks.withType(JavaCompile).configureEach { task ->
     options.errorprone {

@@ -21,4 +21,4 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
         env:
-          ADDITIONAL_TEST_RUNS_ON_JAVA_VERSIONS: 17,18
+          ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS: 17,18
