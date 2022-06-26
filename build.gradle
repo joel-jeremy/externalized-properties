@@ -13,9 +13,10 @@ apply from: "${rootDir}/gradle/reporting.gradle"
 apply from: "${rootDir}/gradle/coveralls.gradle"
 apply from: "${rootDir}/gradle/snyk.gradle"
 apply from: "${rootDir}/gradle/sonarqube.gradle"
+apply from: "${rootDir}/gradle/dependency-updates.gradle"
 
 allprojects {
-    apply from: "${rootDir}/gradle/dependencies.gradle"
+    apply from: "${rootDir}/gradle/dependency-versions.gradle"
 
     group = "io.github.joeljeremy7.externalizedproperties"
 
@@ -36,6 +37,7 @@ configure(javaProjects) {
 
     apply from: "${rootDir}/gradle/publications.gradle"
     apply from: "${rootDir}/gradle/code-quality.gradle"
+    apply from: "${rootDir}/gradle/multi-jvm-tests.gradle"
 
     dependencies {
         testImplementation "org.junit.jupiter:junit-jupiter:${versions.junitJupiter}"
@@ -44,7 +46,7 @@ configure(javaProjects) {
     testing {
         suites { 
             test { 
-                useJUnitJupiter() 
+                useJUnitJupiter()
             }
             integrationTest(JvmTestSuite) {
                 testType = TestSuiteType.INTEGRATION_TEST
@@ -59,16 +61,16 @@ configure(javaProjects) {
         }
     }
 
+    compileJava {
+        options.release = 11
+    }
+
     java {
         archivesBaseName = rootProject.relativeProjectPath(project.path).replace(":", "-")
-        
+
         toolchain {
             languageVersion = JavaLanguageVersion.of(11)
         }
-    }
-
-    compileJava {
-        options.release = 8
     }
 
     javadoc {
@@ -93,18 +95,4 @@ if (project.hasProperty("ossrh")) {
             }
         }
     }
-}
-
-def isNonStable = { String version ->
-    def nonStableKeyword = ["PREVIEW","ALPHA","BETA", "SNAPSHOT"].any { 
-        it -> version.toUpperCase().contains(it) 
-    }
-    return nonStableKeyword
-}
-tasks.named("dependencyUpdates").configure {
-    rejectVersionIf {
-        isNonStable(it.candidate.version) && !isNonStable(it.currentVersion)
-    }
-    checkForGradleUpdate = true
-    outputFormatter = "html"
 }

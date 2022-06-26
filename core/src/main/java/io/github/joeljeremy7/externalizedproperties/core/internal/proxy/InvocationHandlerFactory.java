@@ -1,4 +1,4 @@
-package io.github.joeljeremy7.externalizedproperties.core.proxy;
+package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;

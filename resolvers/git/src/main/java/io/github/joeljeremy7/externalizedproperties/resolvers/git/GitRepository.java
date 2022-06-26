@@ -63,7 +63,7 @@ public class GitRepository {
      * @return This builder.
      */
     public Path checkout(String pathToCheckout) {
-        requireNonNull(pathToCheckout, "pathToCheckout");
+        requireNonNullOrBlank(pathToCheckout, "pathToCheckout");
         try (Git git = gitCloneOrOpenRepo()) {
             return gitCheckoutPath(git, branch, pathToCheckout);
         }
@@ -74,30 +74,9 @@ public class GitRepository {
             if (Files.exists(cloneDirectory.resolve(".git"))) {
                 // Open existing git repo.
                 return Git.open(cloneDirectory.toFile());
-            }
-            else {
+            } else {
                 cleanDirectory(cloneDirectory);
-
-                // Clone repo but don't checkout anything yet.
-                CloneCommand clone = Git.cloneRepository()
-                    .setURI(uri)
-                    .setDirectory(cloneDirectory.toFile())
-                    .setNoCheckout(true)
-                    .setCloneAllBranches(false);
-
-                if (credentialsProvider != null) {
-                    clone.setCredentialsProvider(credentialsProvider);
-                } 
-                
-                if (sshSessionFactory != null) {
-                    clone.setTransportConfigCallback(transport -> {
-                        if (transport instanceof SshTransport) {
-                            ((SshTransport)transport).setSshSessionFactory(sshSessionFactory);
-                        }
-                    });
-                }
-
-                return clone.call();
+                return gitCloneRepo();
             }
         } catch (GitAPIException | IOException e) {
             throw new ExternalizedPropertiesException(
@@ -105,6 +84,29 @@ public class GitRepository {
                 e
             );
         }
+    }
+
+    private Git gitCloneRepo() throws GitAPIException {
+        // Clone repo but don't checkout anything yet.
+        CloneCommand clone = Git.cloneRepository()
+            .setURI(uri)
+            .setDirectory(cloneDirectory.toFile())
+            .setNoCheckout(true)
+            .setCloneAllBranches(false);
+
+        if (credentialsProvider != null) {
+            clone.setCredentialsProvider(credentialsProvider);
+        } 
+        
+        if (sshSessionFactory != null) {
+            clone.setTransportConfigCallback(transport -> {
+                if (transport instanceof SshTransport) {
+                    ((SshTransport)transport).setSshSessionFactory(sshSessionFactory);
+                }
+            });
+        }
+
+        return clone.call();
     }
 
     private static Path gitCheckoutPath(

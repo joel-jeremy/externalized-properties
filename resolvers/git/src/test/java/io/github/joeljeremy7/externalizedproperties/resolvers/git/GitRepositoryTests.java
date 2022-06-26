@@ -233,6 +233,54 @@ public class GitRepositoryTests {
     @Nested
     class CheckoutMethod {
         @Test
+        @DisplayName("should throw when path to checkout argument is null")
+        void validationTest1() {
+            GitRepository gitRepository = GitRepository.builder()
+                .uri(LOCAL_HTTP_GIT_SERVER.getRepositoryUri())
+                .branch(DEFAULT_GIT_BRANCH)
+                .cloneDirectory(CLONE_DIR)
+                .credentialsProvider(LocalHttpGitServer.DEFAULT_CREDENTIALS)
+                .build();
+            
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> gitRepository.checkout(null)
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when path to checkout argument is empty")
+        void validationTest2() {
+            GitRepository gitRepository = GitRepository.builder()
+                .uri(LOCAL_HTTP_GIT_SERVER.getRepositoryUri())
+                .branch(DEFAULT_GIT_BRANCH)
+                .cloneDirectory(CLONE_DIR)
+                .credentialsProvider(LocalHttpGitServer.DEFAULT_CREDENTIALS)
+                .build();
+            
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> gitRepository.checkout("")
+            );
+        }
+
+        @Test
+        @DisplayName("should throw when path to checkout argument is blank")
+        void validationTest3() {
+            GitRepository gitRepository = GitRepository.builder()
+                .uri(LOCAL_HTTP_GIT_SERVER.getRepositoryUri())
+                .branch(DEFAULT_GIT_BRANCH)
+                .cloneDirectory(CLONE_DIR)
+                .credentialsProvider(LocalHttpGitServer.DEFAULT_CREDENTIALS)
+                .build();
+            
+            assertThrows(
+                IllegalArgumentException.class, 
+                () -> gitRepository.checkout("   ")
+            );
+        }
+
+        @Test
         @DisplayName("should checkout file from Git repository")
         void test1() {
             GitRepository gitRepository = GitRepository.builder()

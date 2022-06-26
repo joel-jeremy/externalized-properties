@@ -8,7 +8,6 @@ import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationCach
 import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationContextFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.caching.WeakConcurrentHashMapCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.caching.WeakHashMapCacheStrategy;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandlerFactory;
 
 import java.lang.reflect.Method;
 

@@ -10,7 +10,6 @@ import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationCont
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubResolver;
 import io.github.joeljeremy7.externalizedproperties.core.variableexpansion.SimpleVariableExpander;
 import org.junit.jupiter.api.DisplayName;
