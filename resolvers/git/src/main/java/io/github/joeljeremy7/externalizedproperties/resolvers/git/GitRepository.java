@@ -59,7 +59,7 @@ public class GitRepository {
      * in {@link Builder#cloneDirectory(Path)}.
      * 
      * @param pathToCheckout The path to the file to checkout. The path will be 
-     * resolved relative to the root of the Git working tree.
+     * resolved relative to the root directory of the Git working tree.
      * @return This builder.
      */
     public Path checkout(String pathToCheckout) {

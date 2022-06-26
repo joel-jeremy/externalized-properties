@@ -74,11 +74,13 @@ public class GitResolver implements Resolver {
         }
 
         /**
-         * The path of the resource file to resolve properties from. The path is 
-         * relative to the Git clone directory.
+         * The path of the resource file to checkout from the Git repository and resolve 
+         * properties from. The path will be resolved relative to the root directory of 
+         * the Git working tree
          * 
-         * @param resourceFilePath The path of the resource file to resolve properties 
-         * from. The path is relative to the Git clone directory.
+         * @param resourceFilePath The path of the resource file to checkout from the Git 
+         * repository and to resolve properties from. The path will be resolved relative 
+         * to the root directory of the Git working tree.
          * @return This builder.
          */
         public Builder resourceFilePath(String resourceFilePath) {
@@ -90,11 +92,10 @@ public class GitResolver implements Resolver {
         }
 
         /**
-         * The resource reader to use in reading the configuration resource. By default,
-         * the configuration resource is expected to be in {@code .properties} file format.
+         * The resource reader to use in reading the resource file. By default, the 
+         * resource file is expected to be in {@code .properties} file format.
          * 
-         * @param resourceReader The resource reader to use in reading the configuration 
-         * resource.
+         * @param resourceReader The resource reader to use in reading the resource file.
          * @return This builder.
          */
         public Builder resourceReader(ResourceReader resourceReader) {
@@ -106,8 +107,8 @@ public class GitResolver implements Resolver {
         }
 
         /**
-         * Build a {@link GitResolver} which resolves properties from the
-         * target resource file.
+         * Build a {@link GitResolver} which resolves properties from the target resource 
+         * file.
          * 
          * @return The built {@link GitResolver}.
          */
