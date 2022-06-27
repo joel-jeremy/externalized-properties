@@ -3,6 +3,7 @@ package io.github.joeljeremy7.externalizedproperties.core;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.CachingExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationCacheKey;
+import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.SystemExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.internal.caching.ExpiringCacheStrategy;
 import io.github.joeljeremy7.externalizedproperties.core.internal.caching.WeakConcurrentHashMapCacheStrategy;
@@ -12,7 +13,6 @@ import io.github.joeljeremy7.externalizedproperties.core.internal.processing.Roo
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.CachingInvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.EagerLoadingInvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.ExternalizedPropertiesInvocationHandlerFactory;
-import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.InvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.DefaultResolver;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.VariableExpandingResolver;

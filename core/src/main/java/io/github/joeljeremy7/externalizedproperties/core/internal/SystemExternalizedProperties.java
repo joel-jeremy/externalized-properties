@@ -9,7 +9,6 @@ import io.github.joeljeremy7.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderFacade;
-import io.github.joeljeremy7.externalizedproperties.core.internal.proxy.InvocationHandlerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

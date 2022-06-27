@@ -1,10 +1,9 @@
-package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
+package io.github.joeljeremy7.externalizedproperties.core.internal;
 
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
-import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationContextFactory;
 
 import java.lang.reflect.InvocationHandler;
 

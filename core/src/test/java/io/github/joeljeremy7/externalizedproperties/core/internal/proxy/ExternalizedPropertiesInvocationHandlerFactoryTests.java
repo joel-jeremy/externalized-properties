@@ -7,6 +7,7 @@ import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationContextFactory;
+import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.conversion.RootConverter;
 import io.github.joeljeremy7.externalizedproperties.core.internal.processing.RootProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.internal.resolvers.RootResolver;
