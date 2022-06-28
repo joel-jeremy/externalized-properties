@@ -1,7 +1,7 @@
-apply plugin: 'java-library'
-apply plugin: 'java-test-fixtures'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
+apply plugin: "java-library"
+apply plugin: "java-test-fixtures"
+apply plugin: "maven-publish"
+apply plugin: "signing"
 
 java {
     withJavadocJar()
@@ -25,56 +25,56 @@ publishing {
                     name = project.description
 					description = project.description
 				}
-                packaging = 'jar'
-                url = 'https://github.com/joeljeremy7/externalized-properties'
+                packaging = "jar"
+                url = "https://github.com/joeljeremy7/externalized-properties"
 
                 licenses {
                     license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
                     }
                 }
 
                 developers {
                     developer {
-                        id = 'joeljeremy7'
-                        name = 'Joel Jeremy M. Marquez'
-                        email = 'joeljeremy.marquez@gmail.com'
-                        roles = [ 'owner', 'developer' ]
+                        id = "joeljeremy7"
+                        name = "Joel Jeremy M. Marquez"
+                        email = "joeljeremy.marquez@gmail.com"
+                        roles = [ "owner", "developer" ]
                     }
                 }
 
                 scm {
-                    connection = 'scm:git:https://github.com/joeljeremy7/externalized-properties.git'
-                    developerConnection = 'scm:git:https://github.com/joeljeremy7/externalized-properties.git'
-                    url = 'https://github.com/joeljeremy7/externalized-properties'
+                    connection = "scm:git:https://github.com/joeljeremy7/externalized-properties.git"
+                    developerConnection = "scm:git:https://github.com/joeljeremy7/externalized-properties.git"
+                    url = "https://github.com/joeljeremy7/externalized-properties"
                 }
             }
         }
     }
 
-    if (project.hasProperty('github-packages')) {
+    if (project.hasProperty("github-packages")) {
         repositories {
             maven {
-                url = 'https://maven.pkg.github.com/joeljeremy7/externalized-properties'
-                name = 'github-packages'
+                url = "https://maven.pkg.github.com/joeljeremy7/externalized-properties"
+                name = "github-packages"
                 credentials {
-                    username = System.getenv('GITHUB_ACTOR') ?: property('githubActor')
-                    password = System.getenv('GITHUB_TOKEN') ?: property('githubToken')
+                    username = System.getenv("GITHUB_ACTOR") ?: property("githubActor")
+                    password = System.getenv("GITHUB_TOKEN") ?: property("githubToken")
                 }
             }
         }
     }
 }
 
-if (project.hasProperty('release')) {
+if (project.hasProperty("release")) {
     // If release property is set, do not allow publishing with SNAPSHOT dependencies.
-    Task checkSnapshotDependencies = project.tasks.create('checkSnapshotDependencies', {
+    Task checkSnapshotDependencies = project.tasks.create("checkSnapshotDependencies", {
         doFirst {
             def snapshots = project.configurations.findAll {
                 it.canBeResolved
             }.resolvedConfiguration.resolvedArtifacts.flatten().findAll {
-                it.moduleVersion.id.version.endsWith('-SNAPSHOT')
+                it.moduleVersion.id.version.endsWith("-SNAPSHOT")
             }.unique()
             if (!snapshots.isEmpty()) {
                 throw new GradleException(
@@ -87,7 +87,7 @@ if (project.hasProperty('release')) {
 }
 
 signing {
-    required project.hasProperty('ossrh')
+    required project.hasProperty("ossrh")
 
     def signingKey = findProperty("signingKey")
     def signingPassword = findProperty("signingPassword")

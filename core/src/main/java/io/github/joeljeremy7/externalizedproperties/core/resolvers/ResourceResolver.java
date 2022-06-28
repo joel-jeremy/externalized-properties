@@ -1,5 +1,6 @@
 package io.github.joeljeremy7.externalizedproperties.core.resolvers;
 
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -7,6 +8,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.UncheckedIOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -63,9 +66,8 @@ public class ResourceResolver extends MapResolver {
      * </pre></blockquote>
      * 
      * @param url The URL resource to read the properties from.
-     * @throws IOException if an I/O exception occurs.
      */
-    private ResourceResolver(URL url) throws IOException {
+    private ResourceResolver(URL url) {
         this(url, new PropertiesReader());
     }
 
@@ -75,10 +77,9 @@ public class ResourceResolver extends MapResolver {
      * @param url The URL resource to read the properties from.
      * @param reader The reader which reads/parses properties from the URL into
      * a {@link Map} instance.
-     * @throws IOException if an I/O exception occurs.
      */
-    private ResourceResolver(URL url, ResourceReader reader) throws IOException {
-        super(readFromUrl(
+    private ResourceResolver(URL url, ResourceReader reader) {
+        super(readMapFromUrl(
             requireNonNull(url, "url"), 
             requireNonNull(reader, "reader")
         ));
@@ -106,9 +107,8 @@ public class ResourceResolver extends MapResolver {
      * @param url The URL resource to read properties from.
      * @return The {@link ResourceResolver} which reads and resolves properties from the 
      * given {@link URL}.
-     * @throws IOException if an I/O exception occurs.
      */
-    public static ResourceResolver fromUrl(URL url) throws IOException {
+    public static ResourceResolver fromUrl(URL url) {
         return new ResourceResolver(url);
     }
 
@@ -130,9 +130,8 @@ public class ResourceResolver extends MapResolver {
      * a {@link Map} instance.
      * @return The {@link ResourceResolver} which reads and resolves properties from the 
      * given {@link URL}.
-     * @throws IOException if an I/O exception occurs.
      */
-    public static ResourceResolver fromUrl(URL url, ResourceReader reader) throws IOException {
+    public static ResourceResolver fromUrl(URL url, ResourceReader reader) {
         return new ResourceResolver(url, reader);
     }
 
@@ -162,10 +161,9 @@ public class ResourceResolver extends MapResolver {
      * @param uri The URI resource to read properties from.
      * @return The {@link ResourceResolver} which reads and resolves properties from the 
      * given {@link URL}.
-     * @throws IOException if an I/O exception occurs.
      */
-    public static ResourceResolver fromUri(URI uri) throws IOException {
-        return fromUrl(requireNonNull(uri, "uri").toURL());
+    public static ResourceResolver fromUri(URI uri) {
+        return fromUrl(toUrl(requireNonNull(uri, "uri")));
     }
 
     /**
@@ -191,10 +189,9 @@ public class ResourceResolver extends MapResolver {
      * a {@link Map} instance.
      * @return The {@link ResourceResolver} which reads and resolves properties from the 
      * given {@link URL}.
-     * @throws IOException if an I/O exception occurs.
      */
-    public static ResourceResolver fromUri(URI uri, ResourceReader reader) throws IOException {
-        return fromUrl(requireNonNull(uri, "uri").toURL(), reader);
+    public static ResourceResolver fromUri(URI uri, ResourceReader reader) {
+        return fromUrl(toUrl(requireNonNull(uri, "uri")), reader);
     }
 
     /**
@@ -223,10 +220,9 @@ public class ResourceResolver extends MapResolver {
      * @param path The path resource to read properties from.
      * @return The {@link ResourceResolver} which reads and resolves properties from the 
      * given {@link URL}.
-     * @throws IOException if an I/O exception occurs.
      */
-    public static ResourceResolver fromPath(Path path) throws IOException {
-        return fromUri(requireNonNull(path, "path").toUri());
+    public static ResourceResolver fromPath(Path path) {
+        return fromUrl(toUrl(requireNonNull(path, "path")));
     }
 
     /**
@@ -252,22 +248,29 @@ public class ResourceResolver extends MapResolver {
      * a {@link Map} instance.
      * @return The {@link ResourceResolver} which reads and resolves properties from the 
      * given {@link Path}.
-     * @throws IOException if an I/O exception occurs.
      */
-    public static ResourceResolver fromPath(Path path, ResourceReader reader) throws IOException {
-        return fromUri(requireNonNull(path, "path").toUri(), reader);
+    public static ResourceResolver fromPath(Path path, ResourceReader reader) {
+        return fromUrl(toUrl(requireNonNull(path, "path")), reader);
     }
 
-    private static Map<String, String> readFromUrl(URL url, ResourceReader reader) 
-            throws IOException 
-    {
+    private static Map<String, String> readMapFromUrl(URL url, ResourceReader reader) {
         Map<String, String> result = new LinkedHashMap<>();
-        String resourceContent = readString(url.openStream());
-        // Add the raw resource String as property.
-        result.put(url.toString(), resourceContent);
-        Map<String, Object> properties = reader.read(resourceContent);
-        // Flatten the properties.
-        result.putAll(flattenMap(properties));
+        try {
+            String resourceContent = readString(url.openStream());
+            // Add the raw resource String as property.
+            result.put(url.toString(), resourceContent);
+            Map<String, Object> properties = reader.read(resourceContent);
+            // Flatten the properties.
+            result.putAll(flattenMap(properties));
+        } catch (IOException e) {
+            throw new ExternalizedPropertiesException(
+                String.format(
+                    "An exception occurred while trying to read resource: %s",
+                    url.toString()
+                ),
+                e
+            );
+        }
         return result;
     }
 
@@ -392,6 +395,18 @@ public class ResourceResolver extends MapResolver {
             return parentPath + '.' + key;
         }
         return key;
+    }
+
+    private static URL toUrl(URI uri) {
+        try {
+            return uri.toURL();
+        } catch (MalformedURLException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static URL toUrl(Path path) {
+        return toUrl(path.toUri());
     }
 
     /**

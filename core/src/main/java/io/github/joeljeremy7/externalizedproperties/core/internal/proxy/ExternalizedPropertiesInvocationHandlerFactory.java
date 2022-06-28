@@ -4,7 +4,7 @@ import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationContextFactory;
-import io.github.joeljeremy7.externalizedproperties.core.proxy.InvocationHandlerFactory;
+import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationHandlerFactory;
 
 /**
  * The factory for {@link ExternalizedPropertiesInvocationHandler}.

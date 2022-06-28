@@ -15,3 +15,4 @@ rootProject.name = "externalized-properties"
 
 include "core"
 include "resolvers:database"
+include "resolvers:git"

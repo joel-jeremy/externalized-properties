@@ -266,7 +266,7 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
             }
         } else if (method.getParameterCount() == 1) {
             if ("equals".equals(method.getName()) && 
-                    method.getParameterTypes()[0].equals(Object.class)) {
+                    Object.class.equals(method.getParameterTypes()[0])) {
                 return proxyEquals(proxy, args);
             }
         }

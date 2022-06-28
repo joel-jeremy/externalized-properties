@@ -1,0 +1,22 @@
+description = "Externalized Properties Git Resolver"
+
+dependencies {
+    implementation project(":core")
+    implementation "org.eclipse.jgit:org.eclipse.jgit:${versions.jGit}"
+    testImplementation(testFixtures(project(":core")))
+    testImplementation "org.eclipse.jgit:org.eclipse.jgit.ssh.apache:${versions.jGit}"
+    testImplementation "org.eclipse.jgit:org.eclipse.jgit.junit.http:${versions.jGit}"
+    testImplementation "org.eclipse.jgit:org.eclipse.jgit.junit.ssh:${versions.jGit}"
+    // For JsonReader.
+    testImplementation "com.fasterxml.jackson.core:jackson-databind:2.13.3"
+    // Required by jgit.junit modules.
+    testRuntimeOnly "junit:junit:4.13.2"
+}
+
+jar {
+    manifest {
+        attributes(
+            "Automatic-Module-Name": "io.github.joeljeremy7.externalizedproperties.resolvers.git"
+        )
+    }
+}

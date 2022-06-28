@@ -1,5 +1,5 @@
-apply plugin: 'test-report-aggregation'
-apply plugin: 'jacoco-report-aggregation'
+apply plugin: "test-report-aggregation"
+apply plugin: "jacoco-report-aggregation"
 
 reporting {
     reports {
