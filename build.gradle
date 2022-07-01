@@ -18,6 +18,7 @@ apply from: "${rootDir}/gradle/dependency-updates.gradle"
 
 allprojects {
   apply from: "${rootDir}/gradle/dependency-versions.gradle"
+  apply from: "${rootDir}/gradle/eclipse.gradle"
 
   group = "io.github.joel-jeremy.externalized-properties"
 
@@ -56,7 +57,19 @@ configure(javaProjects) {
     suites.configureEach {
       useJUnitJupiter("${versions.junitJupiter}")
     }
-  }
+
+    compileJava {
+        options.release.set(11)
+        options.javaModuleVersion.set(project.version)
+    }
+
+    java {
+        archivesBaseName = rootProject.relativeProjectPath(project.path).replace(":", "-")
+
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(11)
+        }
+    }
 
   java {
     toolchain {
