@@ -1,7 +1,7 @@
 name: Publish Snapshot to OSSRH
 on:
   workflow_run:
-    workflows: ["Scans"]
+    workflows: [Scans]
     branches: [main]
     types: [completed]
 jobs:
@@ -16,8 +16,8 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          java-version: '11'
-          distribution: 'temurin'
+          java-version: 11
+          distribution: temurin
         
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
