@@ -40,7 +40,7 @@ public class SetConverterTests {
     @Nested
     class Constructor {
         @Test
-        @DisplayName("should throw when set factory argument is null.")
+        @DisplayName("should throw when set factory argument is null")
         void test1() {
             assertThrows(
                 IllegalArgumentException.class,
@@ -52,7 +52,7 @@ public class SetConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is a Set class.")
+        @DisplayName("should return true when target type is a Set class")
         void test1() {
             SetConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Set.class);
@@ -60,7 +60,7 @@ public class SetConverterTests {
         }
 
         @Test
-        @DisplayName("should return false when target type is not a Set class.")
+        @DisplayName("should return false when target type is not a Set class")
         void test2() {
             SetConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(String.class);
@@ -71,7 +71,7 @@ public class SetConverterTests {
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert value to a Set.")
+        @DisplayName("should convert value to a Set")
         void test1() {
             SetConverter converter = converterToTest();
 
@@ -100,22 +100,19 @@ public class SetConverterTests {
         @Test
         @DisplayName(
             "should convert to Set<String> when target type has no " + 
-            "type parameters i.e. Set.class"
+            "type parameters i.e. Set"
         )
         void test2() {
             SetConverter converter = converterToTest();
 
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::setInteger,
+                ProxyInterface::setRaw,
                 externalizedProperties(converter)
             );
                 
             ConversionResult<? extends Set<?>> result = converter.convert(
                 context,
-                "1,2,3",
-                // Override proxy method return type with a raw Set
-                // No generic type parameter
-                Set.class
+                "1,2,3"
             );
 
             assertNotNull(result);
@@ -132,7 +129,7 @@ public class SetConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to a Set using custom delimiter.")
+        @DisplayName("should convert value to a Set using custom delimiter")
         void test3() {
             SetConverter converter = converterToTest();
 
@@ -160,7 +157,7 @@ public class SetConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value according to the Set's generic type parameter.")
+        @DisplayName("should convert value according to the Set's generic type parameter")
         void test4() {
             SetConverter converter = converterToTest();
 
@@ -221,7 +218,7 @@ public class SetConverterTests {
         }
 
         @Test
-        @DisplayName("should return String values when Set's generic type parameter is Object.")
+        @DisplayName("should return String values when Set's generic type parameter is Object")
         void test6() {
             SetConverter converter = converterToTest();
 
@@ -249,7 +246,7 @@ public class SetConverterTests {
         }
 
         @Test
-        @DisplayName("should return empty Set when property value is empty.")
+        @DisplayName("should return empty Set when property value is empty")
         void test7() {
             SetConverter converter = converterToTest();
 
@@ -271,7 +268,7 @@ public class SetConverterTests {
         }
 
         @Test
-        @DisplayName("should retain empty values from property value.")
+        @DisplayName("should retain empty values from property value")
         void test8() {
             SetConverter converter = converterToTest();
 
@@ -301,7 +298,7 @@ public class SetConverterTests {
         }
 
         @Test
-        @DisplayName("should strip empty values when annotated with @StripEmptyValues.")
+        @DisplayName("should strip empty values when annotated with @StripEmptyValues")
         void test9() {
             SetConverter converter = converterToTest();
 
@@ -433,7 +430,7 @@ public class SetConverterTests {
         }
 
         @Test
-        @DisplayName("should throw when target type has a type variable e.g. Set<T>.")
+        @DisplayName("should throw when target type has a type variable e.g. Set<T>")
         void test13() {
             SetConverter converter = converterToTest();
 
@@ -451,7 +448,7 @@ public class SetConverterTests {
 
 
         @Test
-        @DisplayName("should discard duplicate values.")
+        @DisplayName("should discard duplicate values")
         void test14() {
             SetConverter converter = converterToTest();
 
@@ -595,6 +592,10 @@ public class SetConverterTests {
     
         @ExternalizedProperty("property.set.integer")
         Set<Integer> setInteger();
+    
+        @ExternalizedProperty("property.set.raw")
+        @SuppressWarnings("rawtypes")
+        Set setRaw();
     
         @ExternalizedProperty("property.set.wildcard")
         Set<?> setPropertyWildcard();

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -23,7 +24,7 @@ public class CharacterConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is a Character.")
+        @DisplayName("should return true when target type is a Character")
         void test1() {
             CharacterConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Character.class);
@@ -31,18 +32,26 @@ public class CharacterConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a primitive char.")
+        @DisplayName("should return true when target type is a primitive char")
         void test2() {
             CharacterConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Character.TYPE);
             assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is not a Character/char")
+        void test3() {
+            CharacterConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Integer.class);
+            assertFalse(canConvert);
         }
     }
 
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert value to a Character.")
+        @DisplayName("should convert value to a Character")
         void test1() {
             CharacterConverter converter = converterToTest();
 
@@ -64,7 +73,7 @@ public class CharacterConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to a primitive char.")
+        @DisplayName("should convert value to a primitive char")
         void test2() {
             CharacterConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -85,7 +94,7 @@ public class CharacterConverterTests {
         }
 
         @Test
-        @DisplayName("should throw when value is not a valid Character/char.")
+        @DisplayName("should throw when value is not a valid Character/char")
         void test3() {
             CharacterConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(

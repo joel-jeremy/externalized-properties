@@ -45,7 +45,7 @@ public class DefaultConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is an Integer.")
+        @DisplayName("should return true when target type is an Integer")
         void primitiveTest1() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Integer.class);
@@ -53,7 +53,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a primitive int.")
+        @DisplayName("should return true when target type is a primitive int")
         void primitiveTest2() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Integer.TYPE);
@@ -61,7 +61,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a Long.")
+        @DisplayName("should return true when target type is a Long")
         void primitiveTest3() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Long.class);
@@ -69,7 +69,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a primitive long.")
+        @DisplayName("should return true when target type is a primitive long")
         void primitiveTest4() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Long.TYPE);
@@ -77,7 +77,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a Float.")
+        @DisplayName("should return true when target type is a Float")
         void primitiveTest5() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Float.class);
@@ -85,7 +85,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a primitive float.")
+        @DisplayName("should return true when target type is a primitive float")
         void primitiveTest6() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Float.TYPE);
@@ -93,7 +93,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a Double.")
+        @DisplayName("should return true when target type is a Double")
         void primitiveTest7() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Double.class);
@@ -101,7 +101,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a primitive double.")
+        @DisplayName("should return true when target type is a primitive double")
         void primitiveTest8() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Double.TYPE);
@@ -109,7 +109,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a List.")
+        @DisplayName("should return true when target type is a List")
         void listTest1() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(List.class);
@@ -117,7 +117,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a Collection.")
+        @DisplayName("should return true when target type is a Collection")
         void listTest2() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Collection.class);
@@ -125,7 +125,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a Set.")
+        @DisplayName("should return true when target type is a Set")
         void setTest1() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Set.class);
@@ -133,7 +133,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is an Array.")
+        @DisplayName("should return true when target type is an Array")
         void arrayTest1() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(String[].class);
@@ -141,7 +141,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is an enum.")
+        @DisplayName("should return true when target type is an enum")
         void enumTest1() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(TestEnum.class);
@@ -149,7 +149,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is LocalDateTime.")
+        @DisplayName("should return true when target type is LocalDateTime")
         void dateTimeTest1() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(LocalDateTime.class);
@@ -157,7 +157,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is LocalDate.")
+        @DisplayName("should return true when target type is LocalDate")
         void dateTimeTest2() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(LocalDate.class);
@@ -165,7 +165,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is LocalTime.")
+        @DisplayName("should return true when target type is LocalTime")
         void dateTimeTest3() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(LocalTime.class);
@@ -173,7 +173,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is OffsetDateTime.")
+        @DisplayName("should return true when target type is OffsetDateTime")
         void dateTimeTest4() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(OffsetDateTime.class);
@@ -181,7 +181,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is OffsetTime.")
+        @DisplayName("should return true when target type is OffsetTime")
         void dateTimeTest5() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(OffsetTime.class);
@@ -189,7 +189,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is ZonedDateTime.")
+        @DisplayName("should return true when target type is ZonedDateTime")
         void dateTimeTest6() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(ZonedDateTime.class);
@@ -197,7 +197,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is Instant.")
+        @DisplayName("should return true when target type is Instant")
         void dateTimeTest7() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Instant.class);
@@ -205,7 +205,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is DayOfWeek.")
+        @DisplayName("should return true when target type is DayOfWeek")
         void dateTimeTest8() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(DayOfWeek.class);
@@ -213,7 +213,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is Month.")
+        @DisplayName("should return true when target type is Month")
         void dateTimeTest9() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Month.class);
@@ -221,7 +221,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is MonthDay.")
+        @DisplayName("should return true when target type is MonthDay")
         void dateTimeTest10() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(MonthDay.class);
@@ -229,7 +229,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is Year.")
+        @DisplayName("should return true when target type is Year")
         void dateTimeTest11() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Year.class);
@@ -237,7 +237,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is YearMonth.")
+        @DisplayName("should return true when target type is YearMonth")
         void dateTimeTest12() {
             DefaultConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(YearMonth.class);
@@ -245,7 +245,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should return false when target type is not supported.")
+        @DisplayName("should return false when target type is not supported")
         void unsupportedTest1() {
             DefaultConverter converter = converterToTest();
             // Unsupported.
@@ -254,7 +254,7 @@ public class DefaultConverterTests {
         }
         
         // @Test
-        // @DisplayName("should return false when target type is null.")
+        // @DisplayName("should return false when target type is null")
         // void unsupportedTest2() {
         //     DefaultConverter converter = converterToTest();
         //     boolean canConvert = converter.canConvertTo(null);
@@ -265,7 +265,7 @@ public class DefaultConverterTests {
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should return skip result when target type is not supported.")
+        @DisplayName("should return skip result when target type is not supported")
         void unsupportedTest1() {
             DefaultConverter converter = converterToTest();
 
@@ -283,7 +283,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property to an Integer or primitive int.")
+        @DisplayName("should convert resolved property to an Integer or primitive int")
         void primitiveTest1() {
             DefaultConverter converter = converterToTest();
 
@@ -323,7 +323,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property to a Long or primitive long.")
+        @DisplayName("should convert resolved property to a Long or primitive long")
         void primitiveTest2() {
             DefaultConverter converter = converterToTest();
 
@@ -363,7 +363,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property to a Float or primitive float.")
+        @DisplayName("should convert resolved property to a Float or primitive float")
         void primitiveTest3() {
             DefaultConverter converter = converterToTest();
 
@@ -403,7 +403,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property to a Double or primitive double.")
+        @DisplayName("should convert resolved property to a Double or primitive double")
         void primitiveTest4() {
             DefaultConverter converter = converterToTest();
 
@@ -443,7 +443,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property to a Short or primitive short.")
+        @DisplayName("should convert resolved property to a Short or primitive short")
         void primitiveTest5() {
             DefaultConverter converter = converterToTest();
 
@@ -483,7 +483,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property to a Boolean or primitive boolean.")
+        @DisplayName("should convert resolved property to a Boolean or primitive boolean")
         void primitiveTest6() {
             DefaultConverter converter = converterToTest();
 
@@ -523,7 +523,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property to a Byte or primitive byte.")
+        @DisplayName("should convert resolved property to a Byte or primitive byte")
         void primitiveTest7() {
             DefaultConverter converter = converterToTest();
 
@@ -563,7 +563,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property to a List or Collection.")
+        @DisplayName("should convert resolved property to a List or Collection")
         void listTest1() {
             DefaultConverter converter = converterToTest();
 
@@ -609,7 +609,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property to a Set.")
+        @DisplayName("should convert resolved property to a Set")
         void setTest1() {
             DefaultConverter converter = converterToTest();
 
@@ -633,7 +633,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property to an array.")
+        @DisplayName("should convert resolved property to an array")
         void arrayTest1() {
             DefaultConverter converter = converterToTest();
 
@@ -659,7 +659,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert resolved property to enum.")
+        @DisplayName("should convert resolved property to enum")
         void enumTest1() {
             DefaultConverter converter = converterToTest();
 
@@ -679,7 +679,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to LocalDateTime.")
+        @DisplayName("should convert value to LocalDateTime")
         void dateTimeTest1() {
             DefaultConverter converter = converterToTest();
 
@@ -703,7 +703,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to LocalDate.")
+        @DisplayName("should convert value to LocalDate")
         void dateTimeTest2() {
             DefaultConverter converter = converterToTest();
 
@@ -727,7 +727,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to LocalTime.")
+        @DisplayName("should convert value to LocalTime")
         void dateTimeTest3() {
             DefaultConverter converter = converterToTest();
 
@@ -751,7 +751,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to OffsetDateTime.")
+        @DisplayName("should convert value to OffsetDateTime")
         void dateTimeTest4() {
             DefaultConverter converter = converterToTest();
 
@@ -779,7 +779,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to OffsetTime.")
+        @DisplayName("should convert value to OffsetTime")
         void dateTimeTest5() {
             DefaultConverter converter = converterToTest();
 
@@ -806,7 +806,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to ZonedDateTime.")
+        @DisplayName("should convert value to ZonedDateTime")
         void dateTimeTest7() {
             DefaultConverter converter = converterToTest();
 
@@ -834,7 +834,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to Instant.")
+        @DisplayName("should convert value to Instant")
         void dateTimeTest8() {
             DefaultConverter converter = converterToTest();
 
@@ -858,7 +858,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to DayOfWeek.")
+        @DisplayName("should convert value to DayOfWeek")
         void dateTimeTest9() {
             DefaultConverter converter = converterToTest();
 
@@ -882,7 +882,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to Month.")
+        @DisplayName("should convert value to Month")
         void dateTimeTest10() {
             DefaultConverter converter = converterToTest();
 
@@ -906,7 +906,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to MonthDay.")
+        @DisplayName("should convert value to MonthDay")
         void dateTimeTest11() {
             DefaultConverter converter = converterToTest();
 
@@ -930,7 +930,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to Year.")
+        @DisplayName("should convert value to Year")
         void dateTimeTest12() {
             DefaultConverter converter = converterToTest();
 
@@ -954,7 +954,7 @@ public class DefaultConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to YearMonth.")
+        @DisplayName("should convert value to YearMonth")
         void dateTimeTest13() {
             DefaultConverter converter = converterToTest();
 

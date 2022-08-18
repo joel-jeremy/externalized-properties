@@ -24,7 +24,7 @@ public class SystemPropertyResolverTests {
     @Nested
     class ResolveMethod {
         @Test
-        @DisplayName("should resolve property value from system properties.")
+        @DisplayName("should resolve property value from system properties")
         void test1() {
             SystemPropertyResolver resolver = resolverToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -44,7 +44,7 @@ public class SystemPropertyResolverTests {
 
         @Test
         @DisplayName(
-            "should return empty Optional when system property is not found."
+            "should return empty Optional when system property is not found"
         )
         void test2() {
             SystemPropertyResolver resolver = resolverToTest();

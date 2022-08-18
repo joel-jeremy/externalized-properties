@@ -37,7 +37,7 @@ public class ListConverterTests {
     @Nested
     class Constructor {
         @Test
-        @DisplayName("should throw when list factory argument is null.")
+        @DisplayName("should throw when list factory argument is null")
         void test1() {
             assertThrows(
                 IllegalArgumentException.class,
@@ -49,7 +49,7 @@ public class ListConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is a List class.")
+        @DisplayName("should return true when target type is a List class")
         void test1() {
             ListConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(List.class);
@@ -57,7 +57,7 @@ public class ListConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a Collection class.")
+        @DisplayName("should return true when target type is a Collection class")
         void test2() {
             ListConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Collection.class);
@@ -65,7 +65,7 @@ public class ListConverterTests {
         }
 
         @Test
-        @DisplayName("should return false when target type is not a List/Collection class.")
+        @DisplayName("should return false when target type is not a List/Collection class")
         void test3() {
             ListConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(String.class);
@@ -76,7 +76,7 @@ public class ListConverterTests {
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert value to a List.")
+        @DisplayName("should convert value to a List")
         void test1() {
             ListConverter converter = converterToTest();
 
@@ -105,22 +105,19 @@ public class ListConverterTests {
         @Test
         @DisplayName(
             "should convert to List<String> when target type has no " + 
-            "type parameters i.e. List.class"
+            "type parameters i.e. List"
         )
         void test2() {
             ListConverter converter = converterToTest();
 
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::listInteger,
+                ProxyInterface::listPropertyRaw,
                 externalizedProperties(converter)
             );
                 
             ConversionResult<? extends List<?>> result = converter.convert(
                 context,
-                "1,2,3",
-                // Override proxy method return type with a raw List
-                // No generic type parameter
-                List.class
+                "1,2,3"
             );
 
             assertNotNull(result);
@@ -137,7 +134,7 @@ public class ListConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to a List using custom delimiter.")
+        @DisplayName("should convert value to a List using custom delimiter")
         void test3() {
             ListConverter converter = converterToTest();
 
@@ -165,7 +162,7 @@ public class ListConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value according to the List's generic type parameter.")
+        @DisplayName("should convert value according to the List's generic type parameter")
         void test4() {
             ListConverter converter = converterToTest();
 
@@ -194,7 +191,7 @@ public class ListConverterTests {
 
         @Test
         @DisplayName(
-            "should return String values when List's generic type parameter is a wildcard."
+            "should return String values when List's generic type parameter is a wildcard"
         )
         void test5() {
             ListConverter converter = converterToTest();
@@ -223,7 +220,7 @@ public class ListConverterTests {
         }
 
         @Test
-        @DisplayName("should return String values when List's generic type parameter is Object.")
+        @DisplayName("should return String values when List's generic type parameter is Object")
         void test6() {
             ListConverter converter = converterToTest();
 
@@ -251,7 +248,7 @@ public class ListConverterTests {
         }
 
         @Test
-        @DisplayName("should return empty List when property value is empty.")
+        @DisplayName("should return empty List when property value is empty")
         void test7() {
             ListConverter converter = converterToTest();
 
@@ -273,7 +270,7 @@ public class ListConverterTests {
         }
 
         @Test
-        @DisplayName("should retain empty values from property value.")
+        @DisplayName("should retain empty values from property value")
         void test8() {
             ListConverter converter = converterToTest();
 
@@ -301,7 +298,7 @@ public class ListConverterTests {
         }
 
         @Test
-        @DisplayName("should strip empty values when annotated with @StripEmptyValues.")
+        @DisplayName("should strip empty values when annotated with @StripEmptyValues")
         void test9() {
             ListConverter converter = converterToTest();
 
@@ -330,7 +327,7 @@ public class ListConverterTests {
         @Test
         @DisplayName(
             "should throw when no rootConverter is registered that can handle " + 
-            "the List's generic type parameter."
+            "the List's generic type parameter"
         )
         void test10() {
             ListConverter converter = converterToTest();
@@ -350,7 +347,7 @@ public class ListConverterTests {
         @Test
         @DisplayName(
             "should convert value according to the List's generic type parameter. " + 
-            "Generic type parameter is also a parameterized type e.g. List<Optional<String>>."
+            "Generic type parameter is also a parameterized type e.g. List<Optional<String>>"
         )
         void test11() {
             ListConverter converter = converterToTest();
@@ -384,7 +381,7 @@ public class ListConverterTests {
         @Test
         @DisplayName(
             "should convert value according to the List's generic type parameter. " + 
-            "Generic type parameter is generic array e.g. List<Optional<String>[]>."
+            "Generic type parameter is generic array e.g. List<Optional<String>[]>"
         )
         void test12() {
             ListConverter converter = converterToTest();
@@ -429,7 +426,7 @@ public class ListConverterTests {
         }
 
         @Test
-        @DisplayName("should throw when target type has a type variable e.g. List<T>.")
+        @DisplayName("should throw when target type has a type variable e.g. List<T>")
         void test13() {
             ListConverter converter = converterToTest();
 
@@ -450,7 +447,7 @@ public class ListConverterTests {
         
         @Test
         @DisplayName(
-            "should use provided list factory to construct lists/collections."
+            "should use provided list factory to construct lists/collections"
         )
         void listFactoryTest1() {
             ListConverter converter = converterToTest(
@@ -485,7 +482,7 @@ public class ListConverterTests {
         
         @Test
         @DisplayName(
-            "should throw when provided list factory returns null."
+            "should throw when provided list factory returns null"
         )
         void listFactoryTest2() {
             ListConverter converter = converterToTest(
@@ -510,7 +507,7 @@ public class ListConverterTests {
         
         @Test
         @DisplayName(
-            "should throw when provided list factory returns a populated list."
+            "should throw when provided list factory returns a populated list"
         )
         void listFactoryTest3() {
             ListConverter converter = converterToTest(
@@ -555,6 +552,10 @@ public class ListConverterTests {
     private static interface ProxyInterface {
         @ExternalizedProperty("property.list")
         List<String> listProperty();
+        
+        @ExternalizedProperty("property.list.raw")
+        @SuppressWarnings("rawtypes")
+        List listPropertyRaw();
 
         @ExternalizedProperty("property.list.object")
         List<Object> listPropertyObject();

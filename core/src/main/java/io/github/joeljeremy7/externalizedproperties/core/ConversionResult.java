@@ -95,13 +95,13 @@ public class ConversionResult<T> {
         return value;
     }
 
-    /** {@inheritDoc}} */
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return Objects.hashCode(value);
     }
 
-    /** {@inheritDoc}} */
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

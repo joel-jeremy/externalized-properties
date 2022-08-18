@@ -39,7 +39,7 @@ public class DateTimeConverterTests {
     @Nested
     class CanConvertMethod {
         @Test
-        @DisplayName("should return true when target type is LocalDateTime.")
+        @DisplayName("should return true when target type is LocalDateTime")
         void test1() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(LocalDateTime.class);
@@ -47,7 +47,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is LocalDate.")
+        @DisplayName("should return true when target type is LocalDate")
         void dateTimeTest2() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(LocalDate.class);
@@ -55,7 +55,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is LocalTime.")
+        @DisplayName("should return true when target type is LocalTime")
         void test3() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(LocalTime.class);
@@ -63,7 +63,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is OffsetDateTime.")
+        @DisplayName("should return true when target type is OffsetDateTime")
         void test4() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(OffsetDateTime.class);
@@ -71,7 +71,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is OffsetTime.")
+        @DisplayName("should return true when target type is OffsetTime")
         void test5() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(OffsetTime.class);
@@ -79,7 +79,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is ZonedDateTime.")
+        @DisplayName("should return true when target type is ZonedDateTime")
         void test6() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(ZonedDateTime.class);
@@ -87,7 +87,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is Instant.")
+        @DisplayName("should return true when target type is Instant")
         void test7() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Instant.class);
@@ -95,7 +95,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is DayOfWeek.")
+        @DisplayName("should return true when target type is DayOfWeek")
         void test8() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(DayOfWeek.class);
@@ -103,7 +103,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is Month.")
+        @DisplayName("should return true when target type is Month")
         void test9() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Month.class);
@@ -111,7 +111,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is MonthDay.")
+        @DisplayName("should return true when target type is MonthDay")
         void test10() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(MonthDay.class);
@@ -119,7 +119,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is Year.")
+        @DisplayName("should return true when target type is Year")
         void test11() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Year.class);
@@ -127,7 +127,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is YearMonth.")
+        @DisplayName("should return true when target type is YearMonth")
         void test12() {
             DateTimeConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(YearMonth.class);
@@ -138,7 +138,7 @@ public class DateTimeConverterTests {
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert value to LocalDateTime.")
+        @DisplayName("should convert value to LocalDateTime")
         void test1() {
             DateTimeConverter converter = converterToTest();
 
@@ -162,7 +162,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to LocalDate.")
+        @DisplayName("should convert value to LocalDate")
         void test2() {
             DateTimeConverter converter = converterToTest();
 
@@ -186,7 +186,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to LocalTime.")
+        @DisplayName("should convert value to LocalTime")
         void test3() {
             DateTimeConverter converter = converterToTest();
 
@@ -210,7 +210,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to OffsetDateTime.")
+        @DisplayName("should convert value to OffsetDateTime")
         void test4() {
             DateTimeConverter converter = converterToTest();
 
@@ -238,7 +238,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to OffsetTime.")
+        @DisplayName("should convert value to OffsetTime")
         void test5() {
             DateTimeConverter converter = converterToTest();
 
@@ -265,7 +265,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to ZonedDateTime.")
+        @DisplayName("should convert value to ZonedDateTime")
         void test7() {
             DateTimeConverter converter = converterToTest();
 
@@ -293,7 +293,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to Instant.")
+        @DisplayName("should convert value to Instant")
         void test8() {
             DateTimeConverter converter = converterToTest();
 
@@ -317,7 +317,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to DayOfWeek.")
+        @DisplayName("should convert value to DayOfWeek")
         void test9() {
             DateTimeConverter converter = converterToTest();
 
@@ -341,7 +341,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to Month.")
+        @DisplayName("should convert value to Month")
         void test10() {
             DateTimeConverter converter = converterToTest();
 
@@ -365,7 +365,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to MonthDay.")
+        @DisplayName("should convert value to MonthDay")
         void test11() {
             DateTimeConverter converter = converterToTest();
 
@@ -389,7 +389,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to Year.")
+        @DisplayName("should convert value to Year")
         void test12() {
             DateTimeConverter converter = converterToTest();
 
@@ -413,7 +413,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to YearMonth.")
+        @DisplayName("should convert value to YearMonth")
         void test13() {
             DateTimeConverter converter = converterToTest();
 
@@ -437,7 +437,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return skip return when target type is not supported.")
+        @DisplayName("should return skip return when target type is not supported")
         void test14() {
             DateTimeConverter converter = converterToTest();
             
@@ -459,7 +459,7 @@ public class DateTimeConverterTests {
          */
 
         @Test
-        @DisplayName("should convert value to LocalDateTime using custom date time format.")
+        @DisplayName("should convert value to LocalDateTime using custom date time format")
         void customFormatTest1() {
             DateTimeConverter converter = converterToTest();
 
@@ -484,7 +484,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to LocalDate using custom date time format.")
+        @DisplayName("should convert value to LocalDate using custom date time format")
         void customFormatTest2() {
             DateTimeConverter converter = converterToTest();
 
@@ -509,7 +509,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to LocalTime using custom date time format.")
+        @DisplayName("should convert value to LocalTime using custom date time format")
         void customFormatTest3() {
             DateTimeConverter converter = converterToTest();
 
@@ -534,7 +534,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to OffsetDateTime using custom date time format.")
+        @DisplayName("should convert value to OffsetDateTime using custom date time format")
         void customFormatTest4() {
             DateTimeConverter converter = converterToTest();
 
@@ -563,7 +563,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to OffsetTime using custom date time format.")
+        @DisplayName("should convert value to OffsetTime using custom date time format")
         void customFormatTest5() {
             DateTimeConverter converter = converterToTest();
 
@@ -591,7 +591,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to ZonedDateTime using custom date time format.")
+        @DisplayName("should convert value to ZonedDateTime using custom date time format")
         void customFormatTest6() {
             DateTimeConverter converter = converterToTest();
 
@@ -621,7 +621,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to MonthDay using custom date time format.")
+        @DisplayName("should convert value to MonthDay using custom date time format")
         void customFormatTest7() {
             DateTimeConverter converter = converterToTest();
 
@@ -646,7 +646,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to Year using custom date time format.")
+        @DisplayName("should convert value to Year using custom date time format")
         void customFormatTest8() {
             DateTimeConverter converter = converterToTest();
 
@@ -670,7 +670,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to YearMonth using custom date time format.")
+        @DisplayName("should convert value to YearMonth using custom date time format")
         void customFormatTest9() {
             DateTimeConverter converter = converterToTest();
 
@@ -695,7 +695,7 @@ public class DateTimeConverterTests {
         }
 
         @Test
-        @DisplayName("should return skip return when target type is not supported.")
+        @DisplayName("should return skip return when target type is not supported")
         void customFormatTest10() {
             DateTimeConverter converter = converterToTest();
 
@@ -791,10 +791,10 @@ public class DateTimeConverterTests {
         @DateTimeFormat("yy")
         Year yearCustomFormat();
 
-        @ExternalizedProperty("property.yearmonth.customformat")
+        @ExternalizedProperty("property.yearmonth")
         YearMonth yearMonth();
 
-        @ExternalizedProperty("property.yearmonth")
+        @ExternalizedProperty("property.yearmonth.customformat")
         @DateTimeFormat("yyyy MMMM")
         YearMonth yearMonthCustomFormat();
 

@@ -4,6 +4,7 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
+import io.github.joeljeremy7.externalizedproperties.core.testentities.Unsafe;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +25,7 @@ public class EnvironmentVariableResolverTests {
     @Nested
     class ResolveMethod {
         @Test
-        @DisplayName("should resolve property value from environment variables.")
+        @DisplayName("should resolve property value from environment variables")
         void test1() {
             EnvironmentVariableResolver resolver = resolverToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -47,7 +48,7 @@ public class EnvironmentVariableResolverTests {
 
         @Test
         @DisplayName(
-            "should return empty Optional when environment variable is not found."
+            "should return empty Optional when environment variable is not found"
         )
         void test2() {
             EnvironmentVariableResolver resolver = resolverToTest();
@@ -68,33 +69,57 @@ public class EnvironmentVariableResolverTests {
         @Test
         @DisplayName(
             "should attempt to resolve environment variable by formatting " + 
-            "property name to environment variable format."
+            "property name to environment variable format (convert dots to underscores)"
         )
         void test3() {
-            EnvironmentVariableResolver resolver = resolverToTest();
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::javaHome,
-                externalizedProperties(resolver)
-            );
+            Unsafe.setEnv("TEST_3", "test3");
+            try {
+                EnvironmentVariableResolver resolver = resolverToTest();
+                InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
+                    ProxyInterface::test3,
+                    externalizedProperties(resolver)
+                );
 
-            Optional<String> result1 = resolver.resolve(
-                context,
-                // java.home should be converted to JAVA_HOME
-                "java.home"
-            );
+                Optional<String> result = resolver.resolve(
+                    context,
+                    // test.3 should be converted to TEST_3
+                    "test.3"
+                );
 
-            Optional<String> result2 = resolver.resolve(
-                context,
-                // java-home should be converted to JAVA_HOME
-                "java-home"  
-            );
+                assertNotNull(result);
+                assertTrue(result.isPresent());
+                assertEquals(System.getenv("TEST_3"), result.get());
+            } finally {
+                Unsafe.clearEnv("TEST_3");
+            }
+        }
 
-            assertNotNull(result1);
-            assertNotNull(result2);
-            assertTrue(result1.isPresent());
-            assertTrue(result2.isPresent());
-            assertEquals(System.getenv("JAVA_HOME"), result1.get());
-            assertEquals(System.getenv("JAVA_HOME"), result2.get());
+        @Test
+        @DisplayName(
+            "should attempt to resolve environment variable by formatting " + 
+            "property name to environment variable format (convert dashes to underscores)"
+        )
+        void test4() {
+            Unsafe.setEnv("TEST_4", "test4");
+            try {
+                EnvironmentVariableResolver resolver = resolverToTest();
+                InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
+                    ProxyInterface::test4,
+                    externalizedProperties(resolver)
+                );
+
+                Optional<String> result = resolver.resolve(
+                    context,
+                    // test-4 should be converted to TEST_ENV_VAR
+                    "test-4"
+                );
+
+                assertNotNull(result);
+                assertTrue(result.isPresent());
+                assertEquals(System.getenv("TEST_4"), result.get());
+            } finally {
+                Unsafe.clearEnv("TEST_4");
+            }
         }
     }
 
@@ -109,17 +134,24 @@ public class EnvironmentVariableResolverTests {
     private static interface ProxyInterface {
         /**
          * EnvironmentVariableResolver supports formatting of
-         * property names such that path is converted to PATH.
+         * property names such that "path" is converted to "PATH".
          */
         @ExternalizedProperty("path")
         String path();
 
         /**
          * EnvironmentVariableResolver supports formatting of
-         * property names such that java.home is converted to JAVA_HOME.
+         * property names such that "test.3" is converted to "TEST_3".
          */
-        @ExternalizedProperty("java.home")
-        String javaHome();
+        @ExternalizedProperty("test.3")
+        String test3();
+
+        /**
+         * EnvironmentVariableResolver supports formatting of
+         * property names such that "test-4" is converted to "TEST_4".
+         */
+        @ExternalizedProperty("test-4")
+        String test4();
 
         @ExternalizedProperty("not.found")
         String notFound();

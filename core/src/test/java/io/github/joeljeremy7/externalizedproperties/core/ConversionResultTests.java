@@ -16,7 +16,7 @@ public class ConversionResultTests {
     @Nested
     class OfMethod {
         @Test
-        @DisplayName("should throw when value argument is null.")
+        @DisplayName("should throw when value argument is null")
         void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -28,7 +28,7 @@ public class ConversionResultTests {
     @Nested
     class SkipMethod {
         @Test
-        @DisplayName("should always return the same object reference.")
+        @DisplayName("should always return the same object reference")
         void test1() {
             assertSame(ConversionResult.skip(), ConversionResult.skip());
         }
@@ -37,7 +37,7 @@ public class ConversionResultTests {
     @Nested
     class ValueMethod {
         @Test
-        @DisplayName("should return the provided value via of() factory method.")
+        @DisplayName("should return the provided value via of() factory method")
         void test1() {
             ConversionResult<String> result = ConversionResult.of("test");
             assertEquals("test", result.value());

@@ -39,15 +39,8 @@ configure(javaProjects) {
     apply from: "${rootDir}/gradle/code-quality.gradle"
     apply from: "${rootDir}/gradle/multi-jvm-tests.gradle"
 
-    dependencies {
-        testImplementation "org.junit.jupiter:junit-jupiter:${versions.junitJupiter}"
-    }
-
     testing {
-        suites { 
-            test { 
-                useJUnitJupiter()
-            }
+        suites {
             integrationTest(JvmTestSuite) {
                 testType = TestSuiteType.INTEGRATION_TEST
                 targets {
@@ -59,10 +52,9 @@ configure(javaProjects) {
                 }
             }
         }
-    }
-
-    compileJava {
-        options.release = 11
+        suites.configureEach {
+            useJUnitJupiter("${versions.junitJupiter}")
+        }
     }
 
     java {
@@ -71,6 +63,11 @@ configure(javaProjects) {
         toolchain {
             languageVersion = JavaLanguageVersion.of(11)
         }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        // For some reason, options.release flag doesn't work with compileJava.
+        options.release = 8
     }
 
     javadoc {

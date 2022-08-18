@@ -41,18 +41,24 @@ tasks.withType(JavaCompile).configureEach { task ->
         enabled = task.name.equals("compileJava")
 
         def enabledChecks = [
-            "AssertFalse", "CatchingUnchecked", "CheckedExceptionNotThrown", "ClassName",
-            "ComparisonContractViolated", "DepAnn", "EmptyIf", "EqualsBrokenForNull",
+            "AssertFalse", "BuilderReturnThis", "CatchingUnchecked", "CheckedExceptionNotThrown", 
+            "ClassName", "ComparisonContractViolated", "DepAnn", "EmptyIf", "EqualsBrokenForNull",
             "FieldCanBeFinal", "FieldCanBeLocal", "FieldCanBeStatic", "ForEachIterable",
             "FuzzyEqualsShouldNotBeUsedInEqualsMethod", "FunctionalInterfaceClash",
             "IterablePathParameter", "LongLiteralLowerCaseSuffix", "MissingBraces",
-            "MissingDefault", "MixedArrayDimensions", "MissingDefault", "NoAllocation", 
-            "PackageLocation", "PreferredInterfaceType", "RedundantThrows", "RemoveUnusedImports", 
-            "ReturnsNullCollection", "StronglyTypeByteString", "StronglyTypeTime", "SwitchDefault", 
-            "TimeUnitMismatch", "TransientMisuse", "UnnecessarilyVisible", "UnnecessaryAnonymousClass",
-            "UnnecessaryOptionalGet", "UsingJsr305CheckReturnValue"
+            "MissingDefault", "MixedArrayDimensions", "NoAllocation", "PackageLocation", 
+            "PreferredInterfaceType", "RedundantThrows", "RemoveUnusedImports", 
+            "ReturnsNullCollection", "SelfAlwaysReturnsThis", "StronglyTypeByteString", 
+            "StronglyTypeTime", "SwitchDefault", "TimeUnitMismatch", "TransientMisuse", 
+            "UnnecessarilyVisible", "UnnecessaryAnonymousClass", "UnnecessaryOptionalGet", 
+            "UnsafeLocaleUsage", "UnusedTypeParameter", "UsingJsr305CheckReturnValue"
         ]
         enabledChecks.each { enable(it) }
+
+        def disabledChecks = [
+            "CanIgnoreReturnValueSuggester"
+        ]
+        disabledChecks.each { disable(it) }
 
         nullaway {
             severity = net.ltgt.gradle.errorprone.CheckSeverity.ERROR

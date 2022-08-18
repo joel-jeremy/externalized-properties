@@ -26,7 +26,7 @@ public class ServiceLoaderResolverTests {
     @Nested
     class ResolveMethod {
         @Test
-        @DisplayName("should load properties from ServiceLoader resolvers.")
+        @DisplayName("should load properties from ServiceLoader resolvers")
         void test1() {
             ServiceLoaderResolver resolver = resolverToTest();
             InvocationContext javaVersionContext = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -62,7 +62,7 @@ public class ServiceLoaderResolverTests {
         @Test
         @DisplayName(
             "should return empty Optional when property cannot be resolved from " + 
-            "any of the ServiceLoader resolvers."
+            "any of the ServiceLoader resolvers"
         )
         void test2() {
             ServiceLoaderResolver resolver = resolverToTest();

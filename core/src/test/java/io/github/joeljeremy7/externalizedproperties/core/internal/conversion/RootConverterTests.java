@@ -36,7 +36,7 @@ public class RootConverterTests {
     @Nested
     class Constructor {
         @Test
-        @DisplayName("should throw when converter collection argument is null.")
+        @DisplayName("should throw when converter collection argument is null")
         void test1() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -47,7 +47,7 @@ public class RootConverterTests {
         }
 
         @Test
-        @DisplayName("should throw when converter varargs argument is null.")
+        @DisplayName("should throw when converter varargs argument is null")
         void test2() {
             assertThrows(
                 IllegalArgumentException.class, 
@@ -102,7 +102,7 @@ public class RootConverterTests {
     @Nested
     class ConvertMethod {
         // @Test
-        // @DisplayName("should throw when proxy method argument is null.")
+        // @DisplayName("should throw when proxy method argument is null")
         // void test1() {
         //     Converter<?> converter = new PrimitiveConverter();
         //     RootConverter rootConverter = rootConverter(converter);
@@ -114,7 +114,7 @@ public class RootConverterTests {
         // }
 
         // @Test
-        // @DisplayName("should throw when value to convert argument is null.")
+        // @DisplayName("should throw when value to convert argument is null")
         // void test2() {
         //     Converter<?> converter = new PrimitiveConverter();
         //     RootConverter rootConverter = rootConverter(converter);
@@ -131,7 +131,7 @@ public class RootConverterTests {
         // }
 
         // @Test
-        // @DisplayName("should throw when value target type argument is null.")
+        // @DisplayName("should throw when value target type argument is null")
         // void test3() {
         //     Converter<?> converter = new PrimitiveConverter();
         //     RootConverter rootConverter = rootConverter(converter);
@@ -148,7 +148,7 @@ public class RootConverterTests {
         // }
 
         @Test
-        @DisplayName("should correctly convert to target type.")
+        @DisplayName("should correctly convert to target type")
         void test1() {
             Converter<?> converter = new IntegerConverter();
             RootConverter rootConverter = rootConverter(converter);
@@ -170,7 +170,7 @@ public class RootConverterTests {
         }
 
         @Test
-        @DisplayName("should have out-of-the-box support for Optional.")
+        @DisplayName("should have out-of-the-box support for Optional")
         void test2() {
             // No converters registered.
             RootConverter rootConverter = rootConverter();
@@ -213,7 +213,7 @@ public class RootConverterTests {
         }
 
         @Test
-        @DisplayName("should wrap and re-throw when converter has thrown an exception.")
+        @DisplayName("should wrap and re-throw when converter has thrown an exception")
         void test4() {
             // Handler that can convert anything but always throws.
             Converter<?> throwingConverter = new Converter<Object>() {
@@ -228,7 +228,7 @@ public class RootConverterTests {
                         String valueToConvert,
                         Type targetType
                 ) {
-                    throw new RuntimeException("Mr. Stark I don't feel so good...");
+                    throw new RuntimeException("Mr. Stark, I don't feel so good.");
                 }
             };
             
@@ -239,16 +239,14 @@ public class RootConverterTests {
                 externalizedProperties(throwingConverter)
             );
 
-            Type targetType = context.method().returnType();
-
             assertThrows(
                 ConversionException.class, 
-                () -> converter.convert(context, "1", targetType)
+                () -> converter.convert(context, "1")
             );
         }
 
         @Test
-        @DisplayName("should skip to next converter when skip result is returned.")
+        @DisplayName("should skip to next converter when skip result is returned")
         void test5() throws InterruptedException {
             Converter<?> converter1 = new Converter<Object>() {
                 @Override
@@ -298,8 +296,7 @@ public class RootConverterTests {
 
             ConversionResult<?> result = rootConverter.convert(
                 context,
-                "1",
-                context.method().returnType()
+                "1"
             );
 
             Object convertedValue = result.value();

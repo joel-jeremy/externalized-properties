@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,7 +23,7 @@ public class ShortConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is a Short.")
+        @DisplayName("should return true when target type is a Short")
         void test1() {
             ShortConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Short.class);
@@ -30,18 +31,26 @@ public class ShortConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a primitive short.")
+        @DisplayName("should return true when target type is a primitive short")
         void test2() {
             ShortConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Short.TYPE);
             assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is not a Short/short")
+        void test3() {
+            ShortConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Integer.class);
+            assertFalse(canConvert);
         }
     }
 
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert value to a Short.")
+        @DisplayName("should convert value to a Short")
         void test1() {
             ShortConverter converter = converterToTest();
 
@@ -63,7 +72,7 @@ public class ShortConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to a primitive short.")
+        @DisplayName("should convert value to a primitive short")
         void test2() {
             ShortConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -84,7 +93,7 @@ public class ShortConverterTests {
         }
 
         @Test
-        @DisplayName("should throw when value is not a valid Short/short.")
+        @DisplayName("should throw when value is not a valid Short/short")
         void test3() {
             ShortConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(

@@ -13,6 +13,9 @@ import java.util.Optional;
 
 import static io.github.joeljeremy7.externalizedproperties.core.internal.Arguments.requireNonNull;
 
+/**
+ * The factory for {@link InvocationContext}.
+ */
 public class InvocationContextFactory {
 
     private final ExternalizedProperties externalizedProperties;

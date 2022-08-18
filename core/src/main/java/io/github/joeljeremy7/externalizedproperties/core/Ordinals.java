@@ -166,7 +166,7 @@ public class Ordinals {
             this.decorated = requireNonNull(decorated, "decorated");
         }
     
-        /** {@inheritDoc}} */
+        /** {@inheritDoc} */
         @Override
         public Optional<String> resolve(InvocationContext context, String propertyName) {
             return decorated.resolve(context, propertyName);
@@ -212,13 +212,13 @@ public class Ordinals {
             this.decorated = requireNonNull(decorated, "decorated");;
         }
 
-        /** {@inheritDoc}} */
+        /** {@inheritDoc} */
         @Override
         public boolean canConvertTo(Class<?> targetType) {
             return decorated.canConvertTo(targetType);
         }
 
-        /** {@inheritDoc}} */
+        /** {@inheritDoc} */
         @Override
         public ConversionResult<T> convert(
                 InvocationContext context, 
