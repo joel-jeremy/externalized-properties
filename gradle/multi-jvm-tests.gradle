@@ -1,5 +1,5 @@
-// Ideally every LTS release (succeeding the toolchain's Java language version) 
-// plus the latest released Java version.
+// Ideally every LTS release (succeeding the version used in source compilation) 
+// plus the latest released non-LTS version.
 def additionalTestRunsOnJvmVersions = 
     System.getenv("ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS") ?:
     System.getProperties().getOrDefault("additionalTestRunsOnJvmVersions", "")
@@ -17,7 +17,8 @@ additionalTestRunsOnJvmVersions.split(",").findAll({ !it.isEmpty() }).each { jav
         if (Integer.valueOf(javaVersion) >= 17) {
             // We are reflectively setting environment variable in some unit tests.
             // As of Java 17, this is no longer permitted. We need this flag to re-enable
-            // the unit test hack.
+            // the unit test hack. We are opening java.util because we are reflectively
+            // accessing the internal mutable map of a Collections.unmodifiableMap instance.
             jvmArgs = [ "--add-opens=java.base/java.util=ALL-UNNAMED" ]
         }
     }
