@@ -58,11 +58,6 @@ configure(javaProjects) {
       useJUnitJupiter("${versions.junitJupiter}")
     }
 
-    compileJava {
-        options.release.set(11)
-        options.javaModuleVersion.set(project.version)
-    }
-
     java {
         archivesBaseName = rootProject.relativeProjectPath(project.path).replace(":", "-")
 
@@ -71,9 +66,10 @@ configure(javaProjects) {
         }
     }
 
-  java {
-    toolchain {
-      languageVersion = JavaLanguageVersion.of(11)
+    tasks.withType(JavaCompile) {
+        // For some reason, options.release flag doesn't work with compileJava.
+        options.release = 11
+        options.javaModuleVersion = project.version
     }
   }
 
