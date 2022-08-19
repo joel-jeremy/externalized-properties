@@ -2,7 +2,7 @@
 // plus the latest released non-LTS version.
 def additionalTestRunsOnJvmVersions = 
     System.getenv("ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS") ?:
-    System.getProperties().getOrDefault("additionalTestRunsOnJvmVersions", "")
+    System.getProperties().getOrDefault("additionalTestRunsOnJvmVersions", "8,17,18")
 
 additionalTestRunsOnJvmVersions.split(",").findAll({ !it.isEmpty() }).each { javaVersion ->
     def testTaskName = "testOnJava${javaVersion}"
