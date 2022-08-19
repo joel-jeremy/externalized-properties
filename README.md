@@ -27,6 +27,9 @@ The goal of this library is to make it easy for applications to implement config
 
 ```groovy
 implementation "io.github.joeljeremy7.externalizedproperties:core:${version}"
+// Optional/additional resolvers
+implementation "io.github.joeljeremy7.externalizedproperties:resolvers-database:${version}"
+implementation "io.github.joeljeremy7.externalizedproperties:resolvers-git:${version}"
 ```
 
 ### Maven
@@ -37,6 +40,17 @@ implementation "io.github.joeljeremy7.externalizedproperties:core:${version}"
     <artifactId>core</artifactId>
     <version>${version}</version>
 </dependency>
+<!-- Optional/additional resolvers -->
+<dependency>
+    <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
+    <artifactId>resolvers-database</artifactId>
+    <version>${version}</version>
+</dependency>
+<dependency>
+    <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
+    <artifactId>resolvers-git</artifactId>
+    <version>${version}</version>
+</dependency>
 ```
 
 ### 🧩 Java 9 Module Names
@@ -45,6 +59,7 @@ Externalized Properties jars are published with Automatic-Module-Name manifest a
 
 - Core - `io.github.joeljeremy7.externalizedproperties.core`
 - Database Resolver - `io.github.joeljeremy7.externalizedproperties.resolvers.database`
+- Git Resolver - `io.github.joeljeremy7.externalizedproperties.resolvers.git`
 
 Module authors can use above module names in their module-info.java:
 
@@ -52,6 +67,7 @@ Module authors can use above module names in their module-info.java:
 module foo.bar {
     requires io.github.joeljeremy7.externalizedproperties.core;
     requires io.github.joeljeremy7.externalizedproperties.resolvers.database;
+    requires io.github.joeljeremy7.externalizedproperties.resolvers.git;
 }
 ```
 
