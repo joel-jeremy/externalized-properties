@@ -31,7 +31,7 @@ public class ArrayConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is an array class.")
+        @DisplayName("should return true when target type is an array class")
         void test1() {
             ArrayConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(String[].class);
@@ -39,7 +39,7 @@ public class ArrayConverterTests {
         }
 
         @Test
-        @DisplayName("should return false when target type is not an array.")
+        @DisplayName("should return false when target type is not an array")
         void test2() {
             ArrayConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Integer.class);
@@ -50,7 +50,7 @@ public class ArrayConverterTests {
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should return skip result when target type is not an array.")
+        @DisplayName("should return skip result when target type is not an array")
         void test1() {
             ArrayConverter converter = converterToTest();
 
@@ -70,7 +70,7 @@ public class ArrayConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to an array.")
+        @DisplayName("should convert value to an array")
         void test2() {
             ArrayConverter converter = converterToTest();
 
@@ -98,7 +98,7 @@ public class ArrayConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value according to the array's component type.")
+        @DisplayName("should convert value according to the array's component type")
         void test3() {
             ArrayConverter converter = converterToTest();
 
@@ -125,7 +125,7 @@ public class ArrayConverterTests {
         }
 
         @Test
-        @DisplayName("should return empty array when value is empty.")
+        @DisplayName("should return empty array when value is empty")
         void test4() {
             ArrayConverter converter = converterToTest();
             
@@ -146,7 +146,7 @@ public class ArrayConverterTests {
         }
 
         @Test
-        @DisplayName("should retain empty values from value.")
+        @DisplayName("should retain empty values from value")
         void test5() {
             ArrayConverter converter = converterToTest();
             
@@ -173,7 +173,7 @@ public class ArrayConverterTests {
         }
 
         @Test
-        @DisplayName("should strip empty values when annotated with @StripEmptyValues.")
+        @DisplayName("should strip empty values when annotated with @StripEmptyValues")
         void test6() {
             ArrayConverter converter = converterToTest();
             
@@ -200,7 +200,7 @@ public class ArrayConverterTests {
         }
 
         @Test
-        @DisplayName("should return Strings when array component type is Object.")
+        @DisplayName("should return Strings when array component type is Object")
         void test7() {
             ArrayConverter converter = converterToTest();
             
@@ -229,7 +229,7 @@ public class ArrayConverterTests {
         @Test
         @DisplayName(
             "should throw when no rootConverter is registered that can handle " + 
-            "the array's component type."
+            "the array's component type"
         )
         void test8() {
             // No registered converter for Integer.
@@ -249,7 +249,7 @@ public class ArrayConverterTests {
         }
 
         @Test
-        @DisplayName("should use custom delimiter defined by @Delimiter.")
+        @DisplayName("should use custom delimiter defined by @Delimiter")
         void test9() {
             ArrayConverter converter = converterToTest();
             
@@ -277,7 +277,7 @@ public class ArrayConverterTests {
 
         @Test
         @DisplayName(
-            "should convert value according to the array's generic component type."
+            "should convert value according to the array's generic component type"
         )
         void test10() {
             ArrayConverter converter = converterToTest();
@@ -310,7 +310,7 @@ public class ArrayConverterTests {
 
         @Test
         @DisplayName(
-            "should convert generic type parameter wildcards to Strings."
+            "should convert generic type parameter wildcards to Strings"
         )
         void test11() {
             ArrayConverter converter = converterToTest();
@@ -342,7 +342,7 @@ public class ArrayConverterTests {
         }
 
         @Test
-        @DisplayName("should throw when target type has a type variable e.g. List<T>.")
+        @DisplayName("should throw when target type has a type variable e.g. List<T>")
         void test12() {
             ArrayConverter converter = converterToTest();
             

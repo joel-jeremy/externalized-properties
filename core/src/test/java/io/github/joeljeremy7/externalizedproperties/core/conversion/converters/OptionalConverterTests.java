@@ -31,7 +31,7 @@ public class OptionalConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is an Optional class.")
+        @DisplayName("should return true when target type is an Optional class")
         void test1() {
             OptionalConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Optional.class);
@@ -39,7 +39,7 @@ public class OptionalConverterTests {
         }
 
         @Test
-        @DisplayName("should return false when target type is not an Optional class.")
+        @DisplayName("should return false when target type is not an Optional class")
         void test2() {
             OptionalConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(String.class);
@@ -50,7 +50,7 @@ public class OptionalConverterTests {
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert value to an Optional.")
+        @DisplayName("should convert value to an Optional")
         void test1() {
             OptionalConverter converter = converterToTest();
 
@@ -75,7 +75,7 @@ public class OptionalConverterTests {
 
         @Test
         @DisplayName(
-            "should convert value according to the Optional's generic type parameter."
+            "should convert value according to the Optional's generic type parameter"
         )
         void test2() {
             OptionalConverter converter = converterToTest();
@@ -102,22 +102,19 @@ public class OptionalConverterTests {
         @Test
         @DisplayName(
             "should return String value when target type has no " + 
-            "type parameters i.e. Optional.class"
+            "type parameters i.e. Optional"
         )
         void test3() {
             OptionalConverter converter = converterToTest();
 
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::nonStringOptionalProperty,
+                ProxyInterface::optionalPropertyRaw,
                 externalizedProperties(converter)
             );
 
             ConversionResult<? extends Optional<?>> result = converter.convert(
                 context,
-                "1",
-                // Override proxy method return type with a raw Optional
-                // No generic type parameter
-                Optional.class
+                "1"
             );
             
             assertNotNull(result);
@@ -131,7 +128,7 @@ public class OptionalConverterTests {
         }
 
         @Test
-        @DisplayName("should return String value when Optional's generic type parameter is Object.")
+        @DisplayName("should return String value when Optional's generic type parameter is Object")
         void test4() {
             OptionalConverter converter = converterToTest();
 
@@ -156,7 +153,7 @@ public class OptionalConverterTests {
 
         @Test
         @DisplayName(
-            "should return String value when Optional's generic type parameter is a wildcard."
+            "should return String value when Optional's generic type parameter is a wildcard"
         )
         void test5() {
             OptionalConverter converter = converterToTest();
@@ -181,7 +178,7 @@ public class OptionalConverterTests {
         }
 
         @Test
-        @DisplayName("should throw when target type has a type variable e.g. Optional<T>.")
+        @DisplayName("should throw when target type has a type variable e.g. Optional<T>")
         void test6() {
             OptionalConverter converter = converterToTest();
 
@@ -199,7 +196,7 @@ public class OptionalConverterTests {
         @Test
         @DisplayName(
             "should convert value according to the Optional's generic type parameter. " + 
-            "Generic type parameter is also a parameterized type e.g. Optional<List<String>>."
+            "Generic type parameter is also a parameterized type e.g. Optional<List<String>>"
         )
         void test7() {
             OptionalConverter converter = converterToTest();
@@ -229,7 +226,7 @@ public class OptionalConverterTests {
         @Test
         @DisplayName(
             "should convert value according to the Optional's generic type parameter. " + 
-            "Generic type parameter is a generic array e.g. Optional<Optional<String>[]>."
+            "Generic type parameter is a generic array e.g. Optional<Optional<String>[]>"
         )
         void test8() {
             OptionalConverter converter = converterToTest();
@@ -263,7 +260,7 @@ public class OptionalConverterTests {
 
         @Test
         @DisplayName(
-            "should convert value to an empty Optional when property value is empty."
+            "should convert value to an empty Optional when property value is empty"
         )
         void test9() {
             OptionalConverter converter = converterToTest();
@@ -303,6 +300,10 @@ public class OptionalConverterTests {
     static interface ProxyInterface {
         @ExternalizedProperty("property.optional")
         Optional<String> optionalProperty();
+
+        @ExternalizedProperty("property.optional.raw")
+        @SuppressWarnings("rawtypes")
+        Optional optionalPropertyRaw();
 
         @ExternalizedProperty("property.optional.with.default.value")
         default Optional<String> optionalPropertyWithDefaultValue() {

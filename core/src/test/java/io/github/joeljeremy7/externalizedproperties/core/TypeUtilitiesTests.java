@@ -30,7 +30,7 @@ public class TypeUtilitiesTests {
     @Nested
     class GetRawTypeMethod {
         @Test
-        @DisplayName("should throw when type argument is null.")
+        @DisplayName("should throw when type argument is null")
         void nullTest() {
             assertThrows(
                 IllegalArgumentException.class,
@@ -39,7 +39,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return same class when type is a class.")
+        @DisplayName("should return same class when type is a class")
         void classTest1() {
             assertEquals(
                 String.class, 
@@ -48,7 +48,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return raw type when type is a parameterized type.")
+        @DisplayName("should return raw type when type is a parameterized type")
         void parameterizedTest1() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::parameterizedTypeReturnType,
@@ -255,7 +255,7 @@ public class TypeUtilitiesTests {
     @Nested
     class GetTypeParametersMethod {
         @Test
-        @DisplayName("should return generic type parameter.")
+        @DisplayName("should return generic type parameter")
         void test1() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::parameterizedTypeReturnType,
@@ -271,7 +271,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return empty array when type is not a parameterized type.")
+        @DisplayName("should return empty array when type is not a parameterized type")
         void test2() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::nonParameterizedTypeReturnType,
@@ -287,7 +287,7 @@ public class TypeUtilitiesTests {
     @Nested
     class IsClassMethod {
         @Test
-        @DisplayName("should return true when type is a class.")
+        @DisplayName("should return true when type is a class")
         void test1() {
             Type type = String.class;
             assertTrue(type instanceof Class<?>);
@@ -295,7 +295,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return false when type is not a class.")
+        @DisplayName("should return false when type is not a class")
         void test2() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::parameterizedTypeReturnType,
@@ -312,7 +312,7 @@ public class TypeUtilitiesTests {
     @Nested
     class IsParameterizedTypeMethod {
         @Test
-        @DisplayName("should return true when type is a parameterized type.")
+        @DisplayName("should return true when type is a parameterized type")
         void test1() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::parameterizedTypeReturnType,
@@ -325,7 +325,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return false when type is not a parameterized type.")
+        @DisplayName("should return false when type is not a parameterized type")
         void test2() {
             Type type = String.class;
             assertFalse(type instanceof ParameterizedType);
@@ -336,7 +336,7 @@ public class TypeUtilitiesTests {
     @Nested
     class IsGenericArrayTypeMethod {
         @Test
-        @DisplayName("should return true when type is a generic array type.")
+        @DisplayName("should return true when type is a generic array type")
         void test1() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::genericArrayTypeReturnTypeWithTypeVariable,
@@ -349,7 +349,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return false when type is not a generic array type.")
+        @DisplayName("should return false when type is not a generic array type")
         void test2() {
             Type type = String.class;
             assertFalse(type instanceof GenericArrayType);
@@ -360,7 +360,7 @@ public class TypeUtilitiesTests {
     @Nested
     class IsTypeVariableMethod {
         @Test
-        @DisplayName("should return true when type is a type variable.")
+        @DisplayName("should return true when type is a type variable")
         void test1() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::typeVariableReturnType,
@@ -373,7 +373,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return false when type is not a type variable.")
+        @DisplayName("should return false when type is not a type variable")
         void test2() {
             Type type = String.class;
             assertFalse(type instanceof TypeVariable<?>);
@@ -384,7 +384,7 @@ public class TypeUtilitiesTests {
     @Nested
     class IsWildcardTypeMethod {
         @Test
-        @DisplayName("should return true when type is a wildcard type.")
+        @DisplayName("should return true when type is a wildcard type")
         void test1() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::wildcardTypeReturnType,
@@ -405,7 +405,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return false when type is not a wildcard type.")
+        @DisplayName("should return false when type is not a wildcard type")
         void test2() {
             Type type = String.class;
             assertFalse(type instanceof WildcardType);
@@ -416,7 +416,7 @@ public class TypeUtilitiesTests {
     @Nested
     class AsClassMethod {
         @Test
-        @DisplayName("should return a class when type is a class.")
+        @DisplayName("should return a class when type is a class")
         void test1() {
             Type type = String.class;
 
@@ -427,7 +427,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return null when type is not a class.")
+        @DisplayName("should return null when type is not a class")
         void test2() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::parameterizedTypeReturnType,
@@ -443,7 +443,7 @@ public class TypeUtilitiesTests {
     @Nested
     class AsParameterizedTypeMethod {
         @Test
-        @DisplayName("should return a parameterized type when type is a parameterized type.")
+        @DisplayName("should return a parameterized type when type is a parameterized type")
         void test1() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::parameterizedTypeReturnType,
@@ -459,7 +459,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return null when type is not a parameterized type.")
+        @DisplayName("should return null when type is not a parameterized type")
         void test2() {
             Type type = String.class;
             assertFalse(type instanceof ParameterizedType);
@@ -470,7 +470,7 @@ public class TypeUtilitiesTests {
     @Nested
     class AsGenericArrayTypeMethod {
         @Test
-        @DisplayName("should return a generic array type when type is a generic array type.")
+        @DisplayName("should return a generic array type when type is a generic array type")
         void test1() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::genericArrayTypeReturnTypeWithTypeVariable,
@@ -486,7 +486,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return null when type is not a generic array type.")
+        @DisplayName("should return null when type is not a generic array type")
         void test2() {
             Type type = String.class;
             assertFalse(type instanceof GenericArrayType);
@@ -497,7 +497,7 @@ public class TypeUtilitiesTests {
     @Nested
     class AsTypeVariableMethod {
         @Test
-        @DisplayName("should return a type variable when type is a type variable.")
+        @DisplayName("should return a type variable when type is a type variable")
         void test1() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::typeVariableReturnType,
@@ -513,7 +513,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return false when type is not a type variable.")
+        @DisplayName("should return false when type is not a type variable")
         void test2() {
             Type type = String.class;
             assertFalse(type instanceof TypeVariable<?>);
@@ -524,7 +524,7 @@ public class TypeUtilitiesTests {
     @Nested
     class AsWildcardTypeMethod {
         @Test
-        @DisplayName("should return a wildcard type when type is a wildcard type.")
+        @DisplayName("should return a wildcard type when type is a wildcard type")
         void test1() {
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 TypesInterface::wildcardTypeReturnType,
@@ -548,7 +548,7 @@ public class TypeUtilitiesTests {
         }
 
         @Test
-        @DisplayName("should return null when type is not a wildcard type.")
+        @DisplayName("should return null when type is not a wildcard type")
         void test2() {
             Type type = String.class;
             assertFalse(type instanceof WildcardType);

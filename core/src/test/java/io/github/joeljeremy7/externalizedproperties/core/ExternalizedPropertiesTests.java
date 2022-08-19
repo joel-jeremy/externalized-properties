@@ -3,6 +3,7 @@ package io.github.joeljeremy7.externalizedproperties.core;
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties.ProfileConfigurator;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver;
+import io.github.joeljeremy7.externalizedproperties.core.testentities.Unsafe;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubConverter;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubConverter.ConverterResultKey;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubResolver;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.Field;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
@@ -307,24 +307,25 @@ public class ExternalizedPropertiesTests {
             // Environment variables too but it's not trivial to set environment variables
             void profilesTest6(String activeProfile) {
                 System.setProperty(EXTERNALIZEDPROPERTIES_PROFILE_SYSTEM_PROPERTY, activeProfile);
+                try {
+                    ExternalizedProperties externalizedProperties = 
+                        ExternalizedProperties.builder()
+                            // Wildcard profile.
+                            .onProfiles("test").apply((profile, builder) ->
+                                builder.resolvers(new MapResolver(
+                                    "property", 
+                                    profile
+                                ))
+                            )
+                            .build();
+                    
+                    ProxyInterface proxyInterface = 
+                        externalizedProperties.initialize(ProxyInterface.class);
 
-                ExternalizedProperties externalizedProperties = 
-                    ExternalizedProperties.builder()
-                        // Wildcard profile.
-                        .onProfiles("test").apply((profile, builder) ->
-                            builder.resolvers(new MapResolver(
-                                "property", 
-                                profile
-                            ))
-                        )
-                        .build();
-                
-                ProxyInterface proxyInterface = 
-                    externalizedProperties.initialize(ProxyInterface.class);
-
-                assertEquals(activeProfile, proxyInterface.property());
-
-                System.clearProperty(EXTERNALIZEDPROPERTIES_PROFILE_SYSTEM_PROPERTY);
+                    assertEquals(activeProfile, proxyInterface.property());
+                } finally {
+                    System.clearProperty(EXTERNALIZEDPROPERTIES_PROFILE_SYSTEM_PROPERTY);
+                }
             }
 
             @ParameterizedTest
@@ -334,25 +335,26 @@ public class ExternalizedPropertiesTests {
                 "even if environment variable resolver is not explicitly registered."
             )
             void profilesTest7(String activeProfile) {
-                setEnv(EXTERNALIZEDPROPERTIES_PROFILE_ENV_VAR, activeProfile);
+                Unsafe.setEnv(EXTERNALIZEDPROPERTIES_PROFILE_ENV_VAR, activeProfile);
+                try {
+                    ExternalizedProperties externalizedProperties = 
+                        ExternalizedProperties.builder()
+                            // Wildcard profile.
+                            .onProfiles("test").apply((profile, builder) ->
+                                builder.resolvers(new MapResolver(
+                                    "property", 
+                                    profile
+                                ))
+                            )
+                            .build();
+                    
+                    ProxyInterface proxyInterface = 
+                        externalizedProperties.initialize(ProxyInterface.class);
 
-                ExternalizedProperties externalizedProperties = 
-                    ExternalizedProperties.builder()
-                        // Wildcard profile.
-                        .onProfiles("test").apply((profile, builder) ->
-                            builder.resolvers(new MapResolver(
-                                "property", 
-                                profile
-                            ))
-                        )
-                        .build();
-                
-                ProxyInterface proxyInterface = 
-                    externalizedProperties.initialize(ProxyInterface.class);
-
-                assertEquals(activeProfile, proxyInterface.property());
-
-                clearEnv(EXTERNALIZEDPROPERTIES_PROFILE_ENV_VAR);
+                    assertEquals(activeProfile, proxyInterface.property());
+                } finally {
+                    Unsafe.clearEnv(EXTERNALIZEDPROPERTIES_PROFILE_ENV_VAR);
+                }
             }
 
             @Test
@@ -937,51 +939,6 @@ public class ExternalizedPropertiesTests {
         props.put("property.with.variable.value", "${property.variable}");
         props.put("property.variable", "property-variable-value");
         return props;
-    }
-
-    private static void setEnv(String name, String value) {
-        try {
-            getMutableEnvironmentVariables().put(name, value);
-        } catch (Exception ex) {
-            throw new IllegalStateException(
-                "Exception occurred while trying to obtain the mutable " + 
-                "environment variables map.",
-                ex
-            );
-        }
-    }
-
-    private static void clearEnv(String name) {
-        try {
-            getMutableEnvironmentVariables().remove(name);
-        } catch (Exception ex) {
-            throw new IllegalStateException(
-                "Exception occurred while trying to obtain the mutable " + 
-                "environment variables map and clear an environment variable.",
-                ex
-            );
-        }
-    }
-
-    /** 
-     * Hack to be able to mutate the system environment variables. This reflectively
-     * gets the internal mutable map representation from the {@link System#getenv}'s
-     * unmodifiable map. The resulting map is a mutable map where any modifications will
-     * reflect in any succeeding {@link System#getenv} invocations.
-     * 
-     * DO NOT USE THIS OUTSIDE OF TESTING PURPOSES. 
-     * Future java releases may break this assumption and introduce a bug.
-     */
-    @SuppressWarnings("unchecked")
-    private static Map<String, String> getMutableEnvironmentVariables() 
-            throws Exception {
-        // This is an Collections$UnmodifiableMap. We need to extract the internal
-        // map representation to be able to set environment variables.
-        Map<String, String> env = System.getenv();
-        // The m field in Collections$UnmodifiableMap.
-        Field mapField = env.getClass().getDeclaredField("m");
-        mapField.setAccessible(true);
-        return (Map<String, String>)mapField.get(env);
     }
 
     public static interface ProxyInterface {

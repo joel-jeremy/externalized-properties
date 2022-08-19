@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,7 +23,7 @@ public class FloatConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is a Float.")
+        @DisplayName("should return true when target type is a Float")
         void test1() {
             FloatConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Float.class);
@@ -30,18 +31,26 @@ public class FloatConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a primitive float.")
+        @DisplayName("should return true when target type is a primitive float")
         void test2() {
             FloatConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Float.TYPE);
             assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is not a Float/float")
+        void test3() {
+            FloatConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Integer.class);
+            assertFalse(canConvert);
         }
     }
 
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert value to a Float.")
+        @DisplayName("should convert value to a Float")
         void test1() {
             FloatConverter converter = converterToTest();
 
@@ -63,7 +72,7 @@ public class FloatConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to a primitive float.")
+        @DisplayName("should convert value to a primitive float")
         void test2() {
             FloatConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -84,7 +93,7 @@ public class FloatConverterTests {
         }
 
         @Test
-        @DisplayName("should throw when value is not a valid Float/float.")
+        @DisplayName("should throw when value is not a valid Float/float")
         void test3() {
             FloatConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(

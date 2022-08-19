@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,7 +23,7 @@ public class DoubleConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is a Double.")
+        @DisplayName("should return true when target type is a Double")
         void test1() {
             DoubleConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Double.class);
@@ -30,18 +31,26 @@ public class DoubleConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a primitive double.")
+        @DisplayName("should return true when target type is a primitive double")
         void test2() {
             DoubleConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Double.TYPE);
             assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is not a Double/double")
+        void test3() {
+            DoubleConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Integer.class);
+            assertFalse(canConvert);
         }
     }
 
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert value to a Double.")
+        @DisplayName("should convert value to a Double")
         void test1() {
             DoubleConverter converter = converterToTest();
 
@@ -63,7 +72,7 @@ public class DoubleConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to a primitive double.")
+        @DisplayName("should convert value to a primitive double")
         void test2() {
             DoubleConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -84,7 +93,7 @@ public class DoubleConverterTests {
         }
 
         @Test
-        @DisplayName("should throw when value is not a valid Double/double.")
+        @DisplayName("should throw when value is not a valid Double/double")
         void test3() {
             DoubleConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(

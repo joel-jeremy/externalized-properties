@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,7 +23,7 @@ public class LongConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is a Long.")
+        @DisplayName("should return true when target type is a Long")
         void test1() {
             LongConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Long.class);
@@ -30,18 +31,26 @@ public class LongConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a primitive long.")
+        @DisplayName("should return true when target type is a primitive long")
         void test2() {
             LongConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Long.TYPE);
             assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is not a Long/long")
+        void test3() {
+            LongConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Integer.class);
+            assertFalse(canConvert);
         }
     }
 
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert value to a Long.")
+        @DisplayName("should convert value to a Long")
         void test1() {
             LongConverter converter = converterToTest();
 
@@ -63,7 +72,7 @@ public class LongConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to a primitive long.")
+        @DisplayName("should convert value to a primitive long")
         void test2() {
             LongConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -84,7 +93,7 @@ public class LongConverterTests {
         }
 
         @Test
-        @DisplayName("should throw when value is not a valid Long/long.")
+        @DisplayName("should throw when value is not a valid Long/long")
         void test3() {
             LongConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(

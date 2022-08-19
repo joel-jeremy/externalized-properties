@@ -184,7 +184,7 @@ public class RootResolverTests {
             Processor... processors
     ) {
         return ExternalizedProperties.builder()
-            .resolvers(resolvers.toArray(Resolver[]::new))
+            .resolvers(resolvers.toArray(new Resolver[0]))
             .processors(processors)
             .build();
     }

@@ -53,7 +53,9 @@ public interface Converter<T> {
      * 
      * @param context The invocation context.
      * @param valueToConvert The value to convert.
-     * @param targetType The target type of the conversion.
+     * @param targetType The target type of the conversion. In the case of converter facades 
+     * (see {@link ConverterFacade}), target type may be different from the invoked proxy 
+     * method's return type.
      * @return The result of conversion to the target type or {@link ConversionResult#skip()}
      * if the converter cannot handle conversion to the target type and that the conversion 
      * process should skip/move to the next registered converter in the conversion pipeline.

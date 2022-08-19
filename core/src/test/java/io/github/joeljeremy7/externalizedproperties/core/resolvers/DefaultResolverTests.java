@@ -24,7 +24,7 @@ public class DefaultResolverTests {
     @Nested
     class ResolveMethod {
         @Test
-        @DisplayName("should resolve property value from system properties.")
+        @DisplayName("should resolve property value from system properties")
         void systemPropertyTest1() {
             DefaultResolver resolver = resolverToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -43,7 +43,7 @@ public class DefaultResolverTests {
         }
 
         @Test
-        @DisplayName("should resolve property value from environment variables.")
+        @DisplayName("should resolve property value from environment variables")
         void environmentVariableTest1() {
             DefaultResolver resolver = resolverToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(

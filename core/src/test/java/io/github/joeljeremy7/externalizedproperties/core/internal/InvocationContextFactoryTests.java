@@ -59,7 +59,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class DeclaringClassMethod {
             @Test
-            @DisplayName("should return method's declaring class.")
+            @DisplayName("should return method's declaring class")
             void test1() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -75,7 +75,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class NameMethod {
             @Test
-            @DisplayName("should return method name.")
+            @DisplayName("should return method name")
             void test1() {
                 String methodName = "property";
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
@@ -203,7 +203,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class RawReturnTypeMethod {
             @Test
-            @DisplayName("should return method's return type.")
+            @DisplayName("should return method's return type")
             void test1() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -220,7 +220,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class ReturnTypeMethod {
             @Test
-            @DisplayName("should return method's generic return type.")
+            @DisplayName("should return method's generic return type")
             void test1() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -237,7 +237,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class RawParameterTypesMethod {
             @Test
-            @DisplayName("should return method's parameter types.")
+            @DisplayName("should return method's parameter types")
             void test1() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -258,7 +258,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class RawParameterTypeAtMethod {
             @Test
-            @DisplayName("should return method parameter's raw type at specified index.")
+            @DisplayName("should return method parameter's raw type at specified index")
             void test1() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -294,7 +294,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class ParameterTypesMethod {
             @Test
-            @DisplayName("should return method's generic parameter types.")
+            @DisplayName("should return method's generic parameter types")
             void test1() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -315,7 +315,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class ParameterTypeAtMethod {
             @Test
-            @DisplayName("should return method parameter's type at specified index.")
+            @DisplayName("should return method parameter's type at specified index")
             void test1() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -351,7 +351,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class HasReturnTypeMethod {
             @Test
-            @DisplayName("should return true when method's return type matches.")
+            @DisplayName("should return true when method's return type matches")
             void test1() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -365,7 +365,7 @@ public class InvocationContextFactoryTests {
             }
 
             @Test
-            @DisplayName("should return false when method's return type does not match.")
+            @DisplayName("should return false when method's return type does not match")
             void test2() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -382,7 +382,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class HasReturnTypeMethodWithTypeArgument {
             @Test
-            @DisplayName("should return true when method's return type matches.")
+            @DisplayName("should return true when method's return type matches")
             void test1() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -398,7 +398,7 @@ public class InvocationContextFactoryTests {
             }
 
             @Test
-            @DisplayName("should return false when method's return type does not match.")
+            @DisplayName("should return false when method's return type does not match")
             void test2() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -520,7 +520,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class IsDefaultInterfaceMethodMethod {
             @Test
-            @DisplayName("should return true when method is a default interface method.")
+            @DisplayName("should return true when method is a default interface method")
             void test1() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -534,7 +534,7 @@ public class InvocationContextFactoryTests {
             }
 
             @Test
-            @DisplayName("should return false when method is not a default interface method.")
+            @DisplayName("should return false when method is not a default interface method")
             void test2() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -551,7 +551,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class MethodSignatureStringMethod {
             @Test
-            @DisplayName("should return method's signature string.")
+            @DisplayName("should return method's signature string")
             void test1() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -569,7 +569,7 @@ public class InvocationContextFactoryTests {
             }
 
             @Test
-            @DisplayName("should return method's generic signature string.")
+            @DisplayName("should return method's generic signature string")
             void test2() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 
@@ -588,7 +588,7 @@ public class InvocationContextFactoryTests {
         @Nested
         class ToStringMethod {
             @Test
-            @DisplayName("should match methodSignatureString() method.")
+            @DisplayName("should match methodSignatureString() method")
             void test2() {
                 Method proxyInterfaceMethod = MethodUtils.getMethod(
                     ProxyInterface.class, 

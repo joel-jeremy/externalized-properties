@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -21,7 +22,7 @@ public class BooleanConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is a Boolean.")
+        @DisplayName("should return true when target type is a Boolean")
         void test1() {
             BooleanConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Boolean.class);
@@ -29,18 +30,26 @@ public class BooleanConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a primitive boolean.")
+        @DisplayName("should return true when target type is a primitive boolean")
         void test2() {
             BooleanConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Boolean.TYPE);
             assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is not a Boolean/boolean")
+        void test3() {
+            BooleanConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Integer.class);
+            assertFalse(canConvert);
         }
     }
 
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert value to a Boolean.")
+        @DisplayName("should convert value to a Boolean")
         void test1() {
             BooleanConverter converter = converterToTest();
 
@@ -62,7 +71,7 @@ public class BooleanConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to a primitive boolean.")
+        @DisplayName("should convert value to a primitive boolean")
         void test2() {
             BooleanConverter converter = converterToTest();
 
@@ -84,7 +93,7 @@ public class BooleanConverterTests {
         }
 
         @Test
-        @DisplayName("should convert to false when property value is not a valid Boolean/boolean.")
+        @DisplayName("should convert to false when property value is not a valid Boolean/boolean")
         void test3() {
             BooleanConverter converter = converterToTest();
 

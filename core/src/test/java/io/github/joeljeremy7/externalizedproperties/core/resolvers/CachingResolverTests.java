@@ -28,7 +28,7 @@ public class CachingResolverTests {
     @Nested
     class Constructor {
         @Test
-        @DisplayName("should throw when decorated argument is null.")
+        @DisplayName("should throw when decorated argument is null")
         void test1() {
             StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
 
@@ -39,7 +39,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should throw when cache strategy argument is null.")
+        @DisplayName("should throw when cache strategy argument is null")
         void test2() {
             StubResolver decorated = new StubResolver();
 
@@ -53,7 +53,7 @@ public class CachingResolverTests {
     @Nested
     class ResolveMethod {
         @Test
-        @DisplayName("should resolve property value from the decorated resolver.")
+        @DisplayName("should resolve property value from the decorated resolver")
         void test1() {
             String propertyName = "property";
             StubResolver decorated = new StubResolver();
@@ -95,7 +95,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should cache resolved property.")
+        @DisplayName("should cache resolved property")
         void cacheTest1() {
             String propertyName = "property";
             StubResolver decorated = new StubResolver();
@@ -123,7 +123,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should not cache unresolved property.")
+        @DisplayName("should not cache unresolved property")
         void cacheTest2() {
             StubCacheStrategy<String, String> cacheStrategy = new StubCacheStrategy<>();
 
@@ -150,7 +150,7 @@ public class CachingResolverTests {
         }
 
         @Test
-        @DisplayName("should return cached property.")
+        @DisplayName("should return cached property")
         void cacheTest3() {
             String propertyName = "property";
             StubResolver decorated = new StubResolver();

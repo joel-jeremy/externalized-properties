@@ -17,29 +17,25 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class EnumConverterTests {
+public class ClassConverterTests {
     private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
         InvocationContextUtils.testFactory(ProxyInterface.class);
 
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName(
-            "should return true when target type is an enum"
-        )
+        @DisplayName("should return true when target type is a Class")
         void test1() {
-            EnumConverter converter = converterToTest();
-            boolean canConvert = converter.canConvertTo(TestEnum.class);
+            ClassConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Class.class);
             assertTrue(canConvert);
         }
 
         @Test
-        @DisplayName(
-            "should return false when target type is not an enum"
-        )
+        @DisplayName("should return false when target type is not a Class")
         void test2() {
-            EnumConverter converter = converterToTest();
-            boolean canConvert = converter.canConvertTo(String.class);
+            ClassConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Integer.class);
             assertFalse(canConvert);
         }
     }
@@ -47,67 +43,49 @@ public class EnumConverterTests {
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert resolved property to enum")
+        @DisplayName("should convert value to a Class")
         void test1() {
-            EnumConverter converter = converterToTest();
+            ClassConverter converter = converterToTest();
 
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::enumProperty,
+                ProxyInterface::classProperty,
                 externalizedProperties(converter)
             );
 
-            ConversionResult<? extends Enum<?>> result = converter.convert(
+            ConversionResult<Class<?>> result = converter.convert(
                 context,
-                TestEnum.ONE.name()
-            );
-            assertNotNull(result);
-
-            Enum<?> testEnum = result.value();
-            assertEquals(TestEnum.ONE, testEnum);
-        }
-
-        @Test
-        @DisplayName("should throw when property value is not a valid enum value")
-        void test2() {
-            EnumConverter converter = converterToTest();
-
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::enumProperty,
-                externalizedProperties(converter)
-            );
-
-            assertThrows(ConversionException.class, () -> {
-                converter.convert(
-                    context,
-                    "INVALID_ENUM_VALUE"
-                );
-            });
-        }
-
-        @Test
-        @DisplayName("should return skipped result when target type is not an enum")
-        void test3() {
-            EnumConverter converter = converterToTest();
-
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::notSupportedNotAnEnum,
-                externalizedProperties(converter)
+                "java.lang.String"
             );
             
-            ConversionResult<?> result = converter.convert(
-                context,
-                "1"
+            assertNotNull(result);
+            assertEquals(String.class, result.value());
+        }
+
+        @Test
+        @DisplayName("should throw when value is not a valid Class")
+        void test2() {
+            ClassConverter converter = converterToTest();
+            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
+                ProxyInterface::classProperty,
+                externalizedProperties(converter)
             );
-            assertEquals(ConversionResult.skip(), result);
+
+            assertThrows(
+                ConversionException.class, 
+                () -> converter.convert(
+                    context,
+                    "invalid_value"
+                )
+            );
         }
     }
 
-    private static EnumConverter converterToTest() {
-        return new EnumConverter();
+    private static ClassConverter converterToTest() {
+        return new ClassConverter();
     }
 
     private static ExternalizedProperties externalizedProperties(
-            EnumConverter converterToTest
+            ClassConverter converterToTest
     ) {
         return ExternalizedProperties.builder()
             .converters(converterToTest)
@@ -115,17 +93,7 @@ public class EnumConverterTests {
     }
 
     private static interface ProxyInterface {
-        @ExternalizedProperty("property.enum")
-        TestEnum enumProperty();
-
-        @ExternalizedProperty("property.not.supported")
-        int notSupportedNotAnEnum();
-    }
-
-    private static enum TestEnum {
-        NONE,
-        ONE,
-        TWO,
-        THREE
+        @ExternalizedProperty("property.class")
+        Class<?> classProperty();
     }
 }

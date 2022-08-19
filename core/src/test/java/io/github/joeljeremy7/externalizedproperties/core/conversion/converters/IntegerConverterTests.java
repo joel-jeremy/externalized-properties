@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,7 +23,7 @@ public class IntegerConverterTests {
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is an Integer.")
+        @DisplayName("should return true when target type is an Integer")
         void test1() {
             IntegerConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Integer.class);
@@ -30,18 +31,26 @@ public class IntegerConverterTests {
         }
 
         @Test
-        @DisplayName("should return true when target type is a primitive int.")
+        @DisplayName("should return true when target type is a primitive int")
         void test2() {
             IntegerConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Integer.TYPE);
             assertTrue(canConvert);
+        }
+
+        @Test
+        @DisplayName("should return true when target type is not an Integer/int")
+        void test3() {
+            IntegerConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(Boolean.class);
+            assertFalse(canConvert);
         }
     }
 
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert value to an Integer.")
+        @DisplayName("should convert value to an Integer")
         void test1() {
             IntegerConverter converter = converterToTest();
 
@@ -63,7 +72,7 @@ public class IntegerConverterTests {
         }
 
         @Test
-        @DisplayName("should convert value to a primitive int.")
+        @DisplayName("should convert value to a primitive int")
         void test2() {
             IntegerConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -84,7 +93,7 @@ public class IntegerConverterTests {
         }
 
         @Test
-        @DisplayName("should throw when value is not a valid Integer/int.")
+        @DisplayName("should throw when value is not a valid Integer/int")
         void test3() {
             IntegerConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(

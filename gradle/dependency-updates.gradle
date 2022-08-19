@@ -1,5 +1,5 @@
 def isNonStable = { String version ->
-    def nonStableKeyword = ["PREVIEW","ALPHA","BETA", "SNAPSHOT"].any { 
+    def nonStableKeyword = [ "PREVIEW", "ALPHA", "BETA", "SNAPSHOT" ].any { 
         it -> version.toUpperCase().contains(it) 
     }
     return nonStableKeyword

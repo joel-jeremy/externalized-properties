@@ -10,38 +10,32 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ByteConverterTests {
+public class BigIntegerConverterTests {
     private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
         InvocationContextUtils.testFactory(ProxyInterface.class);
 
     @Nested
     class CanConvertToMethod {
         @Test
-        @DisplayName("should return true when target type is a Byte")
+        @DisplayName("should return true when target type is a BigInteger")
         void test1() {
-            ByteConverter converter = converterToTest();
-            boolean canConvert = converter.canConvertTo(Byte.class);
+            BigIntegerConverter converter = converterToTest();
+            boolean canConvert = converter.canConvertTo(BigInteger.class);
             assertTrue(canConvert);
         }
 
         @Test
-        @DisplayName("should return true when target type is a primitive byte")
+        @DisplayName("should return false when target type is not a BigInteger")
         void test2() {
-            ByteConverter converter = converterToTest();
-            boolean canConvert = converter.canConvertTo(Byte.TYPE);
-            assertTrue(canConvert);
-        }
-
-        @Test
-        @DisplayName("should return true when target type is not a Byte/byte")
-        void test3() {
-            ByteConverter converter = converterToTest();
+            BigIntegerConverter converter = converterToTest();
             boolean canConvert = converter.canConvertTo(Integer.class);
             assertFalse(canConvert);
         }
@@ -50,54 +44,30 @@ public class ByteConverterTests {
     @Nested
     class ConvertMethod {
         @Test
-        @DisplayName("should convert value to a Byte")
+        @DisplayName("should convert value to a BigInteger")
         void test1() {
-            ByteConverter converter = converterToTest();
+            BigIntegerConverter converter = converterToTest();
 
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::byteWrapperProperty, // This method returns a Byte wrapper class
+                ProxyInterface::bigIntegerProperty,
                 externalizedProperties(converter)
             );
 
-            ConversionResult<?> result = converter.convert(
+            ConversionResult<BigInteger> result = converter.convert(
                 context,
                 "1"
             );
             
             assertNotNull(result);
-            Object wrapperValue = result.value();
-            assertNotNull(wrapperValue);
-            assertTrue(wrapperValue instanceof Byte);
-            assertEquals((byte)1, (Byte)wrapperValue);
+            assertEquals(BigInteger.valueOf(1), result.value());
         }
 
         @Test
-        @DisplayName("should convert value to a primitive byte")
+        @DisplayName("should throw when value is not a valid BigInteger")
         void test2() {
-            ByteConverter converter = converterToTest();
+            BigIntegerConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::bytePrimitiveProperty, // This method returns an byte primitive
-                externalizedProperties(converter)
-            );
-
-            ConversionResult<?> result = converter.convert(
-                context,
-                "2"
-            );
-            
-            assertNotNull(result);
-            Object primitiveValue = result.value();
-            assertNotNull(primitiveValue);
-            assertTrue(primitiveValue instanceof Byte);
-            assertEquals((byte)2, (byte)primitiveValue);
-        }
-
-        @Test
-        @DisplayName("should throw when value is not a valid Byte/byte")
-        void test3() {
-            ByteConverter converter = converterToTest();
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::bytePrimitiveProperty, // This method returns an byte primitive
+                ProxyInterface::bigIntegerProperty,
                 externalizedProperties(converter)
             );
 
@@ -111,12 +81,12 @@ public class ByteConverterTests {
         }
     }
 
-    private static ByteConverter converterToTest() {
-        return new ByteConverter();
+    private static BigIntegerConverter converterToTest() {
+        return new BigIntegerConverter();
     }
 
     private static ExternalizedProperties externalizedProperties(
-            ByteConverter converterToTest
+            BigIntegerConverter converterToTest
     ) {
         return ExternalizedProperties.builder()
             .converters(converterToTest)
@@ -124,10 +94,7 @@ public class ByteConverterTests {
     }
 
     private static interface ProxyInterface {
-        @ExternalizedProperty("property.byte.primitive")
-        byte bytePrimitiveProperty();
-    
-        @ExternalizedProperty("property.byte.wrapper")
-        Byte byteWrapperProperty();
+        @ExternalizedProperty("property.biginteger")
+        BigInteger bigIntegerProperty();
     }
 }

@@ -332,7 +332,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         }
 
         @Test
-        @DisplayName("should throw when an annotated non-Optional property cannot be resolved.")
+        @DisplayName("should throw when an annotated non-Optional property cannot be resolved")
         void test9() {
             Resolver resolver = new MapResolver(Collections.emptyMap());
             ExternalizedProperties externalizedProperties = 
@@ -365,7 +365,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         }
 
         @Test
-        @DisplayName("should throw when an unannotated non-Optional property cannot be resolved.")
+        @DisplayName("should throw when an unannotated non-Optional property cannot be resolved")
         void test10() {
             Resolver resolver = new MapResolver(Collections.emptyMap());
             ExternalizedProperties externalizedProperties = 
@@ -476,7 +476,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
          */
 
         @Test
-        @DisplayName("should convert a non-String property via Converter.")
+        @DisplayName("should convert a non-String property via Converter")
         void conversionTest1() throws Throwable {
             Resolver resolver = new MapResolver("property.int", "1");
             Converter<?> converter = new IntegerConverter();
@@ -567,7 +567,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
          */
 
         @Test
-        @DisplayName("should expand variable in property name.")
+        @DisplayName("should expand variable in property name")
         void variableExpansionTest1() throws Throwable {
             Map<String, String> map = new HashMap<>();
             String customVariableValue = "custom-variable";
@@ -603,7 +603,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         }
 
         @Test
-        @DisplayName("should throw when variable value cannot be resolved.")
+        @DisplayName("should throw when variable value cannot be resolved")
         void variableExpansionTest2() {
             Resolver resolver = new MapResolver(
                 "property-custom-variable", 
