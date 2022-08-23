@@ -209,7 +209,7 @@ public class Ordinals {
          */
         public OrdinalConverter(int ordinal, Converter<T> decorated) {
             this.ordinal = ordinal;
-            this.decorated = requireNonNull(decorated, "decorated");;
+            this.decorated = requireNonNull(decorated, "decorated");
         }
 
         /** {@inheritDoc} */
