@@ -87,36 +87,6 @@ public class GitRepositoryTests {
                     () -> builder.uri(uri)
                 );
             }
-
-            // @Test
-            // @DisplayName("should throw when uri argument is null")
-            // void test1() {
-            //     GitRepository.Builder builder = GitRepository.builder();
-            //     assertThrows(
-            //         IllegalArgumentException.class, 
-            //         () -> builder.uri(null)
-            //     );
-            // }
-
-            // @Test
-            // @DisplayName("should throw when uri argument is empty")
-            // void test2() {
-            //     GitRepository.Builder builder = GitRepository.builder();
-            //     assertThrows(
-            //         IllegalArgumentException.class, 
-            //         () -> builder.uri("")
-            //     );
-            // }
-
-            // @Test
-            // @DisplayName("should throw when uri argument is blank")
-            // void test3() {
-            //     GitRepository.Builder builder = GitRepository.builder();
-            //     assertThrows(
-            //         IllegalArgumentException.class, 
-            //         () -> builder.uri("   ")
-            //     );
-            // }
         }
 
         @Nested
@@ -134,36 +104,6 @@ public class GitRepositoryTests {
                     () -> builder.branch(branch)
                 );
             }
-
-            // @Test
-            // @DisplayName("should throw when branch argument is null")
-            // void test1() {
-            //     GitRepository.Builder builder = GitRepository.builder();
-            //     assertThrows(
-            //         IllegalArgumentException.class, 
-            //         () -> builder.branch(null)
-            //     );
-            // }
-
-            // @Test
-            // @DisplayName("should throw when branch argument is empty")
-            // void test2() {
-            //     GitRepository.Builder builder = GitRepository.builder();
-            //     assertThrows(
-            //         IllegalArgumentException.class, 
-            //         () -> builder.branch("")
-            //     );
-            // }
-
-            // @Test
-            // @DisplayName("should throw when branch argument is blank")
-            // void test3() {
-            //     GitRepository.Builder builder = GitRepository.builder();
-            //     assertThrows(
-            //         IllegalArgumentException.class, 
-            //         () -> builder.branch("   ")
-            //     );
-            // }
         }
 
         @Nested
@@ -282,54 +222,6 @@ public class GitRepositoryTests {
                 () -> gitRepository.checkout(pathToCheckout)
             );
         }
-        
-        // @Test
-        // @DisplayName("should throw when path to checkout argument is null")
-        // void validationTest1() {
-        //     GitRepository gitRepository = GitRepository.builder()
-        //         .uri(LOCAL_HTTP_GIT_SERVER.getRepositoryUri())
-        //         .branch(DEFAULT_GIT_BRANCH)
-        //         .cloneDirectory(CLONE_DIR)
-        //         .credentialsProvider(LocalHttpGitServer.DEFAULT_CREDENTIALS)
-        //         .build();
-            
-        //     assertThrows(
-        //         IllegalArgumentException.class, 
-        //         () -> gitRepository.checkout(null)
-        //     );
-        // }
-
-        // @Test
-        // @DisplayName("should throw when path to checkout argument is empty")
-        // void validationTest2() {
-        //     GitRepository gitRepository = GitRepository.builder()
-        //         .uri(LOCAL_HTTP_GIT_SERVER.getRepositoryUri())
-        //         .branch(DEFAULT_GIT_BRANCH)
-        //         .cloneDirectory(CLONE_DIR)
-        //         .credentialsProvider(LocalHttpGitServer.DEFAULT_CREDENTIALS)
-        //         .build();
-            
-        //     assertThrows(
-        //         IllegalArgumentException.class, 
-        //         () -> gitRepository.checkout("")
-        //     );
-        // }
-
-        // @Test
-        // @DisplayName("should throw when path to checkout argument is blank")
-        // void validationTest3() {
-        //     GitRepository gitRepository = GitRepository.builder()
-        //         .uri(LOCAL_HTTP_GIT_SERVER.getRepositoryUri())
-        //         .branch(DEFAULT_GIT_BRANCH)
-        //         .cloneDirectory(CLONE_DIR)
-        //         .credentialsProvider(LocalHttpGitServer.DEFAULT_CREDENTIALS)
-        //         .build();
-            
-        //     assertThrows(
-        //         IllegalArgumentException.class, 
-        //         () -> gitRepository.checkout("   ")
-        //     );
-        // }
 
         @Test
         @DisplayName("should checkout file from Git repository")
