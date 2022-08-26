@@ -250,18 +250,20 @@ public class OrdinalsTests {
         @Test
         @DisplayName("should throw when first argument is null")
         void test1() {
+            StubResolver resolver = new StubResolver();
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> Ordinals.compareOrdinal(null, new StubResolver())
+                () -> Ordinals.compareOrdinal(null, resolver)
             );
         }
 
         @Test
         @DisplayName("should throw when second argument is null")
         void test2() {
+            StubConverter<?> converter = new StubConverter<>();
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> Ordinals.compareOrdinal(new StubConverter<>(), null)
+                () -> Ordinals.compareOrdinal(converter, null)
             );
         }
 

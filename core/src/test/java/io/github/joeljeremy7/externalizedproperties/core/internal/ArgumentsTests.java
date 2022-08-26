@@ -258,10 +258,11 @@ public class ArgumentsTests {
             @Test
             @DisplayName("should throw when arg array argument has null values")
             void test2() {
+                List<String> listWithNullValue = Arrays.asList("test", null, "test");
                 assertThrows(
                     IllegalArgumentException.class, 
                     () -> Arguments.requireNoNullElements(
-                        Arrays.asList("test", null, "test"),
+                        listWithNullValue,
                         "arg"
                     )
                 );

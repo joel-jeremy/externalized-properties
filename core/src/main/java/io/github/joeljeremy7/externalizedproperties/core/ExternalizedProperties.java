@@ -407,12 +407,12 @@ public interface ExternalizedProperties {
             public Optional<String> resolve(InvocationContext context, String propertyName) {
                 try {
                     return decorated.resolve(context, propertyName);
-                } catch (Throwable ex) {
-                    // Ignore exception, but leave a log so user is made aware.
+                } catch (RuntimeException ex) {
+                    // Ignore exception, but leave a log as to make user aware.
                     LOGGER.log(
                         Level.WARNING, 
-                        "Exception occurred while resolving " + propertyName + ". Ignoring...", 
-                        ex
+                        ex,
+                        () -> "Exception occurred while resolving " + propertyName + ". Ignoring..."
                     );
                     return Optional.empty();
                 }

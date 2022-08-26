@@ -118,10 +118,11 @@ public class ResourceResolverTests {
         @Test
         @DisplayName("should throw when URI resource does not exist")
         void uriTest2() {
+            URI resourceUri = URI.create("file://non.existent.properties");
             assertThrows(
                 ExternalizedPropertiesException.class, 
                 () -> ResourceResolver.fromUri(
-                    URI.create("file://non.existent.properties")
+                    resourceUri
                 )
             );
         }
@@ -129,10 +130,11 @@ public class ResourceResolverTests {
         @Test
         @DisplayName("should throw when URI is malformed")
         void uriTest3() {
+            URI resourceUri = URI.create("notsupported://malformed");
             assertThrows(
                 UncheckedIOException.class, 
                 () -> ResourceResolver.fromUri(
-                    URI.create("notsupported://malformed")
+                    resourceUri
                 )
             );
         }
@@ -173,10 +175,11 @@ public class ResourceResolverTests {
         @Test
         @DisplayName("should throw when URI resource does not exist")
         void uriAndReaderOverloadTest3() {
+            URI resourceUri = URI.create("file://non.existent.properties");
             assertThrows(
                 ExternalizedPropertiesException.class, 
                 () -> ResourceResolver.fromUri(
-                    URI.create("file://non.existent.properties"), 
+                    resourceUri, 
                     PROPERTIES_READER
                 )
             );
@@ -185,10 +188,11 @@ public class ResourceResolverTests {
         @Test
         @DisplayName("should throw when URI is malformed")
         void uriAndReaderOverloadTest4() {
+            URI resourceUri = URI.create("notsupported://malformed");
             assertThrows(
                 UncheckedIOException.class, 
                 () -> ResourceResolver.fromUri(
-                    URI.create("notsupported://malformed"),
+                    resourceUri,
                     PROPERTIES_READER
                 )
             );
@@ -220,10 +224,11 @@ public class ResourceResolverTests {
         @Test
         @DisplayName("should throw when path resource does not exist")
         void pathTest2() {
+            Path resourcePath = Paths.get("path", "to", "non.existent.properties");
             assertThrows(
                 ExternalizedPropertiesException.class, 
                 () -> ResourceResolver.fromPath(
-                    Paths.get("path", "to", "non.existent.properties")
+                    resourcePath
                 )
             );
         }
@@ -268,10 +273,11 @@ public class ResourceResolverTests {
         @Test
         @DisplayName("should throw when path resource does not exist")
         void pathAndReaderOverloadTest3() {
+            Path resourcePath = Paths.get("path", "to", "non.existent.properties");
             assertThrows(
                 ExternalizedPropertiesException.class, 
                 () -> ResourceResolver.fromPath(
-                    Paths.get("path", "to", "non.existent.properties"), 
+                    resourcePath, 
                     PROPERTIES_READER
                 )
             );

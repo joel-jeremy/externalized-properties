@@ -251,7 +251,7 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
         return (Type)arg;
     }
     
-    // Avoid calling methods in proxy object to avoid recursion.
+    // Avoid invoking proxy object methods to avoid recursion.
     private static @Nullable Object handleIfObjectMethod(
             Object proxy, 
             Method method, 
@@ -264,11 +264,10 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
             else if ("hashCode".equals(method.getName())) {
                 return proxyHashCode(proxy);
             }
-        } else if (method.getParameterCount() == 1) {
-            if ("equals".equals(method.getName()) && 
-                    Object.class.equals(method.getParameterTypes()[0])) {
-                return proxyEquals(proxy, args);
-            }
+        } else if (method.getParameterCount() == 1 &&
+                "equals".equals(method.getName()) && 
+                Object.class.equals(method.getParameterTypes()[0])) {
+            return proxyEquals(proxy, args);
         }
         
         return null;

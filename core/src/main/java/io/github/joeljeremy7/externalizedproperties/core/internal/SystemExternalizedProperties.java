@@ -228,14 +228,10 @@ public class SystemExternalizedProperties implements ExternalizedProperties {
 
     private static boolean isExclusiveAnnotation(Class<?> annotationType) {
         // Add annotations here that must be exclusive of one another.
-        if (ExternalizedProperty.class.equals(annotationType) ||
-                ResolverFacade.class.equals(annotationType) ||
-                ConverterFacade.class.equals(annotationType) ||
-                VariableExpanderFacade.class.equals(annotationType)
-        ) {
-            return true;
-        }
-        return false;
+        return ExternalizedProperty.class.equals(annotationType) ||
+            ResolverFacade.class.equals(annotationType) ||
+            ConverterFacade.class.equals(annotationType) ||
+            VariableExpanderFacade.class.equals(annotationType);
     }
 
     private static Set<Class<?>> supportedTargetTypes() {
