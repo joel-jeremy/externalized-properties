@@ -28,7 +28,7 @@ public interface InvocationArguments {
      * Otherwise, an empty {@link Optional} if no invocation argument exists
      * at the specified index.
      */
-    Optional<?> get(int index);
+    Optional<Object> get(int index);
 
     /**
      * Get the proxy method invocation argument at the specified index, or 

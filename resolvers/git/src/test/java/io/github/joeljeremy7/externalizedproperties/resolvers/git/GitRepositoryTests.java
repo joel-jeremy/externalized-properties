@@ -12,6 +12,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -71,66 +74,34 @@ public class GitRepositoryTests {
     class BuilderTests {
         @Nested
         class UriMethod {
-            @Test
-            @DisplayName("should throw when uri argument is null")
-            void test1() {
+            @ParameterizedTest
+            @NullAndEmptySource
+            @ValueSource(strings = {
+                "   " // blank
+            })
+            @DisplayName("should throw when uri argument is null, empty, or blank")
+            void test1(String uri) {
                 GitRepository.Builder builder = GitRepository.builder();
                 assertThrows(
                     IllegalArgumentException.class, 
-                    () -> builder.uri(null)
-                );
-            }
-
-            @Test
-            @DisplayName("should throw when uri argument is empty")
-            void test2() {
-                GitRepository.Builder builder = GitRepository.builder();
-                assertThrows(
-                    IllegalArgumentException.class, 
-                    () -> builder.uri("")
-                );
-            }
-
-            @Test
-            @DisplayName("should throw when uri argument is blank")
-            void test3() {
-                GitRepository.Builder builder = GitRepository.builder();
-                assertThrows(
-                    IllegalArgumentException.class, 
-                    () -> builder.uri("   ")
+                    () -> builder.uri(uri)
                 );
             }
         }
 
         @Nested
         class BranchMethod {
-            @Test
-            @DisplayName("should throw when branch argument is null")
-            void test1() {
+            @ParameterizedTest
+            @NullAndEmptySource
+            @ValueSource(strings = {
+                "   " // blank
+            })
+            @DisplayName("should throw when branch argument is null, empty, or blank")
+            void test1(String branch) {
                 GitRepository.Builder builder = GitRepository.builder();
                 assertThrows(
                     IllegalArgumentException.class, 
-                    () -> builder.branch(null)
-                );
-            }
-
-            @Test
-            @DisplayName("should throw when branch argument is empty")
-            void test2() {
-                GitRepository.Builder builder = GitRepository.builder();
-                assertThrows(
-                    IllegalArgumentException.class, 
-                    () -> builder.branch("")
-                );
-            }
-
-            @Test
-            @DisplayName("should throw when branch argument is blank")
-            void test3() {
-                GitRepository.Builder builder = GitRepository.builder();
-                assertThrows(
-                    IllegalArgumentException.class, 
-                    () -> builder.branch("   ")
+                    () -> builder.branch(branch)
                 );
             }
         }
@@ -232,9 +203,13 @@ public class GitRepositoryTests {
 
     @Nested
     class CheckoutMethod {
-        @Test
-        @DisplayName("should throw when path to checkout argument is null")
-        void validationTest1() {
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {
+            "   " // blank
+        })
+        @DisplayName("should throw when path to checkout argument is null, empty, or blank")
+        void validationTest1(String pathToCheckout) {
             GitRepository gitRepository = GitRepository.builder()
                 .uri(LOCAL_HTTP_GIT_SERVER.getRepositoryUri())
                 .branch(DEFAULT_GIT_BRANCH)
@@ -244,39 +219,7 @@ public class GitRepositoryTests {
             
             assertThrows(
                 IllegalArgumentException.class, 
-                () -> gitRepository.checkout(null)
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when path to checkout argument is empty")
-        void validationTest2() {
-            GitRepository gitRepository = GitRepository.builder()
-                .uri(LOCAL_HTTP_GIT_SERVER.getRepositoryUri())
-                .branch(DEFAULT_GIT_BRANCH)
-                .cloneDirectory(CLONE_DIR)
-                .credentialsProvider(LocalHttpGitServer.DEFAULT_CREDENTIALS)
-                .build();
-            
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> gitRepository.checkout("")
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when path to checkout argument is blank")
-        void validationTest3() {
-            GitRepository gitRepository = GitRepository.builder()
-                .uri(LOCAL_HTTP_GIT_SERVER.getRepositoryUri())
-                .branch(DEFAULT_GIT_BRANCH)
-                .cloneDirectory(CLONE_DIR)
-                .credentialsProvider(LocalHttpGitServer.DEFAULT_CREDENTIALS)
-                .build();
-            
-            assertThrows(
-                IllegalArgumentException.class, 
-                () -> gitRepository.checkout("   ")
+                () -> gitRepository.checkout(pathToCheckout)
             );
         }
 

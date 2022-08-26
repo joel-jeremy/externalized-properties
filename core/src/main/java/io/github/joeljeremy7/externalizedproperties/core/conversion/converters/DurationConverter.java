@@ -58,13 +58,11 @@ public class DurationConverter implements Converter<Duration> {
                 return true;
             }
 
-            if (firstChar == '+' || firstChar == '-') {
-                if (valueToConvert.length() > 1) {
-                    char secondChar = Character.toUpperCase(valueToConvert.charAt(1));
-                    if (secondChar == 'P') {
-                        // +P or -P
-                        return true;
-                    }
+            if ((firstChar == '+' || firstChar == '-') && valueToConvert.length() > 1) {
+                char secondChar = Character.toUpperCase(valueToConvert.charAt(1));
+                if (secondChar == 'P') {
+                    // +P or -P
+                    return true;
                 }
             }
         }

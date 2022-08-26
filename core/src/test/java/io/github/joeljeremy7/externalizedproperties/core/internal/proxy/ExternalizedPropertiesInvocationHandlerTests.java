@@ -1332,10 +1332,11 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                     new InvocationContextFactory(externalizedProperties)
                 );
 
+            ProxyInterface proxy = externalizedProperties.initialize(proxyInterface);
             assertThrows(
                 RuntimeException.class, 
                 () -> handler.invoke(
-                    externalizedProperties.initialize(proxyInterface), 
+                    proxy, 
                     method,
                     new String[0]
                 )
@@ -1369,10 +1370,11 @@ public class ExternalizedPropertiesInvocationHandlerTests {
                     new InvocationContextFactory(externalizedProperties)
                 );
 
+            ProxyInterface proxy = externalizedProperties.initialize(proxyInterface);
             assertThrows(
                 ExternalizedPropertiesException.class, 
                 () -> handler.invoke(
-                    externalizedProperties.initialize(proxyInterface), 
+                    proxy, 
                     proxyMethod,
                     new String[0]
                 )

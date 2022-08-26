@@ -381,11 +381,12 @@ public class SystemExternalizedPropertiesTests {
 
             // Target type is List<String> but proxy interface method
             // return type is Integer.
+            TypeReference<List<String>> targetType = new TypeReference<List<String>>(){};
             assertThrows(
                 ClassCastException.class,
                 () -> proxy.convertToTargetTypeReference(
                     "1,2,3",
-                    new TypeReference<List<String>>(){}
+                    targetType
                 )
             );
         }
@@ -433,11 +434,12 @@ public class SystemExternalizedPropertiesTests {
 
             // Target type is List<String> but proxy interface method
             // return type is Integer.
+            Type targetType = new TypeReference<List<String>>(){}.type();
             assertThrows(
                 ClassCastException.class,
                 () -> proxy.convertToTargetType(
                     "1,2,3",
-                    new TypeReference<List<String>>(){}.type()
+                    targetType
                 )
             );
         }
@@ -459,6 +461,7 @@ public class SystemExternalizedPropertiesTests {
 
             // Target type is List<String> but proxy interface method
             // return type is Integer.
+            Type targetType = new TypeReference<List<String>>(){}.type();
             assertThrows(
                 ClassCastException.class,
                 () -> {
@@ -466,7 +469,7 @@ public class SystemExternalizedPropertiesTests {
                     // Value is a List<String> but return variable was resolved to Integer.
                     Integer mismatch = proxy.convertToTargetTypeWithTypeVariableReturnType(
                         "1,2,3",
-                        new TypeReference<List<String>>(){}.type()
+                        targetType
                     );
 
                     fail("Did not throw. Result value: " + mismatch);
@@ -599,11 +602,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     SystemExternalizedPropertiesTests.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -614,11 +618,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     VoidReturnTypeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -629,11 +634,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     VoidClassReturnTypeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -647,11 +653,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     NoArgProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -665,11 +672,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     MoreThanTwoArgsProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -683,11 +691,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     InvalidFirstArgTypeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -701,11 +710,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     InvalidSecondArgTypeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -719,11 +729,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     InvalidArgsConverterFacadeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -737,11 +748,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     NoArgsConverterFacadeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -755,11 +767,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     MoreThanTwoArgsConverterFacadeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -773,11 +786,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     InvalidFirstArgTypeConverterFacadeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -791,11 +805,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     InvalidSecondArgTypeConverterFacadeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -932,11 +947,12 @@ public class SystemExternalizedPropertiesTests {
 
             // Target type is List<String> but proxy interface method
             // return type is Integer.
+            TypeReference<List<String>> targetType = new TypeReference<List<String>>(){};
             assertThrows(
                 ClassCastException.class,
                 () -> proxy.convertToTargetTypeReference(
                     "1,2,3",
-                    new TypeReference<List<String>>(){}
+                    targetType
                 )
             );
         }
@@ -986,11 +1002,12 @@ public class SystemExternalizedPropertiesTests {
 
             // Target type is List<String> but proxy interface method
             // return type is Integer.
+            Type targetType = new TypeReference<List<String>>(){}.type();
             assertThrows(
                 ClassCastException.class,
                 () -> proxy.convertToTargetType(
                     "1,2,3",
-                    new TypeReference<List<String>>(){}.type()
+                    targetType
                 )
             );
         }
@@ -1013,6 +1030,7 @@ public class SystemExternalizedPropertiesTests {
 
             // Target type is List<String> but proxy interface method
             // return type is Integer.
+            Type targetType = new TypeReference<List<String>>(){}.type();
             assertThrows(
                 ClassCastException.class,
                 () -> {
@@ -1020,7 +1038,7 @@ public class SystemExternalizedPropertiesTests {
                     // Value is a List<String> but return variable was resolved to Integer.
                     Integer mismatch = proxy.convertToTargetTypeWithTypeVariableReturnType(
                         "1,2,3",
-                        new TypeReference<List<String>>(){}.type()
+                        targetType
                     );
 
                     fail("Did not throw. Result value: " + mismatch);
@@ -1061,11 +1079,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     NoArgsVariableExpanderFacadeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -1079,11 +1098,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     InvalidNumberOfArgsVariableExpanderFacadeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -1097,11 +1117,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     InvalidArgTypeVariableExpanderFacadeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }
@@ -1115,11 +1136,12 @@ public class SystemExternalizedPropertiesTests {
             SystemExternalizedProperties externalizedProperties = 
                 internalExternalizedProperties(new StubResolver());
 
+            ClassLoader classLoader = getClass().getClassLoader();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> externalizedProperties.initialize(
                     InvalidReturnTypeVariableExpanderFacadeProxyInterface.class,
-                    getClass().getClassLoader()
+                    classLoader
                 )
             );
         }

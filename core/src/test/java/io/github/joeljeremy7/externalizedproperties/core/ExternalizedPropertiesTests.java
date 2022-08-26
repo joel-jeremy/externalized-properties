@@ -1,8 +1,11 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties.ProfileConfigurator;
+import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties.ProfilesBuilder;
 import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor;
+import io.github.joeljeremy7.externalizedproperties.core.processing.processors.DecryptProcessor.JceDecryptor;
 import io.github.joeljeremy7.externalizedproperties.core.resolvers.MapResolver;
+import io.github.joeljeremy7.externalizedproperties.core.testentities.EncryptionUtils;
 import io.github.joeljeremy7.externalizedproperties.core.testentities.Unsafe;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubConverter;
 import io.github.joeljeremy7.externalizedproperties.core.testfixtures.StubConverter.ConverterResultKey;
@@ -13,6 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import javax.crypto.NoSuchPaddingException;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
@@ -77,12 +84,14 @@ public class ExternalizedPropertiesTests {
             @DisplayName("should throw when resolvers argument have null elements")
             void test2() {
                 ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
+                StubResolver resolver1 = new StubResolver();
+                StubResolver resolver2 = new StubResolver();
                 assertThrows(
                     IllegalArgumentException.class,
                     () -> builder.resolvers(
-                        new StubResolver(),
+                        resolver1,
                         null,
-                        new StubResolver()
+                        resolver2
                     )
                 );
             }
@@ -104,12 +113,14 @@ public class ExternalizedPropertiesTests {
             @DisplayName("should throw when converters argument have null elements")
             void test2() {
                 ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
+                StubConverter<?> converter1 = new StubConverter<>();
+                StubConverter<?> converter2 = new StubConverter<>();
                 assertThrows(
                     IllegalArgumentException.class,
                     () -> builder.converters(
-                        new StubConverter<>(),
+                        converter1,
                         null,
-                        new StubConverter<>()
+                        converter2
                     )
                 );
             }
@@ -129,14 +140,26 @@ public class ExternalizedPropertiesTests {
 
             @Test
             @DisplayName("should throw when processors argument have null elements")
-            void test2() {
+            void test2() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
                 ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
+                DecryptProcessor processor1 = new DecryptProcessor(
+                    JceDecryptor.factory().symmetric(
+                        EncryptionUtils.AES_ALGORITHM, 
+                        EncryptionUtils.DEFAULT_AES_SECRET_KEY
+                    )
+                );
+                DecryptProcessor processor2 = new DecryptProcessor(
+                    JceDecryptor.factory().asymmetric(
+                        EncryptionUtils.RSA_ALGORITHM, 
+                        EncryptionUtils.DEFAULT_RSA_PRIVATE_KEY
+                    )
+                );
                 assertThrows(
                     IllegalArgumentException.class,
                     () -> builder.processors(
-                        new DecryptProcessor(),
+                        processor1,
                         null,
-                        new DecryptProcessor()
+                        processor2
                     )
                 );
             }
@@ -689,9 +712,10 @@ public class ExternalizedPropertiesTests {
             @Test
             @DisplayName("should throw when profiles varargs argument is null")
             void test1() {
+                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class, 
-                    () -> ExternalizedProperties.builder().onProfiles((String[])null)
+                    () -> builder.onProfiles((String[])null)
                 );
             }
 
@@ -700,9 +724,10 @@ public class ExternalizedPropertiesTests {
                 "should throw when profiles varargs argument contains null elements"
             )
             void test2() {
+                ExternalizedProperties.Builder builder = ExternalizedProperties.builder();
                 assertThrows(
                     IllegalArgumentException.class, 
-                    () -> ExternalizedProperties.builder().onProfiles(
+                    () -> builder.onProfiles(
                         "test",
                         "staging",
                         null
@@ -719,12 +744,12 @@ public class ExternalizedPropertiesTests {
             @Test
             @DisplayName("should throw when profile configurators argument is null")
             void test1() {
+                ProfilesBuilder profilesBuilder = ExternalizedProperties.builder().onProfiles();
                 assertThrows(
                     IllegalArgumentException.class, 
-                    () -> ExternalizedProperties.builder()
-                        .onProfiles().apply(
-                            (ProfileConfigurator[])null
-                        )
+                    () -> profilesBuilder.apply(
+                        (ProfileConfigurator[])null
+                    )
                 );
             }
 
@@ -733,13 +758,13 @@ public class ExternalizedPropertiesTests {
                 "should throw when profile configurators argument contains null elements"
             )
             void test2() {
+                ProfilesBuilder profilesBuilder = ExternalizedProperties.builder().onProfiles();
                 assertThrows(
                     IllegalArgumentException.class, 
-                    () -> ExternalizedProperties.builder()
-                        .onProfiles().apply(
-                            (activeProfile, builder) -> {},
-                            null // Not allowed
-                        )
+                    () -> profilesBuilder.apply(
+                        (activeProfile, builder) -> {},
+                        null // Not allowed
+                    )
                 );
             }
 
@@ -748,10 +773,10 @@ public class ExternalizedPropertiesTests {
                 "should throw when profile configurators argument is empty"
             )
             void test3() {
+                ProfilesBuilder profilesBuilder = ExternalizedProperties.builder().onProfiles();
                 assertThrows(
                     IllegalArgumentException.class, 
-                    () -> ExternalizedProperties.builder()
-                        .onProfiles().apply()
+                    () -> profilesBuilder.apply()
                 );
             }
         }

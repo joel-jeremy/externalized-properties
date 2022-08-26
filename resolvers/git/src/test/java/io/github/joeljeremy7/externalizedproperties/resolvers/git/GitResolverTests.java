@@ -14,6 +14,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -79,33 +82,19 @@ public class GitResolverTests {
     class BuilderTests {
         @Nested
         class ResourceFilePathMethod {
-            @Test
-            @DisplayName("should throw when resource file path argument is null")
-            void test1() {
+            @ParameterizedTest
+            @NullAndEmptySource
+            @ValueSource(strings = {
+                "   " // blank
+            })
+            @DisplayName(
+                "should throw when path to resource file path argument is null, empty, or blank"
+            )
+            void test1(String resourceFilePath) {
                 GitResolver.Builder builder = GitResolver.builder();
                 assertThrows(
                     IllegalArgumentException.class, 
-                    () -> builder.resourceFilePath(null)
-                );
-            }
-
-            @Test
-            @DisplayName("should throw when resource file path argument is empty")
-            void test2() {
-                GitResolver.Builder builder = GitResolver.builder();
-                assertThrows(
-                    IllegalArgumentException.class, 
-                    () -> builder.resourceFilePath("")
-                );
-            }
-
-            @Test
-            @DisplayName("should throw when resource file path argument is blank")
-            void test3() {
-                GitResolver.Builder builder = GitResolver.builder();
-                assertThrows(
-                    IllegalArgumentException.class, 
-                    () -> builder.resourceFilePath("   ")
+                    () -> builder.resourceFilePath(resourceFilePath)
                 );
             }
         }

@@ -260,7 +260,7 @@ public class InvocationContextFactory {
 
         /** {@inheritDoc} */
         @Override
-        public Optional<?> get(int index) {
+        public Optional<Object> get(int index) {
             return Optional.ofNullable(args.length > index ? args[index] : null);
         }
 

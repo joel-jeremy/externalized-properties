@@ -6,6 +6,7 @@ import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.conversion.converters.DefaultConverter;
+import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationCacheKey;
 import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationContextFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationHandlerFactory;
 import io.github.joeljeremy7.externalizedproperties.core.internal.caching.WeakHashMapCacheStrategy;
@@ -55,11 +56,13 @@ public class EagerLoadingInvocationHandlerFactoryTests {
         @Test
         @DisplayName("should throw when decorated argument is null")
         void test1() {
+            WeakHashMapCacheStrategy<InvocationCacheKey, Object> cacheStrategy = 
+                new WeakHashMapCacheStrategy<>();
             assertThrows(
                 IllegalArgumentException.class, 
                 () -> new EagerLoadingInvocationHandlerFactory(
                     null,
-                    new WeakHashMapCacheStrategy<>()
+                    cacheStrategy
                 )
             );
         }

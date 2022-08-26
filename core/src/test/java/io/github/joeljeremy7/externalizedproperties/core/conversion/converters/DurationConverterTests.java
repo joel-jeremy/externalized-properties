@@ -10,6 +10,8 @@ import io.github.joeljeremy7.externalizedproperties.core.testfixtures.Invocation
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.Duration;
 
@@ -63,18 +65,21 @@ public class DurationConverterTests {
             assertEquals(Duration.ofMillis(60), result.value());
         }
 
-        @Test
+        @ParameterizedTest
+        // 2 days and 30 mins
+        @ValueSource(strings = { 
+            "P2DT30M", 
+            "+P2DT30M", 
+            "-P2DT30M" 
+        })
         @DisplayName("should convert value (in ISO 8601 format) to a Duration")
-        void test2() {
+        void test2(String iso8601Duration) {
             DurationConverter converter = converterToTest();
 
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::durationProperty,
                 externalizedProperties(converter)
             );
-
-            // 2 days and 30 mins
-            String iso8601Duration = "P2DT30M";
 
             ConversionResult<Duration> result = converter.convert(
                 context,
@@ -85,57 +90,20 @@ public class DurationConverterTests {
             assertEquals(Duration.parse(iso8601Duration), result.value());
         }
 
-        @Test
-        @DisplayName(
-            "should convert value (in extended ISO 8601 format - starts with '+') to a Duration"
-        )
-        void test3() {
-            DurationConverter converter = converterToTest();
-
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::durationProperty,
-                externalizedProperties(converter)
-            );
-
-            // 2 days and 30 mins
-            String iso8601Duration = "+P2DT30M";
-
-            ConversionResult<Duration> result = converter.convert(
-                context,
-                iso8601Duration
-            );
-            
-            assertNotNull(result);
-            assertEquals(Duration.parse(iso8601Duration), result.value());
-        }
-
-        @Test
-        @DisplayName(
-            "should convert value (in extended ISO 8601 format - starts with '-') to a Duration"
-        )
-        void test4() {
-            DurationConverter converter = converterToTest();
-
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::durationProperty,
-                externalizedProperties(converter)
-            );
-
-            // 2 days and 30 mins
-            String iso8601Duration = "-P2DT30M";
-
-            ConversionResult<Duration> result = converter.convert(
-                context,
-                iso8601Duration
-            );
-            
-            assertNotNull(result);
-            assertEquals(Duration.parse(iso8601Duration), result.value());
-        }
-
-        @Test
+        @ParameterizedTest
+        // 2 days and 30 mins
+        @ValueSource(strings = { 
+            "invalid_value", 
+            "", 
+            "P", // No duration values
+            "P2DT", // No time values
+            "+", // No duration values
+            "-", // No duration values
+            "+Q", // Invalid duration values
+            "-Q" // Invalid duration values
+        })
         @DisplayName("should throw when value is not a valid Duration")
-        void test5() {
+        void test3(String iso8601Duration) {
             DurationConverter converter = converterToTest();
             InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
                 ProxyInterface::durationProperty,
@@ -146,147 +114,7 @@ public class DurationConverterTests {
                 ConversionException.class, 
                 () -> converter.convert(
                     context,
-                    "invalid_value"
-                )
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when value is empty")
-        void test6() {
-            DurationConverter converter = converterToTest();
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::durationProperty,
-                externalizedProperties(converter)
-            );
-
-            assertThrows(
-                ConversionException.class, 
-                () -> converter.convert(
-                    context,
-                    ""
-                )
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should throw when value is not a valid Duration (no duration values)"
-        )
-        void test7() {
-            DurationConverter converter = converterToTest();
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::durationProperty,
-                externalizedProperties(converter)
-            );
-
-            assertThrows(
-                ConversionException.class, 
-                () -> converter.convert(
-                    context,
-                    "P" // No duration values
-                )
-            );
-        }
-
-        @Test
-        @DisplayName("should throw when value is not a valid Duration (no time values)")
-        void test8() {
-            DurationConverter converter = converterToTest();
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::durationProperty,
-                externalizedProperties(converter)
-            );
-
-            assertThrows(
-                ConversionException.class, 
-                () -> converter.convert(
-                    context,
-                    "P2DT" // No time values
-                )
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should throw when value is not a valid Duration " +
-            "(no duration values after + sign)"
-        )
-        void test9() {
-            DurationConverter converter = converterToTest();
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::durationProperty,
-                externalizedProperties(converter)
-            );
-
-            assertThrows(
-                ConversionException.class, 
-                () -> converter.convert(
-                    context,
-                    "+" // No duration values
-                )
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should throw when value is not a valid Duration " +
-            "(no duration values after - sign)"
-        )
-        void test10() {
-            DurationConverter converter = converterToTest();
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::durationProperty,
-                externalizedProperties(converter)
-            );
-
-            assertThrows(
-                ConversionException.class, 
-                () -> converter.convert(
-                    context,
-                    "-" // No duration values
-                )
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should throw when value is not a valid Duration" +
-            "(value after + sign is invalid)"
-        )
-        void test11() {
-            DurationConverter converter = converterToTest();
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::durationProperty,
-                externalizedProperties(converter)
-            );
-
-            assertThrows(
-                ConversionException.class, 
-                () -> converter.convert(
-                    context,
-                    "+Q" // Invalid duration values
-                )
-            );
-        }
-
-        @Test
-        @DisplayName(
-            "should throw when value is not a valid Duration" +
-            "(value after - sign is invalid)"
-        )
-        void test12() {
-            DurationConverter converter = converterToTest();
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                ProxyInterface::durationProperty,
-                externalizedProperties(converter)
-            );
-
-            assertThrows(
-                ConversionException.class, 
-                () -> converter.convert(
-                    context,
-                    "-Q" // Invalid duration values
+                    iso8601Duration
                 )
             );
         }
