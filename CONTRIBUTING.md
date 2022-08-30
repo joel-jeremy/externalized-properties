@@ -37,6 +37,10 @@ Tests are run in multiple JVM runtimes. By default, it is run in LTS versions (s
 
 ## Development Guidelines
 
+### Git Branching Strategy
+
+The project follows the [GitHub flow](https://docs.github.com/en/get-started/quickstart/github-flow) branching strategy.
+
 ### Unit Test Structure
 
 Unit tests in this project follow a specific structure.
