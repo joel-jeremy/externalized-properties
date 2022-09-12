@@ -1,7 +1,5 @@
 package io.github.joeljeremy7.externalizedproperties.core;
 
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils;
-import io.github.joeljeremy7.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,11 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TypeUtilitiesTests {
-    private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
-        ExternalizedProperties.builder().defaults().build();
-    private static final InvocationContextTestFactory<TypesInterface> INVOCATION_CONTEXT_FACTORY =
-        InvocationContextUtils.testFactory(TypesInterface.class);
-    
     @Nested
     class GetRawTypeMethod {
         @Test
@@ -50,17 +43,12 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return raw type when type is a parameterized type")
         void parameterizedTest1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::parameterizedTypeReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
+            Type genericType = new TypeReference<List<String>>(){}.type();
 
-            assertTrue(genericReturnType instanceof ParameterizedType);
+            assertTrue(genericType instanceof ParameterizedType);
             assertEquals(
                 List.class, 
-                TypeUtilities.getRawType(genericReturnType)
+                TypeUtilities.getRawType(genericType)
             );
         }
 
@@ -69,18 +57,13 @@ public class TypeUtilitiesTests {
             "should return Object array class when type is a generic array type " + 
             "with type variable that has no extends declaration."
         )
-        void genericArrayTypeTest1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::genericArrayTypeReturnTypeWithTypeVariable,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
+        <T> void genericArrayTypeTest1() {
+            Type genericType = new TypeReference<T[]>(){}.type();
 
-            assertTrue(genericReturnType instanceof GenericArrayType);
+            assertTrue(genericType instanceof GenericArrayType);
             assertEquals(
                 Object[].class, 
-                TypeUtilities.getRawType(genericReturnType)
+                TypeUtilities.getRawType(genericType)
             );
         }
 
@@ -89,18 +72,13 @@ public class TypeUtilitiesTests {
             "should return correct bound when type is a generic array type " + 
             "with type variable that has an extends declaration."
         )
-        void genericArrayTypeTest2() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::genericArrayTypeReturnTypeWithTypeVariableExtends,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
+        <T extends List<?>> void genericArrayTypeTest2() {
+            Type genericType = new TypeReference<T[]>(){}.type();
 
-            assertTrue(genericReturnType instanceof GenericArrayType);
+            assertTrue(genericType instanceof GenericArrayType);
             assertEquals(
                 List[].class, 
-                TypeUtilities.getRawType(genericReturnType)
+                TypeUtilities.getRawType(genericType)
             );
         }
 
@@ -109,18 +87,13 @@ public class TypeUtilitiesTests {
             "should return Object class when type is a type variable " + 
             "that has no extends declaration."
         )
-        void typeVariableTest1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::typeVariableReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
+        <T> void typeVariableTest1() {
+            Type genericType = new TypeReference<T>(){}.type();
 
-            assertTrue(genericReturnType instanceof TypeVariable<?>);
+            assertTrue(genericType instanceof TypeVariable<?>);
             assertEquals(
                 Object.class, 
-                TypeUtilities.getRawType(genericReturnType)
+                TypeUtilities.getRawType(genericType)
             );
         }
 
@@ -129,18 +102,13 @@ public class TypeUtilitiesTests {
             "should return correct bound when type is a type variable " + 
             "that has an extends declaration."
         )
-        void typeVariableTest2() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::typeVariableReturnTypeExtends,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
+        <T extends List<?>> void typeVariableTest2() {
+            Type genericType = new TypeReference<T>(){}.type();
 
-            assertTrue(genericReturnType instanceof TypeVariable<?>);
+            assertTrue(genericType instanceof TypeVariable<?>);
             assertEquals(
                 List.class, 
-                TypeUtilities.getRawType(genericReturnType)
+                TypeUtilities.getRawType(genericType)
             );
         }
         
@@ -149,19 +117,14 @@ public class TypeUtilitiesTests {
             "should return Object class when type is a wildcard type " + 
             "that has no extends declaration."
         )
-        void wildcardTypeTest1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::wildcardTypeReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-                
+        void wildcardTypeTest1() throws NoSuchMethodException, SecurityException {
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = context.method().returnType();
+            Type genericType = new TypeReference<List<?>>(){}.type();
 
-            assertTrue(genericReturnType instanceof ParameterizedType);
+            assertTrue(genericType instanceof ParameterizedType);
 
-            ParameterizedType pt = TypeUtilities.asParameterizedType(genericReturnType);
+            ParameterizedType pt = TypeUtilities.asParameterizedType(genericType);
             Type wildcardType = pt.getActualTypeArguments()[0];
 
             assertTrue(wildcardType instanceof WildcardType);
@@ -177,18 +140,13 @@ public class TypeUtilitiesTests {
             "that has an extends declaration e.g. <? extends String>."
         )
         void wildcardTypeTest2() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::wildcardTypeReturnTypeExtends,
-                EXTERNALIZED_PROPERTIES
-            );
-                
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = context.method().returnType();
+            Type genericType = new TypeReference<List<? extends String>>(){}.type();
 
-            assertTrue(genericReturnType instanceof ParameterizedType);
+            assertTrue(genericType instanceof ParameterizedType);
 
-            ParameterizedType pt = TypeUtilities.asParameterizedType(genericReturnType);
+            ParameterizedType pt = TypeUtilities.asParameterizedType(genericType);
             Type wildcardType = pt.getActualTypeArguments()[0];
 
             assertTrue(wildcardType instanceof WildcardType);
@@ -204,14 +162,9 @@ public class TypeUtilitiesTests {
             "that has a super declaration e.g. <? super String>."
         )
         void wildcardTypeTest3() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::wildcardTypeReturnTypeSuper,
-                EXTERNALIZED_PROPERTIES
-            );
-                
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = context.method().returnType();
+            Type genericReturnType = new TypeReference<List<? super String>>(){}.type();
 
             assertTrue(genericReturnType instanceof ParameterizedType);
 
@@ -257,30 +210,20 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return generic type parameter")
         void test1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::parameterizedTypeReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-            
-            Type genericReturnType = context.method().returnType();
+            Type genericType = new TypeReference<List<String>>(){}.type();
 
             assertArrayEquals(
                 new Type[] { String.class },
-                TypeUtilities.getTypeParameters(genericReturnType)
+                TypeUtilities.getTypeParameters(genericType)
             );
         }
 
         @Test
         @DisplayName("should return empty array when type is not a parameterized type")
         void test2() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::nonParameterizedTypeReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-            
-            Type genericReturnType = context.method().returnType();
+            Type genericType = new TypeReference<String>(){}.type();
 
-            assertEquals(0, TypeUtilities.getTypeParameters(genericReturnType).length);
+            assertEquals(0, TypeUtilities.getTypeParameters(genericType).length);
         }
     }
 
@@ -297,15 +240,10 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return false when type is not a class")
         void test2() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::parameterizedTypeReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
+            Type genericType = new TypeReference<List<String>>(){}.type();
 
-            assertFalse(genericReturnType instanceof Class<?>);
-            assertFalse(TypeUtilities.isClass(genericReturnType));
+            assertFalse(genericType instanceof Class<?>);
+            assertFalse(TypeUtilities.isClass(genericType));
         }
     }
 
@@ -314,14 +252,10 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return true when type is a parameterized type")
         void test1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::parameterizedTypeReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
-            assertTrue(genericReturnType instanceof ParameterizedType);
-            assertTrue(TypeUtilities.isParameterizedType(genericReturnType));
+            Type genericType = new TypeReference<List<String>>(){}.type();
+            
+            assertTrue(genericType instanceof ParameterizedType);
+            assertTrue(TypeUtilities.isParameterizedType(genericType));
         }
 
         @Test
@@ -338,14 +272,10 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return true when type is a generic array type")
         void test1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::genericArrayTypeReturnTypeWithTypeVariable,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
-            assertTrue(genericReturnType instanceof GenericArrayType);
-            assertTrue(TypeUtilities.isGenericArrayType(genericReturnType));
+            Type genericType = new TypeReference<List<String>[]>(){}.type();
+            
+            assertTrue(genericType instanceof GenericArrayType);
+            assertTrue(TypeUtilities.isGenericArrayType(genericType));
         }
 
         @Test
@@ -361,15 +291,11 @@ public class TypeUtilitiesTests {
     class IsTypeVariableMethod {
         @Test
         @DisplayName("should return true when type is a type variable")
-        void test1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::typeVariableReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
-            assertTrue(genericReturnType instanceof TypeVariable<?>);
-            assertTrue(TypeUtilities.isTypeVariable(genericReturnType));
+        <T> void test1() {
+            Type genericType = new TypeReference<T>(){}.type();
+            
+            assertTrue(genericType instanceof TypeVariable<?>);
+            assertTrue(TypeUtilities.isTypeVariable(genericType));
         }
 
         @Test
@@ -386,18 +312,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return true when type is a wildcard type")
         void test1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::wildcardTypeReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-            
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = context.method().returnType();
+            Type genericType = new TypeReference<List<?>>(){}.type();
 
-            assertTrue(genericReturnType instanceof ParameterizedType);
+            assertTrue(genericType instanceof ParameterizedType);
 
-            ParameterizedType pt = TypeUtilities.asParameterizedType(genericReturnType);
+            ParameterizedType pt = TypeUtilities.asParameterizedType(genericType);
             Type wildcardType = pt.getActualTypeArguments()[0];
                 
             assertTrue(wildcardType instanceof WildcardType);
@@ -429,14 +350,10 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return null when type is not a class")
         void test2() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::parameterizedTypeReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
-            assertTrue(genericReturnType instanceof ParameterizedType);
-            assertNull(TypeUtilities.asClass(genericReturnType));
+            Type genericType = new TypeReference<List<String>>(){}.type();
+            
+            assertTrue(genericType instanceof ParameterizedType);
+            assertNull(TypeUtilities.asClass(genericType));
         }
     }
 
@@ -445,16 +362,12 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return a parameterized type when type is a parameterized type")
         void test1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::parameterizedTypeReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
-            assertTrue(genericReturnType instanceof ParameterizedType);
+            Type genericType = new TypeReference<List<String>>(){}.type();
+            
+            assertTrue(genericType instanceof ParameterizedType);
             assertEquals(
-                genericReturnType,
-                TypeUtilities.asParameterizedType(genericReturnType)
+                genericType,
+                TypeUtilities.asParameterizedType(genericType)
             );
         }
 
@@ -472,16 +385,12 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return a generic array type when type is a generic array type")
         void test1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::genericArrayTypeReturnTypeWithTypeVariable,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
-            assertTrue(genericReturnType instanceof GenericArrayType);
+            Type genericType = new TypeReference<List<String>[]>(){}.type();
+            
+            assertTrue(genericType instanceof GenericArrayType);
             assertEquals(
-                genericReturnType,
-                TypeUtilities.asGenericArrayType(genericReturnType)
+                genericType,
+                TypeUtilities.asGenericArrayType(genericType)
             );
         }
 
@@ -498,17 +407,13 @@ public class TypeUtilitiesTests {
     class AsTypeVariableMethod {
         @Test
         @DisplayName("should return a type variable when type is a type variable")
-        void test1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::typeVariableReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-                
-            Type genericReturnType = context.method().returnType();
-            assertTrue(genericReturnType instanceof TypeVariable<?>);
+        <T> void test1() {
+            Type genericType = new TypeReference<T>(){}.type();
+            
+            assertTrue(genericType instanceof TypeVariable<?>);
             assertEquals(
-                genericReturnType,
-                TypeUtilities.asTypeVariable(genericReturnType)
+                genericType,
+                TypeUtilities.asTypeVariable(genericType)
             );
         }
 
@@ -526,18 +431,13 @@ public class TypeUtilitiesTests {
         @Test
         @DisplayName("should return a wildcard type when type is a wildcard type")
         void test1() {
-            InvocationContext context = INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-                TypesInterface::wildcardTypeReturnType,
-                EXTERNALIZED_PROPERTIES
-            );
-            
             // This is a parameterized List<?> type. 
             // Need to extract the wildcard type below.
-            Type genericReturnType = context.method().returnType();
+            Type genericType = new TypeReference<List<?>>(){}.type();
 
-            assertTrue(genericReturnType instanceof ParameterizedType);
+            assertTrue(genericType instanceof ParameterizedType);
 
-            ParameterizedType pt = TypeUtilities.asParameterizedType(genericReturnType);
+            ParameterizedType pt = TypeUtilities.asParameterizedType(genericType);
             Type wildcardType = pt.getActualTypeArguments()[0];
                 
             assertTrue(wildcardType instanceof WildcardType);
@@ -781,20 +681,5 @@ public class TypeUtilitiesTests {
         }
     }
 
-    private static interface TypesInterface {
-        String nonParameterizedTypeReturnType();
-        List<String> parameterizedTypeReturnType();
-        
-        <T> T[] genericArrayTypeReturnTypeWithTypeVariable();
-        <T extends List<?>> T[] genericArrayTypeReturnTypeWithTypeVariableExtends();
-        
-        <T> T typeVariableReturnType();
-        <T extends List<?>> T typeVariableReturnTypeExtends();
-
-        List<?> wildcardTypeReturnType();
-        List<? extends String> wildcardTypeReturnTypeExtends();
-        List<? super String> wildcardTypeReturnTypeSuper();
-    }
-
-    private static class UnsupportedType implements Type {}
+    static class UnsupportedType implements Type {}
 }
