@@ -99,3 +99,15 @@ Unit tests in this project follow a specific structure.
         }
     }
     ```
+
+## Release Guidelines
+
+This project follows [Semantic Versioning](https://semver.org/).
+
+When releasing, the following steps must be followed:
+
+1. Create a release and tag via GitHub Releases e.g. `1.0.0`.
+    - The release description should include a changelog.
+2. After release pipeline completes, bump up the version in root `build.gradle` to the next development version by creating a pull request.
+    - By default, the next development version is a minor version bump i.e. `1.0.0` --> `1.1.0`.
+3. Merge the pull request to `main`.
