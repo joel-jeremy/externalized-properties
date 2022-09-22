@@ -20,17 +20,17 @@ The project uses Java 11 as runtime for Gradle but compiles source code to Java 
 To build the project, run the command:
 
 ```sh
-./gradlew clean build
+./gradlew build
 ```
 
 To create reports, run the commands:
 
 ```sh
-./gradlew clean build testAggregateTestReport
+./gradlew testAggregateTestReport
 ```
 
 ```sh
-./gradlew clean build testCodeCoverageReport
+./gradlew testCodeCoverageReport
 ```
 
 Tests are run in multiple JVM runtimes. By default, it is run in LTS versions (succeeding the version used in source compilation) + the latest released non-LTS version. Test runtimes are overrideable by setting the `ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS` environment variable or `additionalTestRunsOnJvmVersions` system property e.g. `ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS=8,17,18` / `additionalTestRunsOnJvmVersions=8,17,18`.
@@ -46,7 +46,10 @@ The project follows the [GitHub flow](https://docs.github.com/en/get-started/qui
 Unit tests in this project follow a specific structure.
 
 - Classes must have a corresponding test class i.e. `MapResolver` -> `MapResolverTests`. The test class must be in the exact same java package as the class it corresponds to.
-- Test classes are nested in structure. Each method in the class under test must have a corresponding `@Nested` test class. Each `@Nested` test class must test scenarios that is supported by the method it corresponds to.
+- Test classes are nested in structure. Each method in the class under test must have a corresponding `@Nested` test class.
+Each `@Nested` test class must test scenarios that is supported by the method it corresponds to.
+- Each `@Nested` test class must test scenarios that is supported by the method it corresponds to via `@Test`.
+- Use `@DisplayName` to describe the scenario being tested by the `@Test` method e.g. `@DisplayName("should throw when x argument is null)`.
 
     ```java
     // Class under test: io.github.joeljeremy7.externalizedproperties.resolver.my.MyResolver
