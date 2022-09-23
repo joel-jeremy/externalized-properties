@@ -2,7 +2,6 @@ package io.github.joeljeremy7.externalizedproperties.core.internal.proxy;
 
 import io.github.joeljeremy7.externalizedproperties.core.Converter;
 import io.github.joeljeremy7.externalizedproperties.core.ConverterFacade;
-import io.github.joeljeremy7.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy7.externalizedproperties.core.InvocationArguments;
 import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy7.externalizedproperties.core.Resolver;
@@ -10,12 +9,12 @@ import io.github.joeljeremy7.externalizedproperties.core.TypeReference;
 import io.github.joeljeremy7.externalizedproperties.core.UnresolvedPropertyException;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpander;
 import io.github.joeljeremy7.externalizedproperties.core.VariableExpanderFacade;
+import io.github.joeljeremy7.externalizedproperties.core.internal.DefaultInterfaceMethodHandlerFactory;
+import io.github.joeljeremy7.externalizedproperties.core.internal.DefaultInterfaceMethodHandlerFactory.DefaultInterfaceMethodHandler;
 import io.github.joeljeremy7.externalizedproperties.core.internal.ExternalizedPropertyName;
 import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationContextFactory;
-import io.github.joeljeremy7.externalizedproperties.core.internal.MethodHandleFactory;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.lang.invoke.MethodHandle;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -33,7 +32,7 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
     private final Converter<?> rootConverter;
     private final VariableExpander variableExpander;
     private final InvocationContextFactory invocationContextFactory;
-    private final MethodHandleFactory methodHandleFactory;
+    private final DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory;
 
     /**
      * Constructor.
@@ -59,7 +58,7 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
             invocationContextFactory, 
             "invocationContextFactory"
         );
-        this.methodHandleFactory = new MethodHandleFactory();
+        this.defaultInterfaceMethodHandlerFactory = new DefaultInterfaceMethodHandlerFactory();
     }
 
     /**
@@ -204,31 +203,8 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
             Object[] args
     ) {
         DefaultInterfaceMethodHandler handler = 
-            buildDefaultInterfaceMethodHandler(proxy, method);
-        return handler.invoke(args);
-    }
-
-    private DefaultInterfaceMethodHandler buildDefaultInterfaceMethodHandler(
-            Object proxy, 
-            Method proxyMethod
-    ) {
-        MethodHandle methodHandle = 
-            methodHandleFactory.createMethodHandle(proxyMethod).bindTo(proxy);
-        
-        return args -> {
-            try {
-                return methodHandle.invokeWithArguments(args);
-            } catch (Throwable e) {
-                throw new ExternalizedPropertiesException(
-                    String.format(
-                        "Error occurred while invoking default interface method. " +
-                        "Proxy method: %s.",
-                        proxyMethod.toGenericString()
-                    ), 
-                    e
-                );
-            }
-        };
+            defaultInterfaceMethodHandlerFactory.create(method);
+        return handler.invoke(proxy, args);
     }
 
     // Same handling for @ResolverFacade and @ConverterFacade.
@@ -285,9 +261,5 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
     private static String proxyToString(Object proxy) {
         return proxy.getClass().getName() + '@' + 
             Integer.toHexString(proxyHashCode(proxy));
-    }
-
-    private static interface DefaultInterfaceMethodHandler {
-        Object invoke(Object... args);
     }
 }

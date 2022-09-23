@@ -399,7 +399,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName(
-            "should return empty Optional when an annotated Optional property cannot be resolved."
+            "should return empty Optional when an annotated Optional property cannot be resolved"
         )
         void test11() throws Throwable {
             Resolver resolver = new MapResolver(Collections.emptyMap());
@@ -436,7 +436,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName(
-            "should return empty Optional when an unannotated Optional property cannot be resolved."
+            "should return empty Optional when an unannotated Optional property cannot be resolved"
         )
         void test12() throws Throwable {
             Resolver resolver = new MapResolver(Collections.emptyMap());
@@ -1307,8 +1307,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName(
-            "should rethrow same runtime exception when default interface method " + 
-            "throws an exception."
+            "should wrap and propagate runtime exceptions thrown by default interface method"
         )
         void rethrowExceptionsTest1() {
             StubResolver resolver = new StubResolver(StubResolver.NULL_VALUE_RESOLVER);
@@ -1334,7 +1333,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
             ProxyInterface proxy = externalizedProperties.initialize(proxyInterface);
             assertThrows(
-                RuntimeException.class, 
+                ExternalizedPropertiesException.class, 
                 () -> handler.invoke(
                     proxy, 
                     method,
@@ -1345,7 +1344,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
         @Test
         @DisplayName(
-            "should wrap checked exceptions thrown by default interface method."
+            "should wrap and propagate checked exceptions thrown by default interface method"
         )
         void rethrowExceptionsTest2() {
             StubResolver resolver = new StubResolver(StubResolver.NULL_VALUE_RESOLVER);
