@@ -1,6 +1,7 @@
 # Externalized Properties
 
 [![Gradle Build](https://github.com/joeljeremy7/externalized-properties/actions/workflows/gradle-build.yaml/badge.svg)](https://github.com/joeljeremy7/externalized-properties/actions/workflows/gradle-build.yaml)
+[![CodeQL](https://github.com/joeljeremy7/externalized-properties/actions/workflows/codeql.yaml/badge.svg)](https://github.com/joeljeremy7/externalized-properties/actions/workflows/codeql.yaml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.joeljeremy7.externalizedproperties/core/badge.svg)](https://search.maven.org/search?q=g:%22io.github.joeljeremy7.externalizedproperties%22)
 [![Coverage Status](https://coveralls.io/repos/github/joeljeremy7/externalized-properties/badge.svg?branch=main)](https://coveralls.io/github/joeljeremy7/externalized-properties?branch=main)
 [![Known Vulnerabilities](https://snyk.io/test/github/joeljeremy7/externalized-properties/badge.svg)](https://snyk.io/test/github/joeljeremy7/externalized-properties)
