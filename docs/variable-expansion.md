@@ -72,7 +72,7 @@ public static void main(String[] args) {
 
 ```
 
-## 🌟 Variable Expansion in Arbitrary Values (via [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
+## 🌟 Variable Expansion in Arbitrary Values
 
 Externalized Properties can create proxies that expand variables in any String values. This is made possible by the [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java) annotation e.g.
 

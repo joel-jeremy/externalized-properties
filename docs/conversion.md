@@ -69,7 +69,7 @@ public interface ApplicationProperties {
 
 Each item in the list will be converted to an `Optional<Integer>`.
 
-## 🌟 Conversion of Arbitrary Values (via [@ConverterFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java))
+## 🌟 Conversion of Arbitrary Values
 
 Externalized Properties has support for conversion of arbitrary String values to other types. This is made possible by the [@ConverterFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java) annotation e.g.
 

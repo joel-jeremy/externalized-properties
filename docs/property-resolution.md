@@ -6,7 +6,7 @@ It works by creating dynamic/configurable proxy instances (created at runtime by
 
 ## 🙋 [Why Dynamic Proxies?](why-dynamic-proxies.md)
 
-## 🌟 Proxy Interface Property Mapping (via [@ExternalizedProperty](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java))  
+## 🌟 Proxy Interface Property Mapping  
 
 Properties are mapped to proxy interface methods by using the [@ExternalizedProperty](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java) annotation.
 
@@ -42,7 +42,7 @@ public interface ApplicationProperties {
 }
 ```
 
-## 🌟 Non-static/Dynamic Property Names (via [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
+## 🌟 Non-static/Dynamic Property Names
 
 Externalized Properties supports resolution of properties whose names are not known at compile time. This is made possible by the [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java) annotation e.g.
 
