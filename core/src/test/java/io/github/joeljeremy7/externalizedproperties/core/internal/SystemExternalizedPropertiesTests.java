@@ -34,7 +34,7 @@ public class SystemExternalizedPropertiesTests {
     @DisplayName("should throw when proxy interface argument is null")
     void validationTest1() {
       // Do not resolve any property.
-      Resolver resolver = new StubResolver(StubResolver.NULL_VALUE_RESOLVER);
+      Resolver resolver = new StubResolver(StubResolver.NULL_DELEGATE);
 
       SystemExternalizedProperties externalizedProperties =
           internalExternalizedProperties(resolver);
@@ -215,7 +215,7 @@ public class SystemExternalizedPropertiesTests {
       assertNotNull(proxy);
       assertTrue(proxy instanceof Proxy);
 
-      assertEquals(resolver.valueResolver().apply("property"), proxy.property());
+      assertEquals(resolver.delegate().apply("property"), proxy.property());
     }
 
     @Test
@@ -233,7 +233,7 @@ public class SystemExternalizedPropertiesTests {
       assertNotNull(proxy);
       assertTrue(proxy instanceof Proxy);
 
-      assertEquals(resolver.valueResolver().apply("property"), proxy.resolve("property"));
+      assertEquals(resolver.delegate().apply("property"), proxy.resolve("property"));
 
       assertEquals(1, proxy.resolve("int.property", new TypeReference<Integer>() {}));
 
@@ -367,7 +367,7 @@ public class SystemExternalizedPropertiesTests {
       assertTrue(proxy instanceof Proxy);
 
       assertEquals(
-          resolver.valueResolver().apply("java.version"), proxy.expandVariables("${java.version}"));
+          resolver.delegate().apply("java.version"), proxy.expandVariables("${java.version}"));
     }
 
     @Test
@@ -641,7 +641,7 @@ public class SystemExternalizedPropertiesTests {
       assertNotNull(proxy);
       assertTrue(proxy instanceof Proxy);
 
-      assertEquals(resolver.valueResolver().apply("property"), proxy.property());
+      assertEquals(resolver.delegate().apply("property"), proxy.property());
     }
 
     @Test
@@ -660,7 +660,7 @@ public class SystemExternalizedPropertiesTests {
       assertNotNull(proxy);
       assertTrue(proxy instanceof Proxy);
 
-      assertEquals(resolver.valueResolver().apply("property"), proxy.resolve("property"));
+      assertEquals(resolver.delegate().apply("property"), proxy.resolve("property"));
 
       assertEquals(1, proxy.resolve("property", new TypeReference<Integer>() {}));
 
@@ -801,8 +801,7 @@ public class SystemExternalizedPropertiesTests {
       assertNotNull(proxy);
       assertTrue(proxy instanceof Proxy);
 
-      assertEquals(
-          resolver.valueResolver().apply("property"), proxy.expandVariables("${property}"));
+      assertEquals(resolver.delegate().apply("property"), proxy.expandVariables("${property}"));
     }
 
     @Test

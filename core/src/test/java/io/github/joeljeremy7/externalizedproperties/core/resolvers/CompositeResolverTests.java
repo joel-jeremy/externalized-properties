@@ -202,9 +202,9 @@ public class CompositeResolverTests {
         "should return empty Optional "
             + "when property is not found from any of the child resolvers")
     void test2() {
-      StubResolver resolver1 = new StubResolver(StubResolver.NULL_VALUE_RESOLVER);
+      StubResolver resolver1 = new StubResolver(StubResolver.NULL_DELEGATE);
 
-      StubResolver resolver2 = new StubResolver(StubResolver.NULL_VALUE_RESOLVER);
+      StubResolver resolver2 = new StubResolver(StubResolver.NULL_DELEGATE);
 
       CompositeResolver compositeResolver = resolverToTest(resolver1, resolver2);
       InvocationContext context =

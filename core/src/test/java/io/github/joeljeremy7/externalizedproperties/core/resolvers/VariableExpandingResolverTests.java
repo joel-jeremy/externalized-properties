@@ -66,7 +66,7 @@ public class VariableExpandingResolverTests {
       Optional<String> resolved = resolver.resolve(context, "property");
 
       assertTrue(resolved.isPresent());
-      assertEquals(decorated.valueResolver().apply("property"), resolved.get());
+      assertEquals(decorated.delegate().apply("property"), resolved.get());
     }
   }
 

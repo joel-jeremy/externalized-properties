@@ -149,7 +149,7 @@ public class EagerLoadingInvocationHandlerTests {
 
       // Always return null.
       StubInvocationHandler decorated =
-          new StubInvocationHandler(StubInvocationHandler.THROWING_HANDLER);
+          new StubInvocationHandler(StubInvocationHandler.THROWING_DELEGATE);
 
       // No cached results.
       CacheStrategy<InvocationCacheKey, Object> cacheStrategy = new StubCacheStrategy<>();
@@ -246,7 +246,7 @@ public class EagerLoadingInvocationHandlerTests {
 
       // Always return null.
       StubInvocationHandler decorated =
-          new StubInvocationHandler(StubInvocationHandler.NULL_HANDLER);
+          new StubInvocationHandler(StubInvocationHandler.NULL_DELEGATE);
 
       // No cached results.
       CacheStrategy<InvocationCacheKey, Object> cacheStrategy = new StubCacheStrategy<>();

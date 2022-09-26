@@ -5,6 +5,7 @@ import java.lang.reflect.Proxy;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+/** Utility methods for extracting methods through strongly-typed method references. */
 public class MethodUtils {
 
   /**
