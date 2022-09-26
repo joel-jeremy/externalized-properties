@@ -18,28 +18,36 @@ import java.util.function.Function;
  */
 public class StubResolver implements Resolver {
 
-  public static final String DEFAULT_PROPERTY_NAME_SUFFIX = "-value";
+  private static final String DEFAULT_PROPERTY_NAME_SUFFIX = "-value";
 
-  // Return property name as value suffixed with "-value".
-  public static final Function<String, String> DEFAULT_VALUE_RESOLVER =
+  /** A delegate which returns the property name suffixed by "-value". */
+  public static final Function<String, String> DEFAULT_DELEGATE =
       propertyName -> propertyName + DEFAULT_PROPERTY_NAME_SUFFIX;
 
-  public static final Function<String, String> NULL_VALUE_RESOLVER = propertyName -> null;
+  /** A delegate which always returns null. */
+  public static final Function<String, String> NULL_DELEGATE = propertyName -> null;
 
   private final Map<String, String> trackedResolvedProperties = new HashMap<>();
-  private final Function<String, String> valueResolver;
+  private final Function<String, String> delegate;
 
+  /** Constructor. */
   public StubResolver() {
-    this(DEFAULT_VALUE_RESOLVER);
+    this(DEFAULT_DELEGATE);
   }
 
-  public StubResolver(Function<String, String> valueResolver) {
-    this.valueResolver = valueResolver;
+  /**
+   * Constructor.
+   *
+   * @param delegate The delegate to use in resolving properties.
+   */
+  public StubResolver(Function<String, String> delegate) {
+    this.delegate = delegate;
   }
 
+  /** {@inheritDoc} */
   @Override
   public Optional<String> resolve(InvocationContext context, String propertyName) {
-    String value = valueResolver.apply(propertyName);
+    String value = delegate.apply(propertyName);
     if (value != null) {
       // Add for tracking.
       trackedResolvedProperties.put(propertyName, value);
@@ -49,14 +57,29 @@ public class StubResolver implements Resolver {
     return Optional.empty();
   }
 
-  public Function<String, String> valueResolver() {
-    return valueResolver;
+  /**
+   * The delegate used in resolving properties.
+   *
+   * @return The delegate used in resolving properties.
+   */
+  public Function<String, String> delegate() {
+    return delegate;
   }
 
+  /**
+   * The properties resolved by this resolver.
+   *
+   * @return The properties resolved by this resolver.
+   */
   public Map<String, String> resolvedProperties() {
     return Collections.unmodifiableMap(trackedResolvedProperties);
   }
 
+  /**
+   * The property names resolved by this resolver.
+   *
+   * @return The property names resolved by this resolver.
+   */
   public Set<String> resolvedPropertyNames() {
     return Collections.unmodifiableSet(trackedResolvedProperties.keySet());
   }

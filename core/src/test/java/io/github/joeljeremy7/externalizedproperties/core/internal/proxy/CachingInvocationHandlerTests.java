@@ -112,7 +112,7 @@ public class CachingInvocationHandlerTests {
 
       // Always return null.
       StubInvocationHandler decorated =
-          new StubInvocationHandler(StubInvocationHandler.NULL_HANDLER);
+          new StubInvocationHandler(StubInvocationHandler.NULL_DELEGATE);
 
       // No cached results.
       CacheStrategy<InvocationCacheKey, Object> cacheStrategy = new StubCacheStrategy<>();
@@ -140,7 +140,7 @@ public class CachingInvocationHandlerTests {
 
       // Always return the same string for any invoked proxy method.
       StubInvocationHandler decorated =
-          new StubInvocationHandler(StubInvocationHandler.THROWING_HANDLER);
+          new StubInvocationHandler(StubInvocationHandler.THROWING_DELEGATE);
 
       CachingInvocationHandler cachingInvocationHandler =
           new CachingInvocationHandler(decorated, new StubCacheStrategy<>());

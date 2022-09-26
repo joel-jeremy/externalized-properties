@@ -527,7 +527,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
               proxyMethod,
               new Object[] {"property"});
 
-      assertEquals(resolver.valueResolver().apply("property"), resolved);
+      assertEquals(resolver.delegate().apply("property"), resolved);
     }
 
     @Test
@@ -990,7 +990,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
               proxyMethod,
               new Object[] {"${java.version}"});
 
-      assertEquals(resolver.valueResolver().apply("java.version"), expanded);
+      assertEquals(resolver.delegate().apply("java.version"), expanded);
     }
 
     @Test
@@ -1023,7 +1023,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
     @Test
     @DisplayName("should wrap and propagate runtime exceptions thrown by default interface method")
     void rethrowExceptionsTest1() {
-      StubResolver resolver = new StubResolver(StubResolver.NULL_VALUE_RESOLVER);
+      StubResolver resolver = new StubResolver(StubResolver.NULL_DELEGATE);
       Converter<?> converter = new DefaultConverter();
       ExternalizedProperties externalizedProperties = externalizedProperties(resolver, converter);
       Class<ProxyInterface> proxyInterface = ProxyInterface.class;
@@ -1046,7 +1046,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
     @Test
     @DisplayName("should wrap and propagate checked exceptions thrown by default interface method")
     void rethrowExceptionsTest2() {
-      StubResolver resolver = new StubResolver(StubResolver.NULL_VALUE_RESOLVER);
+      StubResolver resolver = new StubResolver(StubResolver.NULL_DELEGATE);
       Converter<?> converter = new DefaultConverter();
       ExternalizedProperties externalizedProperties = externalizedProperties(resolver, converter);
       Class<ProxyInterface> proxyInterface = ProxyInterface.class;

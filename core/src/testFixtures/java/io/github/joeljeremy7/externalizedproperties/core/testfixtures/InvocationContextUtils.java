@@ -2,14 +2,13 @@ package io.github.joeljeremy7.externalizedproperties.core.testfixtures;
 
 import io.github.joeljeremy7.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy7.externalizedproperties.core.InvocationContext;
-import io.github.joeljeremy7.externalizedproperties.core.ProxyMethod;
 import io.github.joeljeremy7.externalizedproperties.core.internal.InvocationContextFactory;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-/** Utility methods to manage {@link ProxyMethod}s. */
+/** Utility methods for easy creation of test {@link InvocationContext}s. */
 public class InvocationContextUtils {
   private InvocationContextUtils() {}
 
@@ -25,7 +24,7 @@ public class InvocationContextUtils {
   }
 
   /**
-   * Get a {@link ProxyMethod} instance from a proxy interface's method reference.
+   * Get an {@link InvocationContext} instance from a proxy interface's method reference.
    *
    * <p>This will only work on interfaces.
    *
@@ -64,7 +63,7 @@ public class InvocationContextUtils {
   }
 
   /**
-   * Get a {@link ProxyMethod} instance from a proxy interface's method reference.
+   * Get an {@link InvocationContext} instance from a proxy interface's method reference.
    *
    * <p>This will only work on interfaces.
    *
@@ -107,7 +106,7 @@ public class InvocationContextUtils {
   }
 
   /**
-   * Get a {@link ProxyMethod} instance from a proxy interface's method reference.
+   * Get an {@link InvocationContext} instance from a proxy interface's method reference.
    *
    * <p>This will only work on interfaces.
    *
@@ -153,7 +152,7 @@ public class InvocationContextUtils {
   }
 
   /**
-   * Get a {@link ProxyMethod} instance from a proxy interface's method reference.
+   * Get an {@link InvocationContext} instance from a proxy interface's method reference.
    *
    * <p>This will only work on interfaces.
    *
@@ -265,7 +264,7 @@ public class InvocationContextUtils {
     }
 
     /**
-     * Get a {@link InvocationContext} instance from a proxy interface's method reference.
+     * Get an {@link InvocationContext} instance from a proxy interface's method reference.
      *
      * <p>This will only work on interfaces.
      *
@@ -295,7 +294,7 @@ public class InvocationContextUtils {
     }
 
     /**
-     * Get a {@link InvocationContext} instance from a proxy interface's method reference.
+     * Get an {@link InvocationContext} instance from a proxy interface's method reference.
      *
      * <p>This will only work on interfaces.
      *
@@ -328,7 +327,7 @@ public class InvocationContextUtils {
     }
 
     /**
-     * Get a {@link InvocationContext} instance from a proxy interface's method reference.
+     * Get an {@link InvocationContext} instance from a proxy interface's method reference.
      *
      * <p>This will only work on interfaces.
      *
@@ -364,7 +363,7 @@ public class InvocationContextUtils {
     }
 
     /**
-     * Get a {@link ProxyMethod} instance from a proxy interface's method reference.
+     * Get an {@link InvocationContext} instance from a proxy interface's method reference.
      *
      * <p>This will only work on interfaces.
      *
