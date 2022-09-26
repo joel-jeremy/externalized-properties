@@ -4,7 +4,7 @@ Externalized Properties provides a mechanism to do targeted processing of resolv
 
 This feature may be used to selectively apply transformations to properties such as automatic decryption, masking, validation, etc. This can be achieved via a combination of the [ProcessWith](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/processing/ProcessWith.java) and [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java) classes.
 
-## ✨ Targeted Processing
+## ✨ Targeted Processing of Properties
 
 Externalized Properties inspects the annotations on proxy methods to see if the property should undergo processing.
 
@@ -12,57 +12,47 @@ To mark a proxy method (effectively the property assigned to it) as candidate fo
 
 ```java
 public interface ApplicationProperties {
-    @ExternalizedProperty("encrypted.property.aes")
-    // @Decrypt is meta-annotated with @ProcessWith. 
-    // This can be verified in source code.
-    @Decrypt("MyAESDecryptor")
-    String aesEncryptedProperty();
+  @ExternalizedProperty("encrypted.property.aes")
+  // @Decrypt is meta-annotated with @ProcessWith. 
+  // This can be verified in source code.
+  @Decrypt("MyAESDecryptor")
+  String aesEncryptedProperty();
 
-    @ExternalizedProperty("encrypted.property.rsa")
-    // @Decrypt is meta-annotated with @ProcessWith. 
-    // This can be verified in source code.
-    @Decrypt("MyRSADecryptor")
-    String rsaEncryptedProperty();
+  @ExternalizedProperty("encrypted.property.rsa")
+  // @Decrypt is meta-annotated with @ProcessWith. 
+  // This can be verified in source code.
+  @Decrypt("MyRSADecryptor")
+  String rsaEncryptedProperty();
 }
 
 public static void main(String[] args) {
-    // Processor to decrypt @Decrypt("MyAESDecryptor")
-    DecryptProcessor aesDecryptProcessor = aesDecryptProcessor();
-    // Processor to decrypt @Decrypt("MyRSADecryptor")
-    DecryptProcessor rsaDecryptProcessor = rsaDecryptProcessor();
+  // Processor to decrypt @Decrypt("MyAESDecryptor")
+  DecryptProcessor aesDecryptProcessor = aesDecryptProcessor();
+  // Processor to decrypt @Decrypt("MyRSADecryptor")
+  DecryptProcessor rsaDecryptProcessor = rsaDecryptProcessor();
 
-    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .defaults()
-        .processors(aesDecryptProcessor, rsaDecryptProcessor)
-        .build();
+  ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+      .defaults()
+      .processors(aesDecryptProcessor, rsaDecryptProcessor)
+      .build();
 
-     // Proxied interface.
-    ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
+    // Proxied interface.
+  ApplicationProperties appProperties = 
+      externalizedProperties.initialize(ApplicationProperties.class);
 
-    // Automatically decrypted via @Decrypt/DecryptProcessor.
-    String decryptedAesProperty = props.aesEncryptedProperty();
-    String decryptedRsaProperty = props.rsaEncryptedProperty();
+  // Automatically decrypted via @Decrypt/DecryptProcessor.
+  String decryptedAesProperty = appProperties.aesEncryptedProperty();
+  String decryptedRsaProperty = appProperties.rsaEncryptedProperty();
 }
 
 private static ProcessorProvider<DecryptProcessor> aesDecryptProcessor() {
-    return new DecryptProcessor(
-        JceDecryptor.factory().symmetric(
-            "MyAESDecryptor",
-            "AES/GCM/NoPadding", 
-            getSecretKey(),
-            getGcmParameterSpec()
-        )
-    );
+  return new DecryptProcessor(JceDecryptor.factory()
+      .symmetric("MyAESDecryptor", "AES/GCM/NoPadding", getSecretKey(), getGcmParameterSpec()));
 }
 
 private static ProcessorProvider<DecryptProcessor> rsaDecryptProcessor() {
-    return new DecryptProcessor(
-        JceDecryptor.factory().asymmetric(
-            "MyRSADecryptor",
-            "RSA", 
-            getPrivateKey()
-        )
-    );
+    return new DecryptProcessor(JceDecryptor.factory()
+        .asymmetric("MyRSADecryptor", "RSA", getPrivateKey()));
 }
 ```
 
@@ -76,10 +66,10 @@ To create custom processors, you need to:
 
 ```java
 public class Base64EncodeProcessor implements Processor {
-    @Override
-    public String process(InvocationContext context, String valueToProcess) {
-        return base64Encode(context, valueToProcess);
-    }
+  @Override
+  public String process(InvocationContext context, String valueToProcess) {
+    return base64Encode(context, valueToProcess);
+  }
 }
 ```
 
@@ -104,10 +94,10 @@ public @interface Base64Encode {}
 
 ```java
 public interface ApplicationProperties {
-    @ExternalizedProperty("my.property")
-    // This property will be processed by the Base64EncodeProcessor.
-    @Base64Encode
-    String myProperty();
+  @ExternalizedProperty("my.property")
+  // This property will be processed by the Base64EncodeProcessor.
+  @Base64Encode
+  String myProperty();
 }
 ```
 
@@ -117,14 +107,15 @@ Registration of [Processor](../core/src/main/java/io/github/joeljeremy7/external
 
 ```java
 public static void main(String[] args) {
-    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        // Register custom processor to process @Base64Encode
-        .processors(new Base64EncodeProcessor())
-        .build();
+  ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+      // Register custom processor to process @Base64Encode
+      .processors(new Base64EncodeProcessor())
+      .build();
 
-    ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
+  ApplicationProperties appProperties = 
+      externalizedProperties.initialize(ApplicationProperties.class);
 
-    // Automatically encoded to Base64.
-    String base64EncodedProperty = props.myProperty();
+  // Automatically encoded to Base64.
+  String base64EncodedProperty = appProperties.myProperty();
 }
 ```

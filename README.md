@@ -35,20 +35,20 @@ implementation "io.github.joeljeremy7.externalizedproperties:resolvers-git:${ver
 
 ```xml
 <dependency>
-    <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
-    <artifactId>core</artifactId>
-    <version>${version}</version>
+  <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
+  <artifactId>core</artifactId>
+  <version>${version}</version>
 </dependency>
 <!-- Optional/additional resolvers -->
 <dependency>
-    <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
-    <artifactId>resolvers-database</artifactId>
-    <version>${version}</version>
+  <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
+  <artifactId>resolvers-database</artifactId>
+  <version>${version}</version>
 </dependency>
 <dependency>
-    <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
-    <artifactId>resolvers-git</artifactId>
-    <version>${version}</version>
+  <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
+  <artifactId>resolvers-git</artifactId>
+  <version>${version}</version>
 </dependency>
 ```
 
@@ -64,48 +64,56 @@ Module authors can use above module names in their module-info.java:
 
 ```java
 module foo.bar {
-    requires io.github.joeljeremy7.externalizedproperties.core;
-    requires io.github.joeljeremy7.externalizedproperties.resolvers.database;
-    requires io.github.joeljeremy7.externalizedproperties.resolvers.git;
+  requires io.github.joeljeremy7.externalizedproperties.core;
+  requires io.github.joeljeremy7.externalizedproperties.resolvers.database;
+  requires io.github.joeljeremy7.externalizedproperties.resolvers.git;
 }
 ```
 
 ## 🌟 Features
 
-### 🔗 [Property Resolution via Java Dynamic Proxies](docs/property-resolution.md) ([Why Dynamic Proxies?](docs/why-dynamic-proxies.md))
+Externalized Properties takes full advantage of Java's [Dynamic Proxies](https://docs.oracle.com/javase/8/docs/technotes/guides/reflection/proxy.html) ([Why Dynamic Proxies?](docs/why-dynamic-proxies.md)).
 
-✨ Proxy Interface Property Mapping (via [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java))  
-✨ Default/Fallback Values  
-✨ Non-Static/Dynamic Property Names (via [@ResolverFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
-✨ Support for Various Configuration File/Resource Formats  
-✨ Caching  
-✨ Eager Loading  
-✨ Automatic Cache Reload  
+### ✔️ Property Resolution
 
-### 🔗 [Conversion](docs/conversion.md)
+- [Map Properties to Dynamic Proxy Interface Methods](docs/property-resolution.md#-map-properties-to-dynamic-proxy-interface-methods)
+  - via [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java)
+- [Default/Fallback Values](docs/property-resolution.md#-defaultfallback-values)  
+- [Support for Property Names Known at Runtime](docs/property-resolution.md#-support-for-property-names-known-at-runtime)
+  - via [@ResolverFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java)
+- [Support for Various Configuration File/Resource Formats](docs/property-resolution.md#-support-for-various-configuration-fileresource-formats)  
+- [Caching](docs/property-resolution.md#-caching)  
+- [Eager Loading](docs/property-resolution.md#-eager-loading)  
+- [Custom Resolvers](docs/property-resolution.md#-custom-resolvers)  
 
-✨ Automatic Property Conversion  
-✨ Generic Type Conversion  
-✨ Conversion of Arbitrary Values (via [@ConverterFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java))
+### ✔️ Conversion
 
-### 🔗 [Variable Expansion](docs/variable-expansion.md)
+- [Automatic Property Conversion](docs/conversion.md#-automatic-property-conversion)  
+- [Conversion to Generic Types](docs/conversion.md#-conversion-to-generic-types)  
+- [Conversion of Arbitrary Values](docs/conversion.md#-conversion-of-arbitrary-values)
+  - via [@ConverterFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java)
+- [Custom Converters](docs/conversion.md#-custom-converters)
 
-✨ Automatic Variable Expansion in Property Names  
-✨ Automatic Variable Expansion in Properties  
-✨ Variable Expansion in Arbitrary Values (via [@VariableExpanderFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
+### ✔️ Variable Expansion
 
-### 🔗 [Processing](docs/processing.md)
+- [Automatic Variable Expansion in Property Names](docs/variable-expansion.md#-automatic-variable-expansion-in-property-names)  
+- [Automatic Variable Expansion in Properties](docs/variable-expansion.md#-automatic-variable-expansion-in-properties)  
+- [Variable Expansion in Arbitrary Values](docs/variable-expansion.md#-variable-expansion-in-arbitrary-values)
+  - via [@VariableExpanderFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java)
 
-✨ Targeted Processing
+### ✔️ Processing
 
-### 🔗 [Profiles](docs/profiles.md)
+- [Targeted Processing of Properties](docs/processing.md#-targeted-processing-of-properties)
+- [Custom Processors](docs/processing.md#-custom-processors)
 
-✨ Profile-Specific Configurations
+### ✔️ Profiles
 
-### 🔗 [Ordinal Components](docs/ordinal-components.md)
+- [Profile-Specific Configurations](docs/profiles.md#-profile-specific-configurations)
 
-✨ Ordinal Resolvers  
-✨ Ordinal Converters
+### ✔️ Ordinal Components
+
+- [Ordinal Resolvers](docs/ordinal-components.md#-ordinal-resolvers)  
+- [Ordinal Converters](docs/ordinal-components.md#-ordinal-converters)
 
 ## 🏎️ Quick Start
 
@@ -117,15 +125,15 @@ Given an interface:
 
 ```java
 public interface ApplicationProperties {
-    @ExternalizedProperty("java.home")
-    String javaHome();
+  @ExternalizedProperty("java.home")
+  String javaHome();
 
-    @ExternalizedProperty("encrypted.property")
-    @Decrypt("MyDecryptor")
-    String encryptedProperty();
+  @ExternalizedProperty("encrypted.property")
+  @Decrypt("MyDecryptor")
+  String encryptedProperty();
 
-    @ExternalizedProperty("java.version")
-    int javaVersion();
+  @ExternalizedProperty("java.version")
+  int javaVersion();
 }
 ```
 
@@ -133,25 +141,25 @@ We can initialize and start resolving external configurations/properties by:
 
 ```java
 public static void main(String[] args) {
-    // 1. Configure and build the ExternalizedProperties instance.
-    ExternalizedProperties externalizedProperties = buildExternalizedProperties();
+  // 1. Configure and build the ExternalizedProperties instance.
+  ExternalizedProperties externalizedProperties = buildExternalizedProperties();
 
-    // 2. Initialize a proxy using the ExternalizedProperties.
-    ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
+  // 2. Initialize a proxy using the ExternalizedProperties.
+  ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
 
-    // 3. Resolve the properties.
-    String javaHome = props.javaHome();
-    String encryptedProperty = props.encryptedProperty();
-    int javaVersion = props.javaVersion();
+  // 3. Resolve the properties.
+  String javaHome = props.javaHome();
+  String encryptedProperty = props.encryptedProperty();
+  int javaVersion = props.javaVersion();
 }
 
 private static ExternalizedProperties buildExternalizedProperties() {
-    return ExternalizedProperties.builder()
-        .defaults() 
-        .resolvers(...)
-        .processors(...)
-        .converters(...) 
-        .build();
+  return ExternalizedProperties.builder()
+      .defaults() 
+      .resolvers(...)
+      .processors(...)
+      .converters(...) 
+      .build();
 }
 ```
 

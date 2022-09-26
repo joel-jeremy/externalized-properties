@@ -8,15 +8,15 @@ Variable expansion is supported in property names and is enabled by default e.g.
 
 ```java
 public interface ApplicationProperties {
-    @ExternalizedProperty("environment")
-    default String environment() {
-        return "dev";
-    }
+  @ExternalizedProperty("environment")
+  default String environment() {
+    return "dev";
+  }
 
-    // ${environment} will be replaced with whatever the 
-    // value of the "environment" property is e.g. dev.my.property
-    @ExternalizedProperty("${environment}.my.property")
-    String myProperty();
+  // ${environment} will be replaced with whatever the 
+  // value of the "environment" property is e.g. dev.my.property
+  @ExternalizedProperty("${environment}.my.property")
+  String myProperty();
 }
 ```
 
@@ -24,13 +24,14 @@ If custom variable expansion is required, the default variable expander can be o
 
 ```java
 public static void main(String[] args) {
-    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .defaults()
-        // Format: #(variable)
-        .variableExpander(new SimpleVariableExpander("#(", ")"))
-        .build();
-    
-    ApplicationProperties appProperties = externalizedProperties.initialize(ApplicationProperties.class);
+  ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+      .defaults()
+      // Format: #(variable)
+      .variableExpander(new SimpleVariableExpander("#(", ")"))
+      .build();
+  
+  ApplicationProperties appProperties = 
+      externalizedProperties.initialize(ApplicationProperties.class);
 }
 ```
 
@@ -46,8 +47,8 @@ Variable expansion is supported in properties. This can be enabled via the [Exte
 
 ```java
 public interface ApplicationProperties {
-    @ExternalizedProperty("my.property")
-    String myProperty();
+  @ExternalizedProperty("my.property")
+  String myProperty();
 }
 ```
 
@@ -59,20 +60,21 @@ my.property=${variable}
 
 ```java
 public static void main(String[] args) {
-    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .enableVariableExpansionInProperties()
-        .resolvers(applicationPropertiesResolver())
-        .build();
-    
-    ApplicationProperties appProperties = externalizedProperties.initialize(ApplicationProperties.class);
+  ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+      .enableVariableExpansionInProperties()
+      .resolvers(applicationPropertiesResolver())
+      .build();
+  
+  ApplicationProperties appProperties = 
+      externalizedProperties.initialize(ApplicationProperties.class);
 
-    // Resolved property is "variable-value"
-    String resolved = appProperties.myProperty();
+  // Resolved property is "variable-value"
+  String resolved = appProperties.myProperty();
 }
 
 ```
 
-## 🌟 Variable Expansion in Arbitrary Values (via [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
+## 🌟 Variable Expansion in Arbitrary Values
 
 Externalized Properties can create proxies that expand variables in any String values. This is made possible by the [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java) annotation e.g.
 
@@ -80,8 +82,8 @@ Externalized Properties can create proxies that expand variables in any String v
 
 ```java
 public interface ProxyInterface {
-    @VariableExpanderFacade
-    String expandVariables(String value);
+  @VariableExpanderFacade
+  String expandVariables(String value);
 }
 ```
 

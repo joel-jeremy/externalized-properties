@@ -10,18 +10,18 @@ Setting up ordinal resolvers can be done through the [ExternalizedProperties](..
 
 ```java
 public static void main(String[] args) {
-    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .resolvers(
-            new MapResolver(buildMap()),
-            Ordinals.ordinalResolver(1, new SystemPropertyResolver()),
-            Ordinals.ordinalResolver(2, new EnvironmentVariableResolver())
-        )
-        .converters(
-            new ListConverter(),
-            Ordinals.ordinalConverter(1, new PrimitiveConverter()),
-            Ordinals.ordinalConverter(2, new SomeLegacyPrimitiveConverter())
-        )
-        .build();
+  ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+      .resolvers(
+          new MapResolver(buildMap()),
+          Ordinals.ordinalResolver(1, new SystemPropertyResolver()),
+          Ordinals.ordinalResolver(2, new EnvironmentVariableResolver())
+      )
+      .converters(
+          new ListConverter(),
+          Ordinals.ordinalConverter(1, new PrimitiveConverter()),
+          Ordinals.ordinalConverter(2, new SomeLegacyPrimitiveConverter())
+      )
+      .build();
 }
 ```
 
@@ -37,13 +37,13 @@ Setting up ordinal converters can be done through [ExternalizedProperties](../co
 
 ```java
 public static void main(String[] args) {
-    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .converters(
-            new ListConverter(),
-            Ordinals.ordinalConverter(1, new PrimitiveConverter()),
-            Ordinals.ordinalConverter(2, new SomeLegacyPrimitiveConverter())
-        )
-        .build();
+  ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+      .converters(
+          new ListConverter(),
+          Ordinals.ordinalConverter(1, new PrimitiveConverter()),
+          Ordinals.ordinalConverter(2, new SomeLegacyPrimitiveConverter())
+      )
+      .build();
 }
 ```
 

@@ -6,17 +6,17 @@ It works by creating dynamic/configurable proxy instances (created at runtime by
 
 ## 🙋 [Why Dynamic Proxies?](why-dynamic-proxies.md)
 
-## 🌟 Proxy Interface Property Mapping (via [@ExternalizedProperty](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java))  
+## 🌟 Map Properties to Dynamic Proxy Interface Methods
 
 Properties are mapped to proxy interface methods by using the [@ExternalizedProperty](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java) annotation.
 
 ```java
 public interface ApplicationProperties {
-    @ExternalizedProperty("java.home")
-    String javaHome();
+  @ExternalizedProperty("java.home")
+  String javaHome();
 
-    @ExternalizedProperty("java.version")
-    String javaVersion();
+  @ExternalizedProperty("java.version")
+  String javaVersion();
 }
 ```
 
@@ -26,23 +26,23 @@ Externalized Properties supports default values by using Java's default interfac
 
 ```java
 public interface ApplicationProperties {
-    @ExternalizedProperty("my.property")
-    default String myProperty() {
-        // If "my.property" cannot be resolved, 
-        // "Default Value" will be returned.
-        return "Default Value";
-    }
+  @ExternalizedProperty("my.property")
+  default String myProperty() {
+    // If "my.property" cannot be resolved, 
+    // "Default Value" will be returned.
+    return "Default Value";
+  }
 
-    @ExternalizedProperty("my.property")
-    default String myPropertyOrDefault(String defaultValue) {
-        // If "my.property" cannot be resolved, 
-        // The variable defaultValue will be returned.
-        return defaultValue;
-    }
+  @ExternalizedProperty("my.property")
+  default String myPropertyOrDefault(String defaultValue) {
+    // If "my.property" cannot be resolved, 
+    // The variable defaultValue will be returned.
+    return defaultValue;
+  }
 }
 ```
 
-## 🌟 Non-static/Dynamic Property Names (via [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
+## 🌟 Support for Property Names Known at Runtime
 
 Externalized Properties supports resolution of properties whose names are not known at compile time. This is made possible by the [@ResolverFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java) annotation e.g.
 
@@ -50,11 +50,11 @@ Externalized Properties supports resolution of properties whose names are not kn
 
 ```java
 public interface ApplicationProperties {
-    @ResolverFacade
-    String resolve(String propertyName);
+  @ResolverFacade
+  String resolve(String propertyName);
 
-    @ResolverFacade
-    int resolveInt(String propertyName);
+  @ResolverFacade
+  int resolveInt(String propertyName);
 }
 ```
 
@@ -64,83 +64,76 @@ Externalized Properties can support any configuration file/resource format via t
 
 ```java
 public class App {
-    public static void main(String[] args) throws IOException {
-        ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-            .resolvers(
-                propertiesFileResolver(),
-                yamlFileResolver(),
-                jsonFileResolver(),
-                xmlFileResolver()
-            )
-            .build();
-    }
+  public static void main(String[] args) throws IOException {
+    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+        .resolvers(
+            propertiesFileResolver(),
+            yamlFileResolver(),
+            jsonFileResolver(),
+            xmlFileResolver()
+        )
+        .build();
+  }
 
-    private static ResourceResolver propertiesFileResolver() throws IOException {
-        // By default, ResourceResolver expects the resource to be in properties format.
-        return ResourceResolver.fromUrl(
-            App.class.getResource("/properties-sample/application.properties")
-        );
-    }
+  private static ResourceResolver propertiesFileResolver() throws IOException {
+    // By default, ResourceResolver expects the resource to be in properties format.
+    return ResourceResolver.fromUrl(
+        App.class.getResource("/properties-sample/application.properties"));
+  }
 
-    private static ResourceResolver yamlFileResolver() throws IOException {
-        return ResourceResolver.fromUrl(
-            App.class.getResource("/yaml-sample/application.yaml"),
-            new YamlReader()
-        );
-    }
+  private static ResourceResolver yamlFileResolver() throws IOException {
+    return ResourceResolver.fromUrl(
+        App.class.getResource("/yaml-sample/application.yaml"),
+        new YamlReader());
+  }
 
-    private static ResourceResolver jsonFileResolver() throws IOException {
-        return ResourceResolver.fromUrl(
-            App.class.getResource("/json-sample/application.json"),
-            new JsonReader()
-        );
-    }
+  private static ResourceResolver jsonFileResolver() throws IOException {
+    return ResourceResolver.fromUrl(
+        App.class.getResource("/json-sample/application.json"),
+        new JsonReader());
+  }
 
-    private static ResourceResolver xmlFileResolver() throws IOException {
-        return ResourceResolver.fromUrl(
-            App.class.getResource("/xml-sample/application.xml"),
-            new XmlReader()
-        );
-    }
+  private static ResourceResolver xmlFileResolver() throws IOException {
+    return ResourceResolver.fromUrl(
+        App.class.getResource("/xml-sample/application.xml"),
+        new XmlReader());
+  }
 }
 
 // Example uses Jackson ObjectMapper, but any other libraries will do.
 private class YamlReader implements ResourceReader {
-    private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+  private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
-    @Override
-    public Map<String, Object> read(String resourceContents) throws IOException {
-        return yamlMapper.readValue(
-            resourceContents, 
-            new TypeReference<Map<String, Object>>() {}
-        );
-    }
+  @Override
+  public Map<String, Object> read(String resourceContents) throws IOException {
+    return yamlMapper.readValue(
+        resourceContents, 
+        new TypeReference<Map<String, Object>>() {});
+  }
 }
 
 // Example uses Jackson ObjectMapper, but any other libraries will do.
 private class JsonReader implements ResourceReader {
-    private final ObjectMapper yamlMapper = new ObjectMapper();
+  private final ObjectMapper yamlMapper = new ObjectMapper();
 
-    @Override
-    public Map<String, Object> read(String resourceContents) throws IOException {
-        return yamlMapper.readValue(
-            resourceContents, 
-            new TypeReference<Map<String, Object>>() {}
-        );
-    }
+  @Override
+  public Map<String, Object> read(String resourceContents) throws IOException {
+    return yamlMapper.readValue(
+        resourceContents, 
+        new TypeReference<Map<String, Object>>() {});
+  }
 }
 
 // Example uses Jackson ObjectMapper, but any other libraries will do.
 private class XmlReader implements ResourceReader {
-    private final ObjectMapper yamlMapper = new ObjectMapper(new XmlFactory());
+  private final ObjectMapper yamlMapper = new ObjectMapper(new XmlFactory());
 
-    @Override
-    public Map<String, Object> read(String resourceContents) throws IOException {
-        return yamlMapper.readValue(
-            resourceContents, 
-            new TypeReference<Map<String, Object>>() {}
-        );
-    }
+  @Override
+  public Map<String, Object> read(String resourceContents) throws IOException {
+    return yamlMapper.readValue(
+        resourceContents, 
+        new TypeReference<Map<String, Object>>() {});
+  }
 }
 ```
 
@@ -150,18 +143,19 @@ Caching is enabled by default, but when not using defaults, it can be enabled vi
 
 ```java
 public static void main(String[] args) {
-    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .defaults() 
-        // Cache initialized proxy instances.
-        .enableInitializeCaching()
-        // Cache results of proxy method invocations.
-        .enableInvocationCaching()
-        // Default is 30 minutes.
-        .cacheDuration(Duration.ofMinutes(10))
-        .build();
-    
-    // This proxy will cache any resolved properties.
-    ApplicationProperties appProperties = externalizedProperties.initialize(ApplicationProperties.class);
+  ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+      .defaults() 
+      // Cache initialized proxy instances.
+      .enableInitializeCaching()
+      // Cache results of proxy method invocations.
+      .enableInvocationCaching()
+      // Default is 30 minutes.
+      .cacheDuration(Duration.ofMinutes(10))
+      .build();
+  
+  // This proxy will cache any resolved properties.
+  ApplicationProperties appProperties = 
+      externalizedProperties.initialize(ApplicationProperties.class);
 }
 ```
 
@@ -171,16 +165,17 @@ Eager loading is opt-in and can be enabled via the [ExternalizedProperties](../c
 
 ```java
 private static void main(String[] args) {
-    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        .defaults() 
-        // Eager load properties.
-        .enableEagerLoading()
-        // Default is 30 minutes.
-        .cacheDuration(Duration.ofMinutes(10))
-        .build();
+  ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+      .defaults() 
+      // Eager load properties.
+      .enableEagerLoading()
+      // Default is 30 minutes.
+      .cacheDuration(Duration.ofMinutes(10))
+      .build();
 
-    // This proxy should already have its properties loaded.
-    ApplicationProperties appProperties = externalizedProperties.initialize(ApplicationProperties.class);
+  // This proxy should already have its properties loaded.
+  ApplicationProperties appProperties = 
+      externalizedProperties.initialize(ApplicationProperties.class);
 }
 ```
 
@@ -192,30 +187,31 @@ Creating a custom resolver is as easy as implementing the [Resolver](../core/src
 
 ```java
 public class MyCustomResolver implements Resolver {
-    @Override
-    public Optional<String> resolve(InvocationContext context, String propertyName) {
-        return Optional.ofNullable(...);
-    }
+  @Override
+  public Optional<String> resolve(InvocationContext context, String propertyName) {
+    return Optional.ofNullable(...);
+  }
 }
 ```
 
 ```java
 public interface ApplicationProperties {
-    @ExternalizedProperty("my.property")
-    MyCustomType myProperty();
+  @ExternalizedProperty("my.property")
+  MyCustomType myProperty();
 }
 ```
 
 ```java
 private static void main(String[] args) {
-    ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
-        // Register custom resolvers here.
-        .resolvers(new MyCustomResolver())
-        .build();
+  ExternalizedProperties externalizedProperties = ExternalizedProperties.builder()
+      // Register custom resolvers here.
+      .resolvers(new MyCustomResolver())
+      .build();
 
-    ApplicationProperties props = externalizedProperties.initialize(ApplicationProperties.class);
+  ApplicationProperties appProperties = 
+      externalizedProperties.initialize(ApplicationProperties.class);
 
-    // Resolved from MyCustomResolver.
-    String myProperty = props.myProperty();
+  // Resolved from MyCustomResolver.
+  String myProperty = appProperties.myProperty();
 }
 ```
