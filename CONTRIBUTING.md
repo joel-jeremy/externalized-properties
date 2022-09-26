@@ -23,6 +23,12 @@ To build the project, run the command:
 ./gradlew build
 ```
 
+To check code formatting, run the command:
+
+```sh
+./gradlew build -Dspotless
+```
+
 To create reports, run the commands:
 
 ```sh
@@ -36,6 +42,17 @@ To create reports, run the commands:
 Tests are run in multiple JVM runtimes. By default, it is run in LTS versions (succeeding the version used in source compilation) + the latest released non-LTS version. Test runtimes are overrideable by setting the `ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS` environment variable or `additionalTestRunsOnJvmVersions` system property e.g. `ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS=8,17,18` / `additionalTestRunsOnJvmVersions=8,17,18`.
 
 ## Development Guidelines
+
+### Code Format
+
+The project adheres to the [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).
+
+To easily fix code formatting warning/errors, the Spotless Gradle plugin can be used to apply [Google Java Format](https://github.com/google/google-java-format). Just run the command:
+
+- `./gradlew build -Dspotless` to check for formatting errors.  
+- `./gradlew spotlessApply` to automatically fix formatting errors.
+
+CheckStyle extension/plugin can also be installed to your favorite IDE ([VS Code](https://marketplace.visualstudio.com/items?itemName=shengchen.vscode-checkstyle), [IntelliJ](https://plugins.jetbrains.com/plugin/1065-checkstyle-idea), [Eclipse](https://checkstyle.org/eclipse-cs/#!/)) to highlight code when it does not adhere to [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html) (see [CheckStyle Google Style Docs](https://checkstyle.sourceforge.io/google_style.html) and [google_checks.xml](https://github.com/checkstyle/checkstyle/blob/master/src/main/resources/google_checks.xml)).
 
 ### Git Branching Strategy
 
@@ -77,7 +94,7 @@ Each `@Nested` test class must test scenarios that is supported by the method it
     // Test class: io.github.joeljeremy7.externalizedproperties.resolver.my.MyResolverTests
     class MyResolverTests {
         @Nested
-        class Constructor {
+        class Constructors {
             // @Test methods here...
         }
 

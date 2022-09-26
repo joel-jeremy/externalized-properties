@@ -1,10 +1,10 @@
 ext {
-    versions = [
-        junitJupiter: "5.9.0",
-        jacoco: "0.8.8",
-        errorprone: "2.15.0",
-        nullaway: "0.9.9",
-        checkerframework: "3.24.0",
-        jGit: "5.13.1.202206130422-r"
-    ]
+  versions = [
+    junitJupiter: "5.9.0",
+    jacoco: "0.8.8",
+    errorprone: "2.15.0",
+    nullaway: "0.9.9",
+    checkerframework: "3.24.0",
+    jGit: "5.13.1.202206130422-r"
+  ]
 }
