@@ -74,38 +74,38 @@ module foo.bar {
 
 ### 🔗 Property Resolution via Java Dynamic Proxies ([Why Dynamic Proxies?](docs/why-dynamic-proxies.md))
 
-- [Proxy Interface Property Mapping](docs/property-resolution.md#🌟-proxy-interface-property-mapping) (via [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java))  
-- [Default/Fallback Values](docs/property-resolution.md#🌟-defaultfallback-values)  
-- [Non-Static/Dynamic Property Names](docs/property-resolution.md#🌟-non-staticdynamic-property-names) (via [@ResolverFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
-- [Support for Various Configuration File/Resource Formats](docs/property-resolution.md#🌟-support-for-various-configuration-fileresource-formats)  
-- [Caching](docs/property-resolution.md#🌟-caching)  
-- [Eager Loading](docs/property-resolution.md#🌟-eager-loading)  
-- [Custom Resolvers](docs/property-resolution.md#🚀-custom-resolvers)  
+- [Proxy Interface Property Mapping](docs/property-resolution.md#-proxy-interface-property-mapping) (via [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java))  
+- [Default/Fallback Values](docs/property-resolution.md#-defaultfallback-values)  
+- [Non-Static/Dynamic Property Names](docs/property-resolution.md#-non-staticdynamic-property-names) (via [@ResolverFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java))  
+- [Support for Various Configuration File/Resource Formats](docs/property-resolution.md#-support-for-various-configuration-fileresource-formats)  
+- [Caching](docs/property-resolution.md#-caching)  
+- [Eager Loading](docs/property-resolution.md#-eager-loading)  
+- [Custom Resolvers](docs/property-resolution.md#-custom-resolvers)  
 
 ### 🔗 Conversion
 
-- [Automatic Property Conversion](docs/conversion.md#🌟-automatic-property-conversion)  
-- [Conversion to Generic Types](docs/conversion.md#🌟-conversion-to-generic-types)  
-- [Conversion of Arbitrary Values](docs/conversion.md#🌟-conversion-of-arbitrary-values) (via [@ConverterFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java))
+- [Automatic Property Conversion](docs/conversion.md#-automatic-property-conversion)  
+- [Conversion to Generic Types](docs/conversion.md#-conversion-to-generic-types)  
+- [Conversion of Arbitrary Values](docs/conversion.md#-conversion-of-arbitrary-values) (via [@ConverterFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java))
 
 ### 🔗 Variable Expansion
 
-- [Automatic Variable Expansion in Property Names](docs/variable-expansion.md#🌟-automatic-variable-expansion-in-property-names)  
-- [Automatic Variable Expansion in Properties](docs/variable-expansion.md#✨-automatic-variable-expansion-in-properties)  
-- [Variable Expansion in Arbitrary Values](docs/variable-expansion.md#🌟-variable-expansion-in-arbitrary-values) (via [@VariableExpanderFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
+- [Automatic Variable Expansion in Property Names](docs/variable-expansion.md#-automatic-variable-expansion-in-property-names)  
+- [Automatic Variable Expansion in Properties](docs/variable-expansion.md#-automatic-variable-expansion-in-properties)  
+- [Variable Expansion in Arbitrary Values](docs/variable-expansion.md#-variable-expansion-in-arbitrary-values) (via [@VariableExpanderFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java))
 
 ### 🔗 Processing
 
-- [Targeted Processing](docs/processing.md#✨-targeted-processing)
+- [Targeted Processing](docs/processing.md#-targeted-processing)
 
 ### 🔗 Profiles
 
-- [Profile-Specific Configurations](docs/profiles.md#✨-profile-specific-configurations)
+- [Profile-Specific Configurations](docs/profiles.md#-profile-specific-configurations)
 
 ### 🔗 Ordinal Components
 
-- [Ordinal Resolvers](docs/ordinal-components.md#✨-ordinal-resolvers)  
-- [Ordinal Converters](docs/ordinal-components.md#✨-ordinal-converters)
+- [Ordinal Resolvers](docs/ordinal-components.md#-ordinal-resolvers)  
+- [Ordinal Converters](docs/ordinal-components.md#-ordinal-converters)
 
 ## 🏎️ Quick Start
 
