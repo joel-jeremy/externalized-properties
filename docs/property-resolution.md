@@ -114,11 +114,11 @@ private class YamlReader implements ResourceReader {
 
 // Example uses Jackson ObjectMapper, but any other libraries will do.
 private class JsonReader implements ResourceReader {
-  private final ObjectMapper yamlMapper = new ObjectMapper();
+  private final ObjectMapper jsonMapper = new ObjectMapper();
 
   @Override
   public Map<String, Object> read(String resourceContents) throws IOException {
-    return yamlMapper.readValue(
+    return jsonMapper.readValue(
         resourceContents, 
         new TypeReference<Map<String, Object>>() {});
   }
@@ -126,11 +126,11 @@ private class JsonReader implements ResourceReader {
 
 // Example uses Jackson ObjectMapper, but any other libraries will do.
 private class XmlReader implements ResourceReader {
-  private final ObjectMapper yamlMapper = new ObjectMapper(new XmlFactory());
+  private final ObjectMapper xmlMapper = new ObjectMapper(new XmlFactory());
 
   @Override
   public Map<String, Object> read(String resourceContents) throws IOException {
-    return yamlMapper.readValue(
+    return xmlMapper.readValue(
         resourceContents, 
         new TypeReference<Map<String, Object>>() {});
   }
