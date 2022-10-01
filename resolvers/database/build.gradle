@@ -23,7 +23,7 @@ testing {
         implementation(project.dependencies.testFixtures(project))
         implementation project(":core")
         // Fix when https://github.com/gradle/gradle/issues/19065 is resolved.
-        implementation(project.dependencies.platform("org.testcontainers:testcontainers-bom:1.17.3"))
+        implementation(project.dependencies.platform("org.testcontainers:testcontainers-bom:1.17.4"))
         implementation "org.testcontainers:junit-jupiter"
         implementation "org.testcontainers:postgresql"
         implementation "org.testcontainers:mysql"
