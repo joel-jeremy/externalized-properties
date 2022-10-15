@@ -15,7 +15,7 @@ By enabling the default converters, you get out-of-the-box conversion support fo
 
 ## 🌟 Automatic Property Conversion
 
-Externalized Properties automatically attempts to convert resolved properties to the declared proxy method (non-String) return type. The library will handle the conversion behind the scenes - using the registered [Converter](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Converter.java)s e.g.
+Externalized Properties automatically attempts to convert resolved properties to the declared proxy method (non-String) return type. The library will handle the conversion behind the scenes - using the registered [Converter](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Converter.java)s e.g.
 
 ```java
 public interface ApplicationProperties {
@@ -71,9 +71,9 @@ Each item in the list will be converted to an `Optional<Integer>`.
 
 ## 🌟 Conversion of Arbitrary Values
 
-Externalized Properties has support for conversion of arbitrary String values to other types. This is made possible by the [@ConverterFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java) annotation e.g.
+Externalized Properties has support for conversion of arbitrary String values to other types. This is made possible by the [@ConverterFacade](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ConverterFacade.java) annotation e.g.
 
-(Kindly see [@ConverterFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java) documentation to learn more about the rules of defining a converter facade.)
+(Kindly see [@ConverterFacade](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ConverterFacade.java) documentation to learn more about the rules of defining a converter facade.)
 
 ```java
 public interface ProxyInterface {
@@ -84,11 +84,11 @@ public interface ProxyInterface {
 }
 ```
 
-Invoking the methods annotated with [@ConverterFacade](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java) will delegate the arguments to the registered [Converter](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Converter.java)s to do the conversion. The converted value will be returned by the method.
+Invoking the methods annotated with [@ConverterFacade](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ConverterFacade.java) will delegate the arguments to the registered [Converter](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Converter.java)s to do the conversion. The converted value will be returned by the method.
 
 ## 🚀 Custom Converters
 
-There are several built-in converters but it is very easy to create a custom converter by implementing the [Converter](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Converter.java) interface and registering the converter via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder.
+There are several built-in converters but it is very easy to create a custom converter by implementing the [Converter](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Converter.java) interface and registering the converter via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperties.java) builder.
 
 ```java
 public class MyCustomConverter implements Converter<MyCustomType> {

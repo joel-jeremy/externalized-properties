@@ -12,8 +12,8 @@ pluginManagement {
   }
 }
 
-rootProject.name = "externalized-properties"
+rootProject.name = "Externalized Properties"
 
-include "core"
-include "resolvers:database"
-include "resolvers:git"
+include "externalizedproperties-core"
+include "externalizedproperties-database"
+include "externalizedproperties-git"

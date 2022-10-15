@@ -19,10 +19,10 @@ apply from: "${rootDir}/gradle/dependency-updates.gradle"
 allprojects {
   apply from: "${rootDir}/gradle/dependency-versions.gradle"
 
-  group = "io.github.joeljeremy7.externalizedproperties"
+  group = "io.github.joel-jeremy.externalizedproperties"
 
   def snapshotSuffix = rootProject.hasProperty("release") ? "" : "-SNAPSHOT"
-  version = "1.0.0-alpha.8" + snapshotSuffix
+  version = "1.0.0-alpha" + snapshotSuffix
 
   repositories {
     mavenLocal()
@@ -54,13 +54,11 @@ configure(javaProjects) {
       }
     }
     suites.configureEach {
-        useJUnitJupiter("${versions.junitJupiter}")
+      useJUnitJupiter("${versions.junitJupiter}")
     }
   }
 
   java {
-    archivesBaseName = rootProject.relativeProjectPath(project.path).replace(":", "-")
-
     toolchain {
       languageVersion = JavaLanguageVersion.of(11)
     }
@@ -83,14 +81,14 @@ configure(javaProjects) {
 }
 
 if (project.hasProperty("ossrh")) {
-    nexusPublishing {
-        repositories {
-            sonatype {
-                nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
-                snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-                username = System.getenv("OSSRH_USERNAME") ?: property("ossrhUsername")
-                password = System.getenv("OSSRH_PASSWORD") ?: property("ossrhPassword")
-            }
-        }
+  nexusPublishing {
+    repositories {
+      sonatype {
+        nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+        snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+        username = System.getenv("OSSRH_USERNAME") ?: property("ossrhUsername")
+        password = System.getenv("OSSRH_PASSWORD") ?: property("ossrhPassword")
+      }
     }
+  }
 }

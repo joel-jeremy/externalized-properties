@@ -69,7 +69,7 @@ Each `@Nested` test class must test scenarios that is supported by the method it
 - Use `@DisplayName` to describe the scenario being tested by the `@Test` method e.g. `@DisplayName("should throw when x argument is null)`.
 
     ```java
-    // Class under test: io.github.joeljeremy7.externalizedproperties.resolver.my.MyResolver
+    // Class under test: io.github.joeljeremy.externalizedproperties.resolver.my.MyResolver
     class MyResolver implements Resolver {
         public MyResolver(...) {
             ...
@@ -91,7 +91,7 @@ Each `@Nested` test class must test scenarios that is supported by the method it
         }
     }
 
-    // Test class: io.github.joeljeremy7.externalizedproperties.resolver.my.MyResolverTests
+    // Test class: io.github.joeljeremy.externalizedproperties.resolver.my.MyResolverTests
     class MyResolverTests {
         @Nested
         class Constructors {
