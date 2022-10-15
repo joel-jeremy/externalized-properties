@@ -69,7 +69,7 @@ Each `@Nested` test class must test scenarios that is supported by the method it
 - Use `@DisplayName` to describe the scenario being tested by the `@Test` method e.g. `@DisplayName("should throw when x argument is null)`.
 
     ```java
-    // Class under test: io.github.joeljeremy.externalizedproperties.resolver.my.MyResolver
+    // Class under test: io.github.joeljeremy.externalizedproperties.resolvers.my.MyResolver
     class MyResolver implements Resolver {
         public MyResolver(...) {
             ...
@@ -91,7 +91,7 @@ Each `@Nested` test class must test scenarios that is supported by the method it
         }
     }
 
-    // Test class: io.github.joeljeremy.externalizedproperties.resolver.my.MyResolverTests
+    // Test class: io.github.joeljeremy.externalizedproperties.resolvers.my.MyResolverTests
     class MyResolverTests {
         @Nested
         class Constructors {
@@ -129,5 +129,5 @@ When releasing, the following steps must be followed:
 1. Create a release and tag via GitHub Releases e.g. `1.0.0`.
     - The release description should include a changelog.
 2. After release pipeline completes, bump up the version in root `build.gradle` to the next development version by creating a pull request.
-    - By default, the next development version is a minor version bump i.e. `1.0.0` --> `1.1.0`.
+    - By default, the next development version is a minor version bump i.e. `1.0.0` --> `1.1.0`. In case of pre-release versions (alpha, beta, etc.), bump according to semver guidelines i.e. `1.0.0-alpha` --> `1.0.0.alpha.1`.
 3. Merge the pull request to `main`.

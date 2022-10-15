@@ -2,15 +2,15 @@
 
 [![Gradle Build](https://github.com/joel-jeremy/externalized-properties/actions/workflows/gradle-build.yaml/badge.svg)](https://github.com/joel-jeremy/externalized-properties/actions/workflows/gradle-build.yaml)
 [![CodeQL](https://github.com/joel-jeremy/externalized-properties/actions/workflows/codeql.yaml/badge.svg)](https://github.com/joel-jeremy/externalized-properties/actions/workflows/codeql.yaml)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.joel-jeremy.externalizedproperties/core/badge.svg)](https://search.maven.org/search?q=g:%22io.github.joel-jeremy.externalizedproperties%22)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.joel-jeremy.externalized-properties/core/badge.svg)](https://search.maven.org/search?q=g:%22io.github.joel-jeremy.externalized-properties%22)
 [![Coverage Status](https://coveralls.io/repos/github/joel-jeremy/externalized-properties/badge.svg?branch=main)](https://coveralls.io/github/joel-jeremy/externalized-properties?branch=main)
 [![Known Vulnerabilities](https://snyk.io/test/github/joel-jeremy/externalized-properties/badge.svg)](https://snyk.io/test/github/joel-jeremy/externalized-properties)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/joel-jeremy/externalized-properties/blob/main/LICENSE)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalizedproperties&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalizedproperties)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalizedproperties&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalizedproperties)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalizedproperties&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalizedproperties)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalizedproperties&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalizedproperties)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalizedproperties&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalizedproperties)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
 
 A lightweight and extensible library to resolve application properties from various external sources.
 
@@ -25,29 +25,29 @@ The goal of this library is to make it easy for applications to implement config
 ### Gradle
 
 ```groovy
-implementation "io.github.joel-jeremy.externalizedproperties:externalizedproperties-core:${version}"
+implementation "io.github.joel-jeremy.externalized-properties:externalized-properties-core:${version}"
 // Optional/additional resolvers
-implementation "io.github.joel-jeremy.externalizedproperties:externalizedproperties-database:${version}"
-implementation "io.github.joel-jeremy.externalizedproperties:externalizedproperties-git:${version}"
+implementation "io.github.joel-jeremy.externalized-properties:externalized-properties-database:${version}"
+implementation "io.github.joel-jeremy.externalized-properties:externalized-properties-git:${version}"
 ```
 
 ### Maven
 
 ```xml
 <dependency>
-  <groupId>io.github.joel-jeremy.externalizedproperties</groupId>
-  <artifactId>externalizedproperties-core</artifactId>
+  <groupId>io.github.joel-jeremy.externalized-properties</groupId>
+  <artifactId>externalized-properties-core</artifactId>
   <version>${version}</version>
 </dependency>
 <!-- Optional/additional resolvers -->
 <dependency>
-  <groupId>io.github.joel-jeremy.externalizedproperties</groupId>
-  <artifactId>externalizedproperties-database</artifactId>
+  <groupId>io.github.joel-jeremy.externalized-properties</groupId>
+  <artifactId>externalized-properties-database</artifactId>
   <version>${version}</version>
 </dependency>
 <dependency>
-  <groupId>io.github.joel-jeremy.externalizedproperties</groupId>
-  <artifactId>externalizedproperties-git</artifactId>
+  <groupId>io.github.joel-jeremy.externalized-properties</groupId>
+  <artifactId>externalized-properties-git</artifactId>
   <version>${version}</version>
 </dependency>
 ```

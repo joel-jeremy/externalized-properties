@@ -19,7 +19,7 @@ apply from: "${rootDir}/gradle/dependency-updates.gradle"
 allprojects {
   apply from: "${rootDir}/gradle/dependency-versions.gradle"
 
-  group = "io.github.joel-jeremy.externalizedproperties"
+  group = "io.github.joel-jeremy.externalized-properties"
 
   def snapshotSuffix = rootProject.hasProperty("release") ? "" : "-SNAPSHOT"
   version = "1.0.0-beta" + snapshotSuffix
