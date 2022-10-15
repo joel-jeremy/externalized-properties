@@ -1,0 +1,29 @@
+apply plugin: "me.champeau.jmh"
+
+description = "Externalized Properties Core"
+
+jar {
+  manifest {
+    attributes(
+      "Automatic-Module-Name": "io.github.joeljeremy.externalizedproperties.core"
+    )
+  }
+}
+
+dependencies {
+  // For testing different resource formats in ResourceResolver.
+  testImplementation "com.fasterxml.jackson.core:jackson-databind:2.13.4.2"
+  testImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.4"
+  testImplementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.4"
+  // For testing custom JCE providers with DecryptProcessor.JceDecryptor.
+  testImplementation "org.bouncycastle:bcprov-jdk18on:1.72"
+}
+
+jmh {
+  jmhVersion = "1.35"
+  // includes = ["ResolutionBenchmarks", "ConversionBenchmarks", "VariableExpansionBenchmarks"]
+  humanOutputFile = project.file("${project.buildDir}/reports/jmh/human.txt")
+  resultsFile = project.file("${project.buildDir}/reports/jmh/results.json")
+  resultFormat = "JSON"
+  jvmArgs = [ "-Xmx2G" ]
+}

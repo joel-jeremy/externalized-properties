@@ -2,13 +2,13 @@
 
 Externalized Properties provides a mechanism to do targeted processing of resolved properties.
 
-This feature may be used to selectively apply transformations to properties such as automatic decryption, masking, validation, etc. This can be achieved via a combination of the [ProcessWith](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/processing/ProcessWith.java) and [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java) classes.
+This feature may be used to selectively apply transformations to properties such as automatic decryption, masking, validation, etc. This can be achieved via a combination of the [ProcessWith](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/processing/ProcessWith.java) and [Processor](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Processor.java) classes.
 
 ## ✨ Targeted Processing of Properties
 
 Externalized Properties inspects the annotations on proxy methods to see if the property should undergo processing.
 
-To mark a proxy method (effectively the property assigned to it) as candidate for processing (via [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java)s), an annotation that is meta-annotated with [ProcessWith](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/processing/ProcessWith.java)) should be used e.g.
+To mark a proxy method (effectively the property assigned to it) as candidate for processing (via [Processor](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Processor.java)s), an annotation that is meta-annotated with [ProcessWith](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/processing/ProcessWith.java)) should be used e.g.
 
 ```java
 public interface ApplicationProperties {
@@ -58,11 +58,11 @@ private static ProcessorProvider<DecryptProcessor> rsaDecryptProcessor() {
 
 ## 🚀 Custom Processors
 
-At the heart of Externalized Properties are the [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java)s. Instances of these interface are responsible for the targeted processing of resolved properties.
+At the heart of Externalized Properties are the [Processor](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Processor.java)s. Instances of these interface are responsible for the targeted processing of resolved properties.
 
 To create custom processors, you need to:
 
-### 1. Create a processor by implementing the [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java) interface
+### 1. Create a processor by implementing the [Processor](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Processor.java) interface
 
 ```java
 public class Base64EncodeProcessor implements Processor {
@@ -79,7 +79,7 @@ Requirements for custom processor annotations:
 
 a. The annotation should target methods  
 b. The annotation should have runtime retention  
-c. The annotation should be annotated with the [ProcessWith](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/processing/ProcessWith.java) annotation
+c. The annotation should be annotated with the [ProcessWith](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/processing/ProcessWith.java) annotation
 
 e.g.
 
@@ -103,7 +103,7 @@ public interface ApplicationProperties {
 
 ### 4. Register the processor and fire away
 
-Registration of [Processor](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/Processor.java)s can be done through the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
+Registration of [Processor](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Processor.java)s can be done through the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
 
 ```java
 public static void main(String[] args) {

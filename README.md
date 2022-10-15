@@ -1,17 +1,18 @@
 # Externalized Properties
 
-[![Gradle Build](https://github.com/joeljeremy7/externalized-properties/actions/workflows/gradle-build.yaml/badge.svg)](https://github.com/joeljeremy7/externalized-properties/actions/workflows/gradle-build.yaml)
-[![CodeQL](https://github.com/joeljeremy7/externalized-properties/actions/workflows/codeql.yaml/badge.svg)](https://github.com/joeljeremy7/externalized-properties/actions/workflows/codeql.yaml)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.joeljeremy7.externalizedproperties/core/badge.svg)](https://search.maven.org/search?q=g:%22io.github.joeljeremy7.externalizedproperties%22)
-[![Coverage Status](https://coveralls.io/repos/github/joeljeremy7/externalized-properties/badge.svg?branch=main)](https://coveralls.io/github/joeljeremy7/externalized-properties?branch=main)
-[![Known Vulnerabilities](https://snyk.io/test/github/joeljeremy7/externalized-properties/badge.svg)](https://snyk.io/test/github/joeljeremy7/externalized-properties)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/joeljeremy7/externalized-properties/blob/main/LICENSE)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=io.github.joeljeremy7.externalizedproperties&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=io.github.joeljeremy7.externalizedproperties)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joeljeremy7.externalizedproperties&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joeljeremy7.externalizedproperties)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joeljeremy7.externalizedproperties&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joeljeremy7.externalizedproperties)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joeljeremy7.externalizedproperties&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joeljeremy7.externalizedproperties)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=io.github.joeljeremy7.externalizedproperties&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=io.github.joeljeremy7.externalizedproperties)
-[![Discord](https://img.shields.io/discord/984438350054322206.svg?logo=discord&logoColor=white&logoWidth=20&labelColor=7289DA&label=Discord&color=17cf48)](https://discord.gg/sST9hEAF)
+[![Gradle Build](https://github.com/joel-jeremy/externalized-properties/actions/workflows/gradle-build.yaml/badge.svg)](https://github.com/joel-jeremy/externalized-properties/actions/workflows/gradle-build.yaml)
+[![CodeQL](https://github.com/joel-jeremy/externalized-properties/actions/workflows/codeql.yaml/badge.svg)](https://github.com/joel-jeremy/externalized-properties/actions/workflows/codeql.yaml)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.joel-jeremy.externalized-properties/core/badge.svg)](https://search.maven.org/search?q=g:%22io.github.joel-jeremy.externalized-properties%22)
+[![Coverage Status](https://coveralls.io/repos/github/joel-jeremy/externalized-properties/badge.svg?branch=main)](https://coveralls.io/github/joel-jeremy/externalized-properties?branch=main)
+[![Known Vulnerabilities](https://snyk.io/test/github/joel-jeremy/externalized-properties/badge.svg)](https://snyk.io/test/github/joel-jeremy/externalized-properties)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/joel-jeremy/externalized-properties/blob/main/LICENSE)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=coverage)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
+[![Discord](https://img.shields.io/discord/1025648239162175578.svg?logo=discord&logoColor=white&logoWidth=20&labelColor=7289DA&label=Discord&color=17cf48)](https://discord.gg/SVfahQGMmx)
 
 A lightweight and extensible library to resolve application properties from various external sources.
 
@@ -26,29 +27,29 @@ The goal of this library is to make it easy for applications to implement config
 ### Gradle
 
 ```groovy
-implementation "io.github.joeljeremy7.externalizedproperties:core:${version}"
+implementation "io.github.joel-jeremy.externalized-properties:externalized-properties-core:${version}"
 // Optional/additional resolvers
-implementation "io.github.joeljeremy7.externalizedproperties:resolvers-database:${version}"
-implementation "io.github.joeljeremy7.externalizedproperties:resolvers-git:${version}"
+implementation "io.github.joel-jeremy.externalized-properties:externalized-properties-database:${version}"
+implementation "io.github.joel-jeremy.externalized-properties:externalized-properties-git:${version}"
 ```
 
 ### Maven
 
 ```xml
 <dependency>
-  <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
-  <artifactId>core</artifactId>
+  <groupId>io.github.joel-jeremy.externalized-properties</groupId>
+  <artifactId>externalized-properties-core</artifactId>
   <version>${version}</version>
 </dependency>
 <!-- Optional/additional resolvers -->
 <dependency>
-  <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
-  <artifactId>resolvers-database</artifactId>
+  <groupId>io.github.joel-jeremy.externalized-properties</groupId>
+  <artifactId>externalized-properties-database</artifactId>
   <version>${version}</version>
 </dependency>
 <dependency>
-  <groupId>io.github.joeljeremy7.externalizedproperties</groupId>
-  <artifactId>resolvers-git</artifactId>
+  <groupId>io.github.joel-jeremy.externalized-properties</groupId>
+  <artifactId>externalized-properties-git</artifactId>
   <version>${version}</version>
 </dependency>
 ```
@@ -57,17 +58,17 @@ implementation "io.github.joeljeremy7.externalizedproperties:resolvers-git:${ver
 
 Externalized Properties jars are published with Automatic-Module-Name manifest attribute:
 
-- Core - `io.github.joeljeremy7.externalizedproperties.core`
-- Database Resolver - `io.github.joeljeremy7.externalizedproperties.resolvers.database`
-- Git Resolver - `io.github.joeljeremy7.externalizedproperties.resolvers.git`
+- Core - `io.github.joeljeremy.externalizedproperties.core`
+- Database Resolver - `io.github.joeljeremy.externalizedproperties.database`
+- Git Resolver - `io.github.joeljeremy.externalizedproperties.git`
 
 Module authors can use above module names in their module-info.java:
 
 ```java
 module foo.bar {
-  requires io.github.joeljeremy7.externalizedproperties.core;
-  requires io.github.joeljeremy7.externalizedproperties.resolvers.database;
-  requires io.github.joeljeremy7.externalizedproperties.resolvers.git;
+  requires io.github.joeljeremy.externalizedproperties.core;
+  requires io.github.joeljeremy.externalizedproperties.database;
+  requires io.github.joeljeremy.externalizedproperties.git;
 }
 ```
 
@@ -78,10 +79,10 @@ Externalized Properties takes full advantage of Java's [Dynamic Proxies](https:/
 ### ✔️ Property Resolution
 
 - [Map Properties to Dynamic Proxy Interface Methods](docs/property-resolution.md#-map-properties-to-dynamic-proxy-interface-methods)
-  - via [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java)
+  - via [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperty.java)
 - [Default/Fallback Values](docs/property-resolution.md#-defaultfallback-values)  
 - [Support for Property Names Known at Runtime](docs/property-resolution.md#-support-for-property-names-known-at-runtime)
-  - via [@ResolverFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ResolverFacade.java)
+  - via [@ResolverFacade](core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ResolverFacade.java)
 - [Support for Various Configuration File/Resource Formats](docs/property-resolution.md#-support-for-various-configuration-fileresource-formats)  
 - [Caching](docs/property-resolution.md#-caching)  
 - [Eager Loading](docs/property-resolution.md#-eager-loading)  
@@ -92,7 +93,7 @@ Externalized Properties takes full advantage of Java's [Dynamic Proxies](https:/
 - [Automatic Property Conversion](docs/conversion.md#-automatic-property-conversion)  
 - [Conversion to Generic Types](docs/conversion.md#-conversion-to-generic-types)  
 - [Conversion of Arbitrary Values](docs/conversion.md#-conversion-of-arbitrary-values)
-  - via [@ConverterFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ConverterFacade.java)
+  - via [@ConverterFacade](core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ConverterFacade.java)
 - [Custom Converters](docs/conversion.md#-custom-converters)
 
 ### ✔️ Variable Expansion
@@ -100,7 +101,7 @@ Externalized Properties takes full advantage of Java's [Dynamic Proxies](https:/
 - [Automatic Variable Expansion in Property Names](docs/variable-expansion.md#-automatic-variable-expansion-in-property-names)  
 - [Automatic Variable Expansion in Properties](docs/variable-expansion.md#-automatic-variable-expansion-in-properties)  
 - [Variable Expansion in Arbitrary Values](docs/variable-expansion.md#-variable-expansion-in-arbitrary-values)
-  - via [@VariableExpanderFacade](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/VariableExpanderFacade.java)
+  - via [@VariableExpanderFacade](core/src/main/java/io/github/joeljeremy/externalizedproperties/core/VariableExpanderFacade.java)
 
 ### ✔️ Processing
 
@@ -118,7 +119,7 @@ Externalized Properties takes full advantage of Java's [Dynamic Proxies](https:/
 
 ## 🏎️ Quick Start
 
-Properties are mapped to proxy interface methods by using the [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy7/externalizedproperties/core/ExternalizedProperty.java) annotation.
+Properties are mapped to proxy interface methods by using the [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperty.java) annotation.
 
 (For more advanced scenarios, please see the feature documentations.)
 
@@ -166,4 +167,4 @@ private static ExternalizedProperties buildExternalizedProperties() {
 
 ## 🧪 Samples
 
-More sample can be found here: <https://github.com/joeljeremy7/externalized-properties-samples>
+More sample can be found here: <https://github.com/joel-jeremy/externalized-properties-samples>
