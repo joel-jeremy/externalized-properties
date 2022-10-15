@@ -12,7 +12,7 @@ pluginManagement {
   }
 }
 
-rootProject.name = "Externalized Properties"
+rootProject.name = "externalized-properties"
 
 include "externalized-properties-core"
 include "externalized-properties-database"
