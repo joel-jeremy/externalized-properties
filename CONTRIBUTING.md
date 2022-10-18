@@ -13,9 +13,16 @@ Please create an issue describing the following:
 
 Got an idea to enhance the library? Please feel free to create an issue describing the feature proposal. Any ideas are welcome! :)
 
-## Build
+## Pre-requisites
 
-The project uses Java 11 as runtime for Gradle but compiles source code to Java 8.
+To be able to work on this project, the following software needs to be installed on your machine:
+
+- Java (>= 11)
+- Docker (Rancher Desktop or Docker Desktop)
+  - For integration tests
+- Git
+
+## Build
 
 To build the project, run the command:
 
@@ -23,20 +30,28 @@ To build the project, run the command:
 ./gradlew build
 ```
 
-To check code formatting, run the command:
+> The above command will build all the projects and run unit and integration tests. It will also generate test report and jacoco test coverage report.
+
+To check code format, run the command:
 
 ```sh
 ./gradlew build -Dspotless
 ```
 
-To create reports, run the commands:
+## Test Runs
+
+Running tests is as simple as:
 
 ```sh
-./gradlew testAggregateTestReport
+./gradlew build
 ```
 
+This will run unit and integration tests of all the projects.
+
+Integration tests usually takes longer to complete than unit tests. In cases where integration tests are not required, it can be excluded by:
+
 ```sh
-./gradlew testCodeCoverageReport
+./gradlew build -x integrationTest
 ```
 
 Tests are run in multiple JVM runtimes. By default, it is run in LTS versions (succeeding the version used in source compilation) + the latest released non-LTS version. Test runtimes are overrideable by setting the `ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS` environment variable or `additionalTestRunsOnJvmVersions` system property e.g. `ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS=8,17,18` / `additionalTestRunsOnJvmVersions=8,17,18`.
