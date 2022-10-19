@@ -22,7 +22,7 @@ allprojects {
   group = "io.github.joel-jeremy.externalized-properties"
 
   def snapshotSuffix = rootProject.hasProperty("release") ? "" : "-SNAPSHOT"
-  version = "1.0.0-beta" + snapshotSuffix
+  version = "1.0.0-beta.1" + snapshotSuffix
 
   repositories {
     mavenLocal()
