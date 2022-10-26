@@ -6,9 +6,9 @@ It works by creating dynamic/configurable proxy instances (created at runtime by
 
 ## 🙋 [Why Dynamic Proxies?](why-dynamic-proxies.md)
 
-## 🌟 Map Properties to Dynamic Proxy Interface Methods
+## 🌟 Map Properties to (Java Dynamic Proxy) Interface Methods
 
-Properties are mapped to proxy interface methods by using the [@ExternalizedProperty](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperty.java) annotation.
+Properties are mapped to proxy interface methods by using the [@ExternalizedProperty](../externalized-properties-core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperty.java) annotation.
 
 ```java
 public interface ApplicationProperties {
@@ -44,9 +44,9 @@ public interface ApplicationProperties {
 
 ## 🌟 Support for Property Names Known at Runtime
 
-Externalized Properties supports resolution of properties whose names are not known at compile time. This is made possible by the [@ResolverFacade](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ResolverFacade.java) annotation e.g.
+Externalized Properties supports resolution of properties whose names are not known at compile time. This is made possible by the [@ResolverFacade](../externalized-properties-core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ResolverFacade.java) annotation e.g.
 
-(Kindly see [@ResolverFacade](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ResolverFacade.java) documentation to learn more about the rules of defining a resolver facade.)
+(Kindly see [@ResolverFacade](../externalized-properties-core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ResolverFacade.java) documentation to learn more about the rules of defining a resolver facade.)
 
 ```java
 public interface ApplicationProperties {
@@ -60,7 +60,7 @@ public interface ApplicationProperties {
 
 ## 🌟 Support for Various Configuration File/Resource Formats
 
-Externalized Properties can support any configuration file/resource format via the [ResourceResolver](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/resolvers/ResourceResolver.java) and [ResourceReader](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/resolvers/ResourceResolver.java) classes.
+Externalized Properties can support any configuration file/resource format via the [ResourceResolver](../externalized-properties-core/src/main/java/io/github/joeljeremy/externalizedproperties/core/resolvers/ResourceResolver.java) and [ResourceReader](../externalized-properties-core/src/main/java/io/github/joeljeremy/externalizedproperties/core/resolvers/ResourceResolver.java) classes.
 
 ```java
 public class App {
