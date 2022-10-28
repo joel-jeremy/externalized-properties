@@ -78,11 +78,9 @@ Externalized Properties takes full advantage of Java's [Dynamic Proxies](https:/
 
 ### ✔️ Property Resolution
 
-- [Map Properties to Dynamic Proxy Interface Methods](docs/property-resolution.md#-map-properties-to-dynamic-proxy-interface-methods)
-  - via [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperty.java)
+- [Map Properties to (Java Dynamic Proxy) Interface Methods](docs/property-resolution.md#-map-properties-to-java-dynamic-proxy-interface-methods)
 - [Default/Fallback Values](docs/property-resolution.md#-defaultfallback-values)  
 - [Support for Property Names Known at Runtime](docs/property-resolution.md#-support-for-property-names-known-at-runtime)
-  - via [@ResolverFacade](core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ResolverFacade.java)
 - [Support for Various Configuration File/Resource Formats](docs/property-resolution.md#-support-for-various-configuration-fileresource-formats)  
 - [Caching](docs/property-resolution.md#-caching)  
 - [Eager Loading](docs/property-resolution.md#-eager-loading)  
@@ -93,7 +91,6 @@ Externalized Properties takes full advantage of Java's [Dynamic Proxies](https:/
 - [Automatic Property Conversion](docs/conversion.md#-automatic-property-conversion)  
 - [Conversion to Generic Types](docs/conversion.md#-conversion-to-generic-types)  
 - [Conversion of Arbitrary Values](docs/conversion.md#-conversion-of-arbitrary-values)
-  - via [@ConverterFacade](core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ConverterFacade.java)
 - [Custom Converters](docs/conversion.md#-custom-converters)
 
 ### ✔️ Variable Expansion
@@ -101,7 +98,6 @@ Externalized Properties takes full advantage of Java's [Dynamic Proxies](https:/
 - [Automatic Variable Expansion in Property Names](docs/variable-expansion.md#-automatic-variable-expansion-in-property-names)  
 - [Automatic Variable Expansion in Properties](docs/variable-expansion.md#-automatic-variable-expansion-in-properties)  
 - [Variable Expansion in Arbitrary Values](docs/variable-expansion.md#-variable-expansion-in-arbitrary-values)
-  - via [@VariableExpanderFacade](core/src/main/java/io/github/joeljeremy/externalizedproperties/core/VariableExpanderFacade.java)
 
 ### ✔️ Processing
 
