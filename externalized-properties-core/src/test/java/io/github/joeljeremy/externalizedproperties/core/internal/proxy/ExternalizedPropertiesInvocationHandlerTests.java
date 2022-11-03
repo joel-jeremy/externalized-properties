@@ -129,7 +129,8 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
     @Test
     @DisplayName(
-        "should resolve property from resolver and not from default interface method value parameter")
+        "should resolve property from resolver and not from default interface method value"
+            + " parameter")
     void test4() throws Throwable {
       Resolver resolver = new MapResolver("property.with.default.value", "test.value");
       ExternalizedProperties externalizedProperties = externalizedProperties(resolver);

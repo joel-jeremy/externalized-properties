@@ -214,10 +214,9 @@ public class ExternalizedPropertiesTests {
       @Test
       @DisplayName("should not apply profile configurations when active profile is empty")
       void profilesTest4() {
+        // Empty profile.
         MapResolver activeProfileResolver =
-            new MapResolver(
-                EXTERNALIZEDPROPERTIES_PROFILE_SYSTEM_PROPERTY, "" // Empty profile.
-                );
+            new MapResolver(EXTERNALIZEDPROPERTIES_PROFILE_SYSTEM_PROPERTY, "");
 
         ExternalizedProperties externalizedProperties =
             ExternalizedProperties.builder()

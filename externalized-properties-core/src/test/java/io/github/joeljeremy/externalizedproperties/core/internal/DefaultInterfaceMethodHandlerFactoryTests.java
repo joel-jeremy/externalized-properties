@@ -100,7 +100,8 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
 
     @Test
     @DisplayName(
-        "should create a handler which invokes the target default interface method (with one argument)")
+        "should create a handler which invokes the target default interface method (with one"
+            + " argument)")
     void test3() {
       DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
           new DefaultInterfaceMethodHandlerFactory();
@@ -121,7 +122,8 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
 
     @Test
     @DisplayName(
-        "should create a handler which invokes the target default interface method (with two arguments)")
+        "should create a handler which invokes the target default interface method (with two"
+            + " arguments)")
     void test4() {
       DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
           new DefaultInterfaceMethodHandlerFactory();
@@ -143,7 +145,8 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
 
     @Test
     @DisplayName(
-        "should create a handler which invokes the target default interface method (with two arguments)")
+        "should create a handler which invokes the target default interface method (with two"
+            + " arguments)")
     void test5() {
       DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
           new DefaultInterfaceMethodHandlerFactory();

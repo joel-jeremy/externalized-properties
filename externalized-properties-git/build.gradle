@@ -3,7 +3,7 @@ description = "Externalized Properties module for resolving properties from a Gi
 dependencies {
   implementation project(":externalized-properties-core")
   implementation "org.eclipse.jgit:org.eclipse.jgit:${versions.jGit}"
-  testImplementation(testFixtures(project(":externalized-properties-core")))
+  testImplementation testFixtures(project(":externalized-properties-core"))
   testImplementation "org.eclipse.jgit:org.eclipse.jgit.ssh.apache:${versions.jGit}"
   testImplementation "org.eclipse.jgit:org.eclipse.jgit.junit.http:${versions.jGit}"
   testImplementation "org.eclipse.jgit:org.eclipse.jgit.junit.ssh:${versions.jGit}"
