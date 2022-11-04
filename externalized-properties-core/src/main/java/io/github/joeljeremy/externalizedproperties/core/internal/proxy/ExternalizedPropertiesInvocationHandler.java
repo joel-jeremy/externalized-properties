@@ -14,6 +14,7 @@ import io.github.joeljeremy.externalizedproperties.core.VariableExpanderFacade;
 import io.github.joeljeremy.externalizedproperties.core.internal.DefaultInterfaceMethodHandlerFactory;
 import io.github.joeljeremy.externalizedproperties.core.internal.DefaultInterfaceMethodHandlerFactory.DefaultInterfaceMethodHandler;
 import io.github.joeljeremy.externalizedproperties.core.internal.ExternalizedPropertyName;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import io.github.joeljeremy.externalizedproperties.core.internal.InvocationContextFactory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** The core invocation handler for Externalized Properties. */
+@Internal
 public class ExternalizedPropertiesInvocationHandler implements InvocationHandler {
   private static final Object[] EMPTY_ARGS = new Object[0];
 

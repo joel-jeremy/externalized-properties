@@ -4,6 +4,7 @@ import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Arguments-related utility methods. */
+@Internal
 public class Arguments {
   private Arguments() {}
 

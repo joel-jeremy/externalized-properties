@@ -5,10 +5,12 @@ import static io.github.joeljeremy.externalizedproperties.core.internal.Argument
 import io.github.joeljeremy.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy.externalizedproperties.core.conversion.Delimiter;
 import io.github.joeljeremy.externalizedproperties.core.conversion.StripEmptyValues;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /** Tokenizer that splits values using a specified delimiter. */
+@Internal
 public class Tokenizer {
 
   private final String delimiter;

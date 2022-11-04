@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import javax.crypto.NoSuchPaddingException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -51,10 +52,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class ExternalizedPropertiesTests {
-  private static final String EXTERNALIZEDPROPERTIES_PROFILE_SYSTEM_PROPERTY =
+  static final String EXTERNALIZEDPROPERTIES_PROFILE_SYSTEM_PROPERTY =
       "externalizedproperties.profile";
-  private static final String EXTERNALIZEDPROPERTIES_PROFILE_ENV_VAR =
-      "EXTERNALIZEDPROPERTIES_PROFILE";
+  static final String EXTERNALIZEDPROPERTIES_PROFILE_ENV_VAR = "EXTERNALIZEDPROPERTIES_PROFILE";
 
   @Nested
   class BuilderMethod {
@@ -521,12 +521,22 @@ public class ExternalizedPropertiesTests {
             externalizedProperties.initialize(EagerLoadingProxyInterface.class);
 
         assertNotNull(proxy);
-        mapResolver
-            .resolvedProperties()
-            .forEach(
-                (key, expectedValue) -> {
-                  assertEquals(testProps.get(key), expectedValue);
-                });
+
+        // EagerLoadingProxyInterface methods are all valid eager loading method candidates.
+        String[] propertyNames =
+            Stream.of(EagerLoadingProxyInterface.class.getMethods())
+                .filter(m -> m.isAnnotationPresent(ExternalizedProperty.class))
+                .map(m -> m.getAnnotation(ExternalizedProperty.class))
+                .map(ExternalizedProperty::value)
+                .toArray(String[]::new);
+
+        // Assert each @ExternalizedProperty has been resolved.
+        for (String propertyName : propertyNames) {
+          Map<String, String> resolved = mapResolver.resolvedProperties();
+
+          assertTrue(resolved.containsKey(propertyName));
+          assertEquals(testProps.get(propertyName), resolved.get(propertyName));
+        }
       }
     }
 
@@ -647,7 +657,7 @@ public class ExternalizedPropertiesTests {
     }
   }
 
-  private static void testDefaultResolvers(ExternalizedProperties ep) {
+  static void testDefaultResolvers(ExternalizedProperties ep) {
     ProxyInterface proxyInterface = ep.initialize(ProxyInterface.class);
 
     // Resolved from system properties.
@@ -657,7 +667,7 @@ public class ExternalizedPropertiesTests {
     assertEquals(System.getenv("PATH"), proxyInterface.path());
   }
 
-  private static void testDefaultConverters(
+  static void testDefaultConverters(
       ExternalizedProperties externalizedProperties, Map<String, String> expectedProps) {
     ProxyInterface proxy = externalizedProperties.initialize(ProxyInterface.class);
 
@@ -724,7 +734,7 @@ public class ExternalizedPropertiesTests {
   }
 
   // This is Map<Object, Object>, but only Strings should be put here...
-  private static Map<String, String> testProperties() {
+  static Map<String, String> testProperties() {
     Map<String, String> props = new HashMap<>();
     props.put("property", "property-value");
     props.put("property.int", "1");
@@ -757,7 +767,7 @@ public class ExternalizedPropertiesTests {
     return props;
   }
 
-  public static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("java.version")
     String javaVersion();
 
@@ -849,7 +859,7 @@ public class ExternalizedPropertiesTests {
     String propertyVariable();
   }
 
-  public static interface EagerLoadingProxyInterface {
+  static interface EagerLoadingProxyInterface {
     @ExternalizedProperty("property")
     String property();
 
@@ -860,7 +870,7 @@ public class ExternalizedPropertiesTests {
     Optional<String> optionalProperty();
   }
 
-  public static interface OrdinalProxyInterface {
+  static interface OrdinalProxyInterface {
     @ResolverFacade
     String resolve(String propertyName);
 
@@ -868,7 +878,7 @@ public class ExternalizedPropertiesTests {
     <T> T convert(String property, Class<T> targetType);
   }
 
-  public static enum TestEnum {
+  static enum TestEnum {
     ONE,
     TWO,
     THREE

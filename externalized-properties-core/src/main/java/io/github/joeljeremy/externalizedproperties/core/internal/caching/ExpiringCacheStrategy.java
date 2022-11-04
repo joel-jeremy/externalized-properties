@@ -4,6 +4,7 @@ import static io.github.joeljeremy.externalizedproperties.core.internal.Argument
 
 import io.github.joeljeremy.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy.externalizedproperties.core.internal.DaemonThreadFactory;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
  * expiry timer for a cache item starts on {@link ExpiringCacheStrategy#cache(Object, Object)}
  * method invocation.
  */
+@Internal
 public class ExpiringCacheStrategy<K, V> implements CacheStrategy<K, V> {
 
   private final ScheduledExecutorService expiryScheduler =

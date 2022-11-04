@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.util.Optional;
 
 /** The factory for {@link InvocationContext}. */
+@Internal
 public class InvocationContextFactory {
 
   private final ExternalizedProperties externalizedProperties;

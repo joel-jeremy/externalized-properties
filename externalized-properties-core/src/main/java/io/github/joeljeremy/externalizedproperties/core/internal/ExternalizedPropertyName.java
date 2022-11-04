@@ -9,6 +9,7 @@ import io.github.joeljeremy.externalizedproperties.core.ResolverFacade;
 import java.util.Optional;
 
 /** Utility class to determine the externalized property name from proxy methods. */
+@Internal
 public class ExternalizedPropertyName {
   private ExternalizedPropertyName() {}
 

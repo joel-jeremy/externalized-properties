@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class CachingResolverTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -146,20 +146,20 @@ public class CachingResolverTests {
     }
   }
 
-  private static CachingResolver resolverToTest(Resolver decorated) {
+  static CachingResolver resolverToTest(Resolver decorated) {
     return resolverToTest(decorated, new StubCacheStrategy<>());
   }
 
-  private static CachingResolver resolverToTest(
+  static CachingResolver resolverToTest(
       Resolver decorated, CacheStrategy<String, String> cacheStrategy) {
     return new CachingResolver(decorated, cacheStrategy);
   }
 
-  private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+  static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
     return ExternalizedProperties.builder().resolvers(resolvers).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
   }

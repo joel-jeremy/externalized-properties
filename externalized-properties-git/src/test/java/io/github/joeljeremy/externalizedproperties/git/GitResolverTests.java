@@ -33,19 +33,19 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class GitResolverTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
-  private static Path ROOT_TEST_DIR;
-  private static Path CLONE_DIR;
+  static Path ROOT_TEST_DIR;
+  static Path CLONE_DIR;
 
   // Local Git servers for testing.
-  private static LocalHttpGitServer LOCAL_HTTP_GIT_SERVER;
-  private static GitRepository GIT_REPOSITORY;
+  static LocalHttpGitServer LOCAL_HTTP_GIT_SERVER;
+  static GitRepository GIT_REPOSITORY;
 
-  private static final String DEFAULT_GIT_BRANCH = "git-resolver-configs";
-  private static final String APP_PROPERTIES_FILE_PATH = "app.properties";
-  private static final String APP_JSON_FILE_PATH = "app.json";
+  static final String DEFAULT_GIT_BRANCH = "git-resolver-configs";
+  static final String APP_PROPERTIES_FILE_PATH = "app.properties";
+  static final String APP_JSON_FILE_PATH = "app.json";
 
   @BeforeAll
   static void setup() throws Exception {
@@ -201,21 +201,21 @@ public class GitResolverTests {
     }
   }
 
-  private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+  static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
     return ExternalizedProperties.builder().resolvers(resolvers).build();
   }
 
-  private static Path[] filesToCommitToGitRepo() throws URISyntaxException {
+  static Path[] filesToCommitToGitRepo() throws URISyntaxException {
     return new Path[] {
       getResourceAsPath("/" + APP_PROPERTIES_FILE_PATH), getResourceAsPath("/" + APP_JSON_FILE_PATH)
     };
   }
 
-  private static Path getResourceAsPath(String resourceName) throws URISyntaxException {
+  static Path getResourceAsPath(String resourceName) throws URISyntaxException {
     return Paths.get(GitRepositoryTests.class.getResource(resourceName).toURI());
   }
 
-  private static void deleteRecursively(Path pathToDelete) throws IOException {
+  static void deleteRecursively(Path pathToDelete) throws IOException {
     try (Stream<Path> paths = Files.walk(pathToDelete)) {
       for (Path path : paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new)) {
         Files.delete(path);
@@ -223,7 +223,7 @@ public class GitResolverTests {
     }
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
   }

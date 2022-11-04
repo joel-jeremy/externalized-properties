@@ -4,6 +4,7 @@ import static io.github.joeljeremy.externalizedproperties.core.internal.Argument
 
 import io.github.joeljeremy.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedPropertiesException;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import io.github.joeljeremy.externalizedproperties.core.internal.InvocationCacheKey;
 import io.github.joeljeremy.externalizedproperties.core.internal.caching.WeakConcurrentHashMapCacheStrategy;
 import io.github.joeljeremy.externalizedproperties.core.internal.caching.WeakHashMapCacheStrategy;
@@ -12,6 +13,7 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 /** Implementation of {@link InvocationHandler} that caches invocation results. */
+@Internal
 public class CachingInvocationHandler implements InvocationHandler {
 
   private final InvocationHandler decorated;

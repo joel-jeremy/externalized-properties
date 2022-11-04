@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class ByteConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -99,15 +99,15 @@ public class ByteConverterTests {
     }
   }
 
-  private static ByteConverter converterToTest() {
+  static ByteConverter converterToTest() {
     return new ByteConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(ByteConverter converterToTest) {
+  static ExternalizedProperties externalizedProperties(ByteConverter converterToTest) {
     return ExternalizedProperties.builder().converters(converterToTest).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property.byte.primitive")
     byte bytePrimitiveProperty();
 

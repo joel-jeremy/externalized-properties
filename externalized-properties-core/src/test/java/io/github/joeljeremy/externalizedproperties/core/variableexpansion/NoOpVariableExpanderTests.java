@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class NoOpVariableExpanderTests {
-  private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
+  static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
       ExternalizedProperties.builder().defaults().build();
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -34,7 +34,7 @@ public class NoOpVariableExpanderTests {
     }
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("${test}")
     String variableProperty();
   }

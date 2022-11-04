@@ -3,6 +3,7 @@ package io.github.joeljeremy.externalizedproperties.core.internal.caching;
 import static io.github.joeljeremy.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 import io.github.joeljeremy.externalizedproperties.core.CacheStrategy;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -13,6 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Caching strategy which uses a {@link ConcurrentMap} as cache and whose keys are weakly held. */
+@Internal
 public class WeakConcurrentHashMapCacheStrategy<K, V> implements CacheStrategy<K, V> {
 
   private final ReferenceQueue<K> referenceQueue = new ReferenceQueue<>();

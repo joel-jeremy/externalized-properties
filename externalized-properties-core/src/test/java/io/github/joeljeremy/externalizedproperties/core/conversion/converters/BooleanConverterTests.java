@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class BooleanConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -120,15 +120,15 @@ public class BooleanConverterTests {
     }
   }
 
-  private static BooleanConverter converterToTest() {
+  static BooleanConverter converterToTest() {
     return new BooleanConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(BooleanConverter converterToTest) {
+  static ExternalizedProperties externalizedProperties(BooleanConverter converterToTest) {
     return ExternalizedProperties.builder().converters(converterToTest).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property.boolean.primitive")
     boolean booleanPrimitiveProperty();
 

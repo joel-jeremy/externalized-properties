@@ -6,6 +6,7 @@ import io.github.joeljeremy.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy.externalizedproperties.core.Converter;
 import io.github.joeljeremy.externalizedproperties.core.Resolver;
 import io.github.joeljeremy.externalizedproperties.core.VariableExpander;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import io.github.joeljeremy.externalizedproperties.core.internal.InvocationCacheKey;
 import io.github.joeljeremy.externalizedproperties.core.internal.InvocationContextFactory;
 import io.github.joeljeremy.externalizedproperties.core.internal.InvocationHandlerFactory;
@@ -14,6 +15,7 @@ import io.github.joeljeremy.externalizedproperties.core.internal.caching.WeakHas
 import java.lang.reflect.Method;
 
 /** The factory for {@link EagerLoadingInvocationHandler}. */
+@Internal
 public class EagerLoadingInvocationHandlerFactory implements InvocationHandlerFactory {
 
   private final InvocationHandlerFactory decorated;

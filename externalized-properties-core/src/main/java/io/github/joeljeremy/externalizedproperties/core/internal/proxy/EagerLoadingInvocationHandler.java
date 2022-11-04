@@ -5,6 +5,7 @@ import static io.github.joeljeremy.externalizedproperties.core.internal.Argument
 import io.github.joeljeremy.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import io.github.joeljeremy.externalizedproperties.core.internal.InvocationCacheKey;
 import io.github.joeljeremy.externalizedproperties.core.internal.caching.WeakConcurrentHashMapCacheStrategy;
 import io.github.joeljeremy.externalizedproperties.core.internal.caching.WeakHashMapCacheStrategy;
@@ -18,6 +19,7 @@ import java.util.List;
  * Implementation of {@link InvocationHandler} that eagerly loads property methods that are
  * annotated with {@link ExternalizedProperty} annotation.
  */
+@Internal
 public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
 
   /**
@@ -83,6 +85,8 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
 
     for (Method method : supportedMethods) {
       try {
+        method.setAccessible(true);
+
         Object result = method.invoke(proxy);
         if (result != null) {
           // Safe to not provide args here because methods with
@@ -93,6 +97,8 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
         // Fail fast.
         throw new ExternalizedPropertiesException(
             "Error occurred while eager loading properties.", ex);
+      } finally {
+        method.setAccessible(false);
       }
     }
   }

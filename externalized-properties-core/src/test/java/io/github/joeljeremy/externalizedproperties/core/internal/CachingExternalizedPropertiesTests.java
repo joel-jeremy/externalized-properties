@@ -105,7 +105,7 @@ public class CachingExternalizedPropertiesTests {
     }
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
   }

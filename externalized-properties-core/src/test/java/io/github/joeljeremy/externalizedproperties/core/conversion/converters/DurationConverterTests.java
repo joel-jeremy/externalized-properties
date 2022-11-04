@@ -21,7 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class DurationConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -101,15 +101,15 @@ public class DurationConverterTests {
     }
   }
 
-  private static DurationConverter converterToTest() {
+  static DurationConverter converterToTest() {
     return new DurationConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(DurationConverter converterToTest) {
+  static ExternalizedProperties externalizedProperties(DurationConverter converterToTest) {
     return ExternalizedProperties.builder().converters(converterToTest).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property.duration")
     Duration durationProperty();
   }

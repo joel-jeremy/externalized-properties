@@ -15,6 +15,7 @@ import java.util.WeakHashMap;
 import java.util.stream.Stream;
 
 /** The {@link DefaultInterfaceMethodHandler} factory. */
+@Internal
 public class DefaultInterfaceMethodHandlerFactory {
   // Not Java 1.7, 1.8, etc.
   private static final boolean IS_RUNNING_ON_JAVA_9_OR_LATER = !javaVersion().startsWith("1.");
@@ -174,11 +175,12 @@ public class DefaultInterfaceMethodHandlerFactory {
       // For Java9+, the new private lookup API should be used.
       final Constructor<Lookup> constructor = Lookup.class.getDeclaredConstructor(Class.class);
 
-      constructor.setAccessible(true);
-      final Lookup lookup = constructor.newInstance(classToLookup);
-      constructor.setAccessible(false);
-
-      return lookup;
+      try {
+        constructor.setAccessible(true);
+        return constructor.newInstance(classToLookup);
+      } finally {
+        constructor.setAccessible(false);
+      }
     }
   }
 

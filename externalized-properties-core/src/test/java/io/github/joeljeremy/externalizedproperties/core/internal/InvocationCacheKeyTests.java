@@ -143,15 +143,15 @@ class InvocationCacheKeyTests {
     }
   }
 
-  private static Method stubMethod() {
+  static Method stubMethod() {
     return MethodUtils.getMethod(StubProxyInterface.class, StubProxyInterface::methodName);
   }
 
-  private static interface StubProxyInterface {
+  static interface StubProxyInterface {
     String methodName();
   }
 
-  private static interface OtherProxyInterface {
+  static interface OtherProxyInterface {
     String methodName();
   }
 }

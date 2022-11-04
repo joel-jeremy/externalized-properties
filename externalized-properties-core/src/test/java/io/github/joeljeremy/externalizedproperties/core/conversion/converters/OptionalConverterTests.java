@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class OptionalConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -57,7 +57,7 @@ public class OptionalConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::optionalProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends Optional<?>> result = converter.convert(context, "value");
+      ConversionResult<Optional<?>> result = converter.convert(context, "value");
 
       assertNotNull(result);
       Optional<?> optional = result.value();
@@ -78,7 +78,7 @@ public class OptionalConverterTests {
               ProxyInterface::nonStringOptionalProperty,
               externalizedProperties(converter, new IntegerConverter()));
 
-      ConversionResult<? extends Optional<?>> result = converter.convert(context, "1");
+      ConversionResult<Optional<?>> result = converter.convert(context, "1");
 
       assertNotNull(result);
       Optional<?> optional = result.value();
@@ -99,7 +99,7 @@ public class OptionalConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::optionalPropertyRaw, externalizedProperties(converter));
 
-      ConversionResult<? extends Optional<?>> result = converter.convert(context, "1");
+      ConversionResult<Optional<?>> result = converter.convert(context, "1");
 
       assertNotNull(result);
       Optional<?> optional = result.value();
@@ -120,7 +120,7 @@ public class OptionalConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::optionalPropertyObject, externalizedProperties(converter));
 
-      ConversionResult<? extends Optional<?>> result = converter.convert(context, "value");
+      ConversionResult<Optional<?>> result = converter.convert(context, "value");
 
       assertNotNull(result);
       Optional<?> optional = result.value();
@@ -140,7 +140,7 @@ public class OptionalConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::optionalPropertyWildcard, externalizedProperties(converter));
 
-      ConversionResult<? extends Optional<?>> result = converter.convert(context, "value");
+      ConversionResult<Optional<?>> result = converter.convert(context, "value");
 
       assertNotNull(result);
       Optional<?> optional = result.value();
@@ -175,8 +175,7 @@ public class OptionalConverterTests {
               ProxyInterface::optionalPropertyNestedGenerics,
               externalizedProperties(converter, new ListConverter()));
 
-      ConversionResult<? extends Optional<?>> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<Optional<?>> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       Optional<?> optional = result.value();
@@ -199,8 +198,7 @@ public class OptionalConverterTests {
               ProxyInterface::optionalPropertyNestedGenericsArray,
               externalizedProperties(converter, new ArrayConverter()));
 
-      ConversionResult<? extends Optional<?>> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<Optional<?>> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       Optional<?> optional = result.value();
@@ -223,10 +221,8 @@ public class OptionalConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::optionalProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends Optional<?>> result =
-          converter.convert(
-              context, "" // Empty.
-              );
+      // Value is empty.
+      ConversionResult<Optional<?>> result = converter.convert(context, "");
 
       assertNotNull(result);
       Optional<?> optional = result.value();
@@ -236,11 +232,11 @@ public class OptionalConverterTests {
     }
   }
 
-  private static OptionalConverter converterToTest() {
+  static OptionalConverter converterToTest() {
     return new OptionalConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(
+  static ExternalizedProperties externalizedProperties(
       OptionalConverter converterToTest, Converter<?>... additionalConverters) {
     return ExternalizedProperties.builder()
         .converters(converterToTest)

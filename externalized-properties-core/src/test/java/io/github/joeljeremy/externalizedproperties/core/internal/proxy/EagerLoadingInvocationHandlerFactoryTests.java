@@ -26,20 +26,20 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class EagerLoadingInvocationHandlerFactoryTests {
-  private static final Resolver RESOLVER = new StubResolver();
-  private static final Converter<?> CONVERTER = new DefaultConverter();
-  private static final VariableExpander VARIABLE_EXPANDER = new SimpleVariableExpander();
-  private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
+  static final Resolver RESOLVER = new StubResolver();
+  static final Converter<?> CONVERTER = new DefaultConverter();
+  static final VariableExpander VARIABLE_EXPANDER = new SimpleVariableExpander();
+  static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
       ExternalizedProperties.builder().resolvers(RESOLVER).converters(CONVERTER).build();
 
-  private static final Resolver ROOT_RESOLVER =
+  static final Resolver ROOT_RESOLVER =
       new RootResolver(Arrays.asList(RESOLVER), new RootProcessor());
-  private static final Converter<?> ROOT_CONVERTER = new RootConverter(CONVERTER);
+  static final Converter<?> ROOT_CONVERTER = new RootConverter(CONVERTER);
 
-  private static final InvocationContextFactory INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextFactory INVOCATION_CONTEXT_FACTORY =
       new InvocationContextFactory(EXTERNALIZED_PROPERTIES);
 
-  private static final InvocationHandlerFactory BASE_INVOCATION_HANDLER_FACTORY =
+  static final InvocationHandlerFactory BASE_INVOCATION_HANDLER_FACTORY =
       new ExternalizedPropertiesInvocationHandlerFactory();
 
   @Nested
@@ -100,7 +100,7 @@ public class EagerLoadingInvocationHandlerFactoryTests {
     }
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
   }

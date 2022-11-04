@@ -16,12 +16,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class PatternVariableExpanderTests {
-  private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
+  static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
       ExternalizedProperties.builder().defaults().build();
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
   // Variable pattern: #[variable]
-  private static final Pattern CUSTOM_VARIABLE_PATTERN = Pattern.compile("#\\[(.+?)\\]");
+  static final Pattern CUSTOM_VARIABLE_PATTERN = Pattern.compile("#\\[(.+?)\\]");
 
   @Nested
   class Constructor {
@@ -117,15 +117,15 @@ public class PatternVariableExpanderTests {
     }
   }
 
-  private static PatternVariableExpander variableExpander() {
+  static PatternVariableExpander variableExpander() {
     return new PatternVariableExpander();
   }
 
-  private static PatternVariableExpander variableExpander(Pattern variablePattern) {
+  static PatternVariableExpander variableExpander(Pattern variablePattern) {
     return new PatternVariableExpander(variablePattern);
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property-${java.version}")
     String propertyJavaVersion();
 
@@ -139,7 +139,7 @@ public class PatternVariableExpanderTests {
     String customPrefixSuffix();
   }
 
-  private static interface ResolverFacadeProxyInterface {
+  static interface ResolverFacadeProxyInterface {
     @ResolverFacade
     String resolve(String propertyName);
   }

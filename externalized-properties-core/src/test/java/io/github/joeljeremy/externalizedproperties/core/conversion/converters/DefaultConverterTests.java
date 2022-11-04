@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class DefaultConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -852,15 +852,15 @@ public class DefaultConverterTests {
     }
   }
 
-  private static DefaultConverter converterToTest() {
+  static DefaultConverter converterToTest() {
     return new DefaultConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(DefaultConverter converterToTest) {
+  static ExternalizedProperties externalizedProperties(DefaultConverter converterToTest) {
     return ExternalizedProperties.builder().converters(converterToTest).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property.int.primitive")
     int intPrimitiveProperty();
 
@@ -958,9 +958,9 @@ public class DefaultConverterTests {
     CustomType customType();
   }
 
-  private static class CustomType {}
+  static class CustomType {}
 
-  private static enum TestEnum {
+  static enum TestEnum {
     NONE,
     ONE,
     TWO,

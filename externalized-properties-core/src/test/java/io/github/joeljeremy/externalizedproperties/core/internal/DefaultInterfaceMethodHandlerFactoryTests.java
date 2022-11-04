@@ -420,7 +420,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     }
   }
 
-  private static interface NonDefaultMethodInterface {
+  static interface NonDefaultMethodInterface {
     String nonDefaultMethod(String defaultValue);
   }
 }

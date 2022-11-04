@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class RootResolverTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -135,17 +135,15 @@ public class RootResolverTests {
     }
   }
 
-  private static RootResolver rootResolver(
-      Collection<Resolver> resolvers, Processor... processors) {
+  static RootResolver rootResolver(Collection<Resolver> resolvers, Processor... processors) {
     return rootResolver(resolvers, new RootProcessor(Arrays.asList(processors)));
   }
 
-  private static RootResolver rootResolver(
-      Collection<Resolver> resolvers, RootProcessor rootProcessor) {
+  static RootResolver rootResolver(Collection<Resolver> resolvers, RootProcessor rootProcessor) {
     return new RootResolver(resolvers, rootProcessor);
   }
 
-  private static ExternalizedProperties externalizedProperties(
+  static ExternalizedProperties externalizedProperties(
       Collection<Resolver> resolvers, Processor... processors) {
     return ExternalizedProperties.builder()
         .resolvers(resolvers.toArray(new Resolver[0]))
@@ -153,7 +151,7 @@ public class RootResolverTests {
         .build();
   }
 
-  private static Decryptor getAesDecryptor() {
+  static Decryptor getAesDecryptor() {
     try {
       return JceDecryptor.factory()
           .symmetric(
@@ -168,7 +166,7 @@ public class RootResolverTests {
     }
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
 

@@ -39,26 +39,26 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class DecryptProcessorTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   // AES constants.
-  private static final String AES_ALGORITHM = EncryptionUtils.AES_ALGORITHM;
-  private static final String AES_GCM_ALGORITHM = EncryptionUtils.AES_GCM_ALGORITHM;
-  private static final AlgorithmParameterSpec GCM_PARAMETER_SPEC =
+  static final String AES_ALGORITHM = EncryptionUtils.AES_ALGORITHM;
+  static final String AES_GCM_ALGORITHM = EncryptionUtils.AES_GCM_ALGORITHM;
+  static final AlgorithmParameterSpec GCM_PARAMETER_SPEC =
       EncryptionUtils.DEFAULT_GCM_PARAMETER_SPEC;
-  private static final AlgorithmParameters GCM_PARAMETERS = EncryptionUtils.DEFAULT_GCM_PARAMETERS;
-  private static final SecretKey AES_SECRET_KEY = EncryptionUtils.DEFAULT_AES_SECRET_KEY;
-  private static final Decryptor AES_GCM_DECRYPTOR = createSymmetricDecryptor();
+  static final AlgorithmParameters GCM_PARAMETERS = EncryptionUtils.DEFAULT_GCM_PARAMETERS;
+  static final SecretKey AES_SECRET_KEY = EncryptionUtils.DEFAULT_AES_SECRET_KEY;
+  static final Decryptor AES_GCM_DECRYPTOR = createSymmetricDecryptor();
 
   // RSA constants.
-  private static final String RSA_ALGORITHM = EncryptionUtils.RSA_ALGORITHM;
-  private static final PrivateKey RSA_PRIVATE_KEY = EncryptionUtils.DEFAULT_RSA_PRIVATE_KEY;
-  private static final Decryptor RSA_DECRYPTOR = createAsymmetricDecryptor();
+  static final String RSA_ALGORITHM = EncryptionUtils.RSA_ALGORITHM;
+  static final PrivateKey RSA_PRIVATE_KEY = EncryptionUtils.DEFAULT_RSA_PRIVATE_KEY;
+  static final Decryptor RSA_DECRYPTOR = createAsymmetricDecryptor();
 
-  private static final String BOUNCY_CASTLE_PROVIDER_NAME = "BC";
+  static final String BOUNCY_CASTLE_PROVIDER_NAME = "BC";
 
-  private static final SecureRandom STRONG_SECURE_RANDOM = getStrongSecureRandom();
+  static final SecureRandom STRONG_SECURE_RANDOM = getStrongSecureRandom();
 
   @BeforeAll
   static void setup() {
@@ -1486,15 +1486,15 @@ public class DecryptProcessorTests {
     }
   }
 
-  private static DecryptProcessor processorToTest(Decryptor... decryptors) {
+  static DecryptProcessor processorToTest(Decryptor... decryptors) {
     return new DecryptProcessor(decryptors);
   }
 
-  private static ExternalizedProperties externalizedProperties(Processor... processors) {
+  static ExternalizedProperties externalizedProperties(Processor... processors) {
     return ExternalizedProperties.builder().processors(processors).build();
   }
 
-  private static Decryptor createSymmetricDecryptor() {
+  static Decryptor createSymmetricDecryptor() {
     try {
       return JceDecryptor.factory()
           .symmetric(AES_GCM_ALGORITHM, AES_SECRET_KEY, GCM_PARAMETER_SPEC);
@@ -1506,7 +1506,7 @@ public class DecryptProcessorTests {
     }
   }
 
-  private static Decryptor createAsymmetricDecryptor() {
+  static Decryptor createAsymmetricDecryptor() {
     try {
       return JceDecryptor.factory().asymmetric(RSA_ALGORITHM, RSA_PRIVATE_KEY);
     } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
@@ -1514,7 +1514,7 @@ public class DecryptProcessorTests {
     }
   }
 
-  private static SecureRandom getStrongSecureRandom() {
+  static SecureRandom getStrongSecureRandom() {
     try {
       return SecureRandom.getInstanceStrong();
     } catch (NoSuchAlgorithmException e) {
@@ -1522,7 +1522,7 @@ public class DecryptProcessorTests {
     }
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("proeprty.aes.gcm.encrypted")
     @Decrypt(AES_GCM_ALGORITHM)
     String decryptAesGcm();

@@ -3,7 +3,6 @@ package io.github.joeljeremy.externalizedproperties.core.internal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedProperty;
@@ -18,19 +17,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentest4j.AssertionFailedError;
 
 public class ExternalizedPropertyNameTests {
-  private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
+  static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
       ExternalizedProperties.builder().build();
 
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
-  private static final InvocationContextTestFactory<PrefixProxyInterface>
+  static final InvocationContextTestFactory<PrefixProxyInterface>
       PREFIX_INVOCATION_CONTEXT_FACTORY =
           InvocationContextUtils.testFactory(PrefixProxyInterface.class);
 
-  private static final InvocationContextTestFactory<PrefixWithDelimiterProxyInterface>
+  static final InvocationContextTestFactory<PrefixWithDelimiterProxyInterface>
       PREFIX_WITH_DELIMITER_INVOCATION_CONTEXT_FACTORY =
           InvocationContextUtils.testFactory(PrefixWithDelimiterProxyInterface.class);
 
@@ -122,7 +122,7 @@ public class ExternalizedPropertyNameTests {
           context
               .method()
               .findAnnotation(ExternalizedProperty.class)
-              .orElseThrow(() -> fail("No @ExternalizedProperty annotation."));
+              .orElseThrow(() -> new AssertionFailedError("No @ExternalizedProperty annotation."));
 
       String expected = prefix.value() + prefix.delimiter() + externalizedProperty.value();
 
@@ -191,7 +191,7 @@ public class ExternalizedPropertyNameTests {
           context
               .method()
               .findAnnotation(ExternalizedProperty.class)
-              .orElseThrow(() -> fail("No @ExternalizedProperty annotation"));
+              .orElseThrow(() -> new AssertionFailedError("No @ExternalizedProperty annotation"));
 
       String expected = prefix.value() + prefix.delimiter() + externalizedProperty.value();
 
@@ -239,7 +239,7 @@ public class ExternalizedPropertyNameTests {
     }
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
 

@@ -171,7 +171,7 @@ public class CachingInvocationHandlerTests {
     return MethodUtils.getMethod(StubProxyInterface.class, StubProxyInterface::methodName);
   }
 
-  private static interface StubProxyInterface {
+  static interface StubProxyInterface {
     String methodName();
   }
 }
