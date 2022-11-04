@@ -28,8 +28,8 @@ public class CachingInvocationHandlerFactory implements InvocationHandlerFactory
    * @param cacheStrategy The cache strategy keyed by a {@link InvocationCacheKey} and whose values
    *     are the resolved properties. It is recommended that the {@link CacheStrategy}
    *     implementation only holds weak references to the {@link InvocationCacheKey} due to it
-   *     holding a reference to the invoked {@link Method}. This is in order to avoid leaks and
-   *     class unloading issues.
+   *     holding a reference to the invoked {@link Method}. This is in order to avoid possible leaks
+   *     and class unloading issues.
    * @see WeakConcurrentHashMapCacheStrategy
    * @see WeakHashMapCacheStrategy
    */

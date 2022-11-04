@@ -1,25 +1,14 @@
 package io.github.joeljeremy.externalizedproperties.core.internal;
 
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedPropertiesException;
-import java.lang.invoke.CallSite;
-import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.stream.Stream;
 
 /** The {@link DefaultInterfaceMethodHandler} factory. */
 @Internal
 public class DefaultInterfaceMethodHandlerFactory {
-  // Not Java 1.7, 1.8, etc.
-  private static final boolean IS_RUNNING_ON_JAVA_9_OR_LATER = !javaVersion().startsWith("1.");
-
   private final Map<Method, DefaultInterfaceMethodHandler> weakHandlerCache = new WeakHashMap<>();
 
   /**
@@ -58,7 +47,8 @@ public class DefaultInterfaceMethodHandlerFactory {
       } else {
         // Fallback to using method handles.
         MethodHandle methodHandle =
-            buildMethodHandleInternal(defaultInterfaceMethod)
+            MethodHandleFactory.methodHandleFor(
+                    defaultInterfaceMethod, defaultInterfaceMethod.getDeclaringClass())
                 .asSpreader(Object[].class, defaultInterfaceMethod.getParameterCount());
 
         return cache(
@@ -93,7 +83,10 @@ public class DefaultInterfaceMethodHandlerFactory {
       throws Throwable {
 
     NoArgLambdaFunction lambda =
-        LambdaFactory.createLambdaFunction(defaultInterfaceMethod, NoArgLambdaFunction.class);
+        LambdaFactory.createLambdaFunction(
+            defaultInterfaceMethod,
+            NoArgLambdaFunction.class,
+            defaultInterfaceMethod.getDeclaringClass());
 
     return (instance, args) -> {
       try {
@@ -112,7 +105,10 @@ public class DefaultInterfaceMethodHandlerFactory {
       throws Throwable {
 
     OneArgLambdaFunction lambda =
-        LambdaFactory.createLambdaFunction(defaultInterfaceMethod, OneArgLambdaFunction.class);
+        LambdaFactory.createLambdaFunction(
+            defaultInterfaceMethod,
+            OneArgLambdaFunction.class,
+            defaultInterfaceMethod.getDeclaringClass());
 
     return (instance, args) -> {
       try {
@@ -131,7 +127,10 @@ public class DefaultInterfaceMethodHandlerFactory {
       throws Throwable {
 
     TwoArgsLambdaFunction lambda =
-        LambdaFactory.createLambdaFunction(defaultInterfaceMethod, TwoArgsLambdaFunction.class);
+        LambdaFactory.createLambdaFunction(
+            defaultInterfaceMethod,
+            TwoArgsLambdaFunction.class,
+            defaultInterfaceMethod.getDeclaringClass());
 
     return (instance, args) -> {
       try {
@@ -146,84 +145,9 @@ public class DefaultInterfaceMethodHandlerFactory {
     };
   }
 
-  private static MethodHandle buildMethodHandleInternal(Method method) throws Throwable {
-    if (IS_RUNNING_ON_JAVA_9_OR_LATER) {
-      return Java9MethodHandleFactory.buildMethodHandle(method);
-    }
-
-    return Java8MethodHandleFactory.buildMethodHandle(method);
-  }
-
-  private static Lookup privateLookupIn(Class<?> classToLookup) throws Throwable {
-    if (IS_RUNNING_ON_JAVA_9_OR_LATER) {
-      return Java9MethodHandleFactory.privateLookupIn(classToLookup);
-    }
-
-    return Java8MethodHandleFactory.privateLookupIn(classToLookup);
-  }
-
-  private static class Java8MethodHandleFactory {
-    private Java8MethodHandleFactory() {}
-
-    private static MethodHandle buildMethodHandle(Method method) throws Throwable {
-      final Lookup privateLookup = privateLookupIn(method.getDeclaringClass());
-      return privateLookup.unreflectSpecial(method, method.getDeclaringClass());
-    }
-
-    private static Lookup privateLookupIn(Class<?> classToLookup) throws Throwable {
-      // This will only work on Java 8.
-      // For Java9+, the new private lookup API should be used.
-      final Constructor<Lookup> constructor = Lookup.class.getDeclaredConstructor(Class.class);
-
-      try {
-        constructor.setAccessible(true);
-        return constructor.newInstance(classToLookup);
-      } finally {
-        constructor.setAccessible(false);
-      }
-    }
-  }
-
-  private static class Java9MethodHandleFactory {
-    // This will only work on Java 9+.
-    // This method should be present in Java 9+.
-    // Method handle for MethodHandles.privateLookupIn(...) method.
-    private static final MethodHandle JAVA_9_MH_PRIVATE_LOOKUP_IN =
-        privateLookupInMethodHandleOrThrow();
-
-    private Java9MethodHandleFactory() {}
-
-    private static MethodHandle buildMethodHandle(Method method) throws Throwable {
-      Lookup privateLookup = privateLookupIn(method.getDeclaringClass());
-      return privateLookup.unreflectSpecial(method, method.getDeclaringClass());
-    }
-
-    private static Lookup privateLookupIn(Class<?> classToLookup) throws Throwable {
-      return (Lookup)
-          JAVA_9_MH_PRIVATE_LOOKUP_IN.invokeWithArguments(classToLookup, MethodHandles.lookup());
-    }
-
-    private static MethodHandle privateLookupInMethodHandleOrThrow() {
-      try {
-        Method privateLookupIn =
-            MethodHandles.class.getDeclaredMethod("privateLookupIn", Class.class, Lookup.class);
-        return MethodHandles.lookup().unreflect(privateLookupIn);
-      } catch (Exception e) {
-        throw new IllegalStateException(
-            "Unable to find MethodHandles.privateLookupIn method "
-                + "while running on Java "
-                + javaVersion()
-                + ".",
-            e);
-      }
-    }
-  }
-
-  private static String javaVersion() {
-    return System.getProperty("java.specification.version");
-  }
-
   /** Handler for invoking default interface methods. */
+  @FunctionalInterface
+  @Internal
   public static interface DefaultInterfaceMethodHandler {
     /**
      * Invoke the target default interface method.
@@ -237,6 +161,7 @@ public class DefaultInterfaceMethodHandlerFactory {
 
   /** Interface used internally by the factory to generate a lambda function. */
   @FunctionalInterface
+  @Internal
   public static interface NoArgLambdaFunction {
     /**
      * Invoke the target default interface method.
@@ -249,6 +174,7 @@ public class DefaultInterfaceMethodHandlerFactory {
 
   /** Interface used internally by the factory to generate a lambda function. */
   @FunctionalInterface
+  @Internal
   public static interface OneArgLambdaFunction {
     /**
      * Invoke the target default interface method.
@@ -262,6 +188,7 @@ public class DefaultInterfaceMethodHandlerFactory {
 
   /** Interface used internally by the factory to generate a lambda function. */
   @FunctionalInterface
+  @Internal
   public static interface TwoArgsLambdaFunction {
     /**
      * Invoke the target default interface method.
@@ -272,80 +199,5 @@ public class DefaultInterfaceMethodHandlerFactory {
      * @return The method result.
      */
     Object invoke(Object instance, Object arg1, Object arg2);
-  }
-
-  /** Factory for lambda functions created via {@code LambdaMetafactory}. */
-  static class LambdaFactory {
-    private static final FunctionalInterfaceMethodMap FUNCTIONAL_INTERFACE_METHOD_MAP =
-        new FunctionalInterfaceMethodMap();
-
-    private LambdaFactory() {}
-
-    /**
-     * Create a lambda function using {@code LambdaMetafactory}. This only supports default
-     * interface methods.
-     *
-     * @param <T> The functional interface.
-     * @param targetMethod The defautlt interface method which will be targeted by the lambda
-     *     function.
-     * @param functionalInterface The interface to serve as the functional interface.
-     * @return The instantiated lambda function which targets the specified target method.
-     */
-    static <T> T createLambdaFunction(Method targetMethod, Class<T> functionalInterface)
-        throws Throwable {
-      if (!targetMethod.isDefault()) {
-        throw new IllegalArgumentException(
-            "Target method "
-                + targetMethod.toGenericString()
-                + " is not a default interface method.");
-      }
-      Method samMethod = FUNCTIONAL_INTERFACE_METHOD_MAP.get(functionalInterface);
-
-      Class<?> declaringClass = targetMethod.getDeclaringClass();
-
-      MethodHandles.Lookup lookup = privateLookupIn(declaringClass);
-
-      // unreflectSpecial for default interface methods.
-      MethodHandle requestHandlerMethodHandle =
-          lookup.unreflectSpecial(targetMethod, declaringClass);
-
-      MethodType instantiatedMethodType =
-          MethodType.methodType(
-              targetMethod.getReturnType(), declaringClass, targetMethod.getParameterTypes());
-
-      MethodType samMethodType =
-          MethodType.methodType(samMethod.getReturnType(), samMethod.getParameterTypes());
-
-      CallSite callSite =
-          LambdaMetafactory.metafactory(
-              lookup,
-              samMethod.getName(),
-              MethodType.methodType(functionalInterface),
-              samMethodType,
-              requestHandlerMethodHandle,
-              instantiatedMethodType);
-
-      return (T) callSite.getTarget().invoke();
-    }
-
-    private static class FunctionalInterfaceMethodMap extends ClassValue<Method> {
-      /** Get the single abstract method (SAM) of the functional interface. */
-      @Override
-      protected Method computeValue(Class<?> functionalInterface) {
-        Method[] methods =
-            Stream.of(functionalInterface)
-                .filter(Class::isInterface)
-                .flatMap(m -> Stream.of(m.getMethods()))
-                .filter(m -> Modifier.isAbstract(m.getModifiers()))
-                .toArray(Method[]::new);
-
-        if (methods.length != 1) {
-          throw new IllegalArgumentException(
-              "Class is not a functional interface: " + functionalInterface.getName());
-        }
-
-        return methods[0];
-      }
-    }
   }
 }

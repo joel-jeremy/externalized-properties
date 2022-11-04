@@ -54,14 +54,7 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
     this.defaultInterfaceMethodHandlerFactory = new DefaultInterfaceMethodHandlerFactory();
   }
 
-  /**
-   * Handles the externalized properties proxy method invocation.
-   *
-   * @param proxy The proxy object.
-   * @param method The invoked method.
-   * @param args The method invocation arguments.
-   * @return Method return value.
-   */
+  /** {@inheritDoc} */
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     // args is null instead of an empty array if there are no method parameters...

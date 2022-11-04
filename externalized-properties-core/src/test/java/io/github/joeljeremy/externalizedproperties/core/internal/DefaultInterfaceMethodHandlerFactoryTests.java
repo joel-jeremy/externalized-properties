@@ -1,6 +1,5 @@
 package io.github.joeljeremy.externalizedproperties.core.internal;
 
-import static io.github.joeljeremy.externalizedproperties.core.internal.DefaultInterfaceMethodHandlerFactory.LambdaFactory;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -8,53 +7,51 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy.externalizedproperties.core.internal.DefaultInterfaceMethodHandlerFactory.DefaultInterfaceMethodHandler;
 import io.github.joeljeremy.externalizedproperties.core.testfixtures.MethodUtils;
-import java.awt.List;
 import java.lang.reflect.Method;
-import java.util.function.Function;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class DefaultInterfaceMethodHandlerFactoryTests {
-  private final Method TEST_DEFAULT_INTERFACE_METHOD =
+  static final Method TEST_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(DefaultMethodInterface.class, DefaultMethodInterface::test);
 
-  private final Method TEST_ONE_ARG_DEFAULT_INTERFACE_METHOD =
+  static final Method TEST_ONE_ARG_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(DefaultMethodInterface.class, DefaultMethodInterface::testOneArg);
 
-  private final Method TEST_TWO_ARGS_DEFAULT_INTERFACE_METHOD =
+  static final Method TEST_TWO_ARGS_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(DefaultMethodInterface.class, DefaultMethodInterface::testTwoArgs);
 
-  private final Method TEST_THREE_ARGS_DEFAULT_INTERFACE_METHOD =
+  static final Method TEST_THREE_ARGS_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(DefaultMethodInterface.class, DefaultMethodInterface::testThreeArgs);
 
-  private final Method THROW_RUNTIME_EXCEPTION_DEFAULT_INTERFACE_METHOD =
+  static final Method THROW_RUNTIME_EXCEPTION_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(
           DefaultMethodInterface.class, DefaultMethodInterface::throwRuntimeException);
 
-  private final Method THROW_RUNTIME_EXCEPTION_ONE_ARG_DEFAULT_INTERFACE_METHOD =
+  static final Method THROW_RUNTIME_EXCEPTION_ONE_ARG_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(
           DefaultMethodInterface.class, DefaultMethodInterface::throwRuntimeExceptionOneArg);
 
-  private final Method THROW_RUNTIME_EXCEPTION_TWO_ARGS_DEFAULT_INTERFACE_METHOD =
+  static final Method THROW_RUNTIME_EXCEPTION_TWO_ARGS_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(
           DefaultMethodInterface.class, DefaultMethodInterface::throwRuntimeExceptionTwoArgs);
 
-  private final Method THROW_RUNTIME_EXCEPTION_THREE_ARGS_DEFAULT_INTERFACE_METHOD =
+  static final Method THROW_RUNTIME_EXCEPTION_THREE_ARGS_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(
           DefaultMethodInterface.class, DefaultMethodInterface::throwRuntimeExceptionThreeArgs);
 
-  private final Method THROW_EXCEPTION_DEFAULT_INTERFACE_METHOD =
+  static final Method THROW_EXCEPTION_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(DefaultMethodInterface.class, "throwException");
 
-  private final Method THROW_EXCEPTION_ONE_ARG_DEFAULT_INTERFACE_METHOD =
+  static final Method THROW_EXCEPTION_ONE_ARG_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(DefaultMethodInterface.class, "throwExceptionOneArg", String.class);
 
-  private final Method THROW_EXCEPTION_TWO_ARGS_DEFAULT_INTERFACE_METHOD =
+  static final Method THROW_EXCEPTION_TWO_ARGS_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(
           DefaultMethodInterface.class, "throwExceptionTwoArgs", String.class, String.class);
 
-  private final Method THROW_EXCEPTION_THREE_ARGS_DEFAULT_INTERFACE_METHOD =
+  static final Method THROW_EXCEPTION_THREE_ARGS_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(
           DefaultMethodInterface.class,
           "throwExceptionThreeArgs",
@@ -62,7 +59,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
           String.class,
           String.class);
 
-  private final Method NON_DEFAULT_INTERFACE_METHOD =
+  static final Method NON_DEFAULT_INTERFACE_METHOD =
       MethodUtils.getMethod(
           NonDefaultMethodInterface.class, NonDefaultMethodInterface::nonDefaultMethod);
 
@@ -88,7 +85,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
       DefaultInterfaceMethodHandler handler =
           defaultInterfaceMethodHandlerFactory.create(TEST_DEFAULT_INTERFACE_METHOD);
 
-      // Anonymous class.
+      // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
 
       String value = "test";
@@ -108,7 +105,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
       DefaultInterfaceMethodHandler handler =
           defaultInterfaceMethodHandlerFactory.create(TEST_ONE_ARG_DEFAULT_INTERFACE_METHOD);
 
-      // Anonymous class.
+      // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
 
       String value = "test";
@@ -130,7 +127,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
       DefaultInterfaceMethodHandler handler =
           defaultInterfaceMethodHandlerFactory.create(TEST_TWO_ARGS_DEFAULT_INTERFACE_METHOD);
 
-      // Anonymous class.
+      // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
 
       String value1 = "test1";
@@ -153,7 +150,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
       DefaultInterfaceMethodHandler handler =
           defaultInterfaceMethodHandlerFactory.create(TEST_THREE_ARGS_DEFAULT_INTERFACE_METHOD);
 
-      // Anonymous class.
+      // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
 
       String value1 = "test1";
@@ -191,7 +188,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
           defaultInterfaceMethodHandlerFactory.create(
               THROW_RUNTIME_EXCEPTION_DEFAULT_INTERFACE_METHOD);
 
-      // Anonymous class.
+      // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
 
       assertThrows(ExternalizedPropertiesException.class, () -> handler.invoke(instance));
@@ -208,7 +205,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
           defaultInterfaceMethodHandlerFactory.create(
               THROW_RUNTIME_EXCEPTION_ONE_ARG_DEFAULT_INTERFACE_METHOD);
 
-      // Anonymous class.
+      // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
 
       String value = "test";
@@ -227,7 +224,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
           defaultInterfaceMethodHandlerFactory.create(
               THROW_RUNTIME_EXCEPTION_TWO_ARGS_DEFAULT_INTERFACE_METHOD);
 
-      // Anonymous class.
+      // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
 
       String value1 = "test1";
@@ -248,7 +245,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
           defaultInterfaceMethodHandlerFactory.create(
               THROW_RUNTIME_EXCEPTION_THREE_ARGS_DEFAULT_INTERFACE_METHOD);
 
-      // Anonymous class.
+      // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
 
       String value1 = "test1";
@@ -270,7 +267,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
       DefaultInterfaceMethodHandler handler =
           defaultInterfaceMethodHandlerFactory.create(THROW_EXCEPTION_DEFAULT_INTERFACE_METHOD);
 
-      // Anonymous class.
+      // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
 
       assertThrows(ExternalizedPropertiesException.class, () -> handler.invoke(instance));
@@ -287,7 +284,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
           defaultInterfaceMethodHandlerFactory.create(
               THROW_EXCEPTION_ONE_ARG_DEFAULT_INTERFACE_METHOD);
 
-      // Anonymous class.
+      // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
 
       String value = "test";
@@ -306,7 +303,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
           defaultInterfaceMethodHandlerFactory.create(
               THROW_EXCEPTION_TWO_ARGS_DEFAULT_INTERFACE_METHOD);
 
-      // Anonymous class.
+      // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
 
       String value1 = "test1";
@@ -327,7 +324,7 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
           defaultInterfaceMethodHandlerFactory.create(
               THROW_EXCEPTION_THREE_ARGS_DEFAULT_INTERFACE_METHOD);
 
-      // Anonymous class.
+      // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
 
       String value1 = "test1";
@@ -337,28 +334,6 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
       assertThrows(
           ExternalizedPropertiesException.class,
           () -> handler.invoke(instance, value1, value2, value3));
-    }
-  }
-
-  @Nested
-  class LambdaFactoryTests {
-    @Nested
-    class CreateLambdaFunctionMethod {
-      @Test
-      @DisplayName("should throw when target method argument is not a default interface method")
-      void test1() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> LambdaFactory.createLambdaFunction(NON_DEFAULT_INTERFACE_METHOD, Function.class));
-      }
-
-      @Test
-      @DisplayName("should throw when functional interface argument is not a functional interface")
-      void test2() {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> LambdaFactory.createLambdaFunction(TEST_DEFAULT_INTERFACE_METHOD, List.class));
-      }
     }
   }
 
@@ -383,7 +358,6 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
       throw new RuntimeException("Oops!");
     }
 
-    @SuppressWarnings("unused")
     // Used by THROW_EXCEPTION_DEFAULT_INTERFACE_METHOD.
     default String throwException() throws Exception {
       throw new Exception("Oops!");
@@ -393,7 +367,6 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
       throw new RuntimeException("Oops!");
     }
 
-    @SuppressWarnings("unused")
     // Used by THROW_EXCEPTION_ONE_ARG_DEFAULT_INTERFACE_METHOD.
     default String throwExceptionOneArg(String arg1) throws Exception {
       throw new Exception("Oops!");
@@ -407,13 +380,11 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
       throw new RuntimeException("Oops!");
     }
 
-    @SuppressWarnings("unused")
     // Used by THROW_EXCEPTION_TWO_ARGS_DEFAULT_INTERFACE_METHOD.
     default String throwExceptionTwoArgs(String arg1, String arg2) throws Exception {
       throw new Exception("Oops!");
     }
 
-    @SuppressWarnings("unused")
     // Used by THROW_EXCEPTION_THREE_ARGS_DEFAULT_INTERFACE_METHOD.
     default String throwExceptionThreeArgs(String arg1, String arg2, String arg3) throws Exception {
       throw new Exception("Oops!");

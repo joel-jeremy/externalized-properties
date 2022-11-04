@@ -93,7 +93,7 @@ public class EnvironmentVariableResolverTests {
         Optional<String> result =
             resolver.resolve(
                 context,
-                // test-4 should be converted to TEST_ENV_VAR
+                // test-4 should be converted to TEST_4
                 "test-4");
 
         assertNotNull(result);
