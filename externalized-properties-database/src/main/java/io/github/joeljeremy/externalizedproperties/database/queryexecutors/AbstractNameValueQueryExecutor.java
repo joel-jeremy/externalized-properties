@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
  * name and it's property name and value column mappings.
  */
 public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
+  private static final String NO_SCHEMA = "";
+
   /** {@inheritDoc} */
   @Override
   public Map<String, String> queryProperties(
@@ -26,12 +28,12 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
   }
 
   /**
-   * The target database schema. By default, this will return an empty string.
+   * The target database schema. By default, this will return an empty string (no schema).
    *
    * @return The target database schema.
    */
   protected String schema() {
-    return "";
+    return NO_SCHEMA;
   }
 
   /**

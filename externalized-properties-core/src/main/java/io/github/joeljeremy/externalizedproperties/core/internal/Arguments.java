@@ -6,6 +6,9 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /** Arguments-related utility methods. */
 @Internal
 public class Arguments {
+  private static final String MUST_NOT_BE_NULL = " must not be null.";
+  private static final String MUST_NOT_BE_NULL_OR_EMPTY = " must not be null or empty.";
+
   private Arguments() {}
 
   /**
@@ -19,7 +22,7 @@ public class Arguments {
    */
   public static <T> T requireNonNull(@Nullable T arg, String argName) {
     if (arg == null) {
-      throw new IllegalArgumentException(argName + " must not be null.");
+      throw new IllegalArgumentException(argName + MUST_NOT_BE_NULL);
     }
     return arg;
   }
@@ -34,7 +37,7 @@ public class Arguments {
    */
   public static String requireNonNullOrEmpty(@Nullable String arg, String argName) {
     if (arg == null || "".equals(arg)) {
-      throw new IllegalArgumentException(argName + " must not be null or empty.");
+      throw new IllegalArgumentException(argName + MUST_NOT_BE_NULL_OR_EMPTY);
     }
     return arg;
   }
@@ -49,7 +52,7 @@ public class Arguments {
    */
   public static String requireNonNullOrBlank(@Nullable String arg, String argName) {
     if (arg == null || arg.chars().allMatch(Character::isWhitespace)) {
-      throw new IllegalArgumentException(argName + " must not be null or empty.");
+      throw new IllegalArgumentException(argName + MUST_NOT_BE_NULL_OR_EMPTY);
     }
     return arg;
   }
@@ -66,7 +69,7 @@ public class Arguments {
   public static <T> Collection<T> requireNonNullOrEmpty(
       @Nullable Collection<T> arg, String argName) {
     if (arg == null || arg.isEmpty()) {
-      throw new IllegalArgumentException(argName + " must not be null or empty.");
+      throw new IllegalArgumentException(argName + MUST_NOT_BE_NULL_OR_EMPTY);
     }
     return arg;
   }
@@ -82,7 +85,7 @@ public class Arguments {
    */
   public static <T> T[] requireNonNullOrEmpty(@Nullable T[] arg, String argName) {
     if (arg == null || arg.length == 0) {
-      throw new IllegalArgumentException(argName + " must not be null or empty.");
+      throw new IllegalArgumentException(argName + MUST_NOT_BE_NULL_OR_EMPTY);
     }
     return arg;
   }
@@ -98,7 +101,7 @@ public class Arguments {
    */
   public static <T> T[] requireNoNullElements(@Nullable T[] arg, String argName) {
     if (arg == null) {
-      throw new IllegalArgumentException(argName + " must not be null.");
+      throw new IllegalArgumentException(argName + MUST_NOT_BE_NULL);
     }
     for (T element : arg) {
       if (element == null) {
@@ -120,7 +123,7 @@ public class Arguments {
   public static <T> Collection<T> requireNoNullElements(
       @Nullable Collection<T> arg, String argName) {
     if (arg == null) {
-      throw new IllegalArgumentException(argName + " must not be null.");
+      throw new IllegalArgumentException(argName + MUST_NOT_BE_NULL);
     }
     for (T element : arg) {
       if (element == null) {

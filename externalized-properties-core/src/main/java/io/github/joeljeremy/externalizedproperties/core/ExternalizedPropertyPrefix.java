@@ -68,6 +68,32 @@ import java.lang.annotation.Target;
  * </ul>
  *
  * </blockquote>
+ *
+ * <p>Example with {@link ResolverFacade}:
+ *
+ * <blockquote>
+ *
+ * <pre>
+ *
+ * {@code @ExternalizedPropertyPrefix("myprefix")}
+ * public interface DataSourceProperties {
+ *   {@code @ResolverFacade}
+ *   String resolve(String propertyName);
+ * }
+ *
+ * </pre>
+ *
+ * Every property name passed to the above proxy interface's {@code resolve} method will be prefixed
+ * with the value specified in the annotation.
+ *
+ * <ul>
+ *   <li>{@code dataSourceProperties.resolve("datasource.connectionString")} ->
+ *       myprefix.datasource.connectionString
+ *   <li>{@code dataSourceProperties.resolve("datasource.username")} -> myprefix.datasource.username
+ *   <li>{@code dataSourceProperties.resolve("datasource.password")} -> myprefix.datasource.password
+ * </ul>
+ *
+ * </blockquote>
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
