@@ -84,13 +84,15 @@ import java.lang.annotation.Target;
  * </pre>
  *
  * Every property name passed to the above proxy interface's {@code resolve} method will be prefixed
- * with the value specified in the annotation.
+ * with the value specified in the annotation such that:
  *
  * <ul>
- *   <li>{@code dataSourceProperties.resolve("datasource.connectionString")} ->
+ *   <li>{@code dataSourceProperties.resolve("datasource.connectionString")} will resolve to
  *       myprefix.datasource.connectionString
- *   <li>{@code dataSourceProperties.resolve("datasource.username")} -> myprefix.datasource.username
- *   <li>{@code dataSourceProperties.resolve("datasource.password")} -> myprefix.datasource.password
+ *   <li>{@code dataSourceProperties.resolve("datasource.username")} will resolve to
+ *       myprefix.datasource.username
+ *   <li>{@code dataSourceProperties.resolve("datasource.password")} will resolve to
+ *       myprefix.datasource.password
  * </ul>
  *
  * </blockquote>

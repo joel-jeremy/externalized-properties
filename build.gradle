@@ -92,3 +92,7 @@ if (project.hasProperty("ossrh")) {
     }
   }
 }
+
+tasks.register("clean", Delete).configure {
+  delete rootProject.buildDir
+}
