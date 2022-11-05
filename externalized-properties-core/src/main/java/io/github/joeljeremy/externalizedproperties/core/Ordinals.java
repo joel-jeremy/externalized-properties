@@ -69,7 +69,7 @@ public class Ordinals {
    * @param converters The converters to sort.
    * @return The ordered converters.
    */
-  static <T> List<Converter<T>> sortConverters(List<Converter<T>> converters) {
+  static List<Converter<?>> sortConverters(List<Converter<?>> converters) {
     requireNonNull(converters, "converters");
 
     return converters.stream()
@@ -79,7 +79,7 @@ public class Ordinals {
               // Discard the OrdinalConverter. The converter sequence has
               // already been sorted.
               if (converter instanceof OrdinalConverter<?>) {
-                return ((OrdinalConverter<T>) converter).unwrap();
+                return ((OrdinalConverter<?>) converter).unwrap();
               }
               return converter;
             })
