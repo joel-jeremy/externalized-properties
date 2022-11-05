@@ -74,25 +74,23 @@ class LambdaFactoryTests {
     @Test
     @DisplayName("should throw when target method argument is not a default interface method")
     void test1() {
+      Class<?> specialCaller = NON_DEFAULT_INTERFACE_METHOD.getDeclaringClass();
       assertThrows(
           AbstractMethodError.class,
           () ->
               LambdaFactory.createLambdaFunction(
-                  NON_DEFAULT_INTERFACE_METHOD,
-                  BiFunction.class,
-                  NON_DEFAULT_INTERFACE_METHOD.getDeclaringClass()));
+                  NON_DEFAULT_INTERFACE_METHOD, BiFunction.class, specialCaller));
     }
 
     @Test
     @DisplayName("should throw when functional interface argument is not a functional interface")
     void test2() {
+      Class<?> specialCaller = DEFAULT_INTERFACE_METHOD.getDeclaringClass();
       assertThrows(
           IllegalArgumentException.class,
           () ->
               LambdaFactory.createLambdaFunction(
-                  DEFAULT_INTERFACE_METHOD,
-                  List.class,
-                  DEFAULT_INTERFACE_METHOD.getDeclaringClass()));
+                  DEFAULT_INTERFACE_METHOD, List.class, specialCaller));
     }
 
     @Test
@@ -100,13 +98,12 @@ class LambdaFactoryTests {
         "should create a lambda which invokes the target method (default interface method)")
     void test3() throws Throwable {
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
+      Class<?> specialCaller = DEFAULT_INTERFACE_METHOD.getDeclaringClass();
 
       @SuppressWarnings("unchecked")
       BiFunction<Object, Object, Object> lambda =
           LambdaFactory.createLambdaFunction(
-              DEFAULT_INTERFACE_METHOD,
-              BiFunction.class,
-              DEFAULT_INTERFACE_METHOD.getDeclaringClass());
+              DEFAULT_INTERFACE_METHOD, BiFunction.class, specialCaller);
 
       String value = "test";
       String expected = instance.defaultMethod(value);
@@ -121,11 +118,12 @@ class LambdaFactoryTests {
             + "special caller is not a subclass of the method's declaring class")
     void test4() throws Throwable {
       // Caller is not a subclass of the method's declaring class.
+      Class<?> specialCaller = NonDefaultMethodInterface.class;
       assertThrows(
           IllegalAccessException.class,
           () ->
               LambdaFactory.createLambdaFunction(
-                  DEFAULT_INTERFACE_METHOD, BiFunction.class, NonDefaultMethodInterface.class));
+                  DEFAULT_INTERFACE_METHOD, BiFunction.class, specialCaller));
     }
   }
 

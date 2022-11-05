@@ -64,11 +64,10 @@ class MethodHandleFactoryTests {
     @Test
     @DisplayName("should throw when target method is not a default interface method")
     void test1() throws Throwable {
+      Class<?> specialCaller = NON_DEFAULT_INTERFACE_METHOD.getDeclaringClass();
       assertThrows(
           AbstractMethodError.class,
-          () ->
-              MethodHandleFactory.methodHandleFor(
-                  NON_DEFAULT_INTERFACE_METHOD, NON_DEFAULT_INTERFACE_METHOD.getDeclaringClass()));
+          () -> MethodHandleFactory.methodHandleFor(NON_DEFAULT_INTERFACE_METHOD, specialCaller));
     }
 
     @Test
@@ -76,10 +75,10 @@ class MethodHandleFactoryTests {
         "should create a method handle which invokes the target method (default interface method)")
     void test2() throws Throwable {
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
+      Class<?> specialCaller = DEFAULT_INTERFACE_METHOD.getDeclaringClass();
 
       MethodHandle methodHandle =
-          MethodHandleFactory.methodHandleFor(
-              DEFAULT_INTERFACE_METHOD, DEFAULT_INTERFACE_METHOD.getDeclaringClass());
+          MethodHandleFactory.methodHandleFor(DEFAULT_INTERFACE_METHOD, specialCaller);
 
       String value = "test";
       String expected = instance.defaultMethod(value);
@@ -94,11 +93,10 @@ class MethodHandleFactoryTests {
             + "special caller is not a subclass of the method's declaring class")
     void test3() throws Throwable {
       // Caller is not a subclass of the method's declaring class.
+      Class<?> specialCaller = NonDefaultMethodInterface.class;
       assertThrows(
           IllegalAccessException.class,
-          () ->
-              MethodHandleFactory.methodHandleFor(
-                  DEFAULT_INTERFACE_METHOD, NonDefaultMethodInterface.class));
+          () -> MethodHandleFactory.methodHandleFor(DEFAULT_INTERFACE_METHOD, specialCaller));
     }
   }
 
@@ -114,7 +112,8 @@ class MethodHandleFactoryTests {
       // Assert lookupModes has Lookup.PRIVATE flag.
       int lookupModes = lookup.lookupModes();
       // Same check as Lookup.hasPrivateAccess() introduced in Java 9.
-      assertTrue((lookupModes & Lookup.PRIVATE) != 0);
+      boolean hasPrivateAccess = (lookupModes & Lookup.PRIVATE) != 0;
+      assertTrue(hasPrivateAccess);
     }
   }
 

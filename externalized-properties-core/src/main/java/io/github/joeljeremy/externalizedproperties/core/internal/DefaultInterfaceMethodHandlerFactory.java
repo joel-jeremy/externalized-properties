@@ -9,6 +9,9 @@ import java.util.WeakHashMap;
 /** The {@link DefaultInterfaceMethodHandler} factory. */
 @Internal
 public class DefaultInterfaceMethodHandlerFactory {
+  private static final String DEFAULT_INTERFACE_METHOD_EXCEPTION_MESSAGE_FORMAT =
+      "Error occurred while invoking default interface method. Proxy method: %s.";
+
   private final Map<Method, DefaultInterfaceMethodHandler> weakHandlerCache = new WeakHashMap<>();
 
   /**
@@ -94,7 +97,7 @@ public class DefaultInterfaceMethodHandlerFactory {
       } catch (Throwable e) {
         throw new ExternalizedPropertiesException(
             String.format(
-                "Error occurred while invoking default interface method. " + "Proxy method: %s.",
+                DEFAULT_INTERFACE_METHOD_EXCEPTION_MESSAGE_FORMAT,
                 defaultInterfaceMethod.toGenericString()),
             e);
       }
@@ -116,7 +119,7 @@ public class DefaultInterfaceMethodHandlerFactory {
       } catch (Throwable e) {
         throw new ExternalizedPropertiesException(
             String.format(
-                "Error occurred while invoking default interface method. " + "Proxy method: %s.",
+                DEFAULT_INTERFACE_METHOD_EXCEPTION_MESSAGE_FORMAT,
                 defaultInterfaceMethod.toGenericString()),
             e);
       }
@@ -138,7 +141,7 @@ public class DefaultInterfaceMethodHandlerFactory {
       } catch (Throwable e) {
         throw new ExternalizedPropertiesException(
             String.format(
-                "Error occurred while invoking default interface method. " + "Proxy method: %s.",
+                DEFAULT_INTERFACE_METHOD_EXCEPTION_MESSAGE_FORMAT,
                 defaultInterfaceMethod.toGenericString()),
             e);
       }
