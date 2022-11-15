@@ -70,7 +70,7 @@ public class MethodHandleFactory {
     private static MethodHandle methodHandleFor(Method method, @Nullable Class<?> specialCaller)
         throws Throwable {
       if (specialCaller != null) {
-        return privateLookupIn(specialCaller).unreflectSpecial(method, specialCaller);
+        return privateLookupIn(method.getDeclaringClass()).unreflectSpecial(method, specialCaller);
       }
       return privateLookupIn(method.getDeclaringClass()).unreflect(method);
     }
@@ -117,7 +117,7 @@ public class MethodHandleFactory {
     private static MethodHandle methodHandleFor(Method method, @Nullable Class<?> specialCaller)
         throws Throwable {
       if (specialCaller != null) {
-        return privateLookupIn(specialCaller).unreflectSpecial(method, specialCaller);
+        return privateLookupIn(method.getDeclaringClass()).unreflectSpecial(method, specialCaller);
       }
       return privateLookupIn(method.getDeclaringClass()).unreflect(method);
     }

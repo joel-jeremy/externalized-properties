@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  *
  * <pre>
  *
- * {@code @ExternalizedPropertyPrefix("myprefix")}
+ * {@code @Prefix("myprefix")}
  * public interface DataSourceProperties {
  *   {@code @ExternalizedProperty("datasource.connectionString")}
  *   String connectionString();
@@ -45,7 +45,7 @@ import java.lang.annotation.Target;
  *
  * <pre>
  *
- * {@code @ExternalizedPropertyPrefix(value = "/myprefix", delimiter = "/")}
+ * {@code @Prefix(value = "/myprefix", delimiter = "/")}
  * public interface DataSourceProperties {
  *   {@code @ExternalizedProperty("datasource/connectionString")}
  *   String connectionString();
@@ -75,7 +75,7 @@ import java.lang.annotation.Target;
  *
  * <pre>
  *
- * {@code @ExternalizedPropertyPrefix("myprefix")}
+ * {@code @Prefix("myprefix")}
  * public interface DataSourceProperties {
  *   {@code @ResolverFacade}
  *   String resolve(String propertyName);
@@ -99,7 +99,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ExternalizedPropertyPrefix {
+public @interface Prefix {
   /**
    * The prefix to prepend to the names of externalized properties that belong to the annotated
    * proxy interface.

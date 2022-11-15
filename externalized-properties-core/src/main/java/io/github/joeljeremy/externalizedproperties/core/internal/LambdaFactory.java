@@ -57,14 +57,13 @@ public class LambdaFactory {
         MethodType.methodType(samMethod.getReturnType(), samMethod.getParameterTypes());
 
     MethodHandle requestHandlerMethodHandle;
-    MethodHandles.Lookup lookup;
+    MethodHandles.Lookup lookup =
+        MethodHandleFactory.privateLookupIn(targetMethod.getDeclaringClass());
 
     if (specialCaller != null) {
       requestHandlerMethodHandle = MethodHandleFactory.methodHandleFor(targetMethod, specialCaller);
-      lookup = MethodHandleFactory.privateLookupIn(specialCaller);
     } else {
       requestHandlerMethodHandle = MethodHandleFactory.methodHandleFor(targetMethod);
-      lookup = MethodHandleFactory.privateLookupIn(targetMethod.getDeclaringClass());
     }
 
     MethodType instantiatedMethodType =

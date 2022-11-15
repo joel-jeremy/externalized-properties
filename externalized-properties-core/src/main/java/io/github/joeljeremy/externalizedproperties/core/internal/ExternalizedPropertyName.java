@@ -1,9 +1,9 @@
 package io.github.joeljeremy.externalizedproperties.core.internal;
 
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy.externalizedproperties.core.ExternalizedPropertyPrefix;
 import io.github.joeljeremy.externalizedproperties.core.InvocationArguments;
 import io.github.joeljeremy.externalizedproperties.core.InvocationContext;
+import io.github.joeljeremy.externalizedproperties.core.Prefix;
 import io.github.joeljeremy.externalizedproperties.core.ProxyMethod;
 import io.github.joeljeremy.externalizedproperties.core.ResolverFacade;
 import java.util.Optional;
@@ -24,19 +24,17 @@ public class ExternalizedPropertyName {
    *   <li>Otherwise, the proxy method name will be used as externalized property name.
    * </ol>
    *
-   * If proxy method's declaring class is annotated with {@link ExternalizedPropertyPrefix}, the
-   * value of {@link ExternalizedPropertyPrefix#value()} with be prepended to the externalized
-   * property name.
+   * If proxy method's declaring class is annotated with {@link Prefix}, the value of {@link
+   * Prefix#value()} with be prepended to the externalized property name.
    *
    * @see ExternalizedProperty
    * @see ResolverFacade
-   * @see ExternalizedPropertyPrefix
+   * @see Prefix
    * @param context The invocation context.
    * @return The externalized property name derived from {@link ExternalizedProperty#value()}, or
    *     from proxy method arguments if method is annotated with {@link ResolverFacade}. Otherwise,
-   *     the proxy method name. If proxy method's declaring class is annotated with {@link
-   *     ExternalizedPropertyPrefix}, the value of {@link ExternalizedPropertyPrefix#value()} with
-   *     be prepended to the externalized property name.
+   *     the proxy method name. If proxy method's declaring class is annotated with {@link Prefix},
+   *     the value of {@link Prefix#value()} with be prepended to the externalized property name.
    */
   public static String fromInvocationContext(InvocationContext context) {
     ProxyMethod proxyMethod = context.method();
@@ -76,8 +74,7 @@ public class ExternalizedPropertyName {
   }
 
   private static String prefix(Class<?> declaringClass, String propertyName) {
-    ExternalizedPropertyPrefix prefix =
-        declaringClass.getAnnotation(ExternalizedPropertyPrefix.class);
+    Prefix prefix = declaringClass.getAnnotation(Prefix.class);
     if (prefix != null) {
       return prefix.value() + prefix.delimiter() + propertyName;
     }

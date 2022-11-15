@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedProperty;
-import io.github.joeljeremy.externalizedproperties.core.ExternalizedPropertyPrefix;
 import io.github.joeljeremy.externalizedproperties.core.InvocationContext;
+import io.github.joeljeremy.externalizedproperties.core.Prefix;
 import io.github.joeljeremy.externalizedproperties.core.ResolverFacade;
 import io.github.joeljeremy.externalizedproperties.core.testfixtures.InvocationContextUtils;
 import io.github.joeljeremy.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
@@ -106,8 +106,7 @@ public class ExternalizedPropertyNameTests {
     @Test
     @DisplayName(
         "should prefix externalized property name when proxy method's declaring class is annotated"
-            + " with @ExternalizedPropertyPrefix (externalized property name was derived from"
-            + " @ExternalizedProperty)")
+            + " with @Prefix (externalized property name was derived from @ExternalizedProperty)")
     void test5() {
       InvocationContext context =
           PREFIX_INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -115,8 +114,7 @@ public class ExternalizedPropertyNameTests {
 
       String name = ExternalizedPropertyName.fromInvocationContext(context);
 
-      ExternalizedPropertyPrefix prefix =
-          context.method().declaringClass().getAnnotation(ExternalizedPropertyPrefix.class);
+      Prefix prefix = context.method().declaringClass().getAnnotation(Prefix.class);
 
       ExternalizedProperty externalizedProperty =
           context
@@ -132,8 +130,7 @@ public class ExternalizedPropertyNameTests {
     @Test
     @DisplayName(
         "should prefix externalized property name when proxy method's declaring class is annotated"
-            + " with @ExternalizedPropertyPrefix (externalized property name was derived from"
-            + " @ResolverFacade)")
+            + " with @Prefix (externalized property name was derived from @ResolverFacade)")
     void test6() {
       String propertyName = "test.property";
 
@@ -143,8 +140,7 @@ public class ExternalizedPropertyNameTests {
 
       String name = ExternalizedPropertyName.fromInvocationContext(context);
 
-      ExternalizedPropertyPrefix prefix =
-          context.method().declaringClass().getAnnotation(ExternalizedPropertyPrefix.class);
+      Prefix prefix = context.method().declaringClass().getAnnotation(Prefix.class);
 
       String expected = prefix.value() + prefix.delimiter() + propertyName;
 
@@ -154,8 +150,7 @@ public class ExternalizedPropertyNameTests {
     @Test
     @DisplayName(
         "should prefix externalized property name when proxy method's declaring class is annotated"
-            + " with @ExternalizedPropertyPrefix (externalized property name was derived from"
-            + " method name)")
+            + " with @Prefix (externalized property name was derived from method name)")
     void test7() {
       InvocationContext context =
           PREFIX_INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -163,8 +158,7 @@ public class ExternalizedPropertyNameTests {
 
       String name = ExternalizedPropertyName.fromInvocationContext(context);
 
-      ExternalizedPropertyPrefix prefix =
-          context.method().declaringClass().getAnnotation(ExternalizedPropertyPrefix.class);
+      Prefix prefix = context.method().declaringClass().getAnnotation(Prefix.class);
 
       String expected = prefix.value() + prefix.delimiter() + context.method().name();
 
@@ -175,8 +169,8 @@ public class ExternalizedPropertyNameTests {
 
     @Test
     @DisplayName(
-        "should use @ExternalizedPropertyPrefix delimiter to delimit prefix and externalized"
-            + " property name (externalized property name was derived from @ExternalizedProperty)")
+        "should use @Prefix delimiter to delimit prefix and externalized property name "
+            + "(externalized property name was derived from @ExternalizedProperty)")
     void test8() {
       InvocationContext context =
           PREFIX_WITH_DELIMITER_INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -184,8 +178,7 @@ public class ExternalizedPropertyNameTests {
 
       String name = ExternalizedPropertyName.fromInvocationContext(context);
 
-      ExternalizedPropertyPrefix prefix =
-          context.method().declaringClass().getAnnotation(ExternalizedPropertyPrefix.class);
+      Prefix prefix = context.method().declaringClass().getAnnotation(Prefix.class);
 
       ExternalizedProperty externalizedProperty =
           context
@@ -200,8 +193,8 @@ public class ExternalizedPropertyNameTests {
 
     @Test
     @DisplayName(
-        "should use @ExternalizedPropertyPrefix delimiter to delimit prefix and externalized"
-            + " property name (externalized property name was derived from @ResolverFacade)")
+        "should use @Prefix delimiter to delimit prefix and externalized property name "
+            + "(externalized property name was derived from @ResolverFacade)")
     void test9() {
       String propertyName = "test.property";
 
@@ -211,8 +204,7 @@ public class ExternalizedPropertyNameTests {
 
       String name = ExternalizedPropertyName.fromInvocationContext(context);
 
-      ExternalizedPropertyPrefix prefix =
-          context.method().declaringClass().getAnnotation(ExternalizedPropertyPrefix.class);
+      Prefix prefix = context.method().declaringClass().getAnnotation(Prefix.class);
 
       String expected = prefix.value() + prefix.delimiter() + propertyName;
 
@@ -221,8 +213,8 @@ public class ExternalizedPropertyNameTests {
 
     @Test
     @DisplayName(
-        "should use @ExternalizedPropertyPrefix delimiter to delimit prefix and externalized"
-            + " property name (externalized property name was derived from method name)")
+        "should use @Prefix delimiter to delimit prefix and externalized property name "
+            + "(externalized property name was derived from method name)")
     void test10() {
       InvocationContext context =
           PREFIX_WITH_DELIMITER_INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -230,8 +222,7 @@ public class ExternalizedPropertyNameTests {
 
       String name = ExternalizedPropertyName.fromInvocationContext(context);
 
-      ExternalizedPropertyPrefix prefix =
-          context.method().declaringClass().getAnnotation(ExternalizedPropertyPrefix.class);
+      Prefix prefix = context.method().declaringClass().getAnnotation(Prefix.class);
 
       String expected = prefix.value() + prefix.delimiter() + context.method().name();
 
@@ -249,7 +240,7 @@ public class ExternalizedPropertyNameTests {
     String noAnnotation();
   }
 
-  @ExternalizedPropertyPrefix("myprefix")
+  @Prefix("myprefix")
   static interface PrefixProxyInterface {
     @ExternalizedProperty("test.property")
     String property();
@@ -260,7 +251,7 @@ public class ExternalizedPropertyNameTests {
     String noAnnotation();
   }
 
-  @ExternalizedPropertyPrefix(value = "myprefix", delimiter = "/")
+  @Prefix(value = "myprefix", delimiter = "/")
   static interface PrefixWithDelimiterProxyInterface {
     @ExternalizedProperty("test/property")
     String property();
