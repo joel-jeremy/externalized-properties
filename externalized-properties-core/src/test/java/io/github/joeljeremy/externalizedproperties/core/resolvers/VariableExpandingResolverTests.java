@@ -19,8 +19,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class VariableExpandingResolverTests {
-  private static final InvocationContextTestFactory<ProxyInterface>
-      INVOCATION_CONTEXT_TEST_FACTORY = InvocationContextUtils.testFactory(ProxyInterface.class);
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_TEST_FACTORY =
+      InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
   class Constructor {
@@ -70,14 +70,14 @@ public class VariableExpandingResolverTests {
     }
   }
 
-  private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+  static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
     return ExternalizedProperties.builder()
         .enableVariableExpansionInProperties()
         .resolvers(resolvers)
         .build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
   }

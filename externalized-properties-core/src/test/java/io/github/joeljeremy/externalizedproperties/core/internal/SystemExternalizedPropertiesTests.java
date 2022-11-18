@@ -867,8 +867,7 @@ public class SystemExternalizedPropertiesTests {
     }
   }
 
-  private static SystemExternalizedProperties internalExternalizedProperties(
-      Resolver resolverToUse) {
+  static SystemExternalizedProperties internalExternalizedProperties(Resolver resolverToUse) {
     RootResolver rootResolver = new RootResolver(Arrays.asList(resolverToUse), new RootProcessor());
 
     RootConverter rootConverter = new RootConverter(new DefaultConverter());
@@ -883,48 +882,48 @@ public class SystemExternalizedPropertiesTests {
             new ExternalizedPropertiesInvocationHandler(rr, rc, ve, pmf));
   }
 
-  private static interface NoArgProxyInterface {
+  static interface NoArgProxyInterface {
     // Must have 1 or 2 parameters: The property name and the target type.
     @ResolverFacade
     String resolve();
   }
 
-  private static interface MoreThanTwoArgsProxyInterface {
+  static interface MoreThanTwoArgsProxyInterface {
     // Must have 1 or 2 parameters: The property name and the target type.
     @ResolverFacade
     <T> T resolve(String propertyName, Class<T> targetType, int invalidArg);
   }
 
-  private static interface InvalidFirstArgTypeProxyInterface {
+  static interface InvalidFirstArgTypeProxyInterface {
     // Must have 1 or 2 parameters: The property name and the target type.
     @ResolverFacade
     String resolve(int invalidMustBeString);
   }
 
-  private static interface InvalidSecondArgTypeProxyInterface {
+  static interface InvalidSecondArgTypeProxyInterface {
     // Must have 1 or 2 parameters: The property name and the target type.
     @ResolverFacade
     String resolve(String propertyName, int invalidMustBeTargetType);
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
   }
 
-  private static interface VoidReturnTypeProxyInterface {
+  static interface VoidReturnTypeProxyInterface {
     // Invalid: Void return types not allowed.
     @ExternalizedProperty("test.invalid.method.void")
     void invalidVoidMethod();
   }
 
-  private static interface VoidClassReturnTypeProxyInterface {
+  static interface VoidClassReturnTypeProxyInterface {
     // Invalid: Void return types not allowed.
     @ExternalizedProperty("test.invalid.method.void")
     Void invalidVoidClassMethod();
   }
 
-  private static interface ResolverFacadeProxyInterface {
+  static interface ResolverFacadeProxyInterface {
     @ResolverFacade
     String resolve(String propertyName);
 
@@ -938,7 +937,7 @@ public class SystemExternalizedPropertiesTests {
     Object resolve(String propertyName, Type targetType);
   }
 
-  private static interface ConverterFacadeProxyInterface {
+  static interface ConverterFacadeProxyInterface {
     @ConverterFacade
     <T> T convertToTargetTypeReference(String valueToConvert, TypeReference<T> targetType);
 
@@ -952,39 +951,39 @@ public class SystemExternalizedPropertiesTests {
     int convertToInt(String valueToConvert);
   }
 
-  private static interface InvalidArgsConverterFacadeProxyInterface {
+  static interface InvalidArgsConverterFacadeProxyInterface {
     // First argument must be a String.
     // Second argument must be one of the ff: TypeReference, Class, Type
     @ConverterFacade
     <T> T convert(Integer mustBeString, Double mustBeTargetType);
   }
 
-  private static interface NoArgsConverterFacadeProxyInterface {
+  static interface NoArgsConverterFacadeProxyInterface {
     // Must have 1 or 2 parameters: The value to convert and the target type.
     @ConverterFacade
     <T> T convert();
   }
 
-  private static interface MoreThanTwoArgsConverterFacadeProxyInterface {
+  static interface MoreThanTwoArgsConverterFacadeProxyInterface {
     // Must have 1 or 2 parameters: The value to convert and the target type.
     @ConverterFacade
     <T> T convert(String valueToConvert, Class<T> targetType, String invalidArg);
   }
 
-  private static interface InvalidFirstArgTypeConverterFacadeProxyInterface {
+  static interface InvalidFirstArgTypeConverterFacadeProxyInterface {
     // First parameter must be the value to convert (String)
     @ConverterFacade
     <T> T convert(Integer mustBeString, Class<T> targetType);
   }
 
-  private static interface InvalidSecondArgTypeConverterFacadeProxyInterface {
+  static interface InvalidSecondArgTypeConverterFacadeProxyInterface {
     // Second parameter must be the target type.
     // Second argument must be one of the ff: TypeReference, Class, Type
     @ConverterFacade
     <T> T convert(String valueToConvert, Integer mustBeTargetType);
   }
 
-  private static interface ReturnTypeMismatchConverterFacadeProxyInterface {
+  static interface ReturnTypeMismatchConverterFacadeProxyInterface {
     // Return type not assignable with target type.
     @ConverterFacade
     Integer convertToTargetTypeReference(String valueToConvert, TypeReference<?> targetType);
@@ -1002,36 +1001,36 @@ public class SystemExternalizedPropertiesTests {
     <T> T convertToTargetTypeWithTypeVariableReturnType(String valueToConvert, Type targetType);
   }
 
-  private static interface VariableExpanderFacadeProxyInterface {
+  static interface VariableExpanderFacadeProxyInterface {
     @VariableExpanderFacade
     String expandVariables(String value);
   }
 
-  private static interface InvalidReturnTypeVariableExpanderFacadeProxyInterface {
+  static interface InvalidReturnTypeVariableExpanderFacadeProxyInterface {
     // Return type must be String.
     @VariableExpanderFacade
     int expandVariables(String value);
   }
 
-  private static interface InvalidArgTypeVariableExpanderFacadeProxyInterface {
+  static interface InvalidArgTypeVariableExpanderFacadeProxyInterface {
     // Must have 1 String argument.
     @VariableExpanderFacade
     String expandVariables(int value);
   }
 
-  private static interface NoArgsVariableExpanderFacadeProxyInterface {
+  static interface NoArgsVariableExpanderFacadeProxyInterface {
     // Must have 1 String argument.
     @VariableExpanderFacade
     String expandVariables();
   }
 
-  private static interface InvalidNumberOfArgsVariableExpanderFacadeProxyInterface {
+  static interface InvalidNumberOfArgsVariableExpanderFacadeProxyInterface {
     // Must only have 1 argument (String).
     @VariableExpanderFacade
     int expandVariables(String value, String mustOnlyBeOneArg);
   }
 
-  private static interface ExclusiveProxyInterface {
+  static interface ExclusiveProxyInterface {
     @ExternalizedProperty("property+resolverfacade")
     @ResolverFacade
     String exclusive1();

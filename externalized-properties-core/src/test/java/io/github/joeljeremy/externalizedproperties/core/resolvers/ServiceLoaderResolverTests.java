@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 /** Service loader resolvers are configured in resources/META-INF/services folder. */
 public class ServiceLoaderResolverTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -62,15 +62,15 @@ public class ServiceLoaderResolverTests {
     }
   }
 
-  private static ServiceLoaderResolver resolverToTest() {
+  static ServiceLoaderResolver resolverToTest() {
     return new ServiceLoaderResolver();
   }
 
-  private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+  static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
     return ExternalizedProperties.builder().resolvers(resolvers).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("java.version")
     String javaVersion();
 

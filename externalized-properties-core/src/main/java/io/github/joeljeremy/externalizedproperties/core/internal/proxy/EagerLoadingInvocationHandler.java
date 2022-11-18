@@ -5,7 +5,9 @@ import static io.github.joeljeremy.externalizedproperties.core.internal.Argument
 import io.github.joeljeremy.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedProperty;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import io.github.joeljeremy.externalizedproperties.core.internal.InvocationCacheKey;
+import io.github.joeljeremy.externalizedproperties.core.internal.LambdaFactory;
 import io.github.joeljeremy.externalizedproperties.core.internal.caching.WeakConcurrentHashMapCacheStrategy;
 import io.github.joeljeremy.externalizedproperties.core.internal.caching.WeakHashMapCacheStrategy;
 import java.lang.reflect.InvocationHandler;
@@ -13,11 +15,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Implementation of {@link InvocationHandler} that eagerly loads property methods that are
  * annotated with {@link ExternalizedProperty} annotation.
  */
+@Internal
 public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
 
   /**
@@ -29,8 +33,8 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
    * @param cacheStrategy The cache strategy keyed by a {@link InvocationCacheKey} and whose values
    *     are the resolved properties. It is recommended that the {@link CacheStrategy}
    *     implementation only holds weak references to the {@link InvocationCacheKey} due to it
-   *     holding a reference to the invoked {@link Method}. This is in order to avoid leaks and
-   *     class unloading issues.
+   *     holding a reference to the invoked {@link Method}. This is in order to avoid possible leaks
+   *     and class unloading issues.
    * @see WeakConcurrentHashMapCacheStrategy
    * @see WeakHashMapCacheStrategy
    */
@@ -48,8 +52,8 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
    * @param cacheStrategy The cache strategy keyed by a {@link InvocationCacheKey} and whose values
    *     are the resolved properties. It is recommended that the {@link CacheStrategy}
    *     implementation only holds weak references to the {@link InvocationCacheKey} due to it
-   *     holding a reference to the invoked {@link Method}. This is in order to avoid leaks and
-   *     class unloading issues.
+   *     holding a reference to the invoked {@link Method}. This is in order to avoid possible leaks
+   *     and class unloading issues.
    * @param proxyInterface The proxy interface.
    * @return An {@code EagerLoadingInvocationHandler} whose properties have been eagerly loaded.
    * @see WeakConcurrentHashMapCacheStrategy
@@ -83,13 +87,17 @@ public class EagerLoadingInvocationHandler extends CachingInvocationHandler {
 
     for (Method method : supportedMethods) {
       try {
-        Object result = method.invoke(proxy);
+        @SuppressWarnings("unchecked")
+        Function<Object, Object> lambda =
+            LambdaFactory.createLambdaFunction(method, Function.class);
+
+        Object result = lambda.apply(proxy);
         if (result != null) {
           // Safe to not provide args here because methods with
           // parameters are not supported for eager loading.
           cacheStrategy.cache(new InvocationCacheKey(method), result);
         }
-      } catch (Exception ex) {
+      } catch (Throwable ex) {
         // Fail fast.
         throw new ExternalizedPropertiesException(
             "Error occurred while eager loading properties.", ex);

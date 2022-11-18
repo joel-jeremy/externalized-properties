@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class RootConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -259,15 +259,15 @@ public class RootConverterTests {
     }
   }
 
-  private static RootConverter rootConverter(Converter<?>... converters) {
+  static RootConverter rootConverter(Converter<?>... converters) {
     return new RootConverter(converters);
   }
 
-  private static ExternalizedProperties externalizedProperties(Converter<?>... converters) {
+  static ExternalizedProperties externalizedProperties(Converter<?>... converters) {
     return ExternalizedProperties.builder().converters(converters).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property.int")
     int intProperty();
 

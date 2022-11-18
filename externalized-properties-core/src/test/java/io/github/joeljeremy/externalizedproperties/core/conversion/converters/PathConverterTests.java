@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class PathConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
-  private static Path TEMP_FILE_PATH;
+  static Path TEMP_FILE_PATH;
 
   @BeforeAll
   static void setup() throws IOException {
@@ -92,15 +92,15 @@ public class PathConverterTests {
     }
   }
 
-  private static PathConverter converterToTest() {
+  static PathConverter converterToTest() {
     return new PathConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(PathConverter converterToTest) {
+  static ExternalizedProperties externalizedProperties(PathConverter converterToTest) {
     return ExternalizedProperties.builder().converters(converterToTest).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property.path")
     Path pathProperty();
   }

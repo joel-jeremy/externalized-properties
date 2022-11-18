@@ -6,8 +6,6 @@ import io.github.joeljeremy.externalizedproperties.core.ConversionResult;
 import io.github.joeljeremy.externalizedproperties.core.Converter;
 import io.github.joeljeremy.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy.externalizedproperties.core.TypeUtilities;
-import io.github.joeljeremy.externalizedproperties.core.conversion.Delimiter;
-import io.github.joeljeremy.externalizedproperties.core.conversion.StripEmptyValues;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -16,11 +14,8 @@ import java.util.Set;
 /**
  * Supports conversion of values to a {@link Set} instance.
  *
- * @apiNote By default, this uses ',' as default delimiter when splitting resolved property values.
- *     This can overriden by annotating the proxy interface method with {@link Delimiter} annotation
- *     in which case the {@link Delimiter#value()} attribute will be used as the delimiter.
- * @apiNote If stripping of empty values from the array is desired, the proxy interface method can
- *     be annotated with the {@link StripEmptyValues} annotation.
+ * @apiNote This converter follows the same rules used by {@link ArrayConverter} when
+ *     parsing/splitting resolved property values.
  */
 public class SetConverter implements Converter<Set<?>> {
   private final SetFactory setFactory;

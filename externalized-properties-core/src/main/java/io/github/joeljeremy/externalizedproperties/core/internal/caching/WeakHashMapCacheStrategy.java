@@ -3,10 +3,12 @@ package io.github.joeljeremy.externalizedproperties.core.internal.caching;
 import static io.github.joeljeremy.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 import io.github.joeljeremy.externalizedproperties.core.CacheStrategy;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import java.util.Optional;
 import java.util.WeakHashMap;
 
 /** Caching strategy which uses a {@link WeakHashMap} as cache. */
+@Internal
 public class WeakHashMapCacheStrategy<K, V> implements CacheStrategy<K, V> {
 
   private final WeakHashMap<K, V> weakCache;

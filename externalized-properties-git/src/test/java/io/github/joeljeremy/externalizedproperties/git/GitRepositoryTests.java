@@ -29,14 +29,14 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class GitRepositoryTests {
-  private static final String DEFAULT_GIT_BRANCH = "git-resolver-configs";
-  private static final String APP_PROPERTIES_FILE_PATH = "app.properties";
+  static final String DEFAULT_GIT_BRANCH = "git-resolver-configs";
+  static final String APP_PROPERTIES_FILE_PATH = "app.properties";
 
-  private static Path ROOT_TEST_DIR;
-  private static Path CLONE_DIR;
+  static Path ROOT_TEST_DIR;
+  static Path CLONE_DIR;
 
-  private static LocalHttpGitServer LOCAL_HTTP_GIT_SERVER;
-  private static LocalSshGitServer LOCAL_SSH_GIT_SERVER;
+  static LocalHttpGitServer LOCAL_HTTP_GIT_SERVER;
+  static LocalSshGitServer LOCAL_SSH_GIT_SERVER;
 
   @BeforeAll
   static void setup() throws Exception {
@@ -383,17 +383,17 @@ public class GitRepositoryTests {
     }
   }
 
-  private static Path[] filesToCommitToGitRepo() throws URISyntaxException {
+  static Path[] filesToCommitToGitRepo() throws URISyntaxException {
     return new Path[] {
       getResourceAsPath("/" + APP_PROPERTIES_FILE_PATH),
     };
   }
 
-  private static Path getResourceAsPath(String resourceName) throws URISyntaxException {
+  static Path getResourceAsPath(String resourceName) throws URISyntaxException {
     return Paths.get(GitRepositoryTests.class.getResource(resourceName).toURI());
   }
 
-  private static void deleteRecursively(Path pathToDelete) throws IOException {
+  static void deleteRecursively(Path pathToDelete) throws IOException {
     try (Stream<Path> paths = Files.walk(pathToDelete)) {
       for (Path path : paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new)) {
         Files.delete(path);

@@ -24,13 +24,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class DatabaseResolverTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
-  private static final int NUMBER_OF_TEST_ENTRIES = 2;
-  private static final String H2_CONNECTION_STRING =
+  static final int NUMBER_OF_TEST_ENTRIES = 2;
+  static final String H2_CONNECTION_STRING =
       H2Utils.buildConnectionString(DatabaseResolverTests.class.getSimpleName());
-  private static final ConnectionProvider CONNECTION_PROVIDER =
+  static final ConnectionProvider CONNECTION_PROVIDER =
       H2Utils.createConnectionProvider(H2_CONNECTION_STRING, "sa");
 
   @BeforeAll
@@ -156,7 +156,7 @@ public class DatabaseResolverTests {
     }
   }
 
-  private static void createTestDatabaseConfigurationEntries() throws SQLException {
+  static void createTestDatabaseConfigurationEntries() throws SQLException {
     try (Connection connection = CONNECTION_PROVIDER.getConnection()) {
 
       H2Utils.createPropertiesTable(connection, NUMBER_OF_TEST_ENTRIES);
@@ -167,11 +167,11 @@ public class DatabaseResolverTests {
     }
   }
 
-  private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+  static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
     return ExternalizedProperties.builder().resolvers(resolvers).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("test.property.1")
     String property1();
 

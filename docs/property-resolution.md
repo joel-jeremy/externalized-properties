@@ -55,6 +55,12 @@ public interface ApplicationProperties {
 
   @ResolverFacade
   int resolveInt(String propertyName);
+
+  @ResolverFacade
+  <T> T resolve(String propertyName, Class<T> targetType);
+
+  @ResolverFacade
+  <T> T resolve(String propertyName, TypeReference<T> targetType);
 }
 ```
 

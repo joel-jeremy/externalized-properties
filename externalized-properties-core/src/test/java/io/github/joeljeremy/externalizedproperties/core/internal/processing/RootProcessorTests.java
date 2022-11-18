@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class RootProcessorTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -122,15 +122,15 @@ public class RootProcessorTests {
     }
   }
 
-  private static RootProcessor rootProcessor(Processor... processors) {
+  static RootProcessor rootProcessor(Processor... processors) {
     return new RootProcessor(processors);
   }
 
-  private static ExternalizedProperties externalizedProperties(Processor... processors) {
+  static ExternalizedProperties externalizedProperties(Processor... processors) {
     return ExternalizedProperties.builder().processors(processors).build();
   }
 
-  private static Decryptor createAesDecryptor() {
+  static Decryptor createAesDecryptor() {
     try {
       return JceDecryptor.factory()
           .symmetric(
@@ -145,7 +145,7 @@ public class RootProcessorTests {
     }
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("test.decrypt")
     @Decrypt(AES_GCM_ALGORITHM)
     String decrypt();

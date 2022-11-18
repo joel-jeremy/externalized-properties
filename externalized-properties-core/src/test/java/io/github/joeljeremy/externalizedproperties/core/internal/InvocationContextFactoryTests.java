@@ -26,10 +26,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class InvocationContextFactoryTests {
-  private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
+  static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
       ExternalizedProperties.builder().defaults().build();
-  private static final ProxyInterface PROXY =
-      EXTERNALIZED_PROPERTIES.initialize(ProxyInterface.class);
+  static final ProxyInterface PROXY = EXTERNALIZED_PROPERTIES.initialize(ProxyInterface.class);
 
   @Nested
   class CreateMethod {
@@ -653,23 +652,23 @@ public class InvocationContextFactoryTests {
     }
   }
 
-  private static InvocationContextFactory invocationContextFactory() {
+  static InvocationContextFactory invocationContextFactory() {
     return new InvocationContextFactory(EXTERNALIZED_PROPERTIES);
   }
 
-  private static InvocationContext invocationContext(Method method, Object... args) {
+  static InvocationContext invocationContext(Method method, Object... args) {
     return invocationContextFactory().create(PROXY, method, args);
   }
 
-  private static ProxyMethod proxyMethod(Method method, Object... args) {
+  static ProxyMethod proxyMethod(Method method, Object... args) {
     return invocationContext(method, args).method();
   }
 
-  private static InvocationArguments invocationArguments(Method method, Object... args) {
+  static InvocationArguments invocationArguments(Method method, Object... args) {
     return invocationContext(method, args).arguments();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
 

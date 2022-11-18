@@ -40,12 +40,12 @@ import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
 public class ResourceResolverTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
-  private static final ResourceReader PROPERTIES_READER = new PropertiesReader();
-  private static final ResourceReader JSON_READER = new JsonReader();
-  private static final ResourceReader YAML_READER = new YamlReader();
-  private static final ResourceReader XML_READER = new XmlReader();
+  static final ResourceReader PROPERTIES_READER = new PropertiesReader();
+  static final ResourceReader JSON_READER = new JsonReader();
+  static final ResourceReader YAML_READER = new YamlReader();
+  static final ResourceReader XML_READER = new XmlReader();
 
   @Nested
   class FromUrlFactoryMethod {
@@ -472,16 +472,15 @@ public class ResourceResolverTests {
     }
   }
 
-  private static ResourceResolver resolverToTest(URL url) throws IOException {
+  static ResourceResolver resolverToTest(URL url) throws IOException {
     return ResourceResolver.fromUrl(url);
   }
 
-  private static ResourceResolver resolverToTest(URL url, ResourceReader reader)
-      throws IOException {
+  static ResourceResolver resolverToTest(URL url, ResourceReader reader) throws IOException {
     return ResourceResolver.fromUrl(url, reader);
   }
 
-  private static String readAsString(InputStream inputStream) throws IOException {
+  static String readAsString(InputStream inputStream) throws IOException {
     ByteArrayOutputStream output = new ByteArrayOutputStream();
     byte[] buffer = new byte[1024];
     int bufferLength;
@@ -503,16 +502,16 @@ public class ResourceResolverTests {
     return Paths.get(getClass().getResource(classpathResource).toURI());
   }
 
-  private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+  static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
     return ExternalizedProperties.builder().resolvers(resolvers).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
   }
 
-  private static class ResourceReaderProvider implements ArgumentsProvider {
+  static class ResourceReaderProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
       // File/resource and reader mappings.
@@ -523,7 +522,7 @@ public class ResourceResolverTests {
     }
   }
 
-  private static class NestedResourceReaderProvider implements ArgumentsProvider {
+  static class NestedResourceReaderProvider implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext context) throws Exception {
       // File/resource and reader mappings.

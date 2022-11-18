@@ -20,11 +20,11 @@ public class JdbcConnectionProviderTests {
       H2Utils.buildConnectionString(JdbcConnectionProviderTests.class.getSimpleName());
   static final JdbcDataSource H2_DATA_SOURCE = H2Utils.createDataSource(H2_CONNECTION_STRING, "sa");
 
-  private static final String CUSTOM_H2_USER = "jay";
-  private static final String CUSTOM_H2_USER_PASSWORD = "my_super_s3cret_password";
+  static final String CUSTOM_H2_USER = "jay";
+  static final String CUSTOM_H2_USER_PASSWORD = "my_super_s3cret_password";
 
   @BeforeAll
-  public static void setup() throws SQLException {
+  static void setup() throws SQLException {
     // Custom user that has a password for testing.
     H2Utils.createUser(H2_DATA_SOURCE.getConnection(), CUSTOM_H2_USER, CUSTOM_H2_USER_PASSWORD);
   }

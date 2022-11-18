@@ -7,6 +7,7 @@ import io.github.joeljeremy.externalizedproperties.core.VariableExpander;
 import java.lang.reflect.InvocationHandler;
 
 /** Invocation handler factory. */
+@Internal
 public interface InvocationHandlerFactory {
   /**
    * Create an {@link InvocationHandler} for the specified proxy interface.

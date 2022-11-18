@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class ArrayConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -73,8 +73,7 @@ public class ArrayConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::arrayProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends Object[]> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<Object[]> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       Object[] array = result.value();
@@ -95,7 +94,7 @@ public class ArrayConverterTests {
               ProxyInterface::arrayIntegerWrapper,
               externalizedProperties(converter, new IntegerConverter()));
 
-      ConversionResult<? extends Object[]> result = converter.convert(context, "1,2,3");
+      ConversionResult<Object[]> result = converter.convert(context, "1,2,3");
 
       assertNotNull(result);
       Object[] array = result.value();
@@ -115,10 +114,8 @@ public class ArrayConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::arrayProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends Object[]> result =
-          converter.convert(
-              context, "" // Empty value.
-              );
+      // Value is empty.
+      ConversionResult<Object[]> result = converter.convert(context, "");
       assertNotNull(result);
       Object[] array = result.value();
 
@@ -135,10 +132,8 @@ public class ArrayConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::arrayProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends Object[]> result =
-          converter.convert(
-              context, "value1,,value3,,value5" // Has empty values.
-              );
+      // Value has empty values.
+      ConversionResult<Object[]> result = converter.convert(context, "value1,,value3,,value5");
 
       assertNotNull(result);
       Object[] array = result.value();
@@ -158,10 +153,8 @@ public class ArrayConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::arrayPropertyStripEmpty, externalizedProperties(converter));
 
-      ConversionResult<? extends Object[]> result =
-          converter.convert(
-              context, "value1,,value3,,value5" // Has empty values.
-              );
+      // Value has empty values.
+      ConversionResult<Object[]> result = converter.convert(context, "value1,,value3,,value5");
 
       assertNotNull(result);
       Object[] array = result.value();
@@ -181,8 +174,7 @@ public class ArrayConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::arrayPropertyObject, externalizedProperties(converter));
 
-      ConversionResult<? extends Object[]> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<Object[]> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       Object[] array = result.value();
@@ -205,11 +197,7 @@ public class ArrayConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::arrayIntegerWrapper, externalizedProperties(converter));
 
-      assertThrows(
-          ConversionException.class,
-          () -> {
-            converter.convert(context, "1,2,3,4,5");
-          });
+      assertThrows(ConversionException.class, () -> converter.convert(context, "1,2,3,4,5"));
     }
 
     @Test
@@ -221,10 +209,8 @@ public class ArrayConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::arrayCustomDelimiter, externalizedProperties(converter));
 
-      ConversionResult<? extends Object[]> result =
-          converter.convert(
-              context, "value1|value2|value3" // Custom delimiter
-              );
+      // Value has custom delimiter
+      ConversionResult<Object[]> result = converter.convert(context, "value1|value2|value3");
 
       assertNotNull(result);
       Object[] array = result.value();
@@ -246,8 +232,7 @@ public class ArrayConverterTests {
                   ::arrayPropertyGeneric, // Returns a generic type array Optional<String>[]
               externalizedProperties(converter));
 
-      ConversionResult<? extends Object[]> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<Object[]> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       Object[] array = result.value();
@@ -271,8 +256,7 @@ public class ArrayConverterTests {
                   ::arrayPropertyGenericWildcard, // Returns a generic type array Optional<?>[]
               externalizedProperties(converter));
 
-      ConversionResult<? extends Object[]> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<Object[]> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       Object[] array = result.value();
@@ -300,11 +284,11 @@ public class ArrayConverterTests {
     }
   }
 
-  private static ArrayConverter converterToTest() {
+  static ArrayConverter converterToTest() {
     return new ArrayConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(
+  static ExternalizedProperties externalizedProperties(
       ArrayConverter converterToTest, Converter<?>... additionalConverters) {
     return ExternalizedProperties.builder()
         .converters(converterToTest)
@@ -312,7 +296,7 @@ public class ArrayConverterTests {
         .build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property.array")
     String[] arrayProperty();
 

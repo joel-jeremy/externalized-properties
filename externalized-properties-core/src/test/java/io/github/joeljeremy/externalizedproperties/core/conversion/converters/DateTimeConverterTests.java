@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class DateTimeConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -597,15 +597,15 @@ public class DateTimeConverterTests {
     }
   }
 
-  private static DateTimeConverter converterToTest() {
+  static DateTimeConverter converterToTest() {
     return new DateTimeConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(DateTimeConverter converterToTest) {
+  static ExternalizedProperties externalizedProperties(DateTimeConverter converterToTest) {
     return ExternalizedProperties.builder().converters(converterToTest).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property.localdatetime")
     LocalDateTime localDateTime();
 

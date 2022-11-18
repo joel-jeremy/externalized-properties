@@ -8,6 +8,7 @@ import io.github.joeljeremy.externalizedproperties.core.internal.caching.WeakCon
 import io.github.joeljeremy.externalizedproperties.core.internal.caching.WeakHashMapCacheStrategy;
 
 /** {@link ExternalizedProperties} decorator to enable property resolution caching. */
+@Internal
 public class CachingExternalizedProperties implements ExternalizedProperties {
 
   private final ExternalizedProperties decorated;

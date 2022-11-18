@@ -173,7 +173,7 @@ public class WeakHashMapCacheStrategyTests {
     }
   }
 
-  public static class CacheKey {
+  static class CacheKey {
     private final String key;
 
     public CacheKey(String key) {

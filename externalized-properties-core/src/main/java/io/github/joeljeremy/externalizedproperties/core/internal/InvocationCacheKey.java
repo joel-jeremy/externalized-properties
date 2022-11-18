@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** The method invocation cache key. */
+@Internal
 public final class InvocationCacheKey {
   private final Method method;
   private final @Nullable Object[] args;
