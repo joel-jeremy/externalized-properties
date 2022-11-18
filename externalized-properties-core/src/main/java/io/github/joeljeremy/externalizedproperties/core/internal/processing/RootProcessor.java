@@ -5,6 +5,7 @@ import static io.github.joeljeremy.externalizedproperties.core.internal.Argument
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedProperties;
 import io.github.joeljeremy.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy.externalizedproperties.core.Processor;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import io.github.joeljeremy.externalizedproperties.core.processing.ProcessWith;
 import io.github.joeljeremy.externalizedproperties.core.processing.ProcessingException;
 import java.lang.annotation.Annotation;
@@ -17,6 +18,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * The root {@link Processor}. All requests to process properties are routed through this processor
  * and delegated to the registered {@link Processor}s
  */
+@Internal
 public class RootProcessor implements Processor {
 
   private final ProcessorByAnnotationType processorByAnnotationType;

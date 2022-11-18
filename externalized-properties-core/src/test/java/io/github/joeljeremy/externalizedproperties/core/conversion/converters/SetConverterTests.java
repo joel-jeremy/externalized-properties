@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class SetConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -75,8 +75,7 @@ public class SetConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::setProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends Set<?>> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<Set<?>> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       Set<?> set = result.value();
@@ -88,8 +87,7 @@ public class SetConverterTests {
     }
 
     @Test
-    @DisplayName(
-        "should convert to Set<String> when target type has no " + "type parameters i.e. Set")
+    @DisplayName("should convert to Set<String> when target type has no type parameters i.e. Set")
     void test2() {
       SetConverter converter = converterToTest();
 
@@ -97,7 +95,7 @@ public class SetConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::setRaw, externalizedProperties(converter));
 
-      ConversionResult<? extends Set<?>> result = converter.convert(context, "1,2,3");
+      ConversionResult<Set<?>> result = converter.convert(context, "1,2,3");
 
       assertNotNull(result);
       Set<?> set = result.value();
@@ -118,8 +116,7 @@ public class SetConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::setCustomDelimiter, externalizedProperties(converter));
 
-      ConversionResult<? extends Set<?>> result =
-          converter.convert(context, "value1#value2#value3");
+      ConversionResult<Set<?>> result = converter.convert(context, "value1#value2#value3");
 
       assertNotNull(result);
       Set<?> set = result.value();
@@ -140,7 +137,7 @@ public class SetConverterTests {
               ProxyInterface::setInteger,
               externalizedProperties(converter, new IntegerConverter()));
 
-      ConversionResult<? extends Set<?>> result = converter.convert(context, "1,2,3");
+      ConversionResult<Set<?>> result = converter.convert(context, "1,2,3");
 
       assertNotNull(result);
       Set<?> set = result.value();
@@ -160,8 +157,7 @@ public class SetConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::setPropertyWildcard, externalizedProperties(converter));
 
-      ConversionResult<? extends Set<?>> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<Set<?>> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       Set<?> set = result.value();
@@ -181,8 +177,7 @@ public class SetConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::setPropertyObject, externalizedProperties(converter));
 
-      ConversionResult<? extends Set<?>> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<Set<?>> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       Set<?> set = result.value();
@@ -202,10 +197,8 @@ public class SetConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::setProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends Set<?>> result =
-          converter.convert(
-              context, "" // Empty value.
-              );
+      // Value is empty.
+      ConversionResult<Set<?>> result = converter.convert(context, "");
 
       assertNotNull(result);
       Set<?> set = result.value();
@@ -223,10 +216,8 @@ public class SetConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::setProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends Set<?>> result =
-          converter.convert(
-              context, "value1,value2,value3,,value5" // Has empty values.
-              );
+      // Value has empty values.
+      ConversionResult<Set<?>> result = converter.convert(context, "value1,value2,value3,,value5");
 
       assertNotNull(result);
       Set<?> set = result.value();
@@ -247,10 +238,8 @@ public class SetConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::setPropertyStripEmpty, externalizedProperties(converter));
 
-      ConversionResult<? extends Set<?>> result =
-          converter.convert(
-              context, "value1,,value3,,value5" // Has empty values.
-              );
+      // Value has empty values.
+      ConversionResult<Set<?>> result = converter.convert(context, "value1,,value3,,value5");
 
       assertNotNull(result);
       Set<?> set = result.value();
@@ -289,8 +278,7 @@ public class SetConverterTests {
               ProxyInterface::setPropertyNestedGenerics, // Returns a Set<Optional<String>>.
               externalizedProperties(converter));
 
-      ConversionResult<? extends Set<?>> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<Set<?>> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       Set<?> set = result.value();
@@ -316,8 +304,7 @@ public class SetConverterTests {
               ProxyInterface::setPropertyNestedGenericsArray, // Returns a Set<Optional<String>[]>.
               externalizedProperties(converter, new ArrayConverter()));
 
-      ConversionResult<? extends Set<?>> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<Set<?>> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       Set<?> set = result.value();
@@ -361,10 +348,9 @@ public class SetConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::setProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends Set<?>> result =
-          converter.convert(
-              context, "value1,value1,value1,value1,value5" // There are 4 value1
-              );
+      // There are 4 value1 in value.
+      ConversionResult<Set<?>> result =
+          converter.convert(context, "value1,value1,value1,value1,value5");
 
       assertNotNull(result);
       Set<?> set = result.value();
@@ -379,16 +365,14 @@ public class SetConverterTests {
     @Test
     @DisplayName("should use provided set factory to construct sets.")
     void setFactoryTest1() {
-      SetConverter converter =
-          converterToTest(
-              // Uses CopyOnWriteArraySet.
-              capacity -> new CopyOnWriteArraySet<>());
+      // Factory returns CopyOnWriteArraySet.
+      SetConverter converter = converterToTest(capacity -> new CopyOnWriteArraySet<>());
 
       InvocationContext context =
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::setProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends Set<?>> result =
+      ConversionResult<Set<?>> result =
           converter.convert(context, "value1,value2,value3,value4,value5");
 
       assertNotNull(result);
@@ -409,10 +393,8 @@ public class SetConverterTests {
     @Test
     @DisplayName("should throw when provided set factory returns null.")
     void setFactoryTest2() {
-      SetConverter converter =
-          converterToTest(
-              // Returns null.
-              capacity -> null);
+      // Factory returns null.
+      SetConverter converter = converterToTest(capacity -> null);
 
       InvocationContext context =
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -426,9 +408,9 @@ public class SetConverterTests {
     @Test
     @DisplayName("should throw when provided set factory returns a populated set.")
     void setFactoryTest3() {
+      // Factory returns a populated set.
       SetConverter converter =
           converterToTest(
-              // Returns a populated set.
               capacity -> new HashSet<>(Arrays.asList("should", "not", "be", "populated")));
 
       InvocationContext context =
@@ -441,15 +423,15 @@ public class SetConverterTests {
     }
   }
 
-  private static SetConverter converterToTest(SetFactory setFactory) {
+  static SetConverter converterToTest(SetFactory setFactory) {
     return new SetConverter(setFactory);
   }
 
-  private static SetConverter converterToTest() {
+  static SetConverter converterToTest() {
     return new SetConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(
+  static ExternalizedProperties externalizedProperties(
       SetConverter converterToTest, Converter<?>... additionalConverters) {
     return ExternalizedProperties.builder()
         .converters(converterToTest)

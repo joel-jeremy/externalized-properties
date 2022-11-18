@@ -49,7 +49,7 @@ import org.junit.jupiter.api.Test;
 // Let ExternalizedProperties.initialize(Class<?> proxyInterface)
 // create the proxy for these test cases.
 public class ExternalizedPropertiesInvocationHandlerTests {
-  private static final VariableExpander VARIABLE_EXPANDER = new SimpleVariableExpander();
+  static final VariableExpander VARIABLE_EXPANDER = new SimpleVariableExpander();
 
   @Nested
   class InvokeMethod {
@@ -129,7 +129,8 @@ public class ExternalizedPropertiesInvocationHandlerTests {
 
     @Test
     @DisplayName(
-        "should resolve property from resolver and not from default interface method value parameter")
+        "should resolve property from resolver and not from default interface method value"
+            + " parameter")
     void test4() throws Throwable {
       Resolver resolver = new MapResolver("property.with.default.value", "test.value");
       ExternalizedProperties externalizedProperties = externalizedProperties(resolver);
@@ -1221,15 +1222,14 @@ public class ExternalizedPropertiesInvocationHandlerTests {
     }
   }
 
-  private static ExternalizedProperties externalizedProperties(Resolver resolver) {
+  static ExternalizedProperties externalizedProperties(Resolver resolver) {
     return ExternalizedProperties.builder()
         .resolvers(resolver)
         .variableExpander(variableExpander())
         .build();
   }
 
-  private static ExternalizedProperties externalizedProperties(
-      Resolver resolver, Processor processor) {
+  static ExternalizedProperties externalizedProperties(Resolver resolver, Processor processor) {
     return ExternalizedProperties.builder()
         .resolvers(resolver)
         .processors(processor)
@@ -1237,8 +1237,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         .build();
   }
 
-  private static ExternalizedProperties externalizedProperties(
-      Resolver resolver, Converter<?> converter) {
+  static ExternalizedProperties externalizedProperties(Resolver resolver, Converter<?> converter) {
     return ExternalizedProperties.builder()
         .resolvers(resolver)
         .converters(converter)
@@ -1246,23 +1245,23 @@ public class ExternalizedPropertiesInvocationHandlerTests {
         .build();
   }
 
-  private static Resolver rootResolver(Resolver resolver, Processor processor) {
+  static Resolver rootResolver(Resolver resolver, Processor processor) {
     return new RootResolver(Arrays.asList(resolver), new RootProcessor(processor));
   }
 
-  private static Resolver rootResolver(Resolver... resolvers) {
+  static Resolver rootResolver(Resolver... resolvers) {
     return new RootResolver(Arrays.asList(resolvers), new RootProcessor());
   }
 
-  private static Converter<?> rootConverter(Converter<?>... converters) {
+  static Converter<?> rootConverter(Converter<?>... converters) {
     return new RootConverter(converters);
   }
 
-  private static VariableExpander variableExpander() {
+  static VariableExpander variableExpander() {
     return VARIABLE_EXPANDER;
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
 
@@ -1316,7 +1315,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
     String decryptedProperty();
   }
 
-  private static interface ResolverFacadeProxyInterface {
+  static interface ResolverFacadeProxyInterface {
     @ResolverFacade
     String resolveString(String propertyName);
 
@@ -1333,7 +1332,7 @@ public class ExternalizedPropertiesInvocationHandlerTests {
     Object resolveWithTargetType(String propertyName, Type targetType);
   }
 
-  private static interface ConverterFacadeProxyInterface {
+  static interface ConverterFacadeProxyInterface {
     @ConverterFacade
     <T> T convertToTypeReference(String valueToConvert, TypeReference<T> targetType);
 
@@ -1356,18 +1355,18 @@ public class ExternalizedPropertiesInvocationHandlerTests {
     int convertToInt(String valueToConvert);
   }
 
-  private static interface ExpandVariablesProxyInterface {
+  static interface ExpandVariablesProxyInterface {
     @VariableExpanderFacade
     String expandVariables(String value);
   }
 
-  private static interface OtherProxyInterface {}
+  static interface OtherProxyInterface {}
 
-  private static interface EqualsMethodNoArgProxyInterface {
+  static interface EqualsMethodNoArgProxyInterface {
     boolean equals();
   }
 
-  private static interface EqualsMethodNonObjectArgProxyInterface {
+  static interface EqualsMethodNonObjectArgProxyInterface {
     boolean equals(String other);
   }
 }

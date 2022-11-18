@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class EnumConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -88,15 +88,15 @@ public class EnumConverterTests {
     }
   }
 
-  private static EnumConverter converterToTest() {
+  static EnumConverter converterToTest() {
     return new EnumConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(EnumConverter converterToTest) {
+  static ExternalizedProperties externalizedProperties(EnumConverter converterToTest) {
     return ExternalizedProperties.builder().converters(converterToTest).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property.enum")
     TestEnum enumProperty();
 
@@ -104,7 +104,7 @@ public class EnumConverterTests {
     int notSupportedNotAnEnum();
   }
 
-  private static enum TestEnum {
+  static enum TestEnum {
     NONE,
     ONE,
     TWO,

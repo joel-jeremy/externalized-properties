@@ -9,6 +9,7 @@ import io.github.joeljeremy.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy.externalizedproperties.core.TypeUtilities;
 import io.github.joeljeremy.externalizedproperties.core.conversion.ConversionException;
 import io.github.joeljeremy.externalizedproperties.core.conversion.converters.OptionalConverter;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import java.util.Optional;
  * The root {@link Converter}. All requests to convert properties are routed through this converter
  * and delegated to the registered {@link Converter}s.
  */
+@Internal
 public class RootConverter implements Converter<Object> {
   private final ConvertersByTargetType convertersByTargetType;
 

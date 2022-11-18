@@ -3,11 +3,13 @@ package io.github.joeljeremy.externalizedproperties.core.internal.caching;
 import static io.github.joeljeremy.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 import io.github.joeljeremy.externalizedproperties.core.CacheStrategy;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /** Caching strategy which uses a {@link ConcurrentHashMap} as cache. */
+@Internal
 public class ConcurrentHashMapCacheStrategy<K, V> implements CacheStrategy<K, V> {
 
   private final ConcurrentMap<K, V> cache;

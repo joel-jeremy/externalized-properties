@@ -29,7 +29,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -216,7 +215,13 @@ public interface ExternalizedProperties {
      * @return The built {@link ExternalizedProperties} instance.
      */
     public ExternalizedProperties build() {
-      applyActiveProfileConfigurations();
+      return build(true);
+    }
+
+    private ExternalizedProperties build(boolean applyProfiles) {
+      if (applyProfiles) {
+        applyActiveProfileConfigurations();
+      }
 
       // At this point, profile configurations will have been applied. Let's build!
       ExternalizedProperties externalizedProperties =
@@ -259,22 +264,20 @@ public interface ExternalizedProperties {
       // which configurations should be applied.
 
       // Add a temporary default resolver to resolve active profile from.
-      List<Resolver> profileResolvers =
+      Resolver[] profileResolvers =
           Stream.concat(resolvers.stream(), Stream.of(new DefaultResolver()))
               // Ignore exceptions since we are only using these to resolve
               // the active profile.
               .map(ExceptionIgnoringResolver::new)
-              .collect(Collectors.toList());
+              .toArray(Resolver[]::new);
 
-      // We don't need fancy processors/converters/variable expanders and invocation
-      // handler factory here as we only need to use this to resolve the active profile
-      // which is a String.
+      // We just need barebones resolvers, converters, and invocation handler factory
+      // here as we only need to use this to resolve the active profile which is a String.
       ExternalizedProperties resolverOnlyExternalizedProperties =
-          new SystemExternalizedProperties(
-              buildRootResolver(profileResolvers, Collections.emptyList()),
-              buildRootConverter(Collections.emptyList()),
-              NoOpVariableExpander.INSTANCE,
-              new ExternalizedPropertiesInvocationHandlerFactory());
+          ExternalizedProperties.builder()
+              .resolvers(profileResolvers)
+              .variableExpander(NoOpVariableExpander.INSTANCE)
+              .build(false);
 
       ProfileLookup profileLookup =
           resolverOnlyExternalizedProperties.initialize(ProfileLookup.class);

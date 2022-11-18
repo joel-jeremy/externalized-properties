@@ -5,6 +5,7 @@ import static io.github.joeljeremy.externalizedproperties.core.internal.Argument
 import io.github.joeljeremy.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy.externalizedproperties.core.Processor;
 import io.github.joeljeremy.externalizedproperties.core.Resolver;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import io.github.joeljeremy.externalizedproperties.core.internal.processing.RootProcessor;
 import io.github.joeljeremy.externalizedproperties.core.resolvers.CompositeResolver;
 import java.util.Collection;
@@ -17,6 +18,7 @@ import java.util.Optional;
  * and {@link Processor}s and takes care of resolving properties from the registered resolvers, and
  * applying post-processing using the registered processors.
  */
+@Internal
 public class RootResolver implements Resolver {
   private final Resolver resolver;
   private final RootProcessor rootProcessor;

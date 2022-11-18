@@ -4,6 +4,7 @@ import static io.github.joeljeremy.externalizedproperties.core.internal.Argument
 
 import io.github.joeljeremy.externalizedproperties.core.CacheStrategy;
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedPropertiesException;
+import io.github.joeljeremy.externalizedproperties.core.internal.Internal;
 import io.github.joeljeremy.externalizedproperties.core.internal.InvocationCacheKey;
 import io.github.joeljeremy.externalizedproperties.core.internal.caching.WeakConcurrentHashMapCacheStrategy;
 import io.github.joeljeremy.externalizedproperties.core.internal.caching.WeakHashMapCacheStrategy;
@@ -12,6 +13,7 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 /** Implementation of {@link InvocationHandler} that caches invocation results. */
+@Internal
 public class CachingInvocationHandler implements InvocationHandler {
 
   private final InvocationHandler decorated;
@@ -26,8 +28,8 @@ public class CachingInvocationHandler implements InvocationHandler {
    * @param cacheStrategy The cache strategy keyed by a {@link InvocationCacheKey} and whose values
    *     are the resolved properties. It is recommended that the {@link CacheStrategy}
    *     implementation only holds weak references to the {@link InvocationCacheKey} due to it
-   *     holding a reference to the invoked {@link Method}. This is in order to avoid leaks and
-   *     class unloading issues.
+   *     holding a reference to the invoked {@link Method}. This is in order to avoid possible leaks
+   *     and class unloading issues.
    * @see WeakConcurrentHashMapCacheStrategy
    * @see WeakHashMapCacheStrategy
    */

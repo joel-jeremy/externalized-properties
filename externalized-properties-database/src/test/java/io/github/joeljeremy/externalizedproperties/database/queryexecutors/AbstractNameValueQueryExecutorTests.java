@@ -442,7 +442,7 @@ public class AbstractNameValueQueryExecutorTests {
     }
   }
 
-  private static void createTestDatabaseConfigurationEntries() throws SQLException {
+  static void createTestDatabaseConfigurationEntries() throws SQLException {
     try (Connection connection = CONNECTION_PROVIDER.getConnection()) {
 
       H2Utils.createPropertiesTable(connection, NUMBER_OF_TEST_ENTRIES);

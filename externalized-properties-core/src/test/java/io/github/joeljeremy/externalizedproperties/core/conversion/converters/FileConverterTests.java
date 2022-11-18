@@ -21,10 +21,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class FileConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
-  private static File TEMP_FILE;
+  static File TEMP_FILE;
 
   @BeforeAll
   static void setup() throws IOException {
@@ -91,15 +91,15 @@ public class FileConverterTests {
     }
   }
 
-  private static FileConverter converterToTest() {
+  static FileConverter converterToTest() {
     return new FileConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(FileConverter converterToTest) {
+  static ExternalizedProperties externalizedProperties(FileConverter converterToTest) {
     return ExternalizedProperties.builder().converters(converterToTest).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property.file")
     File fileProperty();
   }

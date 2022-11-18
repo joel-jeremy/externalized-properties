@@ -275,7 +275,7 @@ public class EagerLoadingInvocationHandlerTests {
     }
   }
 
-  private static interface EagerLoadingProxyInterface {
+  static interface EagerLoadingProxyInterface {
     @ExternalizedProperty("java.version")
     String javaVersion();
 
@@ -285,7 +285,7 @@ public class EagerLoadingInvocationHandlerTests {
     }
   }
 
-  private static interface NoEagerLoadingProxyInterface {
+  static interface NoEagerLoadingProxyInterface {
     String noAnnotation();
 
     @ExternalizedProperty("with.parameters")

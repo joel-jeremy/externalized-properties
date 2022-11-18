@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class FloatConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -99,15 +99,15 @@ public class FloatConverterTests {
     }
   }
 
-  private static FloatConverter converterToTest() {
+  static FloatConverter converterToTest() {
     return new FloatConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(FloatConverter converterToTest) {
+  static ExternalizedProperties externalizedProperties(FloatConverter converterToTest) {
     return ExternalizedProperties.builder().converters(converterToTest).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property.float.primitive")
     float floatPrimitiveProperty();
 

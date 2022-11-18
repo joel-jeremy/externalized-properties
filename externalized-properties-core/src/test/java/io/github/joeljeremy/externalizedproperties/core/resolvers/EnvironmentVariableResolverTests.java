@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class EnvironmentVariableResolverTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -93,7 +93,7 @@ public class EnvironmentVariableResolverTests {
         Optional<String> result =
             resolver.resolve(
                 context,
-                // test-4 should be converted to TEST_ENV_VAR
+                // test-4 should be converted to TEST_4
                 "test-4");
 
         assertNotNull(result);
@@ -105,15 +105,15 @@ public class EnvironmentVariableResolverTests {
     }
   }
 
-  private static EnvironmentVariableResolver resolverToTest() {
+  static EnvironmentVariableResolver resolverToTest() {
     return new EnvironmentVariableResolver();
   }
 
-  private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+  static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
     return ExternalizedProperties.builder().resolvers(resolvers).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     /**
      * EnvironmentVariableResolver supports formatting of property names such that "path" is
      * converted to "PATH".

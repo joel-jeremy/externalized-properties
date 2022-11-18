@@ -6,6 +6,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /** Thread factory which create daemon threads. */
+@Internal
 public class DaemonThreadFactory implements ThreadFactory {
   private final AtomicInteger threadCount = new AtomicInteger(1);
   private final String threadNamePrefix;

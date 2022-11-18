@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class MapResolverTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -117,20 +117,20 @@ public class MapResolverTests {
     }
   }
 
-  private static MapResolver resolverToTest(Map<String, String> map) {
+  static MapResolver resolverToTest(Map<String, String> map) {
     return new MapResolver(map);
   }
 
-  private static MapResolver resolverToTest(
+  static MapResolver resolverToTest(
       Map<String, String> map, UnresolvedPropertyHandler unresolverPropertyHandler) {
     return new MapResolver(map, unresolverPropertyHandler);
   }
 
-  private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+  static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
     return ExternalizedProperties.builder().resolvers(resolvers).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
   }

@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class ListConverterTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -80,8 +80,7 @@ public class ListConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::listProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends List<?>> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<List<?>> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       List<?> list = result.value();
@@ -93,8 +92,7 @@ public class ListConverterTests {
     }
 
     @Test
-    @DisplayName(
-        "should convert to List<String> when target type has no " + "type parameters i.e. List")
+    @DisplayName("should convert to List<String> when target type has no type parameters i.e. List")
     void test2() {
       ListConverter converter = converterToTest();
 
@@ -102,7 +100,7 @@ public class ListConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::listPropertyRaw, externalizedProperties(converter));
 
-      ConversionResult<? extends List<?>> result = converter.convert(context, "1,2,3");
+      ConversionResult<List<?>> result = converter.convert(context, "1,2,3");
 
       assertNotNull(result);
       List<?> list = result.value();
@@ -123,8 +121,7 @@ public class ListConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::listCustomDelimiter, externalizedProperties(converter));
 
-      ConversionResult<? extends List<?>> result =
-          converter.convert(context, "value1#value2#value3");
+      ConversionResult<List<?>> result = converter.convert(context, "value1#value2#value3");
 
       assertNotNull(result);
       List<?> list = result.value();
@@ -145,7 +142,7 @@ public class ListConverterTests {
               ProxyInterface::listInteger,
               externalizedProperties(converter, new IntegerConverter()));
 
-      ConversionResult<? extends List<?>> result = converter.convert(context, "1,2,3");
+      ConversionResult<List<?>> result = converter.convert(context, "1,2,3");
 
       assertNotNull(result);
       List<?> list = result.value();
@@ -165,8 +162,7 @@ public class ListConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::listPropertyWildcard, externalizedProperties(converter));
 
-      ConversionResult<? extends List<?>> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<List<?>> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       List<?> list = result.value();
@@ -186,8 +182,7 @@ public class ListConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::listPropertyObject, externalizedProperties(converter));
 
-      ConversionResult<? extends List<?>> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<List<?>> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       List<?> list = result.value();
@@ -207,10 +202,8 @@ public class ListConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::listProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends List<?>> result =
-          converter.convert(
-              context, "" // Empty value.
-              );
+      // Value is empty.
+      ConversionResult<List<?>> result = converter.convert(context, "");
 
       assertNotNull(result);
       List<?> list = result.value();
@@ -228,10 +221,8 @@ public class ListConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::listProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends List<?>> result =
-          converter.convert(
-              context, "value1,,value3,,value5" // Has empty values.
-              );
+      // Value has empty values.
+      ConversionResult<List<?>> result = converter.convert(context, "value1,,value3,,value5");
 
       assertNotNull(result);
       List<?> list = result.value();
@@ -251,10 +242,8 @@ public class ListConverterTests {
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::listPropertyStripEmpty, externalizedProperties(converter));
 
-      ConversionResult<? extends List<?>> result =
-          converter.convert(
-              context, "value1,,value3,,value5" // Has empty values.
-              );
+      // Value has empty values.
+      ConversionResult<List<?>> result = converter.convert(context, "value1,,value3,,value5");
 
       assertNotNull(result);
       List<?> list = result.value();
@@ -293,8 +282,7 @@ public class ListConverterTests {
               ProxyInterface::listPropertyNestedGenerics, // Returns a List<Optional<String>>.
               externalizedProperties(converter));
 
-      ConversionResult<? extends List<?>> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<List<?>> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       List<?> list = result.value();
@@ -319,8 +307,7 @@ public class ListConverterTests {
                   ::listPropertyNestedGenericsArray, // Returns a List<Optional<String>[]>.
               externalizedProperties(converter, new ArrayConverter()));
 
-      ConversionResult<? extends List<?>> result =
-          converter.convert(context, "value1,value2,value3");
+      ConversionResult<List<?>> result = converter.convert(context, "value1,value2,value3");
 
       assertNotNull(result);
       List<?> list = result.value();
@@ -358,16 +345,14 @@ public class ListConverterTests {
     @Test
     @DisplayName("should use provided list factory to construct lists/collections")
     void listFactoryTest1() {
-      ListConverter converter =
-          converterToTest(
-              // Uses CopyOnWriteArrayList.
-              capacity -> new CopyOnWriteArrayList<>());
+      // Factory returns CopyOnWriteArrayList.
+      ListConverter converter = converterToTest(capacity -> new CopyOnWriteArrayList<>());
 
       InvocationContext context =
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::listProperty, externalizedProperties(converter));
 
-      ConversionResult<? extends List<?>> result =
+      ConversionResult<List<?>> result =
           converter.convert(context, "value1,value2,value3,value4,value5");
 
       assertNotNull(result);
@@ -385,10 +370,8 @@ public class ListConverterTests {
     @Test
     @DisplayName("should throw when provided list factory returns null")
     void listFactoryTest2() {
-      ListConverter converter =
-          converterToTest(
-              // Returns null.
-              capacity -> null);
+      // Factory returns null.
+      ListConverter converter = converterToTest(capacity -> null);
 
       InvocationContext context =
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -402,10 +385,9 @@ public class ListConverterTests {
     @Test
     @DisplayName("should throw when provided list factory returns a populated list")
     void listFactoryTest3() {
+      // Factory returns a populated list.
       ListConverter converter =
-          converterToTest(
-              // Returns a populated list.
-              capacity -> Arrays.asList("this", "should", "not", "be", "populated"));
+          converterToTest(capacity -> Arrays.asList("this", "should", "not", "be", "populated"));
 
       InvocationContext context =
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
@@ -417,15 +399,15 @@ public class ListConverterTests {
     }
   }
 
-  private static ListConverter converterToTest(ListFactory listFactory) {
+  static ListConverter converterToTest(ListFactory listFactory) {
     return new ListConverter(listFactory);
   }
 
-  private static ListConverter converterToTest() {
+  static ListConverter converterToTest() {
     return new ListConverter();
   }
 
-  private static ExternalizedProperties externalizedProperties(
+  static ExternalizedProperties externalizedProperties(
       ListConverter converterToTest, Converter<?>... additionalConverters) {
     return ExternalizedProperties.builder()
         .converters(converterToTest)
@@ -433,7 +415,7 @@ public class ListConverterTests {
         .build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property.list")
     List<String> listProperty();
 

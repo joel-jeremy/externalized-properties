@@ -21,9 +21,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class PropertiesResolverTests {
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
-  private static final Properties EMPTY_PROPERTIES = new Properties();
+  static final Properties EMPTY_PROPERTIES = new Properties();
 
   @Nested
   class Constructor {
@@ -130,20 +130,20 @@ public class PropertiesResolverTests {
     }
   }
 
-  private static PropertiesResolver resolverToTest(Properties properties) {
+  static PropertiesResolver resolverToTest(Properties properties) {
     return new PropertiesResolver(properties);
   }
 
-  private static PropertiesResolver resolverToTest(
+  static PropertiesResolver resolverToTest(
       Properties properties, UnresolvedPropertyHandler unresolverPropertyHandler) {
     return new PropertiesResolver(properties, unresolverPropertyHandler);
   }
 
-  private static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
+  static ExternalizedProperties externalizedProperties(Resolver... resolvers) {
     return ExternalizedProperties.builder().resolvers(resolvers).build();
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property")
     String property();
 

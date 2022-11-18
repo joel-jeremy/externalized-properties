@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /** The built-in {@link ExternalizedProperties} implementation. */
+@Internal
 public class SystemExternalizedProperties implements ExternalizedProperties {
   private static final Set<Class<?>> SUPPORTED_TARGET_TYPES = supportedTargetTypes();
   private final Resolver rootResolver;

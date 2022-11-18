@@ -15,10 +15,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 public class SimpleVariableExpanderTests {
-  private static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
+  static final ExternalizedProperties EXTERNALIZED_PROPERTIES =
       ExternalizedProperties.builder().defaults().build();
 
-  private static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
+  static final InvocationContextTestFactory<ProxyInterface> INVOCATION_CONTEXT_FACTORY =
       InvocationContextUtils.testFactory(ProxyInterface.class);
 
   @Nested
@@ -186,16 +186,15 @@ public class SimpleVariableExpanderTests {
     }
   }
 
-  private static SimpleVariableExpander variableExpander() {
+  static SimpleVariableExpander variableExpander() {
     return new SimpleVariableExpander();
   }
 
-  private static SimpleVariableExpander variableExpander(
-      String variablePrefix, String variableSuffix) {
+  static SimpleVariableExpander variableExpander(String variablePrefix, String variableSuffix) {
     return new SimpleVariableExpander(variablePrefix, variableSuffix);
   }
 
-  private static interface ProxyInterface {
+  static interface ProxyInterface {
     @ExternalizedProperty("property-${java.version}")
     String propertyJavaVersion();
 
@@ -218,7 +217,7 @@ public class SimpleVariableExpanderTests {
     String propertyNoVariableSuffix();
   }
 
-  private static interface ResolverFacadeProxyInterface {
+  static interface ResolverFacadeProxyInterface {
     @ResolverFacade
     String resolve(String propertyName);
   }
