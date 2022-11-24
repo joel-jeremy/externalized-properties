@@ -1,5 +1,7 @@
 package io.github.joeljeremy.externalizedproperties.database;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import io.github.joeljeremy.externalizedproperties.database.testentities.JdbcUtils;
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeAll;
@@ -11,16 +13,14 @@ import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
 public class MySqlIntegrationTests extends DatabaseIntegrationTests {
-
   static final int NUMBER_OF_TEST_ENTRIES = 2;
-
   static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:8.0.28");
 
   @Container static final MySQLContainer<?> MYSQL_CONTAINER = new MySQLContainer<>(MYSQL_IMAGE);
 
   @BeforeAll
   static void setup() throws SQLException {
-    JdbcUtils.createPropertiesTable(MYSQL_CONTAINER.createConnection(""), 2);
+    JdbcUtils.createPropertiesTable(MYSQL_CONTAINER.createConnection(""), NUMBER_OF_TEST_ENTRIES);
   }
 
   @Override
@@ -40,5 +40,7 @@ public class MySqlIntegrationTests extends DatabaseIntegrationTests {
 
   /** Dummy test for junit to be able to detect this test class. */
   @Test
-  void detect() {}
+  void detect() {
+    assertTrue(true);
+  }
 }

@@ -99,25 +99,26 @@ public class DatabaseResolverTests {
     @Test
     @DisplayName("should use provided custom query executor")
     void test3() {
+      var customQueryExecutor =
+          new AbstractNameValueQueryExecutor() {
+            @Override
+            protected String table() {
+              return "custom_properties";
+            }
+
+            @Override
+            protected String propertyNameColumn() {
+              return "config_key";
+            }
+
+            @Override
+            protected String propertyValueColumn() {
+              return "config_value";
+            }
+          };
+
       DatabaseResolver databaseResolver =
-          new DatabaseResolver(
-              CONNECTION_PROVIDER,
-              new AbstractNameValueQueryExecutor() {
-                @Override
-                protected String table() {
-                  return "custom_properties";
-                }
-
-                @Override
-                protected String propertyNameColumn() {
-                  return "config_key";
-                }
-
-                @Override
-                protected String propertyValueColumn() {
-                  return "config_value";
-                }
-              });
+          new DatabaseResolver(CONNECTION_PROVIDER, customQueryExecutor);
       InvocationContext context =
           INVOCATION_CONTEXT_FACTORY.fromMethodReference(
               ProxyInterface::property1, externalizedProperties(databaseResolver));
@@ -133,12 +134,14 @@ public class DatabaseResolverTests {
     @Test
     @DisplayName("should wrap and propagate any SQL exceptions")
     void test4() {
-      // Invalid credentials to simulate SQL exception.
+      // Simulate SQL exception.
       ConnectionProvider invalidConnectionProvider =
-          H2Utils.createConnectionProvider(
-              H2Utils.buildConnectionString("ResolveMethod.test6", ";USER=sa;PASSWORD=password"),
-              "invalid_user",
-              "invalid_password");
+          new ConnectionProvider() {
+            @Override
+            public Connection getConnection() throws SQLException {
+              throw new SQLException("Oops!");
+            }
+          };
 
       DatabaseResolver databaseResolver = new DatabaseResolver(invalidConnectionProvider);
       InvocationContext context =

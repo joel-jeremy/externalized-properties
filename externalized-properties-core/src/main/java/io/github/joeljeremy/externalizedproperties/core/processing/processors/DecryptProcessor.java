@@ -242,6 +242,7 @@ public class DecryptProcessor implements Processor {
       }
     }
 
+    /** The {@link JceDecryptor} factory. */
     public static class Factory {
       private final @Nullable Provider provider;
 

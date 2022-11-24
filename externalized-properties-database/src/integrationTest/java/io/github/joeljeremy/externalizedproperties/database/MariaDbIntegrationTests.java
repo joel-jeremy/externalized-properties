@@ -6,39 +6,37 @@ import io.github.joeljeremy.externalizedproperties.database.testentities.JdbcUti
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
-public class PostgresqlIntegrationTests extends DatabaseIntegrationTests {
+public class MariaDbIntegrationTests extends DatabaseIntegrationTests {
   static final int NUMBER_OF_TEST_ENTRIES = 2;
-  static final DockerImageName POSTGRES_IMAGE = DockerImageName.parse("postgres:12.10");
+  static final DockerImageName MARIADB_IMAGE = DockerImageName.parse("mariadb:10.10");
 
   @Container
-  static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER =
-      new PostgreSQLContainer<>(POSTGRES_IMAGE);
+  static final MariaDBContainer<?> MARIADB_CONTAINER = new MariaDBContainer<>(MARIADB_IMAGE);
 
   @BeforeAll
   static void setup() throws SQLException {
-    JdbcUtils.createPropertiesTable(
-        POSTGRESQL_CONTAINER.createConnection(""), NUMBER_OF_TEST_ENTRIES);
+    JdbcUtils.createPropertiesTable(MARIADB_CONTAINER.createConnection(""), NUMBER_OF_TEST_ENTRIES);
   }
 
   @Override
   String getJdbcConnectionString() {
-    return POSTGRESQL_CONTAINER.getJdbcUrl();
+    return MARIADB_CONTAINER.getJdbcUrl();
   }
 
   @Override
   String getJdbcUsername() {
-    return POSTGRESQL_CONTAINER.getUsername();
+    return MARIADB_CONTAINER.getUsername();
   }
 
   @Override
   String getJdbcPassword() {
-    return POSTGRESQL_CONTAINER.getPassword();
+    return MARIADB_CONTAINER.getPassword();
   }
 
   /** Dummy test for junit to be able to detect this test class. */

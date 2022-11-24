@@ -2,18 +2,15 @@ package io.github.joeljeremy.externalizedproperties.database;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedProperties;
-import io.github.joeljeremy.externalizedproperties.core.ExternalizedPropertiesException;
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedProperty;
 import io.github.joeljeremy.externalizedproperties.core.InvocationContext;
 import io.github.joeljeremy.externalizedproperties.core.Resolver;
 import io.github.joeljeremy.externalizedproperties.core.testfixtures.InvocationContextUtils;
 import io.github.joeljeremy.externalizedproperties.core.testfixtures.InvocationContextUtils.InvocationContextTestFactory;
 import io.github.joeljeremy.externalizedproperties.database.testentities.JdbcUtils;
-import java.sql.SQLException;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -80,28 +77,6 @@ public abstract class DatabaseIntegrationTests {
       Optional<String> result = databaseResolver.resolve(context, propertyName);
 
       assertFalse(result.isPresent());
-    }
-
-    @Test
-    @DisplayName("should wrap and propagate any SQL exceptions")
-    void test3() {
-      // Invalid credentials to simulate SQL exception.
-      ConnectionProvider invalidConnectionProvider =
-          getConnectionProvider(getJdbcConnectionString(), "invalid_user", "invalid_password");
-
-      DatabaseResolver databaseResolver = new DatabaseResolver(invalidConnectionProvider);
-      InvocationContext context =
-          INVOCATION_CONTEXT_FACTORY.fromMethodReference(
-              ProxyInterface::property1, externalizedProperties(databaseResolver));
-
-      String propertyName = "test.property.1";
-
-      ExternalizedPropertiesException exception =
-          assertThrows(
-              ExternalizedPropertiesException.class,
-              () -> databaseResolver.resolve(context, propertyName));
-
-      assertTrue(exception.getCause() instanceof SQLException);
     }
   }
 

@@ -6,39 +6,36 @@ import io.github.joeljeremy.externalizedproperties.database.testentities.JdbcUti
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.Db2Container;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
-public class PostgresqlIntegrationTests extends DatabaseIntegrationTests {
+public class Db2IntegrationTests extends DatabaseIntegrationTests {
   static final int NUMBER_OF_TEST_ENTRIES = 2;
-  static final DockerImageName POSTGRES_IMAGE = DockerImageName.parse("postgres:12.10");
+  static final DockerImageName DB2_IMAGE = DockerImageName.parse("ibmcom/db2:11.5.8.0");
 
-  @Container
-  static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER =
-      new PostgreSQLContainer<>(POSTGRES_IMAGE);
+  @Container static final Db2Container DB2_CONTAINER = new Db2Container(DB2_IMAGE).acceptLicense();
 
   @BeforeAll
   static void setup() throws SQLException {
-    JdbcUtils.createPropertiesTable(
-        POSTGRESQL_CONTAINER.createConnection(""), NUMBER_OF_TEST_ENTRIES);
+    JdbcUtils.createPropertiesTable(DB2_CONTAINER.createConnection(""), NUMBER_OF_TEST_ENTRIES);
   }
 
   @Override
   String getJdbcConnectionString() {
-    return POSTGRESQL_CONTAINER.getJdbcUrl();
+    return DB2_CONTAINER.getJdbcUrl();
   }
 
   @Override
   String getJdbcUsername() {
-    return POSTGRESQL_CONTAINER.getUsername();
+    return DB2_CONTAINER.getUsername();
   }
 
   @Override
   String getJdbcPassword() {
-    return POSTGRESQL_CONTAINER.getPassword();
+    return DB2_CONTAINER.getPassword();
   }
 
   /** Dummy test for junit to be able to detect this test class. */

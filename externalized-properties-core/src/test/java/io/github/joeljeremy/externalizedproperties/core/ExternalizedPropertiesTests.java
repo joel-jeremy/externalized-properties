@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 import javax.crypto.NoSuchPaddingException;
 import org.junit.jupiter.api.DisplayName;
@@ -303,6 +304,42 @@ public class ExternalizedPropertiesTests {
         } finally {
           Unsafe.clearEnv(EXTERNALIZEDPROPERTIES_PROFILE_ENV_VAR);
         }
+      }
+
+      @ParameterizedTest
+      @ValueSource(strings = "test")
+      @DisplayName("should ignore resolver exceptions during profile resolution")
+      void profilesTest8(String activeProfile) throws InterruptedException {
+        AtomicBoolean thrown = new AtomicBoolean();
+        Resolver throwingResolver =
+            (context, propertyName) -> {
+              if (!thrown.getAndSet(true)) {
+                // Throw only once. During profile resolution.
+                throw new RuntimeException("Oops!");
+              }
+
+              return Optional.empty();
+            };
+
+        MapResolver activeProfileResolver =
+            new MapResolver(EXTERNALIZEDPROPERTIES_PROFILE_SYSTEM_PROPERTY, activeProfile);
+
+        ExternalizedProperties externalizedProperties =
+            ExternalizedProperties.builder()
+                .resolvers(throwingResolver, activeProfileResolver)
+                // Wildcard profile.
+                .onProfiles("test")
+                .apply(
+                    (profile, builder) -> builder.resolvers(new MapResolver("property", profile)))
+                .build();
+
+        // Assert that the resolver did throw but was ignored.
+        assertTrue(thrown.get());
+
+        ProxyInterface proxyInterface = externalizedProperties.initialize(ProxyInterface.class);
+
+        // Was still able to get profile from the MapResolver and resolve the test profile property.
+        assertEquals(activeProfile, proxyInterface.property());
       }
 
       @Test

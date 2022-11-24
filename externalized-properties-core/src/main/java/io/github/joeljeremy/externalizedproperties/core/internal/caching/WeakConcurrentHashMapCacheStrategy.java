@@ -16,8 +16,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /** Caching strategy which uses a {@link ConcurrentMap} as cache and whose keys are weakly held. */
 @Internal
 public class WeakConcurrentHashMapCacheStrategy<K, V> implements CacheStrategy<K, V> {
-
-  private final ReferenceQueue<K> referenceQueue = new ReferenceQueue<>();
+  private final ReferenceQueue<K> referenceQueue;
   private final ConcurrentMap<WeakKey<K>, V> cache;
 
   /**
@@ -25,12 +24,14 @@ public class WeakConcurrentHashMapCacheStrategy<K, V> implements CacheStrategy<K
    * ConcurrentHashMap} cache.
    */
   public WeakConcurrentHashMapCacheStrategy() {
-    this(new ConcurrentHashMap<>());
+    this(new ConcurrentHashMap<>(), new ReferenceQueue<>());
   }
 
   /** Package-private constructor. */
-  WeakConcurrentHashMapCacheStrategy(ConcurrentMap<WeakKey<K>, V> cache) {
+  WeakConcurrentHashMapCacheStrategy(
+      ConcurrentMap<WeakKey<K>, V> cache, ReferenceQueue<K> referenceQueue) {
     this.cache = requireNonNull(cache, "cache");
+    this.referenceQueue = requireNonNull(referenceQueue, "referenceQueue");
   }
 
   /** {@inheritDoc} */

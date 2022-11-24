@@ -31,7 +31,6 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
   private final Converter<?> rootConverter;
   private final VariableExpander variableExpander;
   private final InvocationContextFactory invocationContextFactory;
-  private final DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory;
 
   /**
    * Constructor.
@@ -51,7 +50,6 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
     this.variableExpander = requireNonNull(variableExpander, "variableExpander");
     this.invocationContextFactory =
         requireNonNull(invocationContextFactory, "invocationContextFactory");
-    this.defaultInterfaceMethodHandlerFactory = new DefaultInterfaceMethodHandlerFactory();
   }
 
   /** {@inheritDoc} */
@@ -83,24 +81,52 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
     return resolveProperty(context, proxy, method, args);
   }
 
+  /**
+   * Resolve property.
+   *
+   * @param context The invocation context.
+   * @param proxy The proxy instance that the method was invoked on.
+   * @param method The invoked method.
+   * @param args The invocation arguments.
+   * @return The resolved property.
+   * @throws Throwable if an exception occurred while resolving the property.
+   */
   private Object resolveProperty(
-      InvocationContext context, Object proxy, Method method, Object[] args) {
+      InvocationContext context, Object proxy, Method method, Object[] args) throws Throwable {
     String externalizedPropertyName = ExternalizedPropertyName.fromInvocationContext(context);
 
     String expandedName = variableExpander.expandVariables(context, externalizedPropertyName);
 
-    return rootResolver
-        .resolve(context, expandedName)
-        .map(resolved -> convert(context, resolved, determineTargetType(context)))
-        .orElseGet(() -> determineDefaultValueOrThrow(context, proxy, method, args));
+    Optional<Object> result =
+        rootResolver
+            .resolve(context, expandedName)
+            .map(resolved -> convert(context, resolved, determineTargetType(context)));
+
+    if (result.isEmpty()) {
+      return determineDefaultValueOrThrow(context, proxy, method, args);
+    }
+
+    return result.get();
   }
 
+  /**
+   * Handle invocation of proxy method annotated with {@link VariableExpanderFacade}.
+   *
+   * @param context The invocation context.
+   * @return The expanded value.
+   */
   private String handleVariableExpanderFacade(InvocationContext context) {
     // No need to validate. Already validated when proxy was built.
     String valueToExpand = (String) context.arguments().getOrThrow(0);
     return variableExpander.expandVariables(context, valueToExpand);
   }
 
+  /**
+   * Handle invocation of proxy method annotated with {@link ConverterFacade}.
+   *
+   * @param context The invocation context.
+   * @return The converted value.
+   */
   private Object handleConverterFacade(InvocationContext context) {
     // No need to validate. Already validated when proxy was built.
     String valueToConvert = (String) context.arguments().getOrThrow(0);
@@ -108,6 +134,14 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
     return convert(context, valueToConvert, targetType);
   }
 
+  /**
+   * Convert value to target type.
+   *
+   * @param context The invocation context.
+   * @param valueToConvert The value to convert.
+   * @param targetType The target type of the conversion.
+   * @return The converted value.
+   */
   private Object convert(InvocationContext context, String valueToConvert, Type targetType) {
     return rootConverter.convert(context, valueToConvert, targetType).value();
   }
@@ -128,9 +162,10 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
    * @param args The arguments passed to the method.
    * @return The default value that shall be returned by the method.
    * @throws UnresolvedPropertyException if a default value cannot be determined.
+   * @throws Throwable if an exception occurred while invoking default method interface.
    */
   private Object determineDefaultValueOrThrow(
-      InvocationContext context, Object proxy, Method method, Object[] args) {
+      InvocationContext context, Object proxy, Method method, Object[] args) throws Throwable {
     if (method.isDefault()) {
       return invokeDefaultInterfaceMethod(proxy, method, args);
     }
@@ -157,9 +192,11 @@ public class ExternalizedPropertiesInvocationHandler implements InvocationHandle
    * @param method The proxy method.
    * @param args The arguments to pass to the default interface method.
    * @return The result of the default interface method.
+   * @throws Throwable if an exception occurred while creating the default interface method handler.
    */
-  private Object invokeDefaultInterfaceMethod(Object proxy, Method method, Object[] args) {
-    DefaultInterfaceMethodHandler handler = defaultInterfaceMethodHandlerFactory.create(method);
+  private Object invokeDefaultInterfaceMethod(Object proxy, Method method, Object[] args)
+      throws Throwable {
+    DefaultInterfaceMethodHandler handler = DefaultInterfaceMethodHandlerFactory.create(method);
     return handler.invoke(proxy, args);
   }
 

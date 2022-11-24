@@ -6,13 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.github.joeljeremy.externalizedproperties.core.CacheStrategy;
-import java.time.Duration;
-import java.util.Objects;
+import io.github.joeljeremy.externalizedproperties.core.internal.caching.WeakConcurrentHashMapCacheStrategy.WeakKey;
+import java.lang.ref.ReferenceQueue;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,10 +28,21 @@ public class WeakConcurrentHashMapCacheStrategyTests {
     }
 
     @Test
-    @DisplayName("should throw when cache argument argument is null")
+    @DisplayName("should throw when cache argument is null")
     void test2() {
+      var referenceQueue = new ReferenceQueue<String>();
       assertThrows(
-          IllegalArgumentException.class, () -> new WeakConcurrentHashMapCacheStrategy<>(null));
+          IllegalArgumentException.class,
+          () -> new WeakConcurrentHashMapCacheStrategy<>(null, referenceQueue));
+    }
+
+    @Test
+    @DisplayName("should throw when reference queue argument is null")
+    void test3() {
+      var cache = new ConcurrentHashMap<WeakKey<String>, String>();
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> new WeakConcurrentHashMapCacheStrategy<>(cache, null));
     }
   }
 
@@ -40,38 +51,31 @@ public class WeakConcurrentHashMapCacheStrategyTests {
     @Test
     @DisplayName("should automatically remove cache key when weak references are cleared")
     void test1() {
-      CacheKey cacheKey1 = new CacheKey("cache.key.1");
-      CacheKey cacheKey2 = new CacheKey("cache.key.2");
+      String cacheKey1 = "cache.key.1";
+      String cacheKey2 = "cache.key.2";
 
-      CacheStrategy<CacheKey, String> cacheStrategy = new WeakConcurrentHashMapCacheStrategy<>();
+      ReferenceQueue<String> referenceQueue = new ReferenceQueue<>();
+      WeakKey<String> weakKeyRef1 = WeakKey.forWrite(cacheKey1, referenceQueue);
+      WeakKey<String> weakKeyRef2 = WeakKey.forWrite(cacheKey2, referenceQueue);
 
-      // Cache and assert.
-      cacheStrategy.cache(cacheKey1, "cache.value.1");
-      cacheStrategy.cache(cacheKey2, "cache.value.2");
+      ConcurrentHashMap<WeakKey<String>, String> cache = new ConcurrentHashMap<>();
+      cache.put(weakKeyRef1, "cache.value.1");
+      cache.put(weakKeyRef2, "cache.value.2");
+
+      var cacheStrategy = new WeakConcurrentHashMapCacheStrategy<>(cache, referenceQueue);
+
+      // Assert that we have initial cached data associated to the keys.
       assertTrue(cacheStrategy.get(cacheKey1).isPresent());
       assertTrue(cacheStrategy.get(cacheKey2).isPresent());
 
-      // Clear references.
-      cacheKey1 = null;
-      cacheKey2 = null;
+      // Enqueue keys so that on next key purge cycle, these keys get purged.
+      // By doing this, we don't need to wait for GC to clear the references.
+      weakKeyRef1.enqueue();
+      weakKeyRef2.enqueue();
 
-      // Original key references were nulled so create a new reference
-      // with matching string keys for lookups.
-      CacheKey cacheKey1Lookup = new CacheKey("cache.key.1");
-      CacheKey cacheKey2Lookup = new CacheKey("cache.key.2");
-
-      assertTimeoutPreemptively(
-          Duration.ofMinutes(10),
-          () -> {
-            // Wait for GC to clear references.
-            while (cacheStrategy.get(cacheKey1Lookup).isPresent()
-                || cacheStrategy.get(cacheKey2Lookup).isPresent()) {
-              System.gc();
-            }
-          });
-
-      assertFalse(cacheStrategy.get(cacheKey1Lookup).isPresent());
-      assertFalse(cacheStrategy.get(cacheKey2Lookup).isPresent());
+      // Assert that the keys have been cleared.
+      assertFalse(cacheStrategy.get(cacheKey1).isPresent());
+      assertFalse(cacheStrategy.get(cacheKey2).isPresent());
     }
   }
 
@@ -255,37 +259,6 @@ public class WeakConcurrentHashMapCacheStrategyTests {
 
         assertFalse(key.equals(new Object()));
       }
-    }
-  }
-
-  static class CacheKey {
-    private final String key;
-
-    public CacheKey(String key) {
-      this.key = key;
-    }
-
-    public String key() {
-      return key;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-
-      if (obj instanceof CacheKey) {
-        CacheKey other = (CacheKey) obj;
-        return Objects.equals(other.key, key);
-      }
-
-      return false;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hashCode(key);
     }
   }
 }
