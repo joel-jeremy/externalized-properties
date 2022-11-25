@@ -4,6 +4,7 @@ plugins {
   id("externalized-properties.java-code-quality-conventions")
   id("externalized-properties.java-publish-conventions")
   id("externalized-properties.java-multi-jvm-test-conventions")
+  id("externalized-properties.eclipse-conventions")
   // See https://youtrack.jetbrains.com/issue/KTIJ-19370
   @Suppress("DSL_SCOPE_VIOLATION")
   alias(libs.plugins.jmh)

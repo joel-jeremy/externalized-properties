@@ -1,5 +1,4 @@
 import org.gradle.api.Project
-import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.the
 import java.io.File
 

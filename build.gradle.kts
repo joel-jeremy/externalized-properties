@@ -6,8 +6,8 @@ plugins {
   id("externalized-properties.coveralls-conventions")
   id("externalized-properties.snyk-conventions")
   id("externalized-properties.dependency-updates-conventions")
-  id("eclipse")
-  id("idea")
+  id("externalized-properties.eclipse-conventions")
+  id("externalized-properties.idea-conventions")
 }
 
 allprojects {
