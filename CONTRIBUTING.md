@@ -147,3 +147,18 @@ When releasing, the following steps must be followed:
 2. After release pipeline completes, bump up the version in root `build.gradle` to the next development version by creating a pull request.
     - By default, the next development version is a minor version bump i.e. `1.0.0` --> `1.1.0`. In case of pre-release versions (alpha, beta, etc.), bump according to semver guidelines i.e. `1.0.0-alpha` --> `1.0.0.alpha.1`.
 3. Merge the pull request to `main`.
+
+## Common Issues
+
+1. You're having compilation errors when in VS Code (Eclipse Buildship) or Eclipse IDE but Gradle builds the project in command line just fine?
+    - Run the command:
+
+      ```bash
+        ./gradlew eclipse
+      ```
+
+    - If above doesn't fix the problem, try running below command first and re-run the command above:
+
+      ```bash
+        ./gradlew cleanEclipse
+      ```
