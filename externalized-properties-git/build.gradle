@@ -8,7 +8,7 @@ dependencies {
   testImplementation "org.eclipse.jgit:org.eclipse.jgit.junit.http:${versions.jGit}"
   testImplementation "org.eclipse.jgit:org.eclipse.jgit.junit.ssh:${versions.jGit}"
   // For JsonReader.
-  testImplementation "com.fasterxml.jackson.core:jackson-databind:2.15.0"
+  testImplementation "com.fasterxml.jackson.core:jackson-databind:2.15.1"
   // Required by jgit.junit modules.
   testRuntimeOnly "junit:junit:4.13.2"
 }
