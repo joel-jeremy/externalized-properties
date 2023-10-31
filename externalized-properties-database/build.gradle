@@ -3,7 +3,7 @@ description = "Externalized Properties module for resolving properties from a da
 dependencies {
   implementation project(":externalized-properties-core")
   testImplementation testFixtures(project(":externalized-properties-core"))
-  testImplementation "com.h2database:h2:2.1.214"
+  testImplementation "com.h2database:h2:2.2.222"
 }
 
 jar {
