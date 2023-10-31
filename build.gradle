@@ -59,17 +59,17 @@ configure(javaProjects) {
     }
 
     java {
-        archivesBaseName = rootProject.relativeProjectPath(project.path).replace(":", "-")
+      archivesBaseName = rootProject.relativeProjectPath(project.path).replace(":", "-")
 
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(11)
-        }
+      toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+      }
     }
 
     tasks.withType(JavaCompile) {
-        // For some reason, options.release flag doesn't work with compileJava.
-        options.release = 11
-        options.javaModuleVersion = project.version
+      // For some reason, options.release flag doesn't work with compileJava.
+      options.release = 11
+      options.javaModuleVersion = project.version
     }
   }
 
