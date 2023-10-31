@@ -13,7 +13,7 @@ snyk-plugin = "0.4"
 sonarqube-plugin = "3.5.0.2730"
 jmh-plugin = "0.6.8"
 dependencyupdates-plugin = "0.43.0"
-jgit = "5.13.1.202206130422-r"
+jgit = "6.2.0.202206071550-r"
 
 [libraries]
 nexuspublish-plugin = { module = "io.github.gradle-nexus:publish-plugin", version.ref = "nexuspublish-plugin" }
