@@ -43,7 +43,7 @@ testing {
         runtimeOnly("org.postgresql:postgresql:42.5.0")
         runtimeOnly("mysql:mysql-connector-java:8.0.31")
         runtimeOnly("com.oracle.database.jdbc:ojdbc8:21.7.0.0")
-        runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:11.2.1.jre8")
+        runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:12.4.2.jre11")
         runtimeOnly("org.xerial:sqlite-jdbc:3.40.0.0")
         runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.1.0")
         runtimeOnly("com.ibm.db2:jcc:11.5.8.0")
