@@ -1,11 +1,10 @@
 # Externalized Properties
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/joel-jeremy/externalized-properties/blob/main/LICENSE)
 [![Gradle Build](https://github.com/joel-jeremy/externalized-properties/actions/workflows/gradle-build.yaml/badge.svg)](https://github.com/joel-jeremy/externalized-properties/actions/workflows/gradle-build.yaml)
 [![CodeQL](https://github.com/joel-jeremy/externalized-properties/actions/workflows/codeql.yaml/badge.svg)](https://github.com/joel-jeremy/externalized-properties/actions/workflows/codeql.yaml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.joel-jeremy.externalized-properties/core/badge.svg)](https://search.maven.org/search?q=g:%22io.github.joel-jeremy.externalized-properties%22)
 [![Coverage Status](https://coveralls.io/repos/github/joel-jeremy/externalized-properties/badge.svg?branch=main)](https://coveralls.io/github/joel-jeremy/externalized-properties?branch=main)
-[![Known Vulnerabilities](https://snyk.io/test/github/joel-jeremy/externalized-properties/badge.svg)](https://snyk.io/test/github/joel-jeremy/externalized-properties)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/joel-jeremy/externalized-properties/blob/main/LICENSE)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
@@ -13,6 +12,8 @@
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=io.github.joel-jeremy.externalized-properties&metric=coverage)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
 [![Discord](https://img.shields.io/discord/1025648239162175578.svg?logo=discord&logoColor=white&logoWidth=20&labelColor=7289DA&label=Discord&color=17cf48)](https://discord.gg/SVfahQGMmx)
+<!-- Commenting out until issue gets fixed: https://github.com/snyk/cli/issues/668 -->
+<!-- [![Known Vulnerabilities](https://snyk.io/test/github/joel-jeremy/externalized-properties/badge.svg)](https://snyk.io/test/github/joel-jeremy/externalized-properties) -->
 
 A lightweight and extensible library to resolve application properties from various external sources.
 

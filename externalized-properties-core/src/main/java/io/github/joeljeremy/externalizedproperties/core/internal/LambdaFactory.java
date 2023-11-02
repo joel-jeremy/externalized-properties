@@ -55,28 +55,31 @@ public class LambdaFactory {
     Method samMethod = FUNCTIONAL_INTERFACE_METHOD_MAP.get(functionalInterface);
     MethodType samMethodType =
         MethodType.methodType(samMethod.getReturnType(), samMethod.getParameterTypes());
-
-    MethodHandle requestHandlerMethodHandle;
-    MethodHandles.Lookup lookup =
-        MethodHandleFactory.privateLookupIn(targetMethod.getDeclaringClass());
-
-    if (specialCaller != null) {
-      requestHandlerMethodHandle = MethodHandleFactory.methodHandleFor(targetMethod, specialCaller);
-    } else {
-      requestHandlerMethodHandle = MethodHandleFactory.methodHandleFor(targetMethod);
-    }
-
     MethodType instantiatedMethodType =
         MethodType.methodType(
-            targetMethod.getReturnType(), lookup.lookupClass(), targetMethod.getParameterTypes());
+            targetMethod.getReturnType(),
+            targetMethod.getDeclaringClass(),
+            targetMethod.getParameterTypes());
+
+    MethodHandles.Lookup callerLookup;
+    MethodHandle methodHandle;
+
+    if (specialCaller != null) {
+      callerLookup = MethodHandles.privateLookupIn(specialCaller, MethodHandles.lookup());
+      methodHandle = MethodHandleFactory.methodHandleFor(targetMethod, specialCaller);
+    } else {
+      callerLookup =
+          MethodHandles.privateLookupIn(targetMethod.getDeclaringClass(), MethodHandles.lookup());
+      methodHandle = MethodHandleFactory.methodHandleFor(targetMethod);
+    }
 
     CallSite callSite =
         LambdaMetafactory.metafactory(
-            lookup,
+            callerLookup,
             samMethod.getName(),
             invokedType,
             samMethodType,
-            requestHandlerMethodHandle,
+            methodHandle,
             instantiatedMethodType);
 
     return (T) callSite.getTarget().invoke();

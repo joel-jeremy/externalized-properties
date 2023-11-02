@@ -47,7 +47,6 @@ public class GitRepositoryTests {
     LocalHttpGitServer httpGitServer =
         new LocalHttpGitServer(DEFAULT_GIT_BRANCH, filesToCommitToGitRepo());
     LOCAL_HTTP_GIT_SERVER = httpGitServer.start();
-    ;
 
     @SuppressWarnings("resource")
     LocalSshGitServer sshGitServer =

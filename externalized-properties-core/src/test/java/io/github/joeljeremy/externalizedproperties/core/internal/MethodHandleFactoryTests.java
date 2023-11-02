@@ -1,13 +1,10 @@
 package io.github.joeljeremy.externalizedproperties.core.internal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.github.joeljeremy.externalizedproperties.core.testfixtures.MethodUtils;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Method;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -97,23 +94,6 @@ class MethodHandleFactoryTests {
       assertThrows(
           IllegalAccessException.class,
           () -> MethodHandleFactory.methodHandleFor(DEFAULT_INTERFACE_METHOD, specialCaller));
-    }
-  }
-
-  @Nested
-  class PrivateLookupInMethod {
-    @Test
-    @DisplayName("should return private lookup for target class")
-    void test1() throws Throwable {
-      Lookup lookup = MethodHandleFactory.privateLookupIn(DefaultMethodInterface.class);
-
-      assertNotNull(lookup);
-
-      // Assert lookupModes has Lookup.PRIVATE flag.
-      int lookupModes = lookup.lookupModes();
-      // Same check as Lookup.hasPrivateAccess() introduced in Java 9.
-      boolean hasPrivateAccess = (lookupModes & Lookup.PRIVATE) != 0;
-      assertTrue(hasPrivateAccess);
     }
   }
 

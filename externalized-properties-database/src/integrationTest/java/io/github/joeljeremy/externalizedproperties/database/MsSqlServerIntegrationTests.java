@@ -1,5 +1,7 @@
 package io.github.joeljeremy.externalizedproperties.database;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import io.github.joeljeremy.externalizedproperties.database.testentities.JdbcUtils;
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeAll;
@@ -11,7 +13,7 @@ import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
 public class MsSqlServerIntegrationTests extends DatabaseIntegrationTests {
-
+  static final int NUMBER_OF_TEST_ENTRIES = 2;
   static final DockerImageName MSSQL_SERVER_IMAGE =
       DockerImageName.parse("mcr.microsoft.com/mssql/server:2019-CU15-ubuntu-20.04");
 
@@ -24,7 +26,8 @@ public class MsSqlServerIntegrationTests extends DatabaseIntegrationTests {
 
   @BeforeAll
   static void setup() throws SQLException {
-    JdbcUtils.createPropertiesTable(MSSQL_SERVER_CONTAINER.createConnection(""), 2);
+    JdbcUtils.createPropertiesTable(
+        MSSQL_SERVER_CONTAINER.createConnection(""), NUMBER_OF_TEST_ENTRIES);
   }
 
   @Override
@@ -43,5 +46,7 @@ public class MsSqlServerIntegrationTests extends DatabaseIntegrationTests {
   }
   /** Dummy test for junit to be able to detect this test class. */
   @Test
-  void detect() {}
+  void detect() {
+    assertTrue(true);
+  }
 }

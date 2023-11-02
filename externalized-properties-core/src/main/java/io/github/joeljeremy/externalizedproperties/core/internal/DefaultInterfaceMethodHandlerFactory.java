@@ -12,15 +12,20 @@ public class DefaultInterfaceMethodHandlerFactory {
   private static final String DEFAULT_INTERFACE_METHOD_EXCEPTION_MESSAGE_FORMAT =
       "Error occurred while invoking default interface method. Proxy method: %s.";
 
-  private final Map<Method, DefaultInterfaceMethodHandler> weakHandlerCache = new WeakHashMap<>();
+  private static final Map<Method, DefaultInterfaceMethodHandler> weakHandlerCache =
+      new WeakHashMap<>();
+
+  private DefaultInterfaceMethodHandlerFactory() {}
 
   /**
    * Create a {@link DefaultInterfaceMethodHandler} for the specified default interface method.
    *
    * @param defaultInterfaceMethod The default interface method.
    * @return The built {@link DefaultInterfaceMethodHandler}.
+   * @throws Throwable if an exception occurred while creating the default interface method handler.
    */
-  public DefaultInterfaceMethodHandler create(Method defaultInterfaceMethod) {
+  public static DefaultInterfaceMethodHandler create(Method defaultInterfaceMethod)
+      throws Throwable {
     DefaultInterfaceMethodHandler cachedHandler = weakHandlerCache.get(defaultInterfaceMethod);
     if (cachedHandler != null) {
       return cachedHandler;
@@ -35,47 +40,43 @@ public class DefaultInterfaceMethodHandlerFactory {
      * Note: We optimize for methods with up to 2 arguments. We create lambda functions for better
      * performance. This number may change in the future.
      */
-    try {
-      // Optimization for default interface methods that have no args.
-      if (defaultInterfaceMethod.getParameterCount() == 0) {
-        return cache(defaultInterfaceMethod, createNoArgLambda(defaultInterfaceMethod));
-      }
-      // Optimization for default interface methods that have one arg.
-      else if (defaultInterfaceMethod.getParameterCount() == 1) {
-        return cache(defaultInterfaceMethod, createOneArgLambda(defaultInterfaceMethod));
-      }
-      // Optimization for default interface methods that have two args.
-      else if (defaultInterfaceMethod.getParameterCount() == 2) {
-        return cache(defaultInterfaceMethod, createTwoArgsLambda(defaultInterfaceMethod));
-      } else {
-        // Fallback to using method handles.
-        MethodHandle methodHandle =
-            MethodHandleFactory.methodHandleFor(
-                    defaultInterfaceMethod, defaultInterfaceMethod.getDeclaringClass())
-                .asSpreader(Object[].class, defaultInterfaceMethod.getParameterCount());
 
-        return cache(
-            defaultInterfaceMethod,
-            (instance, args) -> {
-              try {
-                return methodHandle.invoke(instance, args);
-              } catch (Throwable e) {
-                throw new ExternalizedPropertiesException(
-                    String.format(
-                        "Error occurred while invoking default interface method. "
-                            + "Proxy method: %s.",
-                        defaultInterfaceMethod.toGenericString()),
-                    e);
-              }
-            });
-      }
-    } catch (Throwable e) {
-      throw new ExternalizedPropertiesException(
-          "Error occurred while building default interface method handler", e);
+    // Optimization for default interface methods that have no args.
+    if (defaultInterfaceMethod.getParameterCount() == 0) {
+      return cache(defaultInterfaceMethod, createNoArgLambda(defaultInterfaceMethod));
+    }
+    // Optimization for default interface methods that have one arg.
+    else if (defaultInterfaceMethod.getParameterCount() == 1) {
+      return cache(defaultInterfaceMethod, createOneArgLambda(defaultInterfaceMethod));
+    }
+    // Optimization for default interface methods that have two args.
+    else if (defaultInterfaceMethod.getParameterCount() == 2) {
+      return cache(defaultInterfaceMethod, createTwoArgsLambda(defaultInterfaceMethod));
+    } else {
+      // Fallback to using method handles.
+      MethodHandle methodHandle =
+          MethodHandleFactory.methodHandleFor(
+                  defaultInterfaceMethod, defaultInterfaceMethod.getDeclaringClass())
+              .asSpreader(Object[].class, defaultInterfaceMethod.getParameterCount());
+
+      return cache(
+          defaultInterfaceMethod,
+          (instance, args) -> {
+            try {
+              return methodHandle.invoke(instance, args);
+            } catch (Throwable e) {
+              throw new ExternalizedPropertiesException(
+                  String.format(
+                      "Error occurred while invoking default interface method. "
+                          + "Proxy method: %s.",
+                      defaultInterfaceMethod.toGenericString()),
+                  e);
+            }
+          });
     }
   }
 
-  private DefaultInterfaceMethodHandler cache(
+  private static DefaultInterfaceMethodHandler cache(
       Method defaultInterfaceMethod, DefaultInterfaceMethodHandler handler) {
 
     weakHandlerCache.put(defaultInterfaceMethod, handler);
@@ -84,7 +85,6 @@ public class DefaultInterfaceMethodHandlerFactory {
 
   private static DefaultInterfaceMethodHandler createNoArgLambda(Method defaultInterfaceMethod)
       throws Throwable {
-
     NoArgLambdaFunction lambda =
         LambdaFactory.createLambdaFunction(
             defaultInterfaceMethod,

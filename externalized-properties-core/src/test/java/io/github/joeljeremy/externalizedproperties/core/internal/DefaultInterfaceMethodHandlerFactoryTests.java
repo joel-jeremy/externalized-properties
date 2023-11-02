@@ -69,21 +69,16 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     @DisplayName(
         "should throw if default interface method argument is not a default interface method")
     void test1() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
-
       assertThrows(
           IllegalArgumentException.class,
-          () -> defaultInterfaceMethodHandlerFactory.create(NON_DEFAULT_INTERFACE_METHOD));
+          () -> DefaultInterfaceMethodHandlerFactory.create(NON_DEFAULT_INTERFACE_METHOD));
     }
 
     @Test
     @DisplayName("should create a handler which invokes the target default interface method")
-    void test2() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void test2() throws Throwable {
       DefaultInterfaceMethodHandler handler =
-          defaultInterfaceMethodHandlerFactory.create(TEST_DEFAULT_INTERFACE_METHOD);
+          DefaultInterfaceMethodHandlerFactory.create(TEST_DEFAULT_INTERFACE_METHOD);
 
       // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
@@ -99,11 +94,9 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     @DisplayName(
         "should create a handler which invokes the target default interface method (with one"
             + " argument)")
-    void test3() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void test3() throws Throwable {
       DefaultInterfaceMethodHandler handler =
-          defaultInterfaceMethodHandlerFactory.create(TEST_ONE_ARG_DEFAULT_INTERFACE_METHOD);
+          DefaultInterfaceMethodHandlerFactory.create(TEST_ONE_ARG_DEFAULT_INTERFACE_METHOD);
 
       // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
@@ -121,11 +114,9 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     @DisplayName(
         "should create a handler which invokes the target default interface method (with two"
             + " arguments)")
-    void test4() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void test4() throws Throwable {
       DefaultInterfaceMethodHandler handler =
-          defaultInterfaceMethodHandlerFactory.create(TEST_TWO_ARGS_DEFAULT_INTERFACE_METHOD);
+          DefaultInterfaceMethodHandlerFactory.create(TEST_TWO_ARGS_DEFAULT_INTERFACE_METHOD);
 
       // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
@@ -144,11 +135,9 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     @DisplayName(
         "should create a handler which invokes the target default interface method (with two"
             + " arguments)")
-    void test5() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void test5() throws Throwable {
       DefaultInterfaceMethodHandler handler =
-          defaultInterfaceMethodHandlerFactory.create(TEST_THREE_ARGS_DEFAULT_INTERFACE_METHOD);
+          DefaultInterfaceMethodHandlerFactory.create(TEST_THREE_ARGS_DEFAULT_INTERFACE_METHOD);
 
       // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
@@ -166,13 +155,11 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
 
     @Test
     @DisplayName("should cache handlers per method")
-    void test6() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void test6() throws Throwable {
       DefaultInterfaceMethodHandler handler1 =
-          defaultInterfaceMethodHandlerFactory.create(TEST_DEFAULT_INTERFACE_METHOD);
+          DefaultInterfaceMethodHandlerFactory.create(TEST_DEFAULT_INTERFACE_METHOD);
       DefaultInterfaceMethodHandler handler2 =
-          defaultInterfaceMethodHandlerFactory.create(TEST_DEFAULT_INTERFACE_METHOD);
+          DefaultInterfaceMethodHandlerFactory.create(TEST_DEFAULT_INTERFACE_METHOD);
 
       assertSame(handler1, handler2);
     }
@@ -181,11 +168,9 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     @DisplayName(
         "should create handler that wraps runtime exceptions thrown by default interface method. "
             + "Method has no args.")
-    void rethrowExceptionsTest1() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void rethrowExceptionsTest1() throws Throwable {
       DefaultInterfaceMethodHandler handler =
-          defaultInterfaceMethodHandlerFactory.create(
+          DefaultInterfaceMethodHandlerFactory.create(
               THROW_RUNTIME_EXCEPTION_DEFAULT_INTERFACE_METHOD);
 
       // Anonymous class instance.
@@ -198,11 +183,9 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     @DisplayName(
         "should create handler that wraps runtime exceptions thrown by default interface method. "
             + "Method has one arg.")
-    void rethrowExceptionsTest2() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void rethrowExceptionsTest2() throws Throwable {
       DefaultInterfaceMethodHandler handler =
-          defaultInterfaceMethodHandlerFactory.create(
+          DefaultInterfaceMethodHandlerFactory.create(
               THROW_RUNTIME_EXCEPTION_ONE_ARG_DEFAULT_INTERFACE_METHOD);
 
       // Anonymous class instance.
@@ -217,11 +200,9 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     @DisplayName(
         "should create handler that wraps runtime exceptions thrown by default interface method. "
             + "Method has two args.")
-    void rethrowExceptionsTest3() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void rethrowExceptionsTest3() throws Throwable {
       DefaultInterfaceMethodHandler handler =
-          defaultInterfaceMethodHandlerFactory.create(
+          DefaultInterfaceMethodHandlerFactory.create(
               THROW_RUNTIME_EXCEPTION_TWO_ARGS_DEFAULT_INTERFACE_METHOD);
 
       // Anonymous class instance.
@@ -238,11 +219,9 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     @DisplayName(
         "should create handler that wraps runtime exceptions thrown by default interface method. "
             + "Method has three args.")
-    void rethrowExceptionsTest4() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void rethrowExceptionsTest4() throws Throwable {
       DefaultInterfaceMethodHandler handler =
-          defaultInterfaceMethodHandlerFactory.create(
+          DefaultInterfaceMethodHandlerFactory.create(
               THROW_RUNTIME_EXCEPTION_THREE_ARGS_DEFAULT_INTERFACE_METHOD);
 
       // Anonymous class instance.
@@ -261,11 +240,9 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     @DisplayName(
         "should create handler that wraps checked exceptions thrown by default interface method. "
             + "Method has no args.")
-    void rethrowExceptionsTest5() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void rethrowExceptionsTest5() throws Throwable {
       DefaultInterfaceMethodHandler handler =
-          defaultInterfaceMethodHandlerFactory.create(THROW_EXCEPTION_DEFAULT_INTERFACE_METHOD);
+          DefaultInterfaceMethodHandlerFactory.create(THROW_EXCEPTION_DEFAULT_INTERFACE_METHOD);
 
       // Anonymous class instance.
       DefaultMethodInterface instance = new DefaultMethodInterface() {};
@@ -277,11 +254,9 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     @DisplayName(
         "should create handler that wraps checked exceptions thrown by default interface method. "
             + "Method has one arg.")
-    void rethrowExceptionsTest6() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void rethrowExceptionsTest6() throws Throwable {
       DefaultInterfaceMethodHandler handler =
-          defaultInterfaceMethodHandlerFactory.create(
+          DefaultInterfaceMethodHandlerFactory.create(
               THROW_EXCEPTION_ONE_ARG_DEFAULT_INTERFACE_METHOD);
 
       // Anonymous class instance.
@@ -296,11 +271,9 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     @DisplayName(
         "should create handler that wraps checked exceptions thrown by default interface method. "
             + "Method has two args.")
-    void rethrowExceptionsTest7() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void rethrowExceptionsTest7() throws Throwable {
       DefaultInterfaceMethodHandler handler =
-          defaultInterfaceMethodHandlerFactory.create(
+          DefaultInterfaceMethodHandlerFactory.create(
               THROW_EXCEPTION_TWO_ARGS_DEFAULT_INTERFACE_METHOD);
 
       // Anonymous class instance.
@@ -317,11 +290,9 @@ public class DefaultInterfaceMethodHandlerFactoryTests {
     @DisplayName(
         "should create handler that wraps checked exceptions thrown by default interface method. "
             + "Method has three args.")
-    void rethrowExceptionsTest8() {
-      DefaultInterfaceMethodHandlerFactory defaultInterfaceMethodHandlerFactory =
-          new DefaultInterfaceMethodHandlerFactory();
+    void rethrowExceptionsTest8() throws Throwable {
       DefaultInterfaceMethodHandler handler =
-          defaultInterfaceMethodHandlerFactory.create(
+          DefaultInterfaceMethodHandlerFactory.create(
               THROW_EXCEPTION_THREE_ARGS_DEFAULT_INTERFACE_METHOD);
 
       // Anonymous class instance.
