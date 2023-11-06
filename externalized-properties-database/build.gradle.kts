@@ -20,7 +20,7 @@ tasks.named<Jar>("jar") {
 dependencies {
   implementation(project(":externalized-properties-core"))
   testImplementation(testFixtures(project(":externalized-properties-core")))
-  testImplementation("com.h2database:h2:2.1.214")
+  testImplementation("com.h2database:h2:2.2.224")
 }
 
 testing {
