@@ -460,7 +460,9 @@ public class DecryptProcessor implements Processor {
        */
       public JceDecryptor symmetric(
           String algorithm, SecretKey secretKey, AlgorithmParameterSpec algorithmParameterSpec)
-          throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+          throws NoSuchAlgorithmException,
+              NoSuchPaddingException,
+              InvalidKeyException,
               InvalidAlgorithmParameterException {
         return symmetric(algorithm, algorithm, secretKey, algorithmParameterSpec);
       }
@@ -487,7 +489,9 @@ public class DecryptProcessor implements Processor {
           String algorithm,
           SecretKey secretKey,
           AlgorithmParameterSpec algorithmParameterSpec)
-          throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+          throws NoSuchAlgorithmException,
+              NoSuchPaddingException,
+              InvalidKeyException,
               InvalidAlgorithmParameterException {
         requireNonNull(name, "name");
         requireNonNull(algorithm, "algorithm");
@@ -520,7 +524,9 @@ public class DecryptProcessor implements Processor {
           SecretKey secretKey,
           AlgorithmParameterSpec algorithmParameterSpec,
           SecureRandom secureRandom)
-          throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+          throws NoSuchAlgorithmException,
+              NoSuchPaddingException,
+              InvalidKeyException,
               InvalidAlgorithmParameterException {
         return symmetric(algorithm, algorithm, secretKey, algorithmParameterSpec, secureRandom);
       }
@@ -549,7 +555,9 @@ public class DecryptProcessor implements Processor {
           SecretKey secretKey,
           AlgorithmParameterSpec algorithmParameterSpec,
           SecureRandom secureRandom)
-          throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+          throws NoSuchAlgorithmException,
+              NoSuchPaddingException,
+              InvalidKeyException,
               InvalidAlgorithmParameterException {
         requireNonNull(name, "name");
         requireNonNull(algorithm, "algorithm");
@@ -579,7 +587,9 @@ public class DecryptProcessor implements Processor {
        */
       public JceDecryptor symmetric(
           String algorithm, SecretKey secretKey, AlgorithmParameters algorithmParameters)
-          throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+          throws NoSuchAlgorithmException,
+              NoSuchPaddingException,
+              InvalidKeyException,
               InvalidAlgorithmParameterException {
         return symmetric(algorithm, algorithm, secretKey, algorithmParameters);
       }
@@ -606,7 +616,9 @@ public class DecryptProcessor implements Processor {
           String algorithm,
           SecretKey secretKey,
           AlgorithmParameters algorithmParameters)
-          throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+          throws NoSuchAlgorithmException,
+              NoSuchPaddingException,
+              InvalidKeyException,
               InvalidAlgorithmParameterException {
         requireNonNull(name, "name");
         requireNonNull(algorithm, "algorithm");
@@ -639,7 +651,9 @@ public class DecryptProcessor implements Processor {
           SecretKey secretKey,
           AlgorithmParameters algorithmParameters,
           SecureRandom secureRandom)
-          throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+          throws NoSuchAlgorithmException,
+              NoSuchPaddingException,
+              InvalidKeyException,
               InvalidAlgorithmParameterException {
         return symmetric(algorithm, algorithm, secretKey, algorithmParameters, secureRandom);
       }
@@ -668,7 +682,9 @@ public class DecryptProcessor implements Processor {
           SecretKey secretKey,
           AlgorithmParameters algorithmParameters,
           SecureRandom secureRandom)
-          throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+          throws NoSuchAlgorithmException,
+              NoSuchPaddingException,
+              InvalidKeyException,
               InvalidAlgorithmParameterException {
         requireNonNull(name, "name");
         requireNonNull(algorithm, "algorithm");

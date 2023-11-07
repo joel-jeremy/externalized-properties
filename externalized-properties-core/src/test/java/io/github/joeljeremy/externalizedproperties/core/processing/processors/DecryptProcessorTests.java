@@ -215,7 +215,9 @@ public class DecryptProcessorTests {
       @Test
       @DisplayName("should use cipher argument's algorithm as decryptor name")
       void cipherOverloadTest2()
-          throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+          throws NoSuchAlgorithmException,
+              NoSuchPaddingException,
+              InvalidKeyException,
               InvalidAlgorithmParameterException {
         Cipher cipher = Cipher.getInstance(AES_GCM_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, AES_SECRET_KEY, GCM_PARAMETER_SPEC);
@@ -226,7 +228,9 @@ public class DecryptProcessorTests {
       @Test
       @DisplayName("should throw when name argument is null")
       void nameAndCipherOverloadTest1()
-          throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+          throws NoSuchAlgorithmException,
+              NoSuchPaddingException,
+              InvalidKeyException,
               InvalidAlgorithmParameterException {
         Cipher cipher = Cipher.getInstance(AES_GCM_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, AES_SECRET_KEY, GCM_PARAMETER_SPEC);
@@ -243,7 +247,9 @@ public class DecryptProcessorTests {
       @Test
       @DisplayName("should use specified name as decryptor name")
       void nameAndCipherOverloadTest3()
-          throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+          throws NoSuchAlgorithmException,
+              NoSuchPaddingException,
+              InvalidKeyException,
               InvalidAlgorithmParameterException {
         String decryptorName = "MyDecryptor";
         Cipher cipher = Cipher.getInstance(AES_GCM_ALGORITHM);
@@ -534,7 +540,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor")
         void test1()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor = factory.symmetric(AES_ALGORITHM, AES_SECRET_KEY);
@@ -590,7 +598,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor")
         void test1()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor = factory.symmetric("CustomName", AES_ALGORITHM, AES_SECRET_KEY);
@@ -646,7 +656,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor")
         void test1()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor =
@@ -705,7 +717,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor")
         void test1()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor =
@@ -776,7 +790,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor")
         void test1()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor =
@@ -787,7 +803,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test2()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
           JceDecryptor decryptor =
@@ -798,7 +816,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test3()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory(new BouncyCastleProvider());
           JceDecryptor decryptor =
@@ -853,7 +873,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor")
         void test1()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor =
@@ -865,7 +887,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test2()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
           JceDecryptor decryptor =
@@ -877,7 +901,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test3()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory(new BouncyCastleProvider());
           JceDecryptor decryptor =
@@ -889,7 +915,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor with specified name")
         void test4()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor =
@@ -950,7 +978,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor")
         void test1()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor =
@@ -962,7 +992,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test2()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
           JceDecryptor decryptor =
@@ -974,7 +1006,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test3()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory(new BouncyCastleProvider());
           JceDecryptor decryptor =
@@ -1060,7 +1094,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor")
         void test1()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor =
@@ -1076,7 +1112,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test2()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
           JceDecryptor decryptor =
@@ -1092,7 +1130,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test3()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory(new BouncyCastleProvider());
           JceDecryptor decryptor =
@@ -1108,7 +1148,9 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor with the specified name")
         void test4()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
                 InvalidAlgorithmParameterException {
           JceDecryptor.Factory factory = JceDecryptor.factory(new BouncyCastleProvider());
           JceDecryptor decryptor =
@@ -1156,8 +1198,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor")
         void test1()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor =
               factory.symmetric(AES_GCM_ALGORITHM, AES_SECRET_KEY, GCM_PARAMETERS);
@@ -1167,8 +1212,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test2()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
           JceDecryptor decryptor =
               factory.symmetric(AES_GCM_ALGORITHM, AES_SECRET_KEY, GCM_PARAMETERS);
@@ -1178,8 +1226,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test3()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory(new BouncyCastleProvider());
           JceDecryptor decryptor =
               factory.symmetric(AES_GCM_ALGORITHM, AES_SECRET_KEY, GCM_PARAMETERS);
@@ -1230,8 +1281,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor")
         void test1()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor =
               factory.symmetric("CustomName", AES_GCM_ALGORITHM, AES_SECRET_KEY, GCM_PARAMETERS);
@@ -1241,8 +1295,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test2()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
           JceDecryptor decryptor =
               factory.symmetric("CustomName", AES_GCM_ALGORITHM, AES_SECRET_KEY, GCM_PARAMETERS);
@@ -1252,8 +1309,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test3()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory(new BouncyCastleProvider());
           JceDecryptor decryptor =
               factory.symmetric("CustomName", AES_GCM_ALGORITHM, AES_SECRET_KEY, GCM_PARAMETERS);
@@ -1263,8 +1323,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor with the specified name")
         void test4()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor =
               factory.symmetric("CustomName", AES_GCM_ALGORITHM, AES_SECRET_KEY, GCM_PARAMETERS);
@@ -1320,8 +1383,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor")
         void test1()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor =
               factory.symmetric(
@@ -1332,8 +1398,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test2()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
           JceDecryptor decryptor =
               factory.symmetric(
@@ -1344,8 +1413,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test3()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory(new BouncyCastleProvider());
 
           JceDecryptor decryptor =
@@ -1419,8 +1491,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor")
         void test1()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
           JceDecryptor decryptor =
               factory.symmetric(
@@ -1435,8 +1510,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test2()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory(BOUNCY_CASTLE_PROVIDER_NAME);
           JceDecryptor decryptor =
               factory.symmetric(
@@ -1451,8 +1529,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor from the security provider")
         void test3()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory(new BouncyCastleProvider());
 
           JceDecryptor decryptor =
@@ -1468,8 +1549,11 @@ public class DecryptProcessorTests {
         @Test
         @DisplayName("should create a JCE decryptor with the specified name")
         void test4()
-            throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-                InvalidAlgorithmParameterException, InvalidParameterSpecException {
+            throws InvalidKeyException,
+                NoSuchAlgorithmException,
+                NoSuchPaddingException,
+                InvalidAlgorithmParameterException,
+                InvalidParameterSpecException {
           JceDecryptor.Factory factory = JceDecryptor.factory();
 
           JceDecryptor decryptor =

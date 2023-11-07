@@ -20,6 +20,7 @@ import java.util.List;
  */
 public class ListConverter implements Converter<List<?>> {
   private final ListFactory listFactory;
+
   /** Internal array converter. */
   private final ArrayConverter arrayConverter = new ArrayConverter();
 

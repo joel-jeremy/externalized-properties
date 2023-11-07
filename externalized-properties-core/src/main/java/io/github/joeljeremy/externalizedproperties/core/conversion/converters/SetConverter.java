@@ -19,6 +19,7 @@ import java.util.Set;
  */
 public class SetConverter implements Converter<Set<?>> {
   private final SetFactory setFactory;
+
   /** Internal array converter. */
   private final ArrayConverter arrayConverter = new ArrayConverter();
 
