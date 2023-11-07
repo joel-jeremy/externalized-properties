@@ -41,7 +41,7 @@ testing {
         implementation("org.testcontainers:db2")
         implementation("com.zaxxer:HikariCP:5.1.0")
         runtimeOnly("org.postgresql:postgresql:42.6.0")
-        runtimeOnly("mysql:mysql-connector-java:8.0.31")
+        runtimeOnly("com.mysql:mysql-connector-j:8.2.0")
         runtimeOnly("com.oracle.database.jdbc:ojdbc8:23.3.0.23.09")
         runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:12.4.2.jre11")
         runtimeOnly("org.xerial:sqlite-jdbc:3.40.0.0")
