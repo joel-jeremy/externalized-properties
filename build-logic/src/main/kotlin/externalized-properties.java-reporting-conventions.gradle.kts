@@ -6,7 +6,7 @@ plugins {
 reporting {
   reports {
     register<JacocoCoverageReport>("allCodeCoverageReport") { 
-      testType.set("all")
+      testType = "all"
       reportTask {
         val testTasks = javaProjects().map { it.tasks.withType<Test>() }
         for (collection in testTasks) {
@@ -21,10 +21,10 @@ reporting {
       }
     }
     register<AggregateTestReport>("testAggregateTestReport") { 
-      testType.set(TestSuiteType.UNIT_TEST)
+      testType = TestSuiteType.UNIT_TEST
     }
     register<AggregateTestReport>("integrationTestAggregateTestReport") { 
-      testType.set(TestSuiteType.INTEGRATION_TEST)
+      testType = TestSuiteType.INTEGRATION_TEST
     }
   }
 }

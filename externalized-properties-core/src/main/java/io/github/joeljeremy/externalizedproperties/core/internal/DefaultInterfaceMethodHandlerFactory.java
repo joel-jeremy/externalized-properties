@@ -36,10 +36,8 @@ public class DefaultInterfaceMethodHandlerFactory {
           defaultInterfaceMethod.toGenericString() + " is not a default interface method.");
     }
 
-    /**
-     * Note: We optimize for methods with up to 2 arguments. We create lambda functions for better
-     * performance. This number may change in the future.
-     */
+    // Note: We optimize for methods with up to 2 arguments. We create lambda functions for better
+    // performance. This number may change in the future.
 
     // Optimization for default interface methods that have no args.
     if (defaultInterfaceMethod.getParameterCount() == 0) {

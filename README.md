@@ -17,6 +17,10 @@
 
 A lightweight and extensible library to resolve application properties from various external sources.
 
+## Like the project?
+
+Please consider giving the repository a ⭐. It means a lot! Thank you :)
+
 ## [Twelve Factor Methodology](https://12factor.net)
 
 Externalized Properties was inspired by the [The Twelve Factor Methodology](https://12factor.net)'s section [III. Config](https://12factor.net/config).  

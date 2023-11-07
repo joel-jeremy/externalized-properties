@@ -44,6 +44,7 @@ public class MsSqlServerIntegrationTests extends DatabaseIntegrationTests {
   String getJdbcPassword() {
     return MSSQL_SERVER_CONTAINER.getPassword();
   }
+
   /** Dummy test for junit to be able to detect this test class. */
   @Test
   void detect() {

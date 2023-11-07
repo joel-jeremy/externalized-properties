@@ -9,6 +9,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @Internal
 public class MethodHandleFactory {
   private MethodHandleFactory() {}
+
   /**
    * Get method handle.
    *
