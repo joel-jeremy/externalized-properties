@@ -7,7 +7,7 @@ plugins {
   id("externalized-properties.eclipse-conventions")
 }
 
-description = "Externalized Properties database module"
+description = "Externalized Properties Database Module"
 
 tasks.named<Jar>("jar") {
   manifest {

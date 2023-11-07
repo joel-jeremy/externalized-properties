@@ -7,7 +7,7 @@ plugins {
   id("externalized-properties.eclipse-conventions")
 }
 
-description = "Externalized Properties Git module"
+description = "Externalized Properties Git Module"
 
 tasks.named<Jar>("jar") {
   manifest {
