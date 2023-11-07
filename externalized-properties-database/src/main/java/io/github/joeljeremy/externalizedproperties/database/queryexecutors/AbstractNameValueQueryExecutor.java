@@ -127,15 +127,15 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
       // 6. propertyNamesStatementParameter
       return String.format(
           "SELECT t.%s, t.%s FROM %s.%s t WHERE t.%s IN (%s)",
-          /** SELECT */
+          // SELECT
           propertyNameColumnOrThrow(),
           propertyValueColumnOrThrow(),
-          /** FROM */
+          // FROM
           schema,
           tableOrThrow(),
-          /** WHERE */
+          // WHERE
           propertyNameColumnOrThrow(),
-          /** IN */
+          // IN
           buildInClause(propertyNamesToResolve));
     }
     // The order of format arguments:
@@ -146,14 +146,14 @@ public abstract class AbstractNameValueQueryExecutor implements QueryExecutor {
     // 5. propertyNamesStatementParameter
     return String.format(
         "SELECT t.%s, t.%s FROM %s t WHERE t.%s IN (%s)",
-        /** SELECT */
+        // SELECT
         propertyNameColumnOrThrow(),
         propertyValueColumnOrThrow(),
-        /** FROM */
+        // FROM
         tableOrThrow(),
-        /** WHERE */
+        // WHERE
         propertyNameColumnOrThrow(),
-        /** IN */
+        // IN
         buildInClause(propertyNamesToResolve));
   }
 
