@@ -42,7 +42,7 @@ testing {
         implementation("com.zaxxer:HikariCP:5.0.1")
         runtimeOnly("org.postgresql:postgresql:42.6.0")
         runtimeOnly("mysql:mysql-connector-java:8.0.31")
-        runtimeOnly("com.oracle.database.jdbc:ojdbc8:21.7.0.0")
+        runtimeOnly("com.oracle.database.jdbc:ojdbc8:23.3.0.23.09")
         runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:12.4.2.jre11")
         runtimeOnly("org.xerial:sqlite-jdbc:3.40.0.0")
         runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.1.0")
