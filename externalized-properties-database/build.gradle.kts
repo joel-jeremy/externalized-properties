@@ -44,7 +44,7 @@ testing {
         runtimeOnly("mysql:mysql-connector-java:8.0.31")
         runtimeOnly("com.oracle.database.jdbc:ojdbc8:23.3.0.23.09")
         runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:12.4.2.jre11")
-        runtimeOnly("org.xerial:sqlite-jdbc:3.40.0.0")
+        runtimeOnly("org.xerial:sqlite-jdbc:3.43.2.2")
         runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.2.0")
         runtimeOnly("com.ibm.db2:jcc:11.5.8.0")
       }
