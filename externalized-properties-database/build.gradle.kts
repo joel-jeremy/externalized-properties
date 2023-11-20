@@ -46,7 +46,7 @@ testing {
         runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:12.4.2.jre11")
         runtimeOnly("org.xerial:sqlite-jdbc:3.44.0.0")
         runtimeOnly("org.mariadb.jdbc:mariadb-java-client:3.3.0")
-        runtimeOnly("com.ibm.db2:jcc:11.5.8.0")
+        runtimeOnly("com.ibm.db2:jcc:11.5.9.0")
       }
     }
   }
