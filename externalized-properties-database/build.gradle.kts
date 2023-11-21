@@ -40,7 +40,7 @@ testing {
         implementation("org.testcontainers:mariadb")
         implementation("org.testcontainers:db2")
         implementation("com.zaxxer:HikariCP:5.1.0")
-        runtimeOnly("org.postgresql:postgresql:42.6.0")
+        runtimeOnly("org.postgresql:postgresql:42.7.0")
         runtimeOnly("mysql:mysql-connector-java:8.0.33")
         runtimeOnly("com.oracle.database.jdbc:ojdbc8:23.3.0.23.09")
         runtimeOnly("com.microsoft.sqlserver:mssql-jdbc:12.4.2.jre11")
