@@ -31,7 +31,7 @@ testing {
         implementation(testFixtures(project(project.path)))
         implementation(project(":externalized-properties-core"))
         implementation(testFixtures(project(":externalized-properties-core")))
-        implementation(project.dependencies.platform("org.testcontainers:testcontainers-bom:1.19.1"))
+        implementation(project.dependencies.platform("org.testcontainers:testcontainers-bom:1.19.7"))
         implementation("org.testcontainers:junit-jupiter")
         implementation("org.testcontainers:postgresql")
         implementation("org.testcontainers:mysql")
