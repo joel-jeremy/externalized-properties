@@ -8,6 +8,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class Arguments {
   private static final String MUST_NOT_BE_NULL = " must not be null.";
   private static final String MUST_NOT_BE_NULL_OR_EMPTY = " must not be null or empty.";
+  private static final String MUST_NOT_BE_NULL_OR_BLANK = " must not be null or blank.";
 
   private Arguments() {}
 
@@ -43,7 +44,7 @@ public class Arguments {
   }
 
   /**
-   * Require argument to not be {@code null} or an empty {@link String}.
+   * Require argument to not be {@code null} or a blank {@link String}.
    *
    * @param arg The {@link String} argument.
    * @param argName The name of the {@link String} argument to be used in building the {@link
@@ -52,7 +53,7 @@ public class Arguments {
    */
   public static String requireNonNullOrBlank(@Nullable String arg, String argName) {
     if (arg == null || arg.chars().allMatch(Character::isWhitespace)) {
-      throw new IllegalArgumentException(argName + MUST_NOT_BE_NULL_OR_EMPTY);
+      throw new IllegalArgumentException(argName + MUST_NOT_BE_NULL_OR_BLANK);
     }
     return arg;
   }

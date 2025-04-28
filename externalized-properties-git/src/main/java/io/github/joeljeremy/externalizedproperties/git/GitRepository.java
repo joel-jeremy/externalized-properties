@@ -1,7 +1,7 @@
 package io.github.joeljeremy.externalizedproperties.git;
 
-import static io.github.joeljeremy.externalizedproperties.core.internal.Arguments.requireNonNull;
-import static io.github.joeljeremy.externalizedproperties.core.internal.Arguments.requireNonNullOrBlank;
+import static io.github.joeljeremy.externalizedproperties.git.internal.Arguments.requireNonNull;
+import static io.github.joeljeremy.externalizedproperties.git.internal.Arguments.requireNonNullOrBlank;
 
 import io.github.joeljeremy.externalizedproperties.core.ExternalizedPropertiesException;
 import java.io.IOException;
