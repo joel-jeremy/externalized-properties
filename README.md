@@ -169,3 +169,7 @@ private static ExternalizedProperties buildExternalizedProperties() {
 ## 🧪 Samples
 
 More sample can be found here: <https://github.com/joel-jeremy/externalized-properties-samples>
+
+---
+
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=joel-jeremy_externalized-properties)
