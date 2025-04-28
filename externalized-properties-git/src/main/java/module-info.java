@@ -1,3 +1,4 @@
+/** Git-backed Externalized Properties resolver. */
 module io.github.joeljeremy.externalizedproperties.git {
   exports io.github.joeljeremy.externalizedproperties.git;
 

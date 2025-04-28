@@ -1,3 +1,4 @@
+/** Database-backed Externalized Properties resolver. */
 module io.github.joeljeremy.externalizedproperties.database {
   exports io.github.joeljeremy.externalizedproperties.database;
   exports io.github.joeljeremy.externalizedproperties.database.queryexecutors;
