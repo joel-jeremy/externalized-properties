@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import io.github.joeljeremy.externalizedproperties.core.testfixtures.MethodUtils;
-import java.awt.List;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.function.BiFunction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
