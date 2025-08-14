@@ -3,7 +3,8 @@ plugins {
 }
 
 snyk {
-  setApi(findProperty("snykToken") as String?)
+  // Rely instead on SNYK_TOKEN environment variable being set.
+  // setApi(findProperty("snykToken") as String?)
   setSeverity("low")
   setArguments("--org=3bd738c1-9bba-45b8-b13d-9870bd4a8a4f --all-sub-projects --sarif-file-output=snyk.sarif")
   setAutoDownload(true)
