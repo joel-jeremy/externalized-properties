@@ -7,7 +7,7 @@ import io.github.joeljeremy.externalizedproperties.core.TypeUtilities;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Default property converter which delegates to the following converters (in order):

@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 import javax.sql.DataSource;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /** An implementation which gets connections from JDBC. */
 public class JdbcConnectionProvider implements ConnectionProvider {

@@ -3,7 +3,7 @@ package io.github.joeljeremy.externalizedproperties.core.internal;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Objects;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /** The method invocation cache key. */
 @Internal
@@ -17,6 +17,7 @@ public final class InvocationCacheKey {
    *
    * @param method The invoked method.
    */
+  @SuppressWarnings("NullAway")
   public InvocationCacheKey(Method method) {
     // null because proxies give null instead of
     // empty array when there are no invocation args.

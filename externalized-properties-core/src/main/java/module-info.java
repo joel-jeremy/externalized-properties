@@ -11,5 +11,5 @@ module io.github.joeljeremy.externalizedproperties.core {
   uses io.github.joeljeremy.externalizedproperties.core.Resolver;
 
   requires java.logging;
-  requires static org.checkerframework.checker.qual;
+  requires static org.jspecify;
 }
