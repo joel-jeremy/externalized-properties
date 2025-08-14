@@ -5,5 +5,5 @@ module io.github.joeljeremy.externalizedproperties.database {
 
   requires transitive io.github.joeljeremy.externalizedproperties.core;
   requires transitive java.sql;
-  requires static org.checkerframework.checker.qual;
+  requires static org.jspecify;
 }

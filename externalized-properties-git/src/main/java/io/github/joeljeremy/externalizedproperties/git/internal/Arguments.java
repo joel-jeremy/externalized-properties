@@ -1,6 +1,6 @@
 package io.github.joeljeremy.externalizedproperties.git.internal;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /** Arguments-related utility methods. */
 public class Arguments {

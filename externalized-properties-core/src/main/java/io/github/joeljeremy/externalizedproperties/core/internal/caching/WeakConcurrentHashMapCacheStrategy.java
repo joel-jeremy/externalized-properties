@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /** Caching strategy which uses a {@link ConcurrentMap} as cache and whose keys are weakly held. */
 @Internal

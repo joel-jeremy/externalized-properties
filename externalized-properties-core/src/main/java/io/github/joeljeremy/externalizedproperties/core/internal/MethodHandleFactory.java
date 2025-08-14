@@ -3,7 +3,7 @@ package io.github.joeljeremy.externalizedproperties.core.internal;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /** The {@code MethodHandle} factory. */
 @Internal

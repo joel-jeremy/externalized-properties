@@ -3,7 +3,7 @@ package io.github.joeljeremy.externalizedproperties.core;
 import static io.github.joeljeremy.externalizedproperties.core.internal.Arguments.requireNonNull;
 
 import java.util.Objects;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The conversion result object containing the result of conversion.

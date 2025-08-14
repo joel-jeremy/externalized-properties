@@ -1,7 +1,7 @@
 package io.github.joeljeremy.externalizedproperties.core.internal;
 
 import java.util.Collection;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /** Arguments-related utility methods. */
 @Internal
