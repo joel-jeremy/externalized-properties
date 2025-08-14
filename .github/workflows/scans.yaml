@@ -24,7 +24,7 @@ jobs:
 
       - name: Snyk
         env:
-          ORG_GRADLE_PROJECT_snykToken: ${{ secrets.SNYK_TOKEN }}
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: ./gradlew snyk-test
         continue-on-error: true
 
