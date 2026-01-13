@@ -14,7 +14,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 public class OracleIntegrationTests extends DatabaseIntegrationTests {
   static final int NUMBER_OF_TEST_ENTRIES = 2;
-  static final DockerImageName ORACLE_IMAGE = DockerImageName.parse("gvenzl/oracle-xe:18.4.0-slim");
+  static final DockerImageName ORACLE_IMAGE = DockerImageName.parse("gvenzl/oracle-xe:21-slim");
 
   @Container static final OracleContainer ORACLE_CONTAINER = new OracleContainer(ORACLE_IMAGE);
 

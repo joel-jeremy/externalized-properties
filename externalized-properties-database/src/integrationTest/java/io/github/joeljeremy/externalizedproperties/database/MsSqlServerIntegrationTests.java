@@ -15,7 +15,7 @@ import org.testcontainers.utility.DockerImageName;
 public class MsSqlServerIntegrationTests extends DatabaseIntegrationTests {
   static final int NUMBER_OF_TEST_ENTRIES = 2;
   static final DockerImageName MSSQL_SERVER_IMAGE =
-      DockerImageName.parse("mcr.microsoft.com/mssql/server:2019-CU15-ubuntu-20.04");
+      DockerImageName.parse("mcr.microsoft.com/mssql/server:2022-CU16-ubuntu-22.04");
 
   @Container
   static final MSSQLServerContainer<?> MSSQL_SERVER_CONTAINER =

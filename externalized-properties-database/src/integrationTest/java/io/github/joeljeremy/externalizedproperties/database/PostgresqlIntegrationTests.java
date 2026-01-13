@@ -14,7 +14,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 public class PostgresqlIntegrationTests extends DatabaseIntegrationTests {
   static final int NUMBER_OF_TEST_ENTRIES = 2;
-  static final DockerImageName POSTGRES_IMAGE = DockerImageName.parse("postgres:12.10");
+  static final DockerImageName POSTGRES_IMAGE = DockerImageName.parse("postgres:18");
 
   @Container
   static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER =
