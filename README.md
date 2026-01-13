@@ -27,7 +27,7 @@ Externalized Properties was inspired by the [The Twelve Factor Methodology](http
 
 The goal of this library is to make it easy for applications to implement configuration best practices by providing easy-to-use APIs as well as providing the flexibility to choose where to store their configurations/properties.
 
-## 🛠️ Installation
+## Installation
 
 ### Gradle
 
@@ -59,7 +59,7 @@ implementation "io.github.joel-jeremy.externalized-properties:externalized-prope
 </dependency>
 ```
 
-### 🧩 Java 9 Module Names
+### Java 9 Module Names
 
 Externalized Properties jars are published with Automatic-Module-Name manifest attribute:
 
@@ -77,11 +77,11 @@ module foo.bar {
 }
 ```
 
-## 🌟 Features
+## Features
 
 Externalized Properties takes full advantage of Java's [Dynamic Proxies](https://docs.oracle.com/javase/8/docs/technotes/guides/reflection/proxy.html) ([Why Dynamic Proxies?](docs/why-dynamic-proxies.md)).
 
-### ✔️ Property Resolution
+### Property Resolution
 
 - [Map Properties to (Java Dynamic Proxy) Interface Methods](docs/property-resolution.md#-map-properties-to-java-dynamic-proxy-interface-methods)
 - [Default/Fallback Values](docs/property-resolution.md#-defaultfallback-values)  
@@ -91,34 +91,34 @@ Externalized Properties takes full advantage of Java's [Dynamic Proxies](https:/
 - [Eager Loading](docs/property-resolution.md#-eager-loading)  
 - [Custom Resolvers](docs/property-resolution.md#-custom-resolvers)  
 
-### ✔️ Conversion
+### Conversion
 
 - [Automatic Property Conversion](docs/conversion.md#-automatic-property-conversion)  
 - [Conversion to Generic Types](docs/conversion.md#-conversion-to-generic-types)  
 - [Conversion of Arbitrary Values](docs/conversion.md#-conversion-of-arbitrary-values)
 - [Custom Converters](docs/conversion.md#-custom-converters)
 
-### ✔️ Variable Expansion
+### Variable Expansion
 
 - [Automatic Variable Expansion in Property Names](docs/variable-expansion.md#-automatic-variable-expansion-in-property-names)  
 - [Automatic Variable Expansion in Properties](docs/variable-expansion.md#-automatic-variable-expansion-in-properties)  
 - [Variable Expansion in Arbitrary Values](docs/variable-expansion.md#-variable-expansion-in-arbitrary-values)
 
-### ✔️ Processing
+### Processing
 
 - [Targeted Processing of Properties](docs/processing.md#-targeted-processing-of-properties)
 - [Custom Processors](docs/processing.md#-custom-processors)
 
-### ✔️ Profiles
+### Profiles
 
 - [Profile-Specific Configurations](docs/profiles.md#-profile-specific-configurations)
 
-### ✔️ Ordinal Components
+### Ordinal Components
 
 - [Ordinal Resolvers](docs/ordinal-components.md#-ordinal-resolvers)  
 - [Ordinal Converters](docs/ordinal-components.md#-ordinal-converters)
 
-## 🏎️ Quick Start
+## Quick Start
 
 Properties are mapped to proxy interface methods by using the [@ExternalizedProperty](core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperty.java) annotation.
 
