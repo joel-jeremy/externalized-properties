@@ -23,7 +23,8 @@ jobs:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
+        with:
+          files: ./build/reports/jacoco/allCodeCoverageReport/allCodeCoverageReport.xml
+          disable_search: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-          CC_FILES: ./build/reports/jacoco/allCodeCoverageReport/allCodeCoverageReport.xml
-          CC_DISABLE_SEARCH: true
