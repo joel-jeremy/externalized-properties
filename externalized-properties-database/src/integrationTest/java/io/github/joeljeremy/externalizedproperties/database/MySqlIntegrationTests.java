@@ -14,7 +14,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 public class MySqlIntegrationTests extends DatabaseIntegrationTests {
   static final int NUMBER_OF_TEST_ENTRIES = 2;
-  static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:8.0.28");
+  static final DockerImageName MYSQL_IMAGE = DockerImageName.parse("mysql:8.4");
 
   @Container static final MySQLContainer<?> MYSQL_CONTAINER = new MySQLContainer<>(MYSQL_IMAGE);
 

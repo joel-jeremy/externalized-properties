@@ -14,7 +14,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 public class MariaDbIntegrationTests extends DatabaseIntegrationTests {
   static final int NUMBER_OF_TEST_ENTRIES = 2;
-  static final DockerImageName MARIADB_IMAGE = DockerImageName.parse("mariadb:10.10");
+  static final DockerImageName MARIADB_IMAGE = DockerImageName.parse("mariadb:11.8");
 
   @Container
   static final MariaDBContainer<?> MARIADB_CONTAINER = new MariaDBContainer<>(MARIADB_IMAGE);
