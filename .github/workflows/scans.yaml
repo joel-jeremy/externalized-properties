@@ -16,11 +16,11 @@ jobs:
           java-version: 17
           distribution: temurin
       
-      - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v5
+      # - name: Validate Gradle wrapper
+      #   uses: gradle/actions/wrapper-validation@v5
       
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
+      # - name: Setup Gradle
+      #   uses: gradle/actions/setup-gradle@v5
 
       # - name: Snyk
       #   env:
@@ -37,6 +37,11 @@ jobs:
       #   env:
       #     COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       #   run: ./gradlew check coveralls -S
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   sonarqube:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
