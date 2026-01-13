@@ -4,7 +4,7 @@ Externalized Properties allows registration of custom components such as [Resolv
 
 This is where the [Ordinals](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Ordinals.java) class can help. It allows clients to assign resolver/converter instances with an ordinal. The ordinals will then be considered when building the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperties.java) instance to sort the registered resolvers and converters accordingly.
 
-## ✨ Ordinal Resolvers
+## Ordinal Resolvers
 
 Setting up ordinal resolvers can be done through the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
 
@@ -31,7 +31,7 @@ The resulting resolver order will be:
 2. EnvironmentVariableResolver
 3. MapResolver
 
-## ✨ Ordinal Converters
+## Ordinal Converters
 
 Setting up ordinal converters can be done through [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
 
@@ -53,6 +53,6 @@ The resulting converter order will be:
 2. SomeLegacyPrimitiveConverter
 3. ListConverter
 
-## 📖 Note on ordinal vs non-ordinal components
+## Note on ordinal vs non-ordinal components
 
 Components (resolvers/converters) that were assigned an ordinal will be placed earlier in the sequence than those that were not assigned one. In other words, ordinal components are given higher priority.

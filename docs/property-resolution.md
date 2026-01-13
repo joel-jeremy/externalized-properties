@@ -4,9 +4,9 @@ Externalized Properties makes the best use of Java's strong typing by using Java
 
 It works by creating dynamic/configurable proxy instances (created at runtime by Java) that implement user-defined interfaces as facade to resolve properties.
 
-## 🙋 [Why Dynamic Proxies?](why-dynamic-proxies.md)
+## [Why Dynamic Proxies?](why-dynamic-proxies.md)
 
-## 🌟 Map Properties to (Java Dynamic Proxy) Interface Methods
+## Map Properties to (Java Dynamic Proxy) Interface Methods
 
 Properties are mapped to proxy interface methods by using the [@ExternalizedProperty](../externalized-properties-core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperty.java) annotation.
 
@@ -20,7 +20,7 @@ public interface ApplicationProperties {
 }
 ```
 
-## 🌟 Default/Fallback Values
+## Default/Fallback Values
 
 Externalized Properties supports default values by using Java's default interface methods e.g.
 
@@ -42,7 +42,7 @@ public interface ApplicationProperties {
 }
 ```
 
-## 🌟 Support for Property Names Known at Runtime
+## Support for Property Names Known at Runtime
 
 Externalized Properties supports resolution of properties whose names are not known at compile time. This is made possible by the [@ResolverFacade](../externalized-properties-core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ResolverFacade.java) annotation e.g.
 
@@ -64,7 +64,7 @@ public interface ApplicationProperties {
 }
 ```
 
-## 🌟 Support for Various Configuration File/Resource Formats
+## Support for Various Configuration File/Resource Formats
 
 Externalized Properties can support any configuration file/resource format via the [ResourceResolver](../externalized-properties-core/src/main/java/io/github/joeljeremy/externalizedproperties/core/resolvers/ResourceResolver.java) and [ResourceReader](../externalized-properties-core/src/main/java/io/github/joeljeremy/externalizedproperties/core/resolvers/ResourceResolver.java) classes.
 
@@ -143,7 +143,7 @@ private class XmlReader implements ResourceReader {
 }
 ```
 
-## 🌟 Caching
+## Caching
 
 Caching is enabled by default, but when not using defaults, it can be enabled via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperties.java) builder. All proxies created by the resulting [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperties.java) instance will cache resolved properties.
 
@@ -165,7 +165,7 @@ public static void main(String[] args) {
 }
 ```
 
-## 🌟 Eager Loading
+## Eager Loading
 
 Eager loading is opt-in and can be enabled via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperties.java) builder. All proxies created by the resulting [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperties.java) instance will eagerly load properties on initialization.
 
@@ -185,7 +185,7 @@ private static void main(String[] args) {
 }
 ```
 
-## 🚀 Custom Resolvers
+## Custom Resolvers
 
 At the heart of Externalized Properties are the [Resolver](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Resolver.java)s. Instances of these interface are responsible for resolving requested properties.
 

@@ -2,7 +2,7 @@
 
 Externalized Properties has powerful support for conversion of values to various types.
 
-## 🌟 Out-of-the-box Conversion Support
+## Out-of-the-box Conversion Support
 
 By enabling the default converters, you get out-of-the-box conversion support for:
 
@@ -13,7 +13,7 @@ By enabling the default converters, you get out-of-the-box conversion support fo
 - Enums
 - Date/Time types
 
-## 🌟 Automatic Property Conversion
+## Automatic Property Conversion
 
 Externalized Properties automatically attempts to convert resolved properties to the declared proxy method (non-String) return type. The library will handle the conversion behind the scenes - using the registered [Converter](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Converter.java)s e.g.
 
@@ -45,7 +45,7 @@ private static ExternalizedProperties buildExternalizedProperties() {
 }
 ```
 
-## 🌟 Conversion to Generic Types
+## Conversion to Generic Types
 
 Externalized Properties has support for generic types e.g.
 
@@ -69,7 +69,7 @@ public interface ApplicationProperties {
 
 Each item in the list will be converted to an `Optional<Integer>`.
 
-## 🌟 Conversion of Arbitrary Values
+## Conversion of Arbitrary Values
 
 Externalized Properties has support for conversion of arbitrary String values to other types. This is made possible by the [@ConverterFacade](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ConverterFacade.java) annotation e.g.
 
@@ -86,7 +86,7 @@ public interface ProxyInterface {
 
 Invoking the methods annotated with [@ConverterFacade](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ConverterFacade.java) will delegate the arguments to the registered [Converter](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Converter.java)s to do the conversion. The converted value will be returned by the method.
 
-## 🚀 Custom Converters
+## Custom Converters
 
 There are several built-in converters but it is very easy to create a custom converter by implementing the [Converter](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Converter.java) interface and registering the converter via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperties.java) builder.
 

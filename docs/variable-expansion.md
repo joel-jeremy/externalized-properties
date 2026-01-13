@@ -2,7 +2,7 @@
 
 Externalized Properties has support for expansion of variables in externalized property names and/or any String values. This is made possible by [VariableExpander](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/VariableExpander.java)s. By default, a simple implementation is already enabled. If a custom/more powerful variable expansion implementation is necessary, a custom variable expander can be created by implementing the [VariableExpander](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/VariableExpander.java) interface and registering it to Externalized Properties.
 
-## 🌟 Automatic Variable Expansion in Property Names
+## Automatic Variable Expansion in Property Names
 
 Variable expansion is supported in property names and is enabled by default e.g.
 
@@ -41,7 +41,7 @@ Built-in variable expander implementations:
 - [PatternVariableExpander](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/variableexpansion/PatternVariableExpander.java) - Uses a regex to match variables.
 - [NoOpVariableExpander](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/variableexpansion/NoOpVariableExpander.java) - Disables variable expansion.
 
-## ✨ Automatic Variable Expansion in Properties
+## Automatic Variable Expansion in Properties
 
 Variable expansion is supported in properties. This can be enabled via the [ExternalizedProperties](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/ExternalizedProperties.java) builder e.g.
 
@@ -74,7 +74,7 @@ public static void main(String[] args) {
 
 ```
 
-## 🌟 Variable Expansion in Arbitrary Values
+## Variable Expansion in Arbitrary Values
 
 Externalized Properties can create proxies that expand variables in any String values. This is made possible by the [@VariableExpanderFacade](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/VariableExpanderFacade.java) annotation e.g.
 

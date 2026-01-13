@@ -4,7 +4,7 @@ Externalized Properties provides a mechanism to do targeted processing of resolv
 
 This feature may be used to selectively apply transformations to properties such as automatic decryption, masking, validation, etc. This can be achieved via a combination of the [ProcessWith](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/processing/ProcessWith.java) and [Processor](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Processor.java) classes.
 
-## ✨ Targeted Processing of Properties
+## Targeted Processing of Properties
 
 Externalized Properties inspects the annotations on proxy methods to see if the property should undergo processing.
 
@@ -56,7 +56,7 @@ private static ProcessorProvider<DecryptProcessor> rsaDecryptProcessor() {
 }
 ```
 
-## 🚀 Custom Processors
+## Custom Processors
 
 At the heart of Externalized Properties are the [Processor](../core/src/main/java/io/github/joeljeremy/externalizedproperties/core/Processor.java)s. Instances of these interface are responsible for the targeted processing of resolved properties.
 
