@@ -17,8 +17,8 @@ Got an idea to enhance the library? Please feel free to create an issue describi
 
 To be able to work on this project, the following software needs to be installed on your machine:
 
-- Java (>= 17)
-  - Gradle is run on Java 17 but source code is compiled to Java 11.
+- Java (>= 21)
+  - Gradle is run on Java 21 but source code is compiled to Java 11.
 - Docker (Rancher Desktop or Docker Desktop)
   - For integration tests.
 - Git
@@ -55,7 +55,7 @@ Integration tests usually takes longer to complete than unit tests. In cases whe
 ./gradlew build -x integrationTest
 ```
 
-Tests are run in multiple JVM runtimes. By default, it is run in LTS versions (succeeding the version used in source compilation) + the latest released non-LTS version. Test runtimes are overrideable by setting the `ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS` environment variable or `additionalTestRunsOnJvmVersions` system property e.g. `ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS=8,17,18` / `additionalTestRunsOnJvmVersions=8,17,18`.
+Tests are run in multiple JVM runtimes. By default, it is run in LTS versions (succeeding the version used in source compilation) + the latest released non-LTS version. Test runtimes are overrideable by setting the `ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS` environment variable or `additionalTestRunsOnJvmVersions` system property e.g. `ADDITIONAL_TEST_RUNS_ON_JVM_VERSIONS=11,17` / `additionalTestRunsOnJvmVersions=11,17`.
 
 ## Development Guidelines
 
