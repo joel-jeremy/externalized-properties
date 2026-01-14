@@ -176,4 +176,4 @@ More sample can be found here: <https://github.com/joel-jeremy/externalized-prop
 
 ---
 
-[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=joel-jeremy_externalized-properties)
+[![SonarQube Cloud](https://sonarcloud.io/images/project_badges/sonarcloud-light.svg)](https://sonarcloud.io/summary/new_code?id=io.github.joel-jeremy.externalized-properties)
