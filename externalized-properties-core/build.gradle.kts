@@ -21,7 +21,7 @@ tasks.named<Jar>("jar") {
 }
 
 dependencies {
-  testImplementation(platform("com.fasterxml.jackson:jackson-bom:2.20.0"))
+  testImplementation(platform("com.fasterxml.jackson:jackson-bom:2.20.1"))
   testImplementation("com.fasterxml.jackson.core:jackson-databind")
   testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
   testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
