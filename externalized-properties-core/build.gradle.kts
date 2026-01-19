@@ -5,9 +5,7 @@ plugins {
   id("externalized-properties.java-code-quality-conventions")
   id("externalized-properties.java-publish-conventions")
   id("externalized-properties.eclipse-conventions")
-  // See https://youtrack.jetbrains.com/issue/KTIJ-19370
-  @Suppress("DSL_SCOPE_VIOLATION")
-  alias(libs.plugins.jmh)
+  id("externalized-properties.jmh-conventions")
 }
 
 description = "Externalized Properties Core"
@@ -27,12 +25,4 @@ dependencies {
   testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
   // For testing custom JCE providers with DecryptProcessor.JceDecryptor.
   testImplementation("org.bouncycastle:bcprov-jdk18on:1.82")
-}
-
-jmh {
-  jmhVersion = "1.35"
-  humanOutputFile = layout.buildDirectory.file("reports/jmh/human.txt")
-  resultsFile = layout.buildDirectory.file("reports/jmh/results.json")
-  resultFormat = "JSON"
-  jvmArgs.addAll(listOf("-Xmx2G"))
 }
