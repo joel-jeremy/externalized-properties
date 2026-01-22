@@ -24,5 +24,5 @@ dependencies {
   testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
   testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
   // For testing custom JCE providers with DecryptProcessor.JceDecryptor.
-  testImplementation("org.bouncycastle:bcprov-jdk18on:1.82")
+  testImplementation("org.bouncycastle:bcprov-jdk18on:1.83")
 }
