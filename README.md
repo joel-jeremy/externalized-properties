@@ -25,6 +25,10 @@ A lightweight and extensible library to resolve application properties from vari
 
 Please consider giving the repository a ⭐. It means a lot! Thank you :)
 
+## Contributing
+
+Feedback and contributions are very much welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution guidelines. Please open an [issue](https://github.com/joel-jeremy/emissary/issues) if you run into any problems or have suggestions.
+
 ## [Twelve Factor Methodology](https://12factor.net)
 
 Externalized Properties was inspired by the [The Twelve Factor Methodology](https://12factor.net)'s section [III. Config](https://12factor.net/config).  
